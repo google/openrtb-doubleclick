@@ -5,7 +5,7 @@
   <groupId>com.google.doubleclick</groupId>
   <artifactId>doubleclick-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.6</version>
   <name>Google DoubleClick Libraries</name>
 
   <modules>
@@ -65,7 +65,7 @@
 
   <scm>
     <developerConnection>scm:git:</developerConnection>
-    <tag>HEAD</tag>
+    <tag>0.6</tag>
   </scm>
 
   <build>
@@ -109,7 +109,7 @@
         <configuration>
           <windowtitle>${project.name}</windowtitle>
           <notimestamp>true</notimestamp>
-          <excludePackageNames></excludePackageNames>
+          <excludePackageNames />
           <groups>
             <group>
               <title>OpenRTB for DoubleClick Ad Exchange</title>
