@@ -38,6 +38,6 @@ so this hack for non-Eclipse builds should be temporary.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-# Version 0.6 -- Jul 2014
+# Version 0.6, Jul 2014
 
 * Initial Open Source release.
