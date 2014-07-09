@@ -19,6 +19,8 @@ Before building this project, you may need to check out, build, and
 install in your local Maven repository the following dependency:
 [OpenRTB Library][]. This will be published in maven-central later.
 Necessary at runtime only for users of doubleclick-openrtb.
+You need to check it out in a sibling directory ../openrtb
+so relative protoc imports will work.
 
 [OpenRTB Library]: https://github.com/google/openrtb
 

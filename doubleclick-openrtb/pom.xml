@@ -91,7 +91,7 @@
                   <arg value="--java_out=${protobufGenerated}" />
                   <arg value="-I${protobufSource}" />
                   <arg value="-I${protobufSource}/../../../../doubleclick-core/src/main/protobuf/" />
-                  <arg value="-I${protobufSource}/../../../../../adx-openrtb/openrtb-core/src/main/protobuf/" />
+                  <arg value="-I${protobufSource}/../../../../../openrtb/openrtb-core/src/main/protobuf/" />
                   <arg line="${proto.files}" />
                 </exec>
               </tasks>
