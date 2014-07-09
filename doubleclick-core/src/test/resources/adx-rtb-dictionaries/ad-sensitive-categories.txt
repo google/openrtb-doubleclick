@@ -1,0 +1,5 @@
+1 SensitiveCategory1
+2 SensitiveCategory2
+3 SensitiveCategory3
+
+empty-line-followed-by-bad-line-keep-both-here-for-testing

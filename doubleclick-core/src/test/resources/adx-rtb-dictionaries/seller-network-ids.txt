@@ -1,0 +1,4 @@
+1 GDN
+2 SellerNetwork2
+3 SellerNetwork3
+1000000 Placeholder for semi-transparent inventory

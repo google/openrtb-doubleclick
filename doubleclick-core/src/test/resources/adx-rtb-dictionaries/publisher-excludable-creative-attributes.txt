@@ -1,0 +1,5 @@
+1 CreativeAttribute1
+2 CreativeAttribute2
+3 CreativeAttribute3
+32 MraidType: Mraid 1.0
+34 RichMediaCapabilityType: RichMediaCapabilityFlash

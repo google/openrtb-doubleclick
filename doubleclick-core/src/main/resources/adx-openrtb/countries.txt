@@ -1,0 +1,257 @@
+# code	name	two	three	group
+4	Afghanistan	AF	AFG	Asia
+248	Aland Islands	AX	ALA	Europe
+8	Albania	AL	ALB	Europe
+12	Algeria	DZ	DZA	Africa
+16	American Samoa	AS	ASM	Pacific
+20	Andorra	AD	AND	Europe
+24	Angola	AO	AGO	Africa
+660	Anguilla	AI	AIA	Caribbean
+10	Antarctica	AQ	ATA	Other
+28	Antigua and Barbuda	AG	ATG	Caribbean
+32	Argentina	AR	ARG	South America
+51	Armenia	AM	ARM	Asia
+533	Aruba	AW	ABW	Caribbean
+36	Australia	AU	AUS	Pacific
+40	Austria	AT	AUT	Europe
+31	Azerbaijan	AZ	AZE	Asia
+44	Bahamas	BS	BHS	Caribbean
+48	Bahrain	BH	BHR	Middle East
+50	Bangladesh	BD	BGD	Asia
+52	Barbados	BB	BRB	Caribbean
+112	Belarus	BY	BLR	Europe
+56	Belgium	BE	BEL	Europe
+84	Belize	BZ	BLZ	Central America
+204	Benin	BJ	BEN	Africa
+60	Bermuda	BM	BMU	North America
+64	Bhutan	BT	BTN	Asia
+68	Bolivia	BO	BOL	South America
+535	Bonaire	BQ	BES	Caribbean
+70	Bosnia and Herzegovina	BA	BIH	Europe
+72	Botswana	BW	BWA	Africa
+74	Bouvet Island	BV	BVT	Other
+76	Brazil	BR	BRA	South America
+86	British Indian Ocean Territory	IO	IOT	Asia
+96	Brunei Darussalam	BN	BRN	Asia
+100	Bulgaria	BG	BGR	Europe
+854	Burkina Faso	BF	BFA	Africa
+108	Burundi	BI	BDI	Africa
+116	Cambodia	KH	KHM	Asia
+120	Cameroon	CM	CMR	Africa
+124	Canada	CA	CAN	North America
+132	Cape Verde	CV	CPV	Africa
+136	Cayman Islands	KY	CYM	Caribbean
+140	Central African Republic	CF	CAF	Africa
+148	Chad	TD	TCD	Africa
+152	Chile	CL	CHL	South America
+156	China	CN	CHN	Asia
+162	Christmas Island	CX	CXR	Pacific
+166	Cocos (Keeling) Islands	CC	CCK	Pacific
+170	Colombia	CO	COL	South America
+174	Comoros	KM	COM	Other
+178	Congo	CG	COG	Africa
+180	Congo, Democratic Republic	CD	COD	Africa
+184	Cook Islands	CK	COK	Pacific
+188	Costa Rica	CR	CRI	Central America
+384	Cote d'Ivoire	CI	CIV	Africa
+191	Croatia	HR	HRV	Europe
+192	Cuba	CU	CUB	Caribbean
+531	Curacao	CW	CUW	Caribbean
+196	Cyprus	CY	CYP	Europe
+203	Czech Republic	CZ	CZE	Europe
+208	Denmark	DK	DNK	Europe
+262	Djibouti	DJ	DJI	Africa
+212	Dominica	DM	DMA	Caribbean
+214	Dominican Republic	DO	DOM	Caribbean
+626	Timor-Leste	TL	TLS	Asia
+218	Ecuador	EC	ECU	South America
+818	Egypt	EG	EGY	Africa
+222	El Salvador	SV	SLV	Central America
+226	Equatorial Guinea	GQ	GNQ	Asia
+232	Eritrea	ER	ERI	Africa
+233	Estonia	EE	EST	Europe
+231	Ethiopia	ET	ETH	Africa
+238	Falkland Islands (Malvinas)	FK	FLK	South America
+234	Faroe Islands	FO	FRO	Europe
+242	Fiji	FJ	FJI	Pacific
+246	Finland	FI	FIN	Europe
+250	France	FR	FRA	Europe
+249	France, Metropolitan	FX	FXX	Europe
+254	French Guiana	GF	GUF	South America
+258	French Polynesia	PF	PYF	Pacific
+260	French Southern Territories	TF	ATF	Other
+266	Gabon	GA	GAB	Africa
+270	Gambia	GM	GMB	Africa
+268	Georgia	GE	GEO	Asia
+276	Germany	DE	DEU	Europe
+288	Ghana	GH	GHA	Africa
+292	Gibraltar	GI	GIB	Europe
+300	Greece	GR	GRC	Europe
+304	Greenland	GL	GRL	Europe
+308	Grenada	GD	GRD	Caribbean
+312	Guadeloupe	GP	GLP	Caribbean
+316	Guam	GU	GUM	Pacific
+320	Guatemala	GT	GTM	Central America
+831	Guernsey	GG	GGY	Europe
+324	Guinea	GN	GIN	Asia
+624	Guinea-Bissau	GW	GNB	Asia
+328	Guyana	GY	GUY	South America
+332	Haiti	HT	HTI	Caribbean
+334	Heard and McDonald Islands	HM	HMD	Other
+336	Vatican	VA	VAT	Europe
+340	Honduras	HN	HND	Central America
+344	Hong Kong	HK	HKG	Asia
+348	Hungary	HU	HUN	Europe
+352	Iceland	IS	ISL	Europe
+356	India	IN	IND	Asia
+360	Indonesia	ID	IDN	Asia
+833	Isle of Man	IM	IMN	Europe
+364	Iran	IR	IRN	Middle East
+368	Iraq	IQ	IRQ	Middle East
+372	Ireland	IE	IRL	Europe
+376	Israel	IL	ISR	Middle East
+380	Italy	IT	ITA	Europe
+388	Jamaica	JM	JAM	Caribbean
+392	Japan	JP	JPN	Asia
+832	Jersey	JE	JEY	Europe
+400	Jordan	JO	JOR	Middle East
+398	Kazakhstan	KZ	KAZ	Asia
+404	Kenya	KE	KEN	Africa
+296	Kiribati	KI	KIR	Other
+408	North Korea	KP	PRK	Asia
+410	South Korea	KR	KOR	Asia
+414	Kuwait	KW	KWT	Middle East
+417	Kyrgyzstan	KG	KGZ	Asia
+418	Lao People's Democratic Republic	LA	LAO	Asia
+428	Latvia	LV	LVA	Europe
+422	Lebanon	LB	LBN	Middle East
+426	Lesotho	LS	LSO	Africa
+430	Liberia	LR	LBR	Africa
+434	Libya	LY	LBY	Africa
+438	Liechtenstein	LI	LIE	Europe
+440	Lithuania	LT	LTU	Europe
+442	Luxembourg	LU	LUX	Europe
+446	Macau	MO	MAC	Asia
+807	Macedonia	MK	MKD	Europe
+450	Madagascar	MG	MDG	Africa
+454	Malawi	MW	MWI	Africa
+458	Malaysia	MY	MYS	Asia
+462	Maldives	MV	MDV	Other
+466	Mali	ML	MLI	Africa
+470	Malta	MT	MLT	Europe
+584	Marshall Islands	MH	MHL	Pacific
+474	Martinique	MQ	MTQ	Caribbean
+478	Mauritania	MR	MRT	Africa
+480	Mauritius	MU	MUS	Other
+175	Mayotte	YT	MYT	Other
+484	Mexico	MX	MEX	North America
+583	Micronesia	FM	FSM	Pacific
+498	Moldova	MD	MDA	Europe
+492	Monaco	MC	MCO	Europe
+496	Mongolia	MN	MNG	Asia
+499	Montenegro	ME	MNE	Europe
+500	Montserrat	MS	MSR	Caribbean
+504	Morocco	MA	MAR	Africa
+508	Mozambique	MZ	MOZ	Africa
+104	Myanmar	MM	MMR	Asia
+516	Namibia	NA	NAM	Africa
+520	Nauru	NR	NRU	Other
+524	Nepal	NP	NPL	Asia
+528	Netherlands	NL	NLD	Europe
+530	Netherlands Antilles	AN	ANT	Caribbean
+540	New Caledonia	NC	NCL	Other
+554	New Zealand	NZ	NZL	Pacific
+558	Nicaragua	NI	NIC	Central America
+562	Niger	NE	NER	Africa
+566	Nigeria	NG	NGA	Africa
+570	Niue	NU	NIU	Other
+574	Norfolk Island	NF	NFK	Other
+580	Northern Mariana Islands	MP	MNP	Pacific
+578	Norway	NO	NOR	Europe
+512	Oman	OM	OMN	Middle East
+586	Pakistan	PK	PAK	Asia
+585	Palau	PW	PLW	Other
+275	Palestine	PS	PSE	Middle East
+591	Panama	PA	PAN	Central America
+598	Papua New Guinea	PG	PNG	Asia
+600	Paraguay	PY	PRY	South America
+604	Peru	PE	PER	South America
+608	Philippines	PH	PHL	Asia
+612	Pitcairn	PN	PCN	Pacific
+616	Poland	PL	POL	Europe
+620	Portugal	PT	PRT	Europe
+630	Puerto Rico	PR	PRI	Caribbean
+634	Qatar	QA	QAT	Middle East
+638	Reunion	RE	REU	Other
+642	Romania	RO	ROU	Europe
+643	Russian Federation	RU	RUS	Europe
+646	Rwanda	RW	RWA	Africa
+652	Saint Barthelemy	BL	BLM	Caribbean
+659	Saint Kitts and Nevis	KN	KNA	Caribbean
+662	Saint Lucia	LC	LCA	Caribbean
+663	Saint Martin	MF	MAF	Caribbean
+670	Saint Vincent and the Grenadines	VC	VCT	Caribbean
+882	Samoa	WS	WSM	Pacific
+674	San Marino	SM	SMR	Europe
+678	Sao Tome and Principe	ST	STP	Other
+682	Saudi Arabia	SA	SAU	Middle East
+686	Senegal	SN	SEN	Africa
+688	Serbia	RS	SRB	Europe
+891	Serbia and Montenegro	CS	SCG	Europe
+690	Seychelles	SC	SYC	Africa
+694	Sierra Leone	SL	SLE	Africa
+534	Sint Marteen	SX	SXM	Caribbean
+702	Singapore	SG	SGP	Asia
+703	Slovakia	SK	SVK	Europe
+705	Slovenia	SI	SVN	Europe
+90	Solomon Islands	SB	SLB	Pacific
+706	Somalia	SO	SOM	Africa
+710	South Africa	ZA	ZAF	Africa
+239	South Georgia and The South Sandwich Islands	GS	SGS	Other
+728	South Sudan	SS	SSD	Africa
+724	Spain	ES	ESP	Europe
+144	Sri Lanka	LK	LKA	Asia
+654	St. Helena	SH	SHN	Other
+666	St. Pierre and Miquelon	PM	SPM	Other
+729	Sudan	SD	SDN	Africa
+740	Suriname	SR	SUR	South America
+744	Svalbard and Jan Mayen Islands	SJ	SJM	Europe
+748	Swaziland	SZ	SWZ	Africa
+752	Sweden	SE	SWE	Europe
+756	Switzerland	CH	CHE	Europe
+760	Syria	SY	SYR	Middle East
+158	Taiwan	TW	TWN	Asia
+762	Tajikistan	TJ	TJK	Asia
+834	Tanzania	TZ	TZA	Africa
+764	Thailand	TH	THA	Asia
+768	Togo	TG	TGO	Africa
+772	Tokelau	TK	TKL	Other
+776	Tonga	TO	TON	Pacific
+780	Trinidad and Tobago	TT	TTO	Caribbean
+788	Tunisia	TN	TUN	Africa
+792	Turkey	TR	TUR	Europe
+795	Turkmenistan	TM	TKM	Asia
+796	Turks and Caicos Islands	TC	TCA	Caribbean
+798	Tuvalu	TV	TUV	Asia
+800	Uganda	UG	UGA	Africa
+804	Ukraine	UA	UKR	Europe
+784	United Arab Emirates	AE	ARE	Middle East
+826	United Kingdom	GB	GBR	Europe
+840	United States	US	USA	North America
+581	United States Minor Outlying Islands	UM	UMI	Other
+858	Uruguay	UY	URY	South America
+860	Uzbekistan	UZ	UZB	Asia
+548	Vanuatu	VU	VUT	Pacific
+862	Venezuela	VE	VEN	South America
+704	Viet Nam	VN	VNM	Asia
+92	Virgin Islands (British)	VG	VGB	Caribbean
+850	Virgin Islands (U.S.)	VI	VIR	Caribbean
+876	Wallis and Futuna Islands	WF	WLF	Other
+732	Western Sahara	EH	ESH	Africa
+887	Yemen	YE	YEM	Middle East
+890	Yugoslavia	YU	YUG	Europe
+894	Zambia	ZM	ZMB	Africa
+716	Zimbabwe	ZW	ZWE	Africa
+827	United Kingdom (BRITAIN)	UK	UKG	Europe
+828	European Union	EU	EUR	Europe
+999	Unknown	ZZ	ZZZ	Other

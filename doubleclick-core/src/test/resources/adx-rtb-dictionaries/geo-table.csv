@@ -1,0 +1,8 @@
+1023191,"New York","New York,New York,United States","9058770,200501,21167,2840","","US","City"
+9058770,"Queens","Queens,New York,United States","200501,21167,2840","","US","County"
+21167,"New York","New York,United States","2840","US-NY","US","State"
+2840,"United States","United States","","","US","Country"
+2840,"Bad Record","Much Incomplete"
+"Bad Record",9999,"So Unparseable","","","US","Country"
+1234567,"Some City","Some City,Without,Parent","1,2,3,4","","US","City"
+1234567,"Some City","With bad Canonical Name,And without,Parent","1,2,3,4","","US","City"

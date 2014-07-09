@@ -1,0 +1,562 @@
+// IAB Category ID|IAB Category Name|Adx Category ID|Adx Category Name
+1|Arts & Entertainment|10013|Arts & Entertainment
+1|Arts & Entertainment|10105|Entertainment Industry
+2|Books & Literature|10112|Books & Literature
+//||10108|News, Media & Publications
+//3|Celebrity Fan/Gossip||
+4|Fine Art|13388|Visual Art & Design
+4|Fine Art|13422|Body Art
+5|Humor|10106|Humor & Jokes
+6|Movies|13417|Movies & Films
+7|Music|10109|Music & Audio
+8|Television|13536|Film & TV Industry
+8|Television|10557|TV Shows & Programs
+8|Television|10566|TV Broadcasting
+8|Television|13530|Arts & Entertainment Awards
+8|Television|10103|TV & Video
+9|Automotive|10185|Cars & Trucks
+9|Automotive|13714|Used Cars & Trucks
+10|Auto Parts|10026|Vehicle Parts & Accessories
+10|Auto Parts|10209|Car Parts & Accessories
+11|Auto Repair|10026|Vehicle Parts & Accessories
+11|Auto Repair|10209|Car Parts & Accessories
+12|Buying/Selling Cars|13656|Car Dealers
+12|Buying/Selling Cars|13655|Vehicle Dealers
+13|Car Culture|10881|Car Audio & Video
+14|Certified Pre-Owned|13714|Used Cars & Trucks
+15|Convertible|10001|Vehicles
+16|Coupe|10001|Vehicles
+17|Crossover|10001|Vehicles
+18|Diesel|10001|Vehicles
+19|Electric Vehicle|10024|Motor Vehicles
+20|Hatchback|10001|Vehicles
+21|Hybrid|10001|Vehicles
+22|Luxury|10001|Vehicles
+23|MiniVan|10001|Vehicles
+24|Mororcycles|10001|Vehicles
+25|Off-Road Vehicles|10001|Vehicles
+26|Performance Vehicles|10001|Vehicles
+27|Pickup|10001|Vehicles
+28|Road-Side Assistance|10001|Vehicles
+29|Sedan|10001|Vehicles
+30|Trucks & Accessories|10001|Vehicles
+31|Vintage Cars|10185|Cars & Trucks
+32|Wagon|10001|Vehicles
+33|Business|10004|Business & Industrial
+33|Business|10096|Business Banking & Finance
+33|Business|10300|Office
+33|Business|10098|Business News & Media
+33|Business|10296|Business Management Software
+33|Business|12209|Business & Productivity Software
+//34|Advertising||
+//35|Agriculture||
+36|Biotech/Biomedical|10087|Medical Devices, Equipment & Supplies
+36|Biotech/Biomedical|12494|Medical Diagnostic Equipment & Monitoring Devices
+36|Biotech/Biomedical|10088|Biotech & Pharmaceutical
+//||23|Drugs & Supplements
+//||10089|Pharmacy
+37|Business Software|10296|Business Management Software
+37|Business Software|11270|Project Management Software
+37|Business Software|12209|Business & Productivity Software
+38|Construction|11141|Commercial & General Contracting
+38|Construction|11287|Hardware Tools & Accessories
+38|Construction|12590|Power Tools
+//39|Forestry||
+//40|Government||
+//41|Green Solutions||
+//42|Human Resources||
+//43|Logistics||
+44|Marketing|10307|Commercial & Industrial Printing
+//45|Metals||
+46|Careers|10016|Jobs & Education
+47|Career Planning|10016|Jobs & Education
+48|College|10763|Colleges, Universities & Post-Secondary Education
+49|Financial Aid|10016|Jobs & Education
+50|Job Fairs|10016|Jobs & Education
+51|Job Search|10016|Jobs & Education
+51|Job Search|10746|Job Listings
+52|Resume Writing/Advice|10746|Job Listings
+//53|Nursing||
+//54|Scholarships||
+//55|Telecommuting||
+//56|U.S. Military||
+//57|Career Advice||
+58|Education|10016|Jobs & Education
+58|Education|10141|Education & Training
+58|Education|10754|Standardized & Admissions Tests
+58|Education|10763|Colleges, Universities & Post-Secondary Education
+59|7-12 Education|10141|Education & Training
+60|Adult Education|10141|Education & Training
+60|Adult Education|10759|Vocational Training & Trade Schools
+//61|Art History||
+//62|Colledge Administration||
+//63|College Life||
+//64|Distance Learning||
+//65|English as a 2nd Language||
+66|Language Learning|13432|Translation
+//67|Graduate School||
+//68|Homeschooling||
+69|Homework/Study Tips|10756|Reference Materials & Resources
+//70|K-6 Educators||
+//71|Private School||
+//72|Special Education||
+73|Studying Business|10004|Business & Industrial
+74|Family & Parenting|10002|Family & Community
+74|Family & Parenting|10236|Parenting & Family
+//75|Adoption||
+76|Babies & Toddlers|10235|Baby
+//||11020|Baby Diapering & Toilet Training
+//||11028|Maternity & New Parent
+//77|Daycare/Pre School||
+//78|Family Internet||
+79|Parenting - K-6 Kids|10030|Baby, Parenting & Family
+79|Parenting - K-6 Kids|10236|Parenting & Family
+80|Parenting teens|10030|Baby, Parenting & Family
+80|Parenting teens|10236|Parenting & Family
+//81|Pregnancy||
+//82|Special Needs Kids||
+//83|Eldercare||
+84|Health & Fitness|10011|Health
+84|Health & Fitness|10091|Health Care Services
+84|Health & Fitness|10123|Fitness
+84|Health & Fitness|10454|Warts
+84|Health & Fitness|10460|Vision
+84|Health & Fitness|10666|Fitness Classes & Instruction
+84|Health & Fitness|10669|Personal Training
+84|Health & Fitness|10473|Skin Conditions & Skin Health
+84|Health & Fitness|10491|Diets & Diet Programs
+84|Health & Fitness|10508|Plastic & Cosmetic Surgery
+84|Health & Fitness|10509|Laboratory Testing & Medical Diagnostic Services
+85|Exercise|10011|Health
+85|Exercise|10123|Fitness
+86|A.D.D.|10011|Health
+87|AIDS/HIV|10011|Health
+88|Allergies|10011|Health
+89|Alternative Medicine|10507|Alternative, Non-Western & Complementary Care
+90|Arthritis|10011|Health
+91|Asthma|10011|Health
+92|Autism/PDD|10011|Health
+93|Bipolar Disorder|10011|Health
+94|Brain Tumor|10011|Health
+95|Cancer|10011|Health
+96|Cholesterol|10011|Health
+97|Chronic Fatigue Syndrome|10011|Health
+98|Chronic Pain|10011|Health
+99|Cold & Flu|10011|Health
+100|Deafness|10011|Health
+101|Dental Care|10011|Health
+102|Depression|10011|Health
+103|Dermatology|11710|Acne
+104|Diabetes|10011|Health
+105|Epilepsy|10011|Health
+106|GERD/Acid Reflux|10011|Health
+107|Headaches/Migraines|10011|Health
+108|Heart Disease|10011|Health
+109|Herbs for Health|10011|Health
+110|Holistic Healing|10011|Health
+111|IBS/Crohn's Disease|10011|Health
+112|Incest/Abuse Support|10011|Health
+113|Incontinence|10011|Health
+114|Infertility|10011|Health
+115|Men's Health|10011|Health
+115|Men's Health|10085|Health Conditions & Concerns
+116|Nutrition|10086|Nutrition & Dieting
+117|Orthopedics|10011|Health
+118|Panic/Anxiety Disorders|10011|Health
+119|Pediatrics|10011|Health
+120|Physical Therapy|10011|Health
+121|Psychology/Psychiatry|10011|Health
+122|Senior Health|10011|Health
+122|Senior Health|10085|Health Conditions & Concerns
+123|Sexuality|24|SexualHealth
+123|Sexuality|31|RefToSex
+//124|Sleep Disorders||
+125|Smoking Cessation|10453|Smoking & Smoking Cessation
+//126|Substance Abuse||
+//127|Thyroid Disease||
+128|Weight Loss|18|WeightLoss
+//||11669|Weight Loss Products
+//||12864|Weight Loss Drugs & Medications
+//||12865|Weight Loss Supplements
+129|Women's Health|10011|Health
+129|Women's Health|10085|Health Conditions & Concerns
+130|Food & Drink|10010|Food & Groceries
+130|Food & Drink|10082|Food
+130|Food & Drink|10301|Food Service Industry
+130|Food & Drink|10432|Baked Goods & Bakery Items
+130|Food & Drink|10434|Baking Ingredients
+//131|American Cuisine||
+//132|Barbecues & Grilling||
+//133|Cajun/Creole||
+//134|Chinese Cuisine||
+//135|Cocktails/Beer||
+//136|Coffee/Tea||
+137|Cuisine-Specific|10889|Cuisines
+//138|Desserts & Baking||
+139|Dining Out|10020|Dining & Nightlife
+139|Dining Out|10169|Restaurants
+//||11870|Dining & Nightlife Reviews, Guides &
+140|Food Allergies|10082|Food
+//141|French Cuisine||
+142|Health/Lowfat Cooking|10128|Cooking
+142|Health/Lowfat Cooking|10679|Recipes
+//143|Italian Cuisine||
+//144|Japanese Cuisine||
+//145|Mexican Cuisine||
+//146|Vegan||
+//147|Vegetarian||
+//148|Wine||
+149|Hobbies & Interests|10015|Hobbies & Leisure
+//150|Art/Technology||
+//151|Arts & Crafts||
+//152|Beadwork||
+//153|Birdwatching||
+154|Board Games/Puzzles|10672|Games
+//||10671|Toys
+//155|Candle & Soap Making||
+156|Card Games|10671|Toys
+//157|Chess||
+//158|Cigars||
+159|Collecting|10135|Antiques & Collectibles
+//160|Comic Books||
+//161|Drawing/Sketching||
+//162|Freelance Writing||
+//163|Genealogy||
+//164|Getting Published||
+//165|Guitar||
+//166|Home Recording||
+167|Investors & Patents|10095|Investing
+168|Jewelry Making|10171|Jewelry
+169|Magic & Illusion|30|Esoteric
+//170|Needlework||
+//171|Painting||
+172|Photography|10132|Photo & Video
+//||13596|Photographic & Digital Arts
+//||10691|Digital Cameras
+//173|Radio||
+174|Roleplaying Games|12997|Massive Multiplayer Online Games
+//175|Sci-Fi & Fantasy||
+//176|Scrapbooking||
+//177|Screenwriting||
+//178|Stamps & Coins||
+179|Video & Computer Games|7|VideoGames
+//||11942|Online Games & Puzzles
+//||11950|Video Games, Consoles & Accessories
+//||13377|Computer & Video Games
+//180|Woodworking||
+181|Home & Garden|10009|Home & Garden
+182|Appliances|11339|Office Appliances
+//||11284|HVAC
+//||10412|Home Appliances
+//||12143|Televisions
+//183|Entertaining||
+//184|Environmental Safety||
+185|Gardening|10009|Home & Garden
+185|Gardening|13658|Gardening
+186|Home Repair|10009|Home & Garden
+187|Home Theater|10873|Home Audio & Video
+188|Interior Decorating|10404|Home Improvement & Maintenance
+188|Interior Decorating|10405|Home Decor & Interior Decorating
+188|Interior Decorating|10410|Kitchen & Dining
+188|Interior Decorating|10413|Home Furniture
+189|Landscaping|10406|Yard, Garden & Patio
+190|Remodeling & Construction|13797|Building Materials & Supplies
+190|Remodeling & Construction|10282|Building Construction & Maintenance
+191|Law, Gov't & Politics|3|Politics
+//192|Immigration||
+//193|Legal Issues||
+//194|U.S. Government Resources||
+195|Politics|3|Politics
+//196|Commentary||
+197|News|10098|Business News & Media
+197|News|10108|News, Media & Publications
+198|International News|10108|News, Media & Publications
+199|National News|10108|News, Media & Publications
+200|Local News|10108|News, Media & Publications
+201|Personal Finance|10012|Finance
+201|Personal Finance|11813|Private Banking
+201|Personal Finance|11814|Online Banking
+201|Personal Finance|11842|Credit Cards
+201|Personal Finance|10093|Banking
+201|Personal Finance|10094|Money Transfer & Wire Services
+201|Personal Finance|11816|Debit & Check Cards
+202|Beginning Investing|10095|Investing
+203|Credit/Debt & Loans|27|ConsumerLoans
+203|Credit/Debt & Loans|10097|Credit & Lending
+203|Credit/Debt & Loans|12956|Commercial Lending
+203|Credit/Debt & Loans|11841|Loans
+203|Credit/Debt & Loans|12957|Auto Financing
+203|Credit/Debt & Loans|12960|Home Loans & Mortgages
+203|Credit/Debt & Loans|13296|Home Equity Loans & Lines of Credit
+203|Credit/Debt & Loans|13299|Home Refinancing Loans
+203|Credit/Debt & Loans|13300|Payday & Emergency Loans
+203|Credit/Debt & Loans|10099|Grants, Scholarships & Financial Aid
+203|Credit/Debt & Loans|13301|Personal Loans & Lines of Credit
+203|Credit/Debt & Loans|12961|Personal Lending & Borrowing
+203|Credit/Debt & Loans|13283|Commercial Mortgages
+203|Credit/Debt & Loans|13284|Auto Leasing
+203|Credit/Debt & Loans|13286|Title Loans
+203|Credit/Debt & Loans|13289|Interest Only Mortgages
+203|Credit/Debt & Loans|13291|Government Mortgages
+203|Credit/Debt & Loans|13292|Buy-To-Let Mortgages
+203|Credit/Debt & Loans|13293|Fixed Rate Mortgages
+204|Financial News|10108|News, Media & Publications
+205|Financial Planning|10092|Financial Planning & Management
+206|Hedge Fund|11820|Investor Relations & Venture Capital
+207|Insurance|10550|Vehicle Insurance
+207|Insurance|10102|Insurance
+208|Investing|10095|Investing
+208|Investing|11818|Fixed Deposit Accounts & Certificates
+208|Investing|11827|Securities
+208|Investing|11840|Unsecured Credit & Lending
+208|Investing|11819|Brokerages & Day Trading
+209|Mutual Funds|11828|Mutual Funds
+//210|Options||
+211|Retirement Planning|11824|Retirement Investments
+211|Retirement Planning|12950|401(K)s
+211|Retirement Planning|12952|IRAs
+212|Stocks|13459|Stocks
+213|Tax Planning|11093|Accounting & Auditing
+//214|Society||
+215|Dating|4|Dating
+//||10031|Romance & Relationships
+//216|Divorce Support||
+//217|Gay Life||
+218|Marriage|10031|Romance & Relationships
+//219|Senior Living||
+//220|Teens||
+221|Weddings|10369|Weddings
+//222|Ethnic Specific||
+223|Science|10273|Design & Engineering
+223|Science|10294|Scientific Equipment & Services
+//||10294|Scientific Equipment & Services
+//||10295|Energy & Utility
+224|Astrology|30|Esoteric
+224|Astrology|13469|Astrology & Horoscopes
+224|Astrology|13470|Psychics & Fortune Telling
+//225|Biology||
+226|Chemistry|13491|Chemical Industry
+//227|Geology||
+228|Paranormal Phenomena|10127|Occult & Paranormal
+//229|Physics||
+//230|Space/Astronomy||
+//231|Geography||
+//232|Botany||
+//233|Weather||
+234|Pets|10130|Pets
+234|Pets|10683|Pet Food & Supplies
+//||11980|Pet Breeding
+//235|Aquariums||
+//236|Birds||
+//237|Cats||
+//238|Dogs||
+//239|Large Animals||
+//240|Reptiles||
+//241|Veterinary Medicine||
+242|Sports|10014|Sports & Fitness
+242|Sports|10116|Sports Fan Gear & Apparel
+242|Sports|10121|Sporting Goods
+242|Sports|13605|Sports
+//243|Auto Racing||
+244|Baseball|13610|Baseball
+//245|Bicycling||
+//246|Bodybuilding||
+//247|Boxing||
+//248|Canoeing/Kayaking||
+//249|Cheerleading||
+//250|Climbing||
+//251|Cricket||
+//252|Figure Skating||
+//253|Fly Fishing||
+//254|Football||
+//255|Freshwater Fishing||
+//256|Game & Fish||
+257|Golf|10653|Golf Equipment
+//258|Horse Racing||
+//259|Horses||
+//260|Hunting/Shooting||
+//261|Inline Skating||
+//262|Martial Arts||
+//263|Mountain Biking||
+//264|NASCAR Racing||
+//265|Olympics||
+//266|Paintball||
+267|Power & Motorcycles|10024|Motor Vehicles
+267|Power & Motorcycles|10182|Motorcycles
+//268|Pro Basketball||
+//269|Pro Ice Hockey||
+//270|Rodeo||
+//271|Rugby||
+//272|Running/Jogging||
+273|Sailing|10027|Boats & Watercraft
+273|Sailing|13657|Boat & Yacht Sales & Brokers
+//274|Saltwater Fishing||
+//275|Scuba Diving||
+//276|Skateboarding||
+//277|Skiing||
+//278|Snowboarding||
+279|Surfing/Bodyboarding|10117|Boating & Water Recreation
+//280|Swimming||
+//281|Table Tennis/Ping-Pong||
+//282|Tennis||
+//283|Volleyball||
+//284|Walking||
+285|Waterski/Wakeboard|10117|Boating & Water Recreation
+//286|World Soccer||
+//287|Style & Fashion||
+288|Beauty|10005|Beauty & Personal Care
+//||10050|Anti-Aging
+//||10052|Baby Care & Hygiene
+//||10054|Make-Up & Cosmetics
+//||10048|Tanning & Sun Care
+//||10047|Skin Care
+//||10055|Hair Care
+//||10057|Perfumes & Fragrances
+//||10058|Shaving & Grooming
+//||10048|Tanning & Sun Care
+//||19|Cosmetic Procedures & Body Modification
+//||10060|Hygiene & Toiletries
+//||10061|Face Care
+//290|Fashion||
+//289|Body Art||
+291|Jewelry|10171|Jewelry
+292|Clothing|13780|Children's Clothing
+292|Clothing|10177|Footwear
+292|Clothing|10176|Clothing
+292|Clothing|13116|Jerseys & Knit Shirts
+292|Clothing|10913|Underwear
+293|Accessories|12240|Shirts, Tops & Blouses
+294|Technology & Computing|10168|Computers
+294|Technology & Computing|10294|Scientific Equipment & Services
+//||10883|Computer Hardware
+//||10885|Software
+//||12187|Laptop Computers
+//295|3-D Graphics||
+296|Animation|13760|Cartoons
+297|Antivirus Software|10885|Software
+//298|C/C++||
+//299|Cameras & Camcorders||
+300|Cell Phones|10876|Wireless Devices
+//||10877|Portable Media Devices
+//||10878|Telephony
+//||11511|Mobile Phone Plans
+//||12161|Mobile Phones
+//||13381|Mobile Phones & Accessories
+//||13419|Phone Plans
+301|Computer Certification|10168|Computers
+302|Computer Networking|10168|Computers
+//||12184|Computer Networking Devices
+303|Computer Peripherals|10019|Computers & Consumer Electronics
+303|Computer Peripherals|10167|Consumer Electronics
+//||10872|Consumer Electronic Accessories
+//||12187|Laptop Computers
+//||10886|Computer Accessories
+304|Computer Reviews|10019|Computers & Consumer Electronics
+//305|Data Centers||
+//306|Databases||
+//307|Desktop Publishing||
+//308|Desktop Video||
+309|Email|13094|Email & Messaging
+310|Graphics Software|11368|Graphics & Multimedia Software
+//311|Home Video/DVD||
+312|Internet Technology|11491|Internet Service Plans
+//||11504|Web Hosting
+//||13418|Internet
+//313|Java||
+//314|JavaScript||
+//315|Mac Support||
+//316|MP3/MIDI||
+//317|Net Conferencing||
+//318|Net for Beginners||
+319|Network Security|10299|Security Equipment & Services
+//320|Palmtops/PDAs||
+//321|PC Support||
+//322|Portable||
+//323|Entertainment||
+//324|Shareware/Freeware||
+//325|Unix||
+//326|Visual Basic||
+//327|Web Clip Art||
+328|Web Design/HTML|11493|Web Design & Development
+//329|Web Search||
+//330|Windows||
+331|Travel|10017|Travel & Tourism
+331|Travel|10144|Air Travel
+331|Travel|10145|Tourist Attractions & Destinations
+331|Travel|10146|Transportation & Excursions
+331|Travel|10147|Last Minute Travel
+331|Travel|10150|Specialty Travel
+331|Travel|10151|Travel Booking Services
+331|Travel|10578|Travel Media & Publications
+331|Travel|10776|Luggage
+331|Travel|12066|Resorts
+332|Adventure Travel|10150|Specialty Travel
+332|Adventure Travel|10147|Last Minute Travel
+333|Africa|10150|Specialty Travel
+334|Air Travel|10144|Air Travel
+334|Air Travel|10778|Airline Tickets, Fares & Flights
+//335|Australia & New Zealand||
+//336|Bed & Breakfasts||
+337|Budget Travel|10017|Travel & Tourism
+338|Business Travel|10017|Travel & Tourism
+//339|By US Locale||
+340|Camping|10113|Camping & Outdoor Recreation
+//341|Canada||
+//342|Caribbean||
+343|Cruises|10153|Cruises & Cruise Services
+//344|Eastern Europe||
+//345|Europe||
+//346|France||
+//347|Greece||
+//348|Honeymoons/Getaways||
+349|Hotels|10142|Accommodations
+//||10769|Hotels, Motels & Resorts
+//||12067|Hotels
+//350|Italy||
+//351|Japan||
+//352|Mexico & Central America||
+//353|National Parks||
+//354|South America||
+355|Spas|10049|Spa & Medical Spa
+//356|Theme Parks||
+357|Traveling with Kids|10017|Travel & Tourism
+//358|United Kingdom||
+359|Real Estate|10003|Real Estate
+359|Real Estate|10040|Real Estate Agents & Brokerages
+359|Real Estate|10531|Real Estate Investments
+359|Real Estate|10042|Real Estate Listings
+360|Apartments|10042|Real Estate Listings
+360|Apartments|10032|Rental Listings
+//361|Architects||
+362|Buying/Selling Homes|10032|Rental Listings
+362|Buying/Selling Homes|10039|Property Development
+//363|Shopping||
+364|Contests & Freebies|28|FreeGifts
+//365|Couponing||
+//366|Comparison||
+//367|Engines||
+368|Religion & Spirituality|5|Religion
+369|Alternative Religions|5|Religion
+370|Atheism/Agnosticism|5|Religion
+371|Buddhism|5|Religion
+372|Catholicism|5|Religion
+373|Christianity|5|Religion
+374|Hinduism|5|Religion
+375|Islam|5|Religion
+376|Judaism|5|Religion
+377|Latter-Day Saints|5|Religion
+378|Pagan/Wiccan|5|Religion
+//379|Uncategorized||
+//380|Non-Standard Content||
+//381|Unmoderated UGC||
+//382|Extreme Graphic/Explicit Violence||
+//383|Pornography||
+//384|Profane Content||
+//385|Hate Content||
+//386|Under Construction||
+//387|Incentivized||
+//388|Illegal Content||
+//389|Illegal Content||
+//390|Warez||
+//391|Spyware/Malware||
+//392|Copyright Infringement||
