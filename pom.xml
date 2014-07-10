@@ -60,7 +60,7 @@
     <metricsVersion>3.0.2</metricsVersion>
     <mockitoVersion>1.9.5</mockitoVersion>
     <opencsvVersion>2.3</opencsvVersion>
-    <openrtbVersion>0.7-SNAPSHOT</openrtbVersion>
+    <openrtbVersion>0.6</openrtbVersion>
     <protobufVersion>2.5.0</protobufVersion>
     <slf4jVersion>1.7.7</slf4jVersion>
 
@@ -104,6 +104,7 @@
 
   <scm>
     <connection>scm:git:https://github.com/google/openrtb-doubleclick.git</connection>
+    <developerConnection>scm:git:https://github.com/google/openrtb-doubleclick.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
