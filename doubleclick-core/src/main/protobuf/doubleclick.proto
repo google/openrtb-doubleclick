@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.doubleclick;
 option java_outer_classname = "Doubleclick";
 
-// Synchronized with v.47:
+// Synchronized with v.50:
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2014 Google Inc. All Rights Reserved.
@@ -138,7 +138,9 @@ message BidRequest {
   optional int32 timezone_offset = 25;
 
   // List of detected user verticals.  Currently unused.
-  repeated int32 user_vertical = 30 [packed=true];
+  repeated int32 user_vertical = 30 [
+      packed=true
+  ];
 
   // Audience-targeting list to which the user has been added. See the Buyer UI
   // Help topics on remarketing, where it is called a remarketing list.
@@ -326,6 +328,13 @@ message BidRequest {
     optional bytes constrained_usage_encrypted_advertising_id = 22;
     optional bytes constrained_usage_encrypted_hashed_idfa = 23;
 
+    // App name for Android apps in Google Play store.
+    optional string app_name = 24;
+
+    // Average user rating for the app.  The range of user rating is between 1.0
+    // and 5.0.  Currently only available for apps in Google Play store.
+    optional float app_rating = 25;
+
     // These are deprecated.  Please ignore.
     optional string DEPRECATED_app_name = 1;
     optional string DEPRECATED_company_name = 2;
@@ -505,6 +514,34 @@ message BidRequest {
       // auction.  This may be a global minimum, or it may be a minimum set by
       // the publisher.  The value is in micros of your account currency.
       optional int64 minimum_cpm_micros = 5;
+
+      // Publisher open auction pricing rules applicable to a particular buyer.
+      message BuyerPricingRule {
+        // Only one of the included_advertisers and excluded_advertisers fields
+        // can be set in a rule.  See advertisers.txt file in the technical
+        // documentation for a list of ids.
+        repeated int64 included_advertisers = 1;
+        repeated int64 excluded_advertisers = 2;
+
+        // Only one of the included_agencies and excluded_agencies fields
+        // can be set in a rule.  See agencies.txt file in the technical
+        // documentation for a list of ids.
+        repeated int64 included_agencies = 3;
+        repeated int64 excluded_agencies = 4;
+
+        // Only one of the blocked and minimum_cpm_micros can be set in a rule.
+        // If set to true, indicates that the specified advertisers/agencies are
+        // blocked from bidding.
+        optional bool blocked = 5;
+
+        // Minimum CPM value that you can bid to not be filtered before the
+        // auction.  The value is in micros of the bidder account currency.
+        optional int64 minimum_cpm_micros = 6;
+      }
+
+      // Publisher open auction pricing rules in priority order, from highest to
+      // lowest.
+      repeated BuyerPricingRule pricing_rule = 7;
 
       // Information about any direct deals that matched for this inventory.
       //

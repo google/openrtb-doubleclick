@@ -633,10 +633,16 @@ public class DoubleClickOpenRtbMapper
     } else {
       logger.debug("App request is missing both url and anonymousId: {}", dcRequest);
     }
+    if (dcMobile.hasAppRating()) {
+      content.setUserrating(String.valueOf(dcMobile.getAppRating()));
+    }
     app.setContent(content);
 
     if (dcMobile.hasAppId()) {
       app.setBundle(dcMobile.getAppId());
+    }
+    if (dcMobile.hasAppName()) {
+      app.setName(dcMobile.getAppName());
     }
 
     String channelId = findChannelId(dcRequest);

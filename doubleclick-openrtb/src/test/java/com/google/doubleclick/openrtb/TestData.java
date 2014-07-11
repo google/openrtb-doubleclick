@@ -88,7 +88,9 @@ public class TestData {
               .setOsVersionMajor(3).setOsVersionMinor(2).setOsVersionMicro(1))
           .setModel("MotoX")
           .setEncryptedHashedIdfa(ByteString.EMPTY)
-          .setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY));
+          .setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY)
+          .setAppName("Tic-Tac-Toe")
+          .setAppRating(4.2f));
     }
     if (video) {
       req.setVideo(Video.newBuilder()
