@@ -73,37 +73,6 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>compile-protoc</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <tasks>
-                <mkdir dir="${protobufGenerated}" />
-                <path id="proto.path">
-                  <fileset dir="${protobufSource}">
-                    <include name="**/*.proto" />
-                  </fileset>
-                </path>
-                <pathconvert pathsep=" " property="proto.files" refid="proto.path" />
-                <exec executable="protoc" failonerror="true">
-                  <arg value="--java_out=${protobufGenerated}" />
-                  <arg value="-I${protobufSource}" />
-                  <arg value="-I${protobufSource}/../../../../doubleclick-core/src/main/protobuf/" />
-                  <arg value="-I${protobufSource}/../../../../../openrtb/openrtb-core/src/main/protobuf/" />
-                  <arg line="${proto.files}" />
-                </exec>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
         <version>${buildHelperMavenPluginVersion}</version>
@@ -140,7 +109,7 @@
 
   <profiles>
     <profile>
-      <id>error-prone</id>
+      <id>full</id>
       <activation>
         <property>
           <name>!m2e.version</name>
@@ -148,6 +117,37 @@
       </activation>
       <build>
         <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>compile-protoc</id>
+                <phase>generate-sources</phase>
+                <configuration>
+                  <tasks>
+                    <mkdir dir="${protobufGenerated}" />
+                    <path id="proto.path">
+                      <fileset dir="${protobufSource}">
+                        <include name="**/*.proto" />
+                      </fileset>
+                    </path>
+                    <pathconvert pathsep=" " property="proto.files" refid="proto.path" />
+                    <exec executable="protoc" failonerror="true">
+                      <arg value="--java_out=${protobufGenerated}" />
+                      <arg value="-I${protobufSource}" />
+                      <arg value="-I${protobufSource}/../../../../doubleclick-core/src/main/protobuf/" />
+                      <arg value="-I${protobufSource}/../../../../../openrtb/openrtb-core/src/main/protobuf/" />
+                      <arg line="${proto.files}" />
+                    </exec>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
           <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <executions>
