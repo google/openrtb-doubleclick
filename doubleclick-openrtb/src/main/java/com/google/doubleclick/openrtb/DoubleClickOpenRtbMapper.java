@@ -48,6 +48,7 @@ import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.ContentCategory;
 import com.google.openrtb.OpenRtb.Flag;
 import com.google.openrtb.mapper.OpenRtbMapper;
+import com.google.openrtb.util.OpenRtbUtils;
 import com.google.protobuf.ByteString;
 
 import com.codahale.metrics.Counter;
@@ -140,13 +141,7 @@ public class DoubleClickOpenRtbMapper
 
     dcAd.setBuyerCreativeId(bid.getCrid());
 
-    Impression matchingImp = null;
-    for (Impression imp : request.getImpList()) {
-      if (imp.getId().equals(bid.getImpid())) {
-        matchingImp = imp;
-        break;
-      }
-    }
+    Impression matchingImp = OpenRtbUtils.impWithId(request, bid.getImpid());
     if (matchingImp == null) {
       invalidImp.inc();
       throw new MapperException(
@@ -197,11 +192,13 @@ public class DoubleClickOpenRtbMapper
     Doubleclick.BidResponse.Ad.AdSlot.Builder dcSlot = dcAd.addAdslotBuilder()
         .setId(Integer.parseInt(bid.getImpid()))
         .setMaxCpmMicros((long) bid.getPrice());
-    if (bid.hasCid()) {
-      dcSlot.setAdgroupId(Long.parseLong(bid.getCid()));
-    } else if (dcImpSlot.getMatchingAdDataCount() > 1) {
-      noCid.inc();
-      logger.debug("Missing cid in a Bid created for multi-campaign Impression: {}", bid);
+    if (dcImpSlot.getMatchingAdDataCount() > 1) {
+      if (bid.hasCid()) {
+        dcSlot.setAdgroupId(Long.parseLong(bid.getCid()));
+      } else {
+        noCid.inc();
+        logger.debug("Missing cid in a Bid created for multi-campaign Impression: {}", bid);
+      }
     }
     if (bid.hasDealid()) {
       dcSlot.setDealId(Long.parseLong(bid.getDealid()));
@@ -226,6 +223,7 @@ public class DoubleClickOpenRtbMapper
     for (Doubleclick.BidRequest.UserDataTreatment dcUDT : dcRequest.getUserDataTreatmentList()) {
       if (dcUDT == Doubleclick.BidRequest.UserDataTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT) {
         coppa = true;
+        break;
       }
     }
     if (coppa) {

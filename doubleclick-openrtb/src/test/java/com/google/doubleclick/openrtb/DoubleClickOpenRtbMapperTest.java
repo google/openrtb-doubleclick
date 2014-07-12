@@ -60,7 +60,7 @@ public class DoubleClickOpenRtbMapperTest {
         BidResponse.newBuilder()
             .setBidid("bidid")
             .addSeatbid(SeatBid.newBuilder()
-                .addBid(TestData.newBid()))
+                .addBid(TestData.newBid(false)))
             .build());
     assertNotNull(dcResponse);
     assertEquals("bidid", dcResponse.getDebugString());
@@ -68,7 +68,7 @@ public class DoubleClickOpenRtbMapperTest {
     Doubleclick.BidResponse.Ad ad = dcResponse.getAd(0);
     assertEquals(1, ad.getAdslotCount());
     assertEquals(1, ad.getAdslot(0).getId());
-    assertEquals(3, ad.getAdslot(0).getAdgroupId());
+    assertFalse(ad.getAdslot(0).hasAdgroupId());
     assertEquals(1000, ad.getAdslot(0).getMaxCpmMicros());
   }
 
@@ -78,13 +78,13 @@ public class DoubleClickOpenRtbMapperTest {
         .setId(TestUtil.REQUEST_ID)
         .addAdslot(AdSlot.newBuilder().setId(5))
         .addAdslot(AdSlot.newBuilder().setId(10)));
-    mapper.toNative(request, TestUtil.newBidResponse(TestData.newBid()));
+    mapper.toNative(request, TestUtil.newBidResponse(TestData.newBid(false)));
   }
 
   @Test
   public void testResponse_attributeCheck() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(TestData.newRequest());
-    Bid bid = TestData.newBid()
+    Bid bid = TestData.newBid(false)
         .setAdid("adId")
         .setAdm("snippet")
         .build();
@@ -97,7 +97,7 @@ public class DoubleClickOpenRtbMapperTest {
   @Test
   public void testResponse_htmlSnippetAd() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(TestData.newRequest());
-    Bid bid = TestData.newBid()
+    Bid bid = TestData.newBid(false)
         .setAdid("adId")
         .setCrid("creativeId")
         .setAdm("<img src=\"foo\">")
@@ -113,8 +113,8 @@ public class DoubleClickOpenRtbMapperTest {
   @Test
   public void testResponse_videoAd() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(
-        TestData.newRequest(false, true, false, false));
-    Bid bid = TestData.newBid()
+        TestData.newRequest(false, false).setVideo(TestData.newVideo(false)));
+    Bid bid = TestData.newBid(false)
         .setAdm("http://my-video")
         .setCrid("creativeId")
         .build();
@@ -129,7 +129,7 @@ public class DoubleClickOpenRtbMapperTest {
   @Test
   public void testResponse_htmlSnippetTemplateAd() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(TestData.newRequest());
-    Bid bid = TestData.newBid()
+    Bid bid = TestData.newBid(false)
         .setAdid("99")
         .setCrid("creativeId")
         .setAdm("<img src=\"foo-templatized\">")
@@ -150,7 +150,7 @@ public class DoubleClickOpenRtbMapperTest {
 
   @Test(expected = MapperException.class)
   public void testResponse_noCrid() {
-    Bid bid = TestData.newBid()
+    Bid bid = TestData.newBid(false)
         .clearCrid()
         .build();
     mapper.buildResponseAd(
@@ -170,28 +170,30 @@ public class DoubleClickOpenRtbMapperTest {
             .setId(0)
             .addAllWidth(asList(100, 200))
             .addAllHeight(asList(300, 400)).build());
-    Bid bid1 = TestData.newBid().build();
-    Bid bid2 = TestData.newBid().setW(100).setH(300).build();
+    Bid bid1 = TestData.newBid(false).build();
+    Bid bid2 = TestData.newBid(true).build();
     BidResponse response = TestUtil.newBidResponse(bid1, bid1);
     OpenRtb.BidRequest request = OpenRtb.BidRequest.newBuilder().setId("1").addImp(imp).build();
     Doubleclick.BidResponse.Ad.Builder ad1 = mapper.buildResponseAd(request, response, bid1);
     assertTrue(!ad1.hasWidth() && !ad1.hasHeight());
     Doubleclick.BidResponse.Ad.Builder ad2 = mapper.buildResponseAd(request, response, bid2);
-    assertEquals(100, ad2.getWidth());
-    assertEquals(300, ad2.getHeight());
+    assertEquals(bid2.getW(), ad2.getWidth());
+    assertEquals(bid2.getH(), ad2.getHeight());
   }
 
   @Test
   public void testRequest() {
     for (int test = 0; test < 0x10; ++test) {
       boolean mobile = (test & 0x01) != 0;
-      boolean video = (test & 0x02) != 0;
-      boolean multisize = (test & 0x04) != 0;
-      boolean coppa = (test & 0x08) != 0;
-      String testDesc = String.format("mobile=%s, video=%s, multisize=%s, coppa=%s",
-          mobile, video, multisize, coppa);
+      boolean video = (test & 0x01) != 0;
+      boolean coppa = (test & 0x01) != 0;
+      boolean multi = (test & 0x02) != 0;
+      boolean multiBid = (test & 0x04) != 0;
+      boolean linkExt = (test & 0x08) != 0;
+      String testDesc = String.format("mobile=%s, video=%s, coppa=%s, link=%s, multi=%s/%s",
+          mobile, video, coppa, linkExt, multi, multiBid);
       ImmutableList.Builder<ExtMapper> extMappers = ImmutableList.builder();
-      if ((test & 0x01) != 0) {
+      if (linkExt) {
         extMappers.add(DoubleClickLinkMapper.INSTANCE);
       }
       DoubleClickOpenRtbMapper mapper = new DoubleClickOpenRtbMapper(
@@ -199,24 +201,39 @@ public class DoubleClickOpenRtbMapperTest {
           TestUtil.getMetadata(),
           extMappers.build());
 
-      BidRequest request = mapper.toOpenRtb(TestData.newRequest(mobile, video, multisize, coppa));
+      Doubleclick.BidRequest.Builder dcRequest = TestData.newRequest(multi, coppa);
+      if (mobile) {
+        dcRequest.setMobile(TestData.newMobile());
+      }
+      if (video) {
+        dcRequest.setVideo(TestData.newVideo(multi));
+      }
+      BidRequest request = mapper.toOpenRtb(dcRequest.build());
       Impression imp = request.getImp(0);
       assertEquals(testDesc, mobile, request.getDevice().hasOs());
       assertEquals(testDesc, video, imp.hasVideo());
       assertNotEquals(testDesc, video, imp.hasBanner());
       if (video) {
         Banner compAd = imp.getVideo().getCompanionad(0);
-        assertEquals(testDesc, multisize,
+        assertEquals(testDesc, multi,
             compAd.hasWmin() && compAd.hasWmax() && compAd.hasHmin() && compAd.hasHmax());
-        assertNotEquals(testDesc, multisize, compAd.hasW() && compAd.hasW());
+        assertNotEquals(testDesc, multi, compAd.hasW() && compAd.hasW());
       } else {
         Banner banner = imp.getBanner();
-        assertEquals(testDesc, multisize,
+        assertEquals(testDesc, multi,
             banner.hasWmin() && banner.hasWmax() && banner.hasHmin() && banner.hasHmax());
-        assertNotEquals(testDesc, multisize, banner.hasW() && banner.hasW());
+        assertNotEquals(testDesc, multi, banner.hasW() && banner.hasW());
       }
       assertEquals(testDesc, coppa, request.getRegs().hasCoppa());
       assertEquals(testDesc, coppa, request.getRegs().getCoppa() == Flag.YES);
+
+      Bid.Builder bid = TestData.newBid(multiBid);
+      BidResponse response = TestUtil.newBidResponse(bid);
+      Doubleclick.BidResponse dcResponse = mapper.toNative(request, response).build();
+      if (linkExt) {
+        assertEquals(testDesc, multi && multiBid, dcResponse.getAd(0).hasWidth());
+        assertEquals(testDesc, multi && multiBid, dcResponse.getAd(0).getAdslot(0).hasAdgroupId());
+      }
     }
   }
 
@@ -227,7 +244,7 @@ public class DoubleClickOpenRtbMapperTest {
     PMP pmp = request.getImp(0).getPmp();
     assertEquals(1, pmp.getDealsCount());
     PMP.DirectDeal deal = pmp.getDeals(0);
-    assertEquals("1", deal.getId());
+    assertEquals("5", deal.getId());
     assertEquals(200f, deal.getBidfloor(), 1e-6);
   }
 
