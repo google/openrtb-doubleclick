@@ -9,7 +9,7 @@
   <groupId>com.google.doubleclick</groupId>
   <artifactId>doubleclick-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.7-SNAPSHOT</version>
+  <version>0.6.1-SNAPSHOT</version>
   <name>Google DoubleClick Libraries</name>
   <description>
     Utilities for DoubleClick Ad Exchange, including OpenRTB mapping,
@@ -60,7 +60,7 @@
     <metricsVersion>3.0.2</metricsVersion>
     <mockitoVersion>1.9.5</mockitoVersion>
     <opencsvVersion>2.3</opencsvVersion>
-    <openrtbVersion>0.7-SNAPSHOT</openrtbVersion>
+    <openrtbVersion>0.6.1-SNAPSHOT</openrtbVersion>
     <protobufVersion>2.5.0</protobufVersion>
     <slf4jVersion>1.7.7</slf4jVersion>
 
@@ -76,7 +76,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <releaseMavenPluginVersion>2.5</releaseMavenPluginVersion>
-    <siteMavenPluginVersion>3.3</siteMavenPluginVersion>
+    <siteMavenPluginVersion>3.4</siteMavenPluginVersion>
     <surefireMavenPluginVersion>2.17</surefireMavenPluginVersion>
 
     <!-- Protobuf properties -->
