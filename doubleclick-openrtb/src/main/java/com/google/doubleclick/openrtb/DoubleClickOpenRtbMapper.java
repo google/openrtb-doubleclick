@@ -216,8 +216,11 @@ public class DoubleClickOpenRtbMapper
   @Override
   public OpenRtb.BidRequest toOpenRtb(Doubleclick.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
-        .setId(MapperUtil.toHexString(dcRequest.getId()))
-        .setTmax(100);
+        .setId(MapperUtil.toHexString(dcRequest.getId()));
+
+    if (dcRequest.getIsPing()) {
+      return request.build();
+    }
 
     boolean coppa = false;
     for (Doubleclick.BidRequest.UserDataTreatment dcUDT : dcRequest.getUserDataTreatmentList()) {
@@ -231,18 +234,16 @@ public class DoubleClickOpenRtbMapper
       request.setRegs(Regulations.newBuilder().setCoppa(Flag.YES));
     }
 
-    if (!dcRequest.getIsPing()) {
-      request.setDevice(buildDevice(dcRequest, coppa));
+    request.setDevice(buildDevice(dcRequest, coppa));
 
-      if (dcRequest.hasMobile()) {
-        request.setApp(buildApp(dcRequest));
-      } else {
-        request.setSite(buildSite(dcRequest));
-      }
-
-      addBcat(dcRequest, request);
-      buildImps(dcRequest, request);
+    if (dcRequest.hasMobile()) {
+      request.setApp(buildApp(dcRequest));
+    } else {
+      request.setSite(buildSite(dcRequest));
     }
+
+    addBcat(dcRequest, request);
+    buildImps(dcRequest, request);
 
     User.Builder user = buildUser(dcRequest, coppa);
     if (user != null) {
@@ -253,7 +254,9 @@ public class DoubleClickOpenRtbMapper
       extMapper.toOpenRtb(dcRequest, request);
     }
 
-    return request.build();
+    return request
+        .setTmax(100)
+        .build();
   }
 
   protected User.Builder buildUser(Doubleclick.BidRequest dcRequest, boolean coppa) {

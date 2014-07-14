@@ -16,8 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
-import static java.util.Arrays.asList;
+import static java.lang.Math.min;
 
+import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.Doubleclick;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
@@ -32,19 +33,22 @@ import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.Creativ
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.protobuf.ByteString;
 
-public class TestData {
+import java.util.List;
 
-  public static Bid.Builder newBid(boolean multi) {
+public class TestData {
+  static final int NO_SLOT = -1;
+
+  public static Bid.Builder newBid(boolean size) {
     Bid.Builder bid = Bid.newBuilder()
         .setId("0")
         .setImpid("1")
         .setAdid("2")
         .setCrid("4")
-        .setDealid("5")
         .setPrice(1000)
         .setAdm("<blink>hello world</blink>");
-    if (multi) {
+    if (size) {
       bid.setCid("3");
+      bid.setDealid("5");
       bid.setW(200);
       bid.setH(220);
     }
@@ -52,29 +56,27 @@ public class TestData {
   }
 
   public static Doubleclick.BidRequest newRequest() {
-    return newRequest(false, false).build();
+    return newRequest(0, false).build();
   }
 
-  public static Doubleclick.BidRequest.Builder newRequest(boolean multi, boolean coppa) {
-    AdSlot.Builder adSlot = AdSlot.newBuilder()
-        .setId(1)
-        .setSlotVisibility(SlotVisibility.ABOVE_THE_FOLD)
-        .addAllWidth(multi ? asList(100, 110) : asList(100))
-        .addAllHeight(multi ? asList(120, 130) : asList(120))
-        .addAllAllowedVendorType(asList(10, 94, 97))
-        .addAllExcludedSensitiveCategory(asList(0, 3, 4))
-        .addAllExcludedAttribute(asList(1, 2, 3))
-        .addAllExcludedProductCategory(asList(13, 14))
-        .addTargetableChannel(coppa ? "afv_user_id_PewDiePie" : "pack-anon-x::y")
-        .addMatchingAdData(MatchingAdData.newBuilder()
-            .setAdgroupId(3)
-            .addDirectDeal(MatchingAdData.DirectDeal.newBuilder()
-                .setDirectDealId(5)
-                .setFixedCpmMicros(200)));
-    if (multi) {
-      adSlot.addMatchingAdData(MatchingAdData.newBuilder()
-          .setAdgroupId(7));
+  static List<Integer> createSizes(int size, int base) {
+    ImmutableList.Builder<Integer> sizes = ImmutableList.builder();
+    for (int i = 0; i < size; ++i) {
+      sizes.add(base + i);
     }
+    return sizes.build();
+  }
+
+  @SafeVarargs
+  static <T> List<T> sublist(int size, T... items) {
+    ImmutableList.Builder<T> sizes = ImmutableList.builder();
+    for (int i = 0; i < min(size, items.length); ++i) {
+      sizes.add(items[i]);
+    }
+    return sizes.build();
+  }
+
+  public static Doubleclick.BidRequest.Builder newRequest(int size, boolean coppa) {
     Doubleclick.BidRequest.Builder req = Doubleclick.BidRequest.newBuilder()
         .setId(TestUtil.REQUEST_ID)
         .setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ))
@@ -85,9 +87,36 @@ public class TestData {
         .setGeoCriteriaId(9058770)
         .setAnonymousId("mysite.com")
         .setUrl("mysite.com/newsfeed")
-        .addDetectedLanguage("en")
-        .addDetectedLanguage("pt_BR")
-        .addAdslot(adSlot);
+        .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"));
+    if (size != NO_SLOT) {
+      AdSlot.Builder adSlot = AdSlot.newBuilder()
+          .setId(1)
+          .setSlotVisibility(SlotVisibility.ABOVE_THE_FOLD)
+          .addAllWidth(createSizes(size, 100))
+          .addAllHeight(createSizes(size, 200))
+          .addAllAllowedVendorType(sublist(size, 10, 94, 97))
+          .addAllExcludedSensitiveCategory(sublist(size, 0, 3, 4))
+          .addAllExcludedAttribute(sublist(size, 1, 2, 3))
+          .addAllExcludedProductCategory(sublist(size, 13, 14))
+          .addAllTargetableChannel(sublist(size, "afv_user_id_PewDiePie", "pack-anon-x::y"));
+      for (int i = 1; i < size; ++i) {
+        MatchingAdData.Builder mad = MatchingAdData.newBuilder()
+            .setAdgroupId(100 + i);
+        if (i >= 2) {
+          mad.setMinimumCpmMicros(10000 + i);
+          for (int j = 2; j <= i; ++j) {
+            MatchingAdData.DirectDeal.Builder deal = MatchingAdData.DirectDeal.newBuilder()
+                .setDirectDealId(10 * i + j);
+            if (j >= 3) {
+              deal.setFixedCpmMicros(12000);
+            }
+            mad.addDirectDeal(deal);
+          }
+        }
+        adSlot.addMatchingAdData(mad);
+      }
+      req.addAdslot(adSlot);
+    }
     if (coppa) {
       req.addUserDataTreatment(UserDataTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT);
     }
@@ -109,14 +138,20 @@ public class TestData {
         .setAppRating(4.2f);
   }
 
-  static Video.Builder newVideo(boolean multi) {
-    return Video.newBuilder()
+  static Video.Builder newVideo(int size) {
+    Video.Builder video = Video.newBuilder()
         .setMinAdDuration(15)
         .setMaxAdDuration(60)
-        .setVideoadStartDelay(5)
-        .addCompanionSlot(CompanionSlot.newBuilder()
-            .addCreativeFormat(CreativeFormat.IMAGE_CREATIVE)
-            .addAllWidth(multi ? asList(200, 210) : asList(200))
-            .addAllHeight(multi ? asList(220, 230) : asList(220)));
+        .setVideoadStartDelay(5);
+    if (size != NO_SLOT) {
+      CompanionSlot.Builder compSlot = CompanionSlot.newBuilder()
+          .addAllWidth(createSizes(size, 100))
+          .addAllHeight(createSizes(size, 200));
+      if (size >= 2) {
+        compSlot.addCreativeFormat(CreativeFormat.IMAGE_CREATIVE);
+      }
+      video.addCompanionSlot(compSlot);
+    }
+    return video;
   }
 }
