@@ -46,7 +46,7 @@
     <dependency>
       <groupId>com.google.doubleclick</groupId>
       <artifactId>doubleclick-core</artifactId>
-      <version>${openrtbVersion}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
