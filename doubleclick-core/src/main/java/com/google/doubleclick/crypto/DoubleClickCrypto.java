@@ -19,6 +19,7 @@ package com.google.doubleclick.crypto;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
@@ -35,7 +36,6 @@ import java.util.Date;
 
 import javax.annotation.Nullable;
 import javax.crypto.Mac;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 
@@ -66,18 +66,15 @@ public class DoubleClickCrypto {
   private static final int SIGNATURE_SIZE = 4;
   private static final int OVERHEAD_SIZE = NONCE_SIZE + SIGNATURE_SIZE;
 
-  private final SecretKey encryptionKey;
-  private final SecretKey integrityKey;
+  private final Keys keys;
 
   /**
    * Initializes with the encryption keys.
    *
-   * @param encryptionKey Encryption key for the buyer's Ad Exchange account
-   * @param integrityKey Integrity key for the buyer's Ad Exchange account
+   * @param keys Keys for the buyer's Ad Exchange account
    */
-  public DoubleClickCrypto(SecretKeySpec encryptionKey, SecretKeySpec integrityKey) {
-    this.encryptionKey = encryptionKey;
-    this.integrityKey = integrityKey;
+  public DoubleClickCrypto(Keys keys) {
+    this.keys = keys;
   }
 
   /**
@@ -176,7 +173,7 @@ public class DoubleClickCrypto {
 
   private byte[] hashNonce(byte[] data) throws NoSuchAlgorithmException, InvalidKeyException {
     Mac encryptionHmac = Mac.getInstance("HmacSHA1");
-    encryptionHmac.init(encryptionKey);
+    encryptionHmac.init(keys.getEncryptionKey());
     encryptionHmac.update(data, NONCE_BASE, NONCE_SIZE);
     hashNoncePadding(data, encryptionHmac);
     return encryptionHmac.doFinal();
@@ -187,7 +184,7 @@ public class DoubleClickCrypto {
 
   private int hashSignature(byte[] data) throws NoSuchAlgorithmException, InvalidKeyException {
     Mac integrityHmac = Mac.getInstance("HmacSHA1");
-    integrityHmac.init(integrityKey);
+    integrityHmac.init(keys.getIntegrityKey());
     integrityHmac.update(data, PAYLOAD_BASE, data.length - OVERHEAD_SIZE);
     integrityHmac.update(data, NONCE_BASE, NONCE_SIZE);
     return Ints.fromByteArray(integrityHmac.doFinal());
@@ -258,6 +255,31 @@ public class DoubleClickCrypto {
     return plaintext;
   }
 
+  public static class Keys {
+    private final SecretKeySpec encryptionKey;
+    private final SecretKeySpec integrityKey;
+
+    public Keys(SecretKeySpec encryptionKey, SecretKeySpec integrityKey) {
+      this.encryptionKey = encryptionKey;
+      this.integrityKey = integrityKey;
+    }
+
+    public SecretKeySpec getEncryptionKey() {
+      return encryptionKey;
+    }
+
+    public SecretKeySpec getIntegrityKey() {
+      return integrityKey;
+    }
+
+    @Override public String toString() {
+      return Objects.toStringHelper(this).omitNullValues()
+          .add("encryptionKey", encryptionKey.getAlgorithm() + '/' + encryptionKey.getFormat())
+          .add("integrityKey", integrityKey.getAlgorithm() + '/' + integrityKey.getFormat())
+          .toString();
+    }
+  }
+
   /**
    * Encryption for winning price.
    * <p>
@@ -268,9 +290,8 @@ public class DoubleClickCrypto {
     private static final int PAYLOAD_SIZE = 8;
 
     @Inject
-    public Price(
-        @EncryptionKey SecretKeySpec encryptionKey, @IntegrityKey SecretKeySpec integrityKey) {
-      super(encryptionKey, integrityKey);
+    public Price(Keys keys) {
+      super(keys);
     }
 
     /**
@@ -313,9 +334,8 @@ public class DoubleClickCrypto {
     private static final int PAYLOAD_SIZE = 16;
 
     @Inject
-    public AdId(
-        @EncryptionKey SecretKeySpec encryptionKey, @IntegrityKey SecretKeySpec integrityKey) {
-      super(encryptionKey, integrityKey);
+    public AdId(Keys keys) {
+      super(keys);
     }
 
     public String encryptAdId(byte[] adidValue, @Nullable byte[] nonce) {
@@ -349,9 +369,8 @@ public class DoubleClickCrypto {
     private static final int PAYLOAD_SIZE = 16;
 
     @Inject
-    public Idfa(
-        @EncryptionKey SecretKeySpec encryptionKey, @IntegrityKey SecretKeySpec integrityKey) {
-      super(encryptionKey, integrityKey);
+    public Idfa(Keys keys) {
+      super(keys);
     }
 
     public String encryptIdfa(byte[] idfaValue, @Nullable byte[] nonce) {
@@ -383,9 +402,8 @@ public class DoubleClickCrypto {
    */
   public static class Hyperlocal extends DoubleClickCrypto {
     @Inject
-    public Hyperlocal(
-        @EncryptionKey SecretKeySpec encryptionKey, @IntegrityKey SecretKeySpec integrityKey) {
-      super(encryptionKey, integrityKey);
+    public Hyperlocal(Keys keys) {
+      super(keys);
     }
 
     public String encryptHyperlocal(byte[] hyperlocalValue, @Nullable byte[] nonce) {

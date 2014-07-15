@@ -43,9 +43,9 @@
       <version>${commonsCodecVersion}</version>
     </dependency>
     <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-      <version>${guiceVersion}</version>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>${injectVersion}</version>
     </dependency>
 
     <dependency>

@@ -40,6 +40,16 @@ so this hack for non-Eclipse builds should be temporary.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.6.1, Jul 2014
+
+* Remove depedency from Guice! The libraries still supports all
+  JSR-305 DI frameworks, but now only uses javax.inject.
+* doubleClick-core: DoubleClick protocol updated to v50;
+  doubleclick-openrtb: We can now map app.content.userrating, app.name.
+* Build system improvements (Maven, Eclipse, NetBeans).
+* Improved OpenRtbSnippetProcessor handling of macro dependencies;
+  see new documentation about this in OpenRtbMacros.
+
 # Version 0.6, Jul 2014
 
 * Initial Open Source release.

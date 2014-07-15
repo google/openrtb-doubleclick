@@ -34,10 +34,11 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class DoubleClickCryptoTest {
 
-  static final SecretKeySpec ENCRYPTION_KEY = new SecretKeySpec(
-      Base64.decodeBase64("sIxwz7yw62yrfoLGt12lIHKuYrK/S5kLuApI2BQe7Ac="), "HmacSHA1");
-  static final SecretKeySpec INTEGRITY_KEY = new SecretKeySpec(
-      Base64.decodeBase64("v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1");
+  static final DoubleClickCrypto.Keys KEYS = new DoubleClickCrypto.Keys(
+      new SecretKeySpec(
+          Base64.decodeBase64("sIxwz7yw62yrfoLGt12lIHKuYrK/S5kLuApI2BQe7Ac="), "HmacSHA1"),
+      new SecretKeySpec(
+          Base64.decodeBase64("v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
   static final long PLAIN_PRICE = 0x000000002A512000L;
   static final Date NONCE_TIMESTAMP = new Date(0x0F1E2D3C4B5A6978L);
   static final long NONCE_SERVERID = 0x0123456789ABCDEFL;
@@ -54,16 +55,12 @@ public class DoubleClickCryptoTest {
   static final String CIPHER_ADID = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmQdL0tmh_fduB2go_";
   static final byte[] PLAIN_HYPERLOCAL = createHyperlocal(16);
   static final String CIPHER_HYPERLOCAL = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmQdL0tmh_fduB2go_";
-  static final DoubleClickCrypto baseCrypto =
-      new DoubleClickCrypto(ENCRYPTION_KEY, INTEGRITY_KEY);
-  static final DoubleClickCrypto.Price priceCrypto =
-      new DoubleClickCrypto.Price(ENCRYPTION_KEY, INTEGRITY_KEY);
-  static final DoubleClickCrypto.Idfa idfaCrypto =
-      new DoubleClickCrypto.Idfa(ENCRYPTION_KEY, INTEGRITY_KEY);
-  static final DoubleClickCrypto.AdId adidCrypto =
-      new DoubleClickCrypto.AdId(ENCRYPTION_KEY, INTEGRITY_KEY);
+  static final DoubleClickCrypto baseCrypto = new DoubleClickCrypto(KEYS);
+  static final DoubleClickCrypto.Price priceCrypto = new DoubleClickCrypto.Price(KEYS);
+  static final DoubleClickCrypto.Idfa idfaCrypto = new DoubleClickCrypto.Idfa(KEYS);
+  static final DoubleClickCrypto.AdId adidCrypto = new DoubleClickCrypto.AdId(KEYS);
   static final DoubleClickCrypto.Hyperlocal hyperlocalCrypto =
-      new DoubleClickCrypto.Hyperlocal(ENCRYPTION_KEY, INTEGRITY_KEY);
+      new DoubleClickCrypto.Hyperlocal(KEYS);
 
   @Test
   public void testDoubleClickCryptoException() {
@@ -145,7 +142,9 @@ public class DoubleClickCryptoTest {
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testPriceDecrypt_wrongKeys() {
-    new DoubleClickCrypto.Price(INTEGRITY_KEY, ENCRYPTION_KEY).decryptPrice(CIPHER_PRICE);
+    new DoubleClickCrypto.Price(
+            new DoubleClickCrypto.Keys(KEYS.getIntegrityKey(), KEYS.getEncryptionKey()))
+        .decryptPrice(CIPHER_PRICE);
   }
 
   @Test
