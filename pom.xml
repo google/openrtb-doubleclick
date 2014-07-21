@@ -51,7 +51,7 @@
   </prerequisites>
 
   <properties>
-  	<commonsCodecVersion>1.9</commonsCodecVersion>
+    <commonsCodecVersion>1.9</commonsCodecVersion>
     <findBugsJsr305Version>3.0.0</findBugsJsr305Version>
     <gpg.skip>true</gpg.skip>
     <guavaVersion>17.0</guavaVersion>

@@ -73,7 +73,7 @@ public class DoubleClickOpenRtbMapper
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickOpenRtbMapper.class);
   private static final String YOUTUBE_AFV_USER_ID = "afv_user_id_";
   private static final Pattern SEMITRANSPARENT_CHANNEL =
-      Pattern.compile("pack-(branded|semi|anon)-([^\\-]+)::(.+)");
+      Pattern.compile("pack-(brand|semi|anon)-([^\\-]+)::(.+)");
   private static final Joiner versionJoiner = Joiner.on(".").skipNulls();
 
   private final DoubleClickMetadata metadata;
