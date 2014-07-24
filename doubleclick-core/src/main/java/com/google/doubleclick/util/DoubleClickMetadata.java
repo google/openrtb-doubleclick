@@ -21,8 +21,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget.TargetType;
 
-import au.com.bytecode.opencsv.CSVParser;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,22 +274,22 @@ public class DoubleClickMetadata {
 
       Map<Integer, GeoTarget> map = new LinkedHashMap<>();
       Map<String, GeoTarget> parentMap = new LinkedHashMap<>();
-      CSVParser csvParser = new CSVParser(',', '"');
+      CSVParser csvParser = new CSVParser(',');
 
       // Some records fail to match the parent by canonical name, for example
       // "Zalau,Salaj County,Romania", the parent record is "Salaj,Romania".
       // Cycle through all data three times (one per hierarchy level), anything left is discarded.
       for (int cycle = 1; cycle <= 3; ++cycle, data = nextData, nextData = new ArrayList<>()) {
         for (String record : data) {
-          String[] fields = csvParser.parseLine(record);
-          if (fields.length != 7) {
+          List<String> fields = csvParser.parseCsv(record);
+          if (fields.size() != 7) {
             continue;
           }
-          Integer criteriaId = new Integer(fields[0]);
-          String name = fields[1];
-          String canonicalName = fields[2];
-          String countryCode = fields[5];
-          String targetType = fields[6];
+          Integer criteriaId = Integer.valueOf(fields.get(0));
+          String name = fields.get(1);
+          String canonicalName = fields.get(2);
+          String countryCode = fields.get(5);
+          String targetType = fields.get(6);
 
           // Parent IDs are legacy, and some records are inconsistent, so we following AdX's docs
           // and build hierarchy by the canonical names. Notice that canonical names are not always
@@ -359,16 +357,17 @@ public class DoubleClickMetadata {
     ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
 
     try (InputStream is = DoubleClickMetadata.class.getResourceAsStream(resourceName)) {
-      BufferedReader rd  = new BufferedReader(new InputStreamReader(is));
-      CSVParser csvParser = new CSVParser('\t', '"');
+      BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+      CSVParser csvParser = new CSVParser('\t');
       Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
       String line;
 
       while ((line = rd.readLine()) != null) {
 
         if (pattern.matcher(line).matches()) {
-          String[] fields = csvParser.parseLine(line);
-          CountryCodes codes = new CountryCodes(Integer.parseInt(fields[0]), fields[2], fields[3]);
+          List<String> fields = csvParser.parseCsv(line);
+          CountryCodes codes = new CountryCodes(
+              Integer.parseInt(fields.get(0)), fields.get(2), fields.get(3));
           map.put(codes.getNumeric(), codes);
           map.put(codes.getAlpha2(), codes);
           map.put(codes.getAlpha3(), codes);
