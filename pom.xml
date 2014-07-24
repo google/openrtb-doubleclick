@@ -59,7 +59,6 @@
     <junitVersion>4.11</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
     <mockitoVersion>1.9.5</mockitoVersion>
-    <opencsvVersion>2.3</opencsvVersion>
     <openrtbVersion>0.6.1</openrtbVersion>
     <protobufVersion>2.5.0</protobufVersion>
     <slf4jVersion>1.7.7</slf4jVersion>

@@ -274,7 +274,7 @@ public class DoubleClickMetadata {
 
       Map<Integer, GeoTarget> map = new LinkedHashMap<>();
       Map<String, GeoTarget> parentMap = new LinkedHashMap<>();
-      CSVParser csvParser = new CSVParser(',', '"', (char) -1);
+      CSVParser csvParser = new CSVParser(',');
 
       // Some records fail to match the parent by canonical name, for example
       // "Zalau,Salaj County,Romania", the parent record is "Salaj,Romania".
@@ -285,7 +285,7 @@ public class DoubleClickMetadata {
           if (fields.size() != 7) {
             continue;
           }
-          Integer criteriaId = new Integer(fields.get(0));
+          Integer criteriaId = Integer.valueOf(fields.get(0));
           String name = fields.get(1);
           String canonicalName = fields.get(2);
           String countryCode = fields.get(5);
@@ -357,8 +357,8 @@ public class DoubleClickMetadata {
     ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
 
     try (InputStream is = DoubleClickMetadata.class.getResourceAsStream(resourceName)) {
-      BufferedReader rd  = new BufferedReader(new InputStreamReader(is));
-      CSVParser csvParser = new CSVParser('\t', '"', (char) -1);
+      BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+      CSVParser csvParser = new CSVParser('\t');
       Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
       String line;
 
