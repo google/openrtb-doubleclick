@@ -399,21 +399,14 @@ public class DoubleClickCrypto {
    * Targeting mobile app inventory with IDFA</a>.
    */
   public static class Idfa extends DoubleClickCrypto {
-    private static final int PAYLOAD_SIZE = 16;
-
     @Inject
     public Idfa(Keys keys) {
       super(keys);
     }
 
     public String encryptIdfa(byte[] idfaValue, @Nullable byte[] nonce) {
-      if (idfaValue.length != PAYLOAD_SIZE) {
-        throw new DoubleClickCryptoException(
-            "IDFA is " + idfaValue.length + " bytes, should be " + PAYLOAD_SIZE);
-      }
-
-      byte[] plaintext = initPlaintext(PAYLOAD_SIZE, nonce);
-      System.arraycopy(idfaValue, 0, plaintext, PAYLOAD_BASE, PAYLOAD_SIZE);
+      byte[] plaintext = initPlaintext(idfaValue.length, nonce);
+      System.arraycopy(idfaValue, 0, plaintext, PAYLOAD_BASE, idfaValue.length);
       return encode(encrypt(plaintext));
     }
 
