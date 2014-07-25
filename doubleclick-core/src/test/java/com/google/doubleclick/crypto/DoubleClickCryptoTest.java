@@ -49,12 +49,12 @@ public class DoubleClickCryptoTest {
     (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
   };
   static final String CIPHER_PRICE = "5nmwvgAM0UABI0VniavN72_sy3TQFLWhVys-IA";
-  static final byte[] PLAIN_IDFA = new byte[]{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-  static final String CIPHER_IDFA = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmQdL0tmh_fduB2go_";
+  static final byte[] PLAIN_IDFA = new byte[]{ 0,1,2,3,4,5,6,7 };
+  static final String CIPHER_IDFA = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmeDOf7A";
   static final byte[] PLAIN_ADID = new byte[]{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
   static final String CIPHER_ADID = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmQdL0tmh_fduB2go_";
-  static final byte[] PLAIN_HYPERLOCAL = createHyperlocal(16);
-  static final String CIPHER_HYPERLOCAL = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmQdL0tmh_fduB2go_";
+  static final byte[] PLAIN_HYPERLOCAL = new byte[]{ 7,6,5,4,3,2,1,0 };
+  static final String CIPHER_HYPERLOCAL = "5nmwvgAM0UABI0VniavN72jqznD5R5ShB_0m0g";
   static final DoubleClickCrypto baseCrypto = new DoubleClickCrypto(KEYS);
   static final DoubleClickCrypto.Price priceCrypto = new DoubleClickCrypto.Price(KEYS);
   static final DoubleClickCrypto.Idfa idfaCrypto = new DoubleClickCrypto.Idfa(KEYS);
@@ -158,11 +158,6 @@ public class DoubleClickCryptoTest {
     assertEquals(CIPHER_IDFA, idfaCrypto.encryptIdfa(PLAIN_IDFA, NONCE));
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
-  public void testIdfaEncrypt_badSize() {
-    idfaCrypto.encryptIdfa(new byte[]{0,1,2,3,4,5,6,7}, NONCE);
-  }
-
   @Test
   public void testIdfaDecrypt() {
     byte[] decrypted = idfaCrypto.decryptIdfa(CIPHER_IDFA);
@@ -172,6 +167,19 @@ public class DoubleClickCryptoTest {
   @Test(expected = DoubleClickCryptoException.class)
   public void testIdfaDecrypt_noData() {
     idfaCrypto.decryptIdfa("");
+  }
+
+  @Test
+  public void testIdfa_dataRange() {
+    // Smaller data possible
+    idfaCrypto.encryptIdfa(createData(1), NONCE);
+    // Bigger data possible: 768 sections = 15360 bytes
+    idfaCrypto.encryptIdfa(createData(20 * 768), NONCE);
+  }
+
+  @Test(expected = DoubleClickCryptoException.class)
+  public void testIdfa_dataTooBig() {
+    idfaCrypto.encryptIdfa(createData(20 * 768 + 1), NONCE);
   }
 
   @Test
@@ -226,14 +234,14 @@ public class DoubleClickCryptoTest {
   @Test
   public void testHyperlocal_dataRange() {
     // Smaller data possible
-    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(1), NONCE);
+    hyperlocalCrypto.encryptHyperlocal(createData(1), NONCE);
     // Bigger data possible: 768 sections = 15360 bytes
-    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(20 * 768), NONCE);
+    hyperlocalCrypto.encryptHyperlocal(createData(20 * 768), NONCE);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testHyperlocal_dataTooBig() {
-    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(20 * 768 + 1), NONCE);
+    hyperlocalCrypto.encryptHyperlocal(createData(20 * 768 + 1), NONCE);
   }
 
   @Test
@@ -242,7 +250,7 @@ public class DoubleClickCryptoTest {
     assertArrayEquals(PLAIN_HYPERLOCAL, hyperlocalCrypto.decryptHyperlocal(encrypted));
   }
 
-  private static final byte[] createHyperlocal(int size) {
+  private static final byte[] createData(int size) {
     byte[] data = new byte[size];
     for (int i = 0; i < data.length; ++i) {
       data[i] = (byte) (i & 0xFF);
