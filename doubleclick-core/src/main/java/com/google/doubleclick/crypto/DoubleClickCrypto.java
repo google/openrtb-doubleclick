@@ -24,6 +24,8 @@ import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.BaseNCodec;
+import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +84,9 @@ public class DoubleClickCrypto {
    * The default implementation performs Base64 URL-safe decoding.
    */
   protected @Nullable byte[] decode(@Nullable String data) {
-    return data == null ? null : new Base64(true).decode(data);
+    return data == null
+        ? null
+        : CryptoBase64.forSize(data.length()).decode(data);
   }
 
   /**
@@ -90,7 +94,9 @@ public class DoubleClickCrypto {
    * The default implementation performs Base64 URL-safe encoding.
    */
   protected @Nullable String encode(@Nullable byte[] data) {
-    return data == null ? null : Base64.encodeBase64URLSafeString(data);
+    return data == null
+        ? null
+        : StringUtils.newStringUtf8(CryptoBase64.forSize(data.length).encode(data));
   }
 
   /**
@@ -180,6 +186,33 @@ public class DoubleClickCrypto {
   }
 
   protected void hashNoncePadding(byte[] data, Mac encryptionHmac) {
+    int payloadSize = data.length - OVERHEAD_SIZE;
+    int pageSize = 20;
+    if (payloadSize <= pageSize) {
+      return;
+    }
+
+    int sections = (payloadSize + pageSize - 1) / pageSize;
+    byte[] pad = new byte[sections + max(0, sections - 256) + max(0, sections - 512)];
+    int padPos = 0;
+
+    for (int section = 1; section <= sections; ++section) {
+      if (section <= 256) {
+        pad[padPos++] = (byte) (section - 1);
+      } else if (section <= 512) {
+        pad[padPos++] = 0;
+        pad[padPos++] = (byte) (section - 256 - 1);
+      } else if (section <= 768) {
+        pad[padPos++] = 0;
+        pad[padPos++] = 0;
+        pad[padPos++] = (byte) (section - 512 - 1);
+      } else {
+        throw new DoubleClickCryptoException(
+            "Payload is " + payloadSize + "bytes, exceeds limit of " + pageSize * 768);
+      }
+    }
+
+    encryptionHmac.update(pad);
   }
 
   private int hashSignature(byte[] data) throws NoSuchAlgorithmException, InvalidKeyException {
@@ -420,36 +453,21 @@ public class DoubleClickCrypto {
       byte[] plaintext = decrypt(decode(encodedCiphertext));
       return Arrays.copyOfRange(plaintext, PAYLOAD_BASE, plaintext.length - SIGNATURE_SIZE);
     }
+  }
 
-    @Override
-    protected void hashNoncePadding(byte[] data, Mac encryptionHmac) {
-      int payloadSize = data.length - OVERHEAD_SIZE;
-      int pageSize = 20;
-      if (payloadSize <= pageSize) {
-        return;
-      }
-
-      int sections = (payloadSize + pageSize - 1) / pageSize;
-      byte[] pad = new byte[sections + max(0, sections - 256) + max(0, sections - 512)];
-      int padPos = 0;
-
-      for (int section = 1; section <= sections; ++section) {
-        if (section <= 256) {
-          pad[padPos++] = (byte) (section - 1);
-        } else if (section <= 512) {
-          pad[padPos++] = 0;
-          pad[padPos++] = (byte) (section - 256 - 1);
-        } else if (section <= 768) {
-          pad[padPos++] = 0;
-          pad[padPos++] = 0;
-          pad[padPos++] = (byte) (section - 512 - 1);
-        } else {
-          throw new DoubleClickCryptoException(
-              "Hyperlocal is " + payloadSize + "bytes, exceeds limit of " + pageSize * 768);
-        }
-      }
-
-      encryptionHmac.update(pad);
+  static class CryptoBase64 extends Base64 {
+    static final int SMALL_SIZE = 64;
+    static final CryptoBase64 small = new CryptoBase64(SMALL_SIZE);
+    final int defaultBufferSize;
+    CryptoBase64(int defaultBufferSize) {
+      super(BaseNCodec.MIME_CHUNK_SIZE, null, true);
+      this.defaultBufferSize = defaultBufferSize;
+    }
+    @Override protected int getDefaultBufferSize() {
+      return defaultBufferSize;
+    }
+    static CryptoBase64 forSize(int size) {
+      return size <= SMALL_SIZE ? small : new CryptoBase64(size);
     }
   }
 }
