@@ -9,7 +9,7 @@
   <groupId>com.google.doubleclick</groupId>
   <artifactId>doubleclick-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.6.2-SNAPSHOT</version>
+  <version>0.6.2</version>
   <name>Google DoubleClick Libraries</name>
   <description>
     Utilities for DoubleClick Ad Exchange, including OpenRTB mapping,
@@ -104,7 +104,7 @@
   <scm>
     <connection>scm:git:https://github.com/google/openrtb-doubleclick.git</connection>
     <developerConnection>scm:git:https://github.com/google/openrtb-doubleclick.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>0.6.2</tag>
   </scm>
 
   <build>
