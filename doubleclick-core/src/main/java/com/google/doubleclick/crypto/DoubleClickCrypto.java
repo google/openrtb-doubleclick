@@ -24,6 +24,7 @@ import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +68,11 @@ public class DoubleClickCrypto {
   private static final int OVERHEAD_SIZE = NONCE_SIZE + SIGNATURE_SIZE;
 
   private final Keys keys;
+  private static final Base64 base64 = new Base64(48, null, true) {
+    @Override protected int getDefaultBufferSize() {
+      return 48; // Override excessive default buffer size 8192!
+    }
+  };
 
   /**
    * Initializes with the encryption keys.
@@ -82,7 +88,7 @@ public class DoubleClickCrypto {
    * The default implementation performs Base64 URL-safe decoding.
    */
   protected @Nullable byte[] decode(@Nullable String data) {
-    return data == null ? null : new Base64(true).decode(data);
+    return data == null ? null : base64.decode(data);
   }
 
   /**
@@ -90,7 +96,7 @@ public class DoubleClickCrypto {
    * The default implementation performs Base64 URL-safe encoding.
    */
   protected @Nullable String encode(@Nullable byte[] data) {
-    return data == null ? null : Base64.encodeBase64URLSafeString(data);
+    return data == null ? null : StringUtils.newStringUtf8(base64.encode(data));
   }
 
   /**
