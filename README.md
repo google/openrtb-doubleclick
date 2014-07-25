@@ -40,7 +40,14 @@ so this hack for non-Eclipse builds should be temporary.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-# Version 0.6.1, Jul 2014
+# Version 0.6.2, 25-07-2014
+
+* DoubleClickCrypto: optimize memory usage in Base64 encoding/decoding;
+  fix support for IDFA, which may also need
+* Remove dependency on buggy, unsupported opencsv; using custom parser.
+* DoubleClickOpenRtbMapper: Fix semi-transparent branded channels.
+
+# Version 0.6.1, 15-07-2014
 
 * Remove depedency from Guice! The libraries still supports all
   JSR-305 DI frameworks, but now only uses javax.inject.
@@ -50,6 +57,6 @@ RELEASE NOTES
 * Improved OpenRtbSnippetProcessor handling of macro dependencies;
   see new documentation about this in OpenRtbMacros.
 
-# Version 0.6, Jul 2014
+# Version 0.6, 10-07-2014
 
 * Initial Open Source release.
