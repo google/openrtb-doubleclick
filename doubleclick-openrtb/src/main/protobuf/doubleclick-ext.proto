@@ -22,7 +22,7 @@ import "openrtb.proto";
 import "doubleclick.proto";
 
 //
-// OpenRTB Extensions for DoubleClick Ad Exchange (ID=101).
+// OpenRTB Extensions for DoubleClick Ad Exchange (ID=101..109).
 // These "Link" extensions are internal only, not used on-wire.
 //
 
@@ -34,6 +34,11 @@ extend com.google.openrtb.BidRequest {
 extend com.google.openrtb.BidRequest.Device {
   /** Reference to the corresponding node in the DoubleClick request. */
   optional com.google.doubleclick.BidRequest.Mobile mobile = 101;
+}
+
+extend com.google.openrtb.BidRequest.Geo {
+  /** Decrypted content of BidRequest.encrypted_hyperlocal_set. */
+  optional com.google.doubleclick.BidRequest.HyperlocalSet hyperLocal = 102;
 }
 
 extend com.google.openrtb.BidRequest.Impression {
@@ -48,8 +53,7 @@ extend com.google.openrtb.BidRequest.Impression.Video {
 
 extend com.google.openrtb.BidRequest.Impression.PMP {
   /** Reference to the corresponding node in the DoubleClick request. */
-  optional com.google.doubleclick.BidRequest.AdSlot.MatchingAdData
-      adData = 101;
+  optional com.google.doubleclick.BidRequest.AdSlot.MatchingAdData adData = 101;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {

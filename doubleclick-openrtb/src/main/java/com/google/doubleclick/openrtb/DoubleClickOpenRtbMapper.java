@@ -580,6 +580,7 @@ public class DoubleClickOpenRtbMapper
       try {
         HyperlocalSet hyperlocalSet = HyperlocalSet.parseFrom(hyperlocalCrypto.decryptHyperlocal(
             dcRequest.getEncryptedHyperlocalSet().toByteArray()));
+        geo.setExtension(DcExt.hyperLocal, hyperlocalSet);
         if (hyperlocalSet.hasCenterPoint()) {
           Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
           if (center.hasLatitude() && center.hasLongitude()) {
