@@ -29,6 +29,7 @@ import com.google.doubleclick.DcExt;
 import com.google.doubleclick.Doubleclick;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot;
 import com.google.doubleclick.Doubleclick.BidResponse.Ad;
+import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Impression;
@@ -48,10 +49,10 @@ import org.junit.Test;
  */
 public class DoubleClickOpenRtbMapperTest {
   public static final String DEFAULT_CALLBACK_URL = "http://localhost";
-
   private DoubleClickOpenRtbMapper mapper = new DoubleClickOpenRtbMapper(
       new MetricRegistry(),
       TestUtil.getMetadata(),
+      new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
       ImmutableList.of(DoubleClickLinkMapper.INSTANCE));
 
   @Test
@@ -217,6 +218,7 @@ public class DoubleClickOpenRtbMapperTest {
       DoubleClickOpenRtbMapper mapper = new DoubleClickOpenRtbMapper(
           new MetricRegistry(),
           TestUtil.getMetadata(),
+          new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
           extMappers.build());
 
       Doubleclick.BidRequest.Builder dcRequest = TestData.newRequest(size, coppa);

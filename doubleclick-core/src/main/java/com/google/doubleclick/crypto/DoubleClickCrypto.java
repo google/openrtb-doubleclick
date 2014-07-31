@@ -20,7 +20,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
 import org.apache.commons.codec.binary.Base64;
@@ -107,7 +106,7 @@ public class DoubleClickCrypto {
    * @throws DoubleClickCryptoException if the decryption fails
    */
   public byte[] decrypt(byte[] ciphertext) {
-    if (ciphertext.length <= OVERHEAD_SIZE) {
+    if (ciphertext.length < OVERHEAD_SIZE) {
       throw new DoubleClickCryptoException("Invalid ciphertext, " + ciphertext.length + " bytes");
     }
 
@@ -145,7 +144,7 @@ public class DoubleClickCrypto {
    * @throws DoubleClickCryptoException if the encryption fails
    */
   public byte[] encrypt(byte[] plaintext) {
-    if (plaintext.length <= OVERHEAD_SIZE) {
+    if (plaintext.length < OVERHEAD_SIZE) {
       throw new DoubleClickCryptoException("Invalid plaintext, " + plaintext.length + " bytes");
     }
 
@@ -208,7 +207,7 @@ public class DoubleClickCrypto {
         pad[padPos++] = (byte) (section - 512 - 1);
       } else {
         throw new DoubleClickCryptoException(
-            "Payload is " + payloadSize + "bytes, exceeds limit of " + pageSize * 768);
+            "Payload is " + payloadSize + " bytes, exceeds limit of " + pageSize * 768);
       }
     }
 
@@ -218,8 +217,10 @@ public class DoubleClickCrypto {
   private int hashSignature(byte[] data) throws NoSuchAlgorithmException, InvalidKeyException {
     Mac integrityHmac = Mac.getInstance("HmacSHA1");
     integrityHmac.init(keys.getIntegrityKey());
-    integrityHmac.update(data, PAYLOAD_BASE, data.length - OVERHEAD_SIZE);
-    integrityHmac.update(data, NONCE_BASE, NONCE_SIZE);
+    if (data.length != 0) {
+      integrityHmac.update(data, PAYLOAD_BASE, data.length - OVERHEAD_SIZE);
+      integrityHmac.update(data, NONCE_BASE, NONCE_SIZE);
+    }
     return Ints.fromByteArray(integrityHmac.doFinal());
   }
 
@@ -288,6 +289,9 @@ public class DoubleClickCrypto {
     return plaintext;
   }
 
+  /**
+   * Holds the keys used to configure DoubleClick cryptography.
+   */
   public static class Keys {
     private final SecretKeySpec encryptionKey;
     private final SecretKeySpec integrityKey;
@@ -328,32 +332,57 @@ public class DoubleClickCrypto {
     }
 
     /**
-     * Encrypts the winning price. Accepts the price and raw nonce data.
+     * Encrypts the winning price.
      *
      * @param priceValue the price
      * @param nonce up to 16 bytes of nonce data
-     * @return encrypted data encoded in AdX's format (web-safe base64)
+     * @return encrypted price
      * @throws DoubleClickCryptoException if the encryption fails
      */
-    public String encryptPrice(long priceValue, @Nullable byte[] nonce) {
+    public byte[] encryptPrice(long priceValue, @Nullable byte[] nonce) {
       byte[] plaintext = initPlaintext(PAYLOAD_SIZE, nonce);
       ByteBuffer.wrap(plaintext).putLong(PAYLOAD_BASE, priceValue);
-      return encode(encrypt(plaintext));
+      return encrypt(plaintext);
     }
 
     /**
      * Decrypts the winning price.
      *
-     * @param encodedCiphertext encoded ciphertext
-     * @return plaintext
+     * @param priceCipher encrypted price
+     * @return the price value
      * @throws DoubleClickCryptoException if the decryption fails
      */
-    public long decryptPrice(String encodedCiphertext) {
-      if (Strings.isNullOrEmpty(encodedCiphertext)) {
-        throw new DoubleClickCryptoException("Empty encoded ciphertext");
+    public long decryptPrice(byte[] priceCipher) {
+      if (priceCipher.length != (OVERHEAD_SIZE + PAYLOAD_SIZE)) {
+        throw new DoubleClickCryptoException(
+            "Price is " + priceCipher.length + " bytes, should be "
+                + (OVERHEAD_SIZE + PAYLOAD_SIZE));
       }
 
-      return ByteBuffer.wrap(decrypt(decode(encodedCiphertext))).getLong(PAYLOAD_BASE);
+      return ByteBuffer.wrap(decrypt(priceCipher)).getLong(PAYLOAD_BASE);
+    }
+
+    /**
+     * Encrypts and encodes the winning price.
+     *
+     * @param priceValue the price
+     * @param nonce up to 16 bytes of nonce data
+     * @return encrypted price, encoded as websafe-base64
+     * @throws DoubleClickCryptoException if the encryption fails
+     */
+    public String encodePrice(long priceValue, @Nullable byte[] nonce) {
+      return encode(encryptPrice(priceValue, nonce));
+    }
+
+    /**
+     * Decodes and decrypts the winning price.
+     *
+     * @param priceCipher encrypted price, encoded as websafe-base64
+     * @return the price value
+     * @throws DoubleClickCryptoException if the decryption fails
+     */
+    public long decodePrice(String priceCipher) {
+      return decryptPrice(decode(priceCipher));
     }
   }
 
@@ -371,23 +400,24 @@ public class DoubleClickCrypto {
       super(keys);
     }
 
-    public String encryptAdId(byte[] adidValue, @Nullable byte[] nonce) {
-      if (adidValue.length != PAYLOAD_SIZE) {
+    public byte[] encryptAdId(byte[] adidPlain, @Nullable byte[] nonce) {
+      if (adidPlain.length != PAYLOAD_SIZE) {
         throw new DoubleClickCryptoException(
-            "AdId is " + adidValue.length + " bytes, should be " + PAYLOAD_SIZE);
+            "AdId is " + adidPlain.length + " bytes, should be " + PAYLOAD_SIZE);
       }
 
       byte[] plaintext = initPlaintext(PAYLOAD_SIZE, nonce);
-      System.arraycopy(adidValue, 0, plaintext, PAYLOAD_BASE, PAYLOAD_SIZE);
-      return encode(encrypt(plaintext));
+      System.arraycopy(adidPlain, 0, plaintext, PAYLOAD_BASE, PAYLOAD_SIZE);
+      return encrypt(plaintext);
     }
 
-    public byte[] decryptAdId(String encodedCiphertext) {
-      if (Strings.isNullOrEmpty(encodedCiphertext)) {
-        throw new DoubleClickCryptoException("Empty encoded ciphertext");
+    public byte[] decryptAdId(byte[] adidCipher) {
+      if (adidCipher.length != (OVERHEAD_SIZE + PAYLOAD_SIZE)) {
+        throw new DoubleClickCryptoException(
+            "AdId is " + adidCipher.length + " bytes, should be " + (OVERHEAD_SIZE + PAYLOAD_SIZE));
       }
 
-      byte[] plaintext = decrypt(decode(encodedCiphertext));
+      byte[] plaintext = decrypt(adidCipher);
       return Arrays.copyOfRange(plaintext, PAYLOAD_BASE, plaintext.length - SIGNATURE_SIZE);
     }
   }
@@ -404,19 +434,28 @@ public class DoubleClickCrypto {
       super(keys);
     }
 
-    public String encryptIdfa(byte[] idfaValue, @Nullable byte[] nonce) {
-      byte[] plaintext = initPlaintext(idfaValue.length, nonce);
-      System.arraycopy(idfaValue, 0, plaintext, PAYLOAD_BASE, idfaValue.length);
-      return encode(encrypt(plaintext));
-    }
-
-    public byte[] decryptIdfa(String encodedCiphertext) {
-      if (Strings.isNullOrEmpty(encodedCiphertext)) {
-        throw new DoubleClickCryptoException("Empty encoded ciphertext");
+    public byte[] encryptIdfa(byte[] idfaPlain, @Nullable byte[] nonce) {
+      if (idfaPlain.length < 1) {
+        throw new DoubleClickCryptoException(
+            "IDFA is " + idfaPlain.length + " bytes, should be >= 1");
       }
 
-      byte[] plaintext = decrypt(decode(encodedCiphertext));
+      byte[] plaintext = initPlaintext(idfaPlain.length, nonce);
+      System.arraycopy(idfaPlain, 0, plaintext, PAYLOAD_BASE, idfaPlain.length);
+      return encrypt(plaintext);
+    }
+
+    public byte[] decryptIdfa(byte[] idfaCipher) {
+      byte[] plaintext = decrypt(idfaCipher);
       return Arrays.copyOfRange(plaintext, PAYLOAD_BASE, plaintext.length - SIGNATURE_SIZE);
+    }
+
+    public String encodeIdfa(byte[] idfaPlain, @Nullable byte[] nonce) {
+      return encode(encryptIdfa(idfaPlain, nonce));
+    }
+
+    public byte[] decodeIdfa(String idfaCipher) {
+      return decryptIdfa(decode(idfaCipher));
     }
   }
 
@@ -432,22 +471,26 @@ public class DoubleClickCrypto {
       super(keys);
     }
 
-    public String encryptHyperlocal(byte[] hyperlocalValue, @Nullable byte[] nonce) {
-      byte[] plaintext = initPlaintext(hyperlocalValue.length, nonce);
-      System.arraycopy(hyperlocalValue, 0, plaintext, PAYLOAD_BASE, hyperlocalValue.length);
-      return encode(encrypt(plaintext));
-    }
-
-    public byte[] decryptHyperlocal(String encodedCiphertext) {
-      if (Strings.isNullOrEmpty(encodedCiphertext)) {
-        throw new DoubleClickCryptoException("Empty encoded ciphertext");
+    public byte[] encryptHyperlocal(byte[] hyperlocalPlain, @Nullable byte[] nonce) {
+      if (hyperlocalPlain.length < 1) {
+        throw new DoubleClickCryptoException(
+            "Hyperlocal is " + hyperlocalPlain.length + " bytes, should be >= 1");
       }
 
-      byte[] plaintext = decrypt(decode(encodedCiphertext));
+      byte[] plaintext = initPlaintext(hyperlocalPlain.length, nonce);
+      System.arraycopy(hyperlocalPlain, 0, plaintext, PAYLOAD_BASE, hyperlocalPlain.length);
+      return encrypt(plaintext);
+    }
+
+    public byte[] decryptHyperlocal(byte[] hyperlocalCipher) {
+      byte[] plaintext = decrypt(hyperlocalCipher);
       return Arrays.copyOfRange(plaintext, PAYLOAD_BASE, plaintext.length - SIGNATURE_SIZE);
     }
   }
 
+  /**
+   * Helper subclass to work around Base64's very bad defaults for buffer sizes.
+   */
   static class CryptoBase64 extends Base64 {
     static final int SMALL_SIZE = 64;
     static final CryptoBase64 small = new CryptoBase64(SMALL_SIZE);

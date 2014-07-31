@@ -18,6 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.Doubleclick;
+import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Impression;
@@ -30,9 +31,14 @@ import com.google.protobuf.ByteString;
 
 import com.codahale.metrics.MetricRegistry;
 
+import javax.crypto.spec.SecretKeySpec;
+
 class TestUtil {
   public static final String DEFAULT_URI = "http://example.com";
   public static final ByteString REQUEST_ID = ByteString.copyFromUtf8("01234567");
+  public static final DoubleClickCrypto.Keys KEYS = new DoubleClickCrypto.Keys(
+      new SecretKeySpec(new byte[32], "HmacSHA1"),
+      new SecretKeySpec(new byte[32], "HmacSHA1"));
   private static DoubleClickMetadata metadata;
 
   private TestUtil() {
@@ -81,7 +87,10 @@ class TestUtil {
     Doubleclick.BidRequest dcRequest = adxRequest instanceof Doubleclick.BidRequest
         ? (Doubleclick.BidRequest) adxRequest
         : ((Doubleclick.BidRequest.Builder) adxRequest).build();
-    return new DoubleClickOpenRtbMapper(new MetricRegistry(), getMetadata(),
+    return new DoubleClickOpenRtbMapper(
+        new MetricRegistry(),
+        getMetadata(),
+        new DoubleClickCrypto.Hyperlocal(KEYS),
         ImmutableList.of(DoubleClickLinkMapper.INSTANCE))
             .toOpenRtb(dcRequest);
   }

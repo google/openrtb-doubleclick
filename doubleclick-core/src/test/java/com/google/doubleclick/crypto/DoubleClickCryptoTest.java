@@ -22,6 +22,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
+import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
+
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
 
@@ -52,9 +55,28 @@ public class DoubleClickCryptoTest {
   static final byte[] PLAIN_IDFA = new byte[]{ 0,1,2,3,4,5,6,7 };
   static final String CIPHER_IDFA = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmeDOf7A";
   static final byte[] PLAIN_ADID = new byte[]{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-  static final String CIPHER_ADID = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmQdL0tmh_fduB2go_";
-  static final byte[] PLAIN_HYPERLOCAL = new byte[]{ 7,6,5,4,3,2,1,0 };
-  static final String CIPHER_HYPERLOCAL = "5nmwvgAM0UABI0VniavN72jqznD5R5ShB_0m0g";
+  static final byte[] CIPHER_ADID = new byte[]{
+    (byte) 0xE6, (byte) 0x79, (byte) 0xB0, (byte) 0xBE,
+    (byte) 0x00, (byte) 0x0C, (byte) 0xD1, (byte) 0x40,
+    (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
+    (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
+    (byte) 0x6F, (byte) 0xED, (byte) 0xC9, (byte) 0x77,
+    (byte) 0xFE, (byte) 0x40, (byte) 0x93, (byte) 0xA6,
+    (byte) 0x41, (byte) 0xD2, (byte) 0xF4, (byte) 0xB6,
+    (byte) 0x68, (byte) 0x7F, (byte) 0x7D, (byte) 0xDB,
+    (byte) 0x81, (byte) 0xDA, (byte) 0x0A, (byte) 0x3F,
+  };
+  static final byte[] PLAIN_HYPERLOCAL = createHyperlocal(1);
+  static final byte[] CIPHER_HYPERLOCAL = new byte[]{
+    (byte) 0xE6, (byte) 0x79, (byte) 0xB0, (byte) 0xBE,
+    (byte) 0x00, (byte) 0x0C, (byte) 0xD1, (byte) 0x40,
+    (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
+    (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
+    (byte) 0x7D, (byte) 0xE6, (byte) 0xC6, (byte) 0x74,
+    (byte) 0xFA, (byte) 0x71, (byte) 0xD7, (byte) 0xB4,
+    (byte) 0x49, (byte) 0xDB, (byte) 0xCA, (byte) 0xFF,
+    (byte) 0x68, (byte) 0xB1, (byte) 0xC9, (byte) 0x1A,
+  };
   static final DoubleClickCrypto baseCrypto = new DoubleClickCrypto(KEYS);
   static final DoubleClickCrypto.Price priceCrypto = new DoubleClickCrypto.Price(KEYS);
   static final DoubleClickCrypto.Idfa idfaCrypto = new DoubleClickCrypto.Idfa(KEYS);
@@ -118,25 +140,25 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testPriceEncrypt() {
-    String cryptoData = priceCrypto.encryptPrice(PLAIN_PRICE, NONCE);
+    String cryptoData = priceCrypto.encodePrice(PLAIN_PRICE, NONCE);
     assertEquals(CIPHER_PRICE, cryptoData);
   }
 
   @Test
   public void testPriceDecrypt() {
-    long decryptedPrice = priceCrypto.decryptPrice(CIPHER_PRICE);
+    long decryptedPrice = priceCrypto.decodePrice(CIPHER_PRICE);
     assertEquals(PLAIN_PRICE, decryptedPrice);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testPriceDecrypt_badData() {
-    long decryptedPrice = priceCrypto.decryptPrice("garbage");
+    long decryptedPrice = priceCrypto.decodePrice("garbage");
     assertEquals(PLAIN_PRICE, decryptedPrice);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testPriceDecrypt_empty() {
-    long decryptedPrice = priceCrypto.decryptPrice("");
+    long decryptedPrice = priceCrypto.decodePrice("");
     assertEquals(PLAIN_PRICE, decryptedPrice);
   }
 
@@ -144,29 +166,29 @@ public class DoubleClickCryptoTest {
   public void testPriceDecrypt_wrongKeys() {
     new DoubleClickCrypto.Price(
             new DoubleClickCrypto.Keys(KEYS.getIntegrityKey(), KEYS.getEncryptionKey()))
-        .decryptPrice(CIPHER_PRICE);
+        .decodePrice(CIPHER_PRICE);
   }
 
   @Test
   public void testPriceRecrypt() {
-    String encrypted = priceCrypto.encryptPrice(PLAIN_PRICE, NONCE);
-    assertEquals(PLAIN_PRICE, priceCrypto.decryptPrice(encrypted));
+    String encrypted = priceCrypto.encodePrice(PLAIN_PRICE, NONCE);
+    assertEquals(PLAIN_PRICE, priceCrypto.decodePrice(encrypted));
   }
 
   @Test
   public void testIdfaEncrypt() {
-    assertEquals(CIPHER_IDFA, idfaCrypto.encryptIdfa(PLAIN_IDFA, NONCE));
+    assertEquals(CIPHER_IDFA, idfaCrypto.encodeIdfa(PLAIN_IDFA, NONCE));
   }
 
   @Test
   public void testIdfaDecrypt() {
-    byte[] decrypted = idfaCrypto.decryptIdfa(CIPHER_IDFA);
+    byte[] decrypted = idfaCrypto.decodeIdfa(CIPHER_IDFA);
     assertArrayEquals(PLAIN_IDFA, decrypted);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testIdfaDecrypt_noData() {
-    idfaCrypto.decryptIdfa("");
+    idfaCrypto.encryptIdfa(new byte[0], NONCE);
   }
 
   @Test
@@ -184,13 +206,13 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testIdfaRecrypt() {
-    String encrypted = idfaCrypto.encryptIdfa(PLAIN_IDFA, NONCE);
-    assertArrayEquals(PLAIN_IDFA, idfaCrypto.decryptIdfa(encrypted));
+    String encrypted = idfaCrypto.encodeIdfa(PLAIN_IDFA, NONCE);
+    assertArrayEquals(PLAIN_IDFA, idfaCrypto.decodeIdfa(encrypted));
   }
 
   @Test
   public void testAdidEncrypt() {
-    assertEquals(CIPHER_ADID, adidCrypto.encryptAdId(PLAIN_ADID, NONCE));
+    assertArrayEquals(CIPHER_ADID, adidCrypto.encryptAdId(PLAIN_ADID, NONCE));
   }
 
   @Test(expected = DoubleClickCryptoException.class)
@@ -206,18 +228,20 @@ public class DoubleClickCryptoTest {
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testAdidDecrypt_noData() {
-    adidCrypto.decryptAdId("");
+    adidCrypto.decryptAdId(new byte[0]);
   }
 
   @Test
   public void testAdidRecrypt() {
-    String encrypted = adidCrypto.encryptAdId(PLAIN_ADID, NONCE);
+    byte[] encrypted = adidCrypto.encryptAdId(PLAIN_ADID, NONCE);
     assertArrayEquals(PLAIN_ADID, adidCrypto.decryptAdId(encrypted));
   }
 
   @Test
   public void testHyperlocalEncrypt() {
-    assertEquals(CIPHER_HYPERLOCAL, hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, NONCE));
+    assertArrayEquals(
+        CIPHER_HYPERLOCAL,
+        hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, NONCE));
   }
 
   @Test
@@ -228,25 +252,26 @@ public class DoubleClickCryptoTest {
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testHyperlocalDecrypt_noData() {
-    hyperlocalCrypto.decryptHyperlocal("");
+    hyperlocalCrypto.decryptHyperlocal(new byte[0]);
   }
 
   @Test
   public void testHyperlocal_dataRange() {
-    // Smaller data possible
-    hyperlocalCrypto.encryptHyperlocal(createData(1), NONCE);
-    // Bigger data possible: 768 sections = 15360 bytes
-    hyperlocalCrypto.encryptHyperlocal(createData(20 * 768), NONCE);
+    // Smallest data possible. Note: createHyperlocal(0) would fail because
+    // an empty protobut message serializes to byte[0], which fails to encrypt.
+    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(1), NONCE);
+    // Biggest data possible: 15311 bytes, max is 15360 (768*20)
+    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(307), NONCE);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testHyperlocal_dataTooBig() {
-    hyperlocalCrypto.encryptHyperlocal(createData(20 * 768 + 1), NONCE);
+    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(308), NONCE);
   }
 
   @Test
   public void testHyperlocalRecrypt() {
-    String encrypted = hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, NONCE);
+    byte[] encrypted = hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, NONCE);
     assertArrayEquals(PLAIN_HYPERLOCAL, hyperlocalCrypto.decryptHyperlocal(encrypted));
   }
 
@@ -256,5 +281,20 @@ public class DoubleClickCryptoTest {
       data[i] = (byte) (i & 0xFF);
     }
     return data;
+  }
+
+  private static byte[] createHyperlocal(int size) {
+    HyperlocalSet.Builder ret = HyperlocalSet.newBuilder();
+    if (size != 0) {
+      ret.setCenterPoint(Hyperlocal.Point.newBuilder().setLatitude(45).setLongitude(45));
+      for (int i = 1; i < size; ++i) {
+        ret.addHyperlocal(Hyperlocal.newBuilder()
+            .addCorners(Hyperlocal.Point.newBuilder().setLatitude(100).setLongitude(100))
+            .addCorners(Hyperlocal.Point.newBuilder().setLatitude(100).setLongitude(101))
+            .addCorners(Hyperlocal.Point.newBuilder().setLatitude(101).setLongitude(101))
+            .addCorners(Hyperlocal.Point.newBuilder().setLatitude(101).setLongitude(100)));
+      }
+    }
+    return ret.build().toByteArray();
   }
 }
