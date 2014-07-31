@@ -22,9 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.openrtb.OpenRtb.CreativeAttribute;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Maps between AdX creative attributes and OpenRTB's creative attributes.
@@ -50,7 +47,7 @@ public class CreativeAttributeMapper {
           .putAll(CreativeAttribute.VIDEO_IN_BANNER_USER_INITIATED, 2, 22)
           .putAll(CreativeAttribute.WINDOWS_DIALOG_OR_ALERT_STYLE)
       .build();
-  private static ImmutableSet<CreativeAttribute>[] dcToOpenrtb = MapperUtil.multimapToSetArray(
+  private static ImmutableSet<CreativeAttribute>[] dcToOpenrtb = MapperUtil.multimapIntToSets(
       ImmutableMultimap.<Integer, CreativeAttribute>builder()
           .putAll(44, CreativeAttribute.AD_CAN_BE_SKIPPED)
           .putAll(28, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
@@ -66,23 +63,23 @@ public class CreativeAttributeMapper {
     return openrtbToDc.get(openrtb);
   }
 
-  public static Collection<CreativeAttribute> toOpenRtb(List<Integer> dcList) {
-    Set<CreativeAttribute> openrtbList = new LinkedHashSet<>(dcList.size());
+  public static ImmutableSet<CreativeAttribute> toOpenRtb(Collection<Integer> dcList) {
+    ImmutableSet.Builder<CreativeAttribute> openrtbSet = ImmutableSet.builder();
 
     for (int dc : dcList) {
-      openrtbList.addAll(toOpenRtb(dc));
+      openrtbSet.addAll(toOpenRtb(dc));
     }
 
-    return openrtbList;
+    return openrtbSet.build();
   }
 
-  public static Collection<Integer> toDoubleClick(List<CreativeAttribute> openrtbList) {
-    Set<Integer> dcList = new LinkedHashSet<>(openrtbList.size());
+  public static ImmutableSet<Integer> toDoubleClick(Collection<CreativeAttribute> openrtbList) {
+    ImmutableSet.Builder<Integer> dcSet = ImmutableSet.builder();
 
     for (CreativeAttribute openrtb : openrtbList) {
-      dcList.addAll(toDoubleClick(openrtb));
+      dcSet.addAll(toDoubleClick(openrtb));
     }
 
-    return dcList;
+    return dcSet.build();
   }
 }

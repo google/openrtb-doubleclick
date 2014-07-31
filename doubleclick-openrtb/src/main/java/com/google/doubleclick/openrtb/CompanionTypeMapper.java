@@ -16,8 +16,11 @@
 
 package com.google.doubleclick.openrtb;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
+
+import java.util.Collection;
 
 /**
  * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link CompanionType}.
@@ -43,5 +46,28 @@ public class CompanionTypeMapper {
         default:
         return CreativeFormat.HTML_CREATIVE;
     }
+  }
+
+  public static ImmutableSet<CompanionType> toOpenRtb(Collection<CreativeFormat> dcList) {
+    ImmutableSet.Builder<CompanionType> openrtbSet = ImmutableSet.builder();
+
+    for (CreativeFormat dc : dcList) {
+      openrtbSet.add(toOpenRtb(dc));
+    }
+
+    return openrtbSet.build();
+  }
+
+  public static ImmutableSet<CreativeFormat> toDoubleClick(Collection<CompanionType> openrtbList) {
+    ImmutableSet.Builder<CreativeFormat> dcSet = ImmutableSet.builder();
+
+    for (CompanionType openrtb : openrtbList) {
+      CreativeFormat dc = toDoubleClick(openrtb);
+      if (dc != null) {
+        dcSet.add(dc);
+      }
+    }
+
+    return dcSet.build();
   }
 }

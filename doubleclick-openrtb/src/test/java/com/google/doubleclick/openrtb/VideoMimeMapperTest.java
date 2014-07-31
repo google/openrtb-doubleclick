@@ -20,26 +20,18 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
+import com.google.doubleclick.Doubleclick.BidRequest.Video.VideoFormat;
 
 import org.junit.Test;
 
-public class CompanionTypeMapperTest {
+public class VideoMimeMapperTest {
   @Test
   public void testMapper() {
     assertEquals(
-        ImmutableSet.of(CompanionType.HTML),
-        CompanionTypeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.HTML_CREATIVE)));
+        ImmutableSet.of("video/mp4", "video/webm"),
+        VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5)));
     assertEquals(
-        ImmutableSet.of(CreativeFormat.HTML_CREATIVE),
-        CompanionTypeMapper.toDoubleClick(ImmutableList.of(CompanionType.HTML)));
-
-    for (CompanionType openrtb : CompanionType.values()) {
-      CompanionTypeMapper.toDoubleClick(openrtb);
-    }
-    for (CreativeFormat dc : CreativeFormat.values()) {
-      CompanionTypeMapper.toOpenRtb(dc);
-    }
+        ImmutableSet.of(VideoFormat.VIDEO_HTML5),
+        VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm")));
   }
 }

@@ -29,11 +29,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +72,7 @@ public class AdCategoryMapper {
 
       openrtbToDc = data.build();
       openrtbToName = ImmutableBiMap.copyOf(names);
-      AdCategoryMapper.dcToOpenrtb = MapperUtil.multimapToSetArray(openrtbToDc.inverse());
+      AdCategoryMapper.dcToOpenrtb = MapperUtil.multimapIntToSets(openrtbToDc.inverse());
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
@@ -92,23 +90,23 @@ public class AdCategoryMapper {
     return openrtbToName;
   }
 
-  public static Set<ContentCategory> toOpenRtb(List<Integer> dcList) {
-    Set<ContentCategory> openrtbList = new LinkedHashSet<>(dcList.size());
+  public static ImmutableSet<ContentCategory> toOpenRtb(Collection<Integer> dcList) {
+    ImmutableSet.Builder<ContentCategory> openrtbSet = ImmutableSet.builder();
 
     for (int dc : dcList) {
-      openrtbList.addAll(toOpenRtb(dc));
+      openrtbSet.addAll(toOpenRtb(dc));
     }
 
-    return openrtbList;
+    return openrtbSet.build();
   }
 
-  public static Set<Integer> toDoubleClick(List<ContentCategory> openrtbList) {
-    Set<Integer> dcList = new LinkedHashSet<>(openrtbList.size());
+  public static ImmutableSet<Integer> toDoubleClick(Collection<ContentCategory> openrtbList) {
+    ImmutableSet.Builder<Integer> dcSet = ImmutableSet.builder();
 
     for (ContentCategory openrtb : openrtbList) {
-      dcList.addAll(toDoubleClick(openrtb));
+      dcSet.addAll(toDoubleClick(openrtb));
     }
 
-    return dcList;
+    return dcSet.build();
   }
 }

@@ -17,6 +17,7 @@
 package com.google.doubleclick.openrtb;
 
 import static java.lang.Math.min;
+import static java.util.Arrays.asList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.Doubleclick;
@@ -33,6 +34,7 @@ import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
 import com.google.doubleclick.Doubleclick.BidRequest.Video;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
+import com.google.doubleclick.Doubleclick.BidRequest.Video.VideoFormat;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.protobuf.ByteString;
@@ -155,6 +157,7 @@ public class TestData {
 
   static Video.Builder newVideo(int size) {
     Video.Builder video = Video.newBuilder()
+        .addAllAllowedVideoFormats(asList(VideoFormat.VIDEO_FLASH, VideoFormat.VIDEO_HTML5))
         .setMinAdDuration(15)
         .setMaxAdDuration(60)
         .setVideoadStartDelay(5);

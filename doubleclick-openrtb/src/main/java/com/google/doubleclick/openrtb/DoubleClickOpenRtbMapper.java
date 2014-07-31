@@ -421,6 +421,10 @@ public class DoubleClickOpenRtbMapper
         .setMaxduration(dcVideo.getMaxAdDuration())
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
 
+    if (dcVideo.getAllowedVideoFormatsCount() != 0) {
+      video.addAllMimes(VideoMimeMapper.toOpenRtb(dcVideo.getAllowedVideoFormatsList()));
+    }
+
     if (dcSlot.hasSlotVisibility()) {
       video.setPos(AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility()));
     }
@@ -445,12 +449,13 @@ public class DoubleClickOpenRtbMapper
           : dcVideo.getCompanionSlotList()) {
         Banner.Builder companion = Banner.newBuilder();
         setSize(companion, dcCompSlot.getWidthList(), dcCompSlot.getHeightList());
-        video.addCompanionad(companion);
 
-        for (Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat dcCompSlotFmt
-            : dcCompSlot.getCreativeFormatList()) {
-          companionTypes.add(CompanionTypeMapper.toOpenRtb(dcCompSlotFmt));
+        if (dcCompSlot.getCreativeFormatCount() != 0) {
+          companion.addAllMimes(BannerMimeMapper.toOpenRtb(dcCompSlot.getCreativeFormatList()));
+          companionTypes.addAll(CompanionTypeMapper.toOpenRtb(dcCompSlot.getCreativeFormatList()));
         }
+
+        video.addCompanionad(companion);
       }
 
       if (!companionTypes.isEmpty()) {
