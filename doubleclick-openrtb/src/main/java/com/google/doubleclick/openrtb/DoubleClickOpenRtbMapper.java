@@ -28,6 +28,7 @@ import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
 import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
 import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
+import com.google.doubleclick.crypto.DoubleClickCryptoException;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest.App;
@@ -547,7 +548,7 @@ public class DoubleClickOpenRtbMapper
   }
 
   protected Geo.Builder buildGeo(Doubleclick.BidRequest dcRequest) {
-    if (!dcRequest.hasGeoCriteriaId()
+    if (!dcRequest.hasGeoCriteriaId() && !dcRequest.hasEncryptedHyperlocalSet()
         && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()) {
       return null;
     }
@@ -577,8 +578,8 @@ public class DoubleClickOpenRtbMapper
 
     if (dcRequest.hasEncryptedHyperlocalSet() && hyperlocalCrypto != null) {
       try {
-        HyperlocalSet hyperlocalSet = hyperlocalCrypto.decryptHyperlocal(
-            dcRequest.getEncryptedHyperlocalSet().toByteArray());
+        HyperlocalSet hyperlocalSet = HyperlocalSet.parseFrom(hyperlocalCrypto.decryptHyperlocal(
+            dcRequest.getEncryptedHyperlocalSet().toByteArray()));
         if (hyperlocalSet.hasCenterPoint()) {
           Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
           if (center.hasLatitude() && center.hasLongitude()) {
@@ -586,7 +587,7 @@ public class DoubleClickOpenRtbMapper
             geo.setLon(center.getLongitude());
           }
         }
-      } catch (InvalidProtocolBufferException e) {
+      } catch (InvalidProtocolBufferException | DoubleClickCryptoException e) {
         invalidHyperlocal.inc();
         logger.warn("Invalid encrypted_hyperlocal_set: {}", e.toString());
       }

@@ -98,7 +98,7 @@ public class TestData {
                     .setCenterPoint(Hyperlocal.Point.newBuilder()
                         .setLatitude(45)
                         .setLongitude(90))
-                    .build(), new byte[16])))
+                    .build().toByteArray(), new byte[16])))
         .setUserDemographic(UserDemographic.newBuilder()
             .setGender(UserDemographic.Gender.FEMALE)
             .setAgeLow(18)
