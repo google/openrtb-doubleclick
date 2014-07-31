@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.doubleclick;
 option java_outer_classname = "Doubleclick";
 
-// Synchronized with v.50:
+// Synchronized with v.51:
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2014 Google Inc. All Rights Reserved.
@@ -141,6 +141,26 @@ message BidRequest {
   repeated int32 user_vertical = 30 [
       packed=true
   ];
+
+  // Demographic data provided by the publisher.
+  message UserDemographic {
+    enum Gender {
+      UNKNOWN = 0;
+      MALE = 1;
+      FEMALE = 2;
+    }
+    // Gender
+    optional Gender gender = 1 [
+        default = UNKNOWN
+    ];
+
+    // Age interval
+    optional int32 age_low = 2 [
+        default = 0];
+    optional int32 age_high = 3 [
+        default = 999];
+  }
+  optional UserDemographic user_demographic = 50;
 
   // Audience-targeting list to which the user has been added. See the Buyer UI
   // Help topics on remarketing, where it is called a remarketing list.

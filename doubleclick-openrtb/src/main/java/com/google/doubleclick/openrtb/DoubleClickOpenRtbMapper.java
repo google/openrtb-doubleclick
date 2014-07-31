@@ -24,6 +24,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.Doubleclick;
+import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
+import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
+import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
+import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest.App;
@@ -50,6 +54,7 @@ import com.google.openrtb.OpenRtb.Flag;
 import com.google.openrtb.mapper.OpenRtbMapper;
 import com.google.openrtb.util.OpenRtbUtils;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -58,11 +63,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -77,6 +84,7 @@ public class DoubleClickOpenRtbMapper
   private static final Joiner versionJoiner = Joiner.on(".").skipNulls();
 
   private final DoubleClickMetadata metadata;
+  private final DoubleClickCrypto.Hyperlocal hyperlocalCrypto;
   private final ImmutableList<ExtMapper> extMappers;
   private final Counter missingCrid = new Counter();
   private final Counter invalidImp = new Counter();
@@ -85,14 +93,17 @@ public class DoubleClickOpenRtbMapper
   private final Counter coppaTreatment = new Counter();
   private final Counter noImp = new Counter();
   private final Counter invalidGeoId = new Counter();
+  private final Counter invalidHyperlocal = new Counter();
   private final Counter noCid = new Counter();
 
   @Inject
   public DoubleClickOpenRtbMapper(
       MetricRegistry metricRegistry,
       DoubleClickMetadata metadata,
+      @Nullable DoubleClickCrypto.Hyperlocal hyperlocalCrypto,
       List<ExtMapper> extMappers) {
     this.metadata = metadata;
+    this.hyperlocalCrypto = hyperlocalCrypto;
     this.extMappers = ImmutableList.copyOf(extMappers);
     metricRegistry.register(MetricRegistry.name(getClass(), "missing-crid"), missingCrid);
     metricRegistry.register(MetricRegistry.name(getClass(), "invalid-imp"), invalidImp);
@@ -101,6 +112,7 @@ public class DoubleClickOpenRtbMapper
     metricRegistry.register(MetricRegistry.name(getClass(), "coppa-treatment"), coppaTreatment);
     metricRegistry.register(MetricRegistry.name(getClass(), "no-imp"), noImp);
     metricRegistry.register(MetricRegistry.name(getClass(), "invalid-geoid"), invalidGeoId);
+    metricRegistry.register(MetricRegistry.name(getClass(), "invalid-hyperlocal"), invalidHyperlocal);
     metricRegistry.register(MetricRegistry.name(getClass(), "no-cid"), noCid);
   }
 
@@ -277,6 +289,25 @@ public class DoubleClickOpenRtbMapper
             : dcRequest.getHostedMatchData();
         user.setCustomdata(MapperUtil.decodeUri(dcHMD.toString("US-ASCII")));
       } catch (UnsupportedEncodingException e) {}
+    }
+
+    if (dcRequest.hasUserDemographic()) {
+      UserDemographic dcUser = dcRequest.getUserDemographic();
+
+      if (dcUser.hasGender()) {
+        user.setGender(GenderMapper.toOpenRtb(dcUser.getGender()));
+      }
+      if (dcUser.hasAgeLow() || dcUser.hasAgeHigh()) {
+        // OpenRTB only supports a single age, not a range. We have to be pessimistic;
+        // if the age range is [X...Y], assume X to be the age (the youngest possible).
+        // We don't want to get in trouble e.g. if the age is [14..30], using the high
+        // or even average would classify as adult an user that's possibly minor.
+        // If the publisher is known to slot users into certain standard ranges, you
+        // can translate this back, i.e. age 25 could mean the [25-34] range.
+        int age = dcUser.hasAgeHigh() ? dcUser.getAgeHigh() : dcUser.getAgeLow();
+        Calendar today = Calendar.getInstance();
+        user.setYob(today.get(Calendar.YEAR) - age);
+      }
     }
 
     return user;
@@ -541,6 +572,23 @@ public class DoubleClickOpenRtbMapper
         }
       } else {
         mapGeo(geoTarget, geo);
+      }
+    }
+
+    if (dcRequest.hasEncryptedHyperlocalSet() && hyperlocalCrypto != null) {
+      try {
+        HyperlocalSet hyperlocalSet = hyperlocalCrypto.decryptHyperlocal(
+            dcRequest.getEncryptedHyperlocalSet().toByteArray());
+        if (hyperlocalSet.hasCenterPoint()) {
+          Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
+          if (center.hasLatitude() && center.hasLongitude()) {
+            geo.setLat(center.getLatitude());
+            geo.setLon(center.getLongitude());
+          }
+        }
+      } catch (InvalidProtocolBufferException e) {
+        invalidHyperlocal.inc();
+        logger.warn("Invalid encrypted_hyperlocal_set: {}", e.toString());
       }
     }
 

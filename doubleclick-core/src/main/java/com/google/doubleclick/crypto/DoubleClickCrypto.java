@@ -22,6 +22,8 @@ import static java.lang.Math.min;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
+import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.BaseNCodec;
@@ -145,7 +147,7 @@ public class DoubleClickCrypto {
    * @throws DoubleClickCryptoException if the encryption fails
    */
   public byte[] encrypt(byte[] plaintext) {
-    if (plaintext.length <= OVERHEAD_SIZE) {
+    if (plaintext.length < OVERHEAD_SIZE) {
       throw new DoubleClickCryptoException("Invalid plaintext, " + plaintext.length + " bytes");
     }
 
@@ -208,7 +210,7 @@ public class DoubleClickCrypto {
         pad[padPos++] = (byte) (section - 512 - 1);
       } else {
         throw new DoubleClickCryptoException(
-            "Payload is " + payloadSize + "bytes, exceeds limit of " + pageSize * 768);
+            "Payload is " + payloadSize + " bytes, exceeds limit of " + pageSize * 768);
       }
     }
 
@@ -218,8 +220,10 @@ public class DoubleClickCrypto {
   private int hashSignature(byte[] data) throws NoSuchAlgorithmException, InvalidKeyException {
     Mac integrityHmac = Mac.getInstance("HmacSHA1");
     integrityHmac.init(keys.getIntegrityKey());
-    integrityHmac.update(data, PAYLOAD_BASE, data.length - OVERHEAD_SIZE);
-    integrityHmac.update(data, NONCE_BASE, NONCE_SIZE);
+    if (data.length != 0) {
+      integrityHmac.update(data, PAYLOAD_BASE, data.length - OVERHEAD_SIZE);
+      integrityHmac.update(data, NONCE_BASE, NONCE_SIZE);
+    }
     return Ints.fromByteArray(integrityHmac.doFinal());
   }
 
@@ -432,19 +436,18 @@ public class DoubleClickCrypto {
       super(keys);
     }
 
-    public String encryptHyperlocal(byte[] hyperlocalValue, @Nullable byte[] nonce) {
-      byte[] plaintext = initPlaintext(hyperlocalValue.length, nonce);
-      System.arraycopy(hyperlocalValue, 0, plaintext, PAYLOAD_BASE, hyperlocalValue.length);
-      return encode(encrypt(plaintext));
+    public byte[] encryptHyperlocal(HyperlocalSet hyperlocalValue, @Nullable byte[] nonce) {
+      byte[] bytes = hyperlocalValue.toByteArray();
+      byte[] plaintext = initPlaintext(bytes.length, nonce);
+      System.arraycopy(bytes, 0, plaintext, PAYLOAD_BASE, bytes.length);
+      return encrypt(plaintext);
     }
 
-    public byte[] decryptHyperlocal(String encodedCiphertext) {
-      if (Strings.isNullOrEmpty(encodedCiphertext)) {
-        throw new DoubleClickCryptoException("Empty encoded ciphertext");
-      }
-
-      byte[] plaintext = decrypt(decode(encodedCiphertext));
-      return Arrays.copyOfRange(plaintext, PAYLOAD_BASE, plaintext.length - SIGNATURE_SIZE);
+    public HyperlocalSet decryptHyperlocal(byte[] hyperlocalValue)
+        throws InvalidProtocolBufferException {
+      byte[] plaintext = decrypt(hyperlocalValue);
+      byte[] bytes = Arrays.copyOfRange(plaintext, PAYLOAD_BASE, plaintext.length - SIGNATURE_SIZE);
+      return HyperlocalSet.parseFrom(bytes);
     }
   }
 

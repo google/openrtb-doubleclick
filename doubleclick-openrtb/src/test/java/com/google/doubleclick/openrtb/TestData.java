@@ -23,13 +23,17 @@ import com.google.doubleclick.Doubleclick;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.SlotVisibility;
+import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
+import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
 import com.google.doubleclick.Doubleclick.BidRequest.Mobile;
 import com.google.doubleclick.Doubleclick.BidRequest.Mobile.DeviceOsVersion;
 import com.google.doubleclick.Doubleclick.BidRequest.Mobile.MobileDeviceType;
 import com.google.doubleclick.Doubleclick.BidRequest.UserDataTreatment;
+import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
 import com.google.doubleclick.Doubleclick.BidRequest.Video;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
+import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.protobuf.ByteString;
 
@@ -87,7 +91,18 @@ public class TestData {
         .setGeoCriteriaId(9058770)
         .setAnonymousId("mysite.com")
         .setUrl("mysite.com/newsfeed")
-        .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"));
+        .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"))
+        .setEncryptedHyperlocalSet(ByteString.copyFrom(
+            new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS).encryptHyperlocal(
+                HyperlocalSet.newBuilder()
+                    .setCenterPoint(Hyperlocal.Point.newBuilder()
+                        .setLatitude(45)
+                        .setLongitude(90))
+                    .build(), new byte[16])))
+        .setUserDemographic(UserDemographic.newBuilder()
+            .setGender(UserDemographic.Gender.FEMALE)
+            .setAgeLow(18)
+            .setAgeHigh(24));
     if (size != NO_SLOT) {
       AdSlot.Builder adSlot = AdSlot.newBuilder()
           .setId(1)
