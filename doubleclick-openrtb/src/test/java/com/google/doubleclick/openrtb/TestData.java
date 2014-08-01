@@ -50,7 +50,7 @@ public class TestData {
         .setImpid("1")
         .setAdid("2")
         .setCrid("4")
-        .setPrice(1000)
+        .setPrice(1.2)
         .setAdm("<blink>hello world</blink>");
     if (size) {
       bid.setCid("3");
@@ -125,7 +125,7 @@ public class TestData {
             MatchingAdData.DirectDeal.Builder deal = MatchingAdData.DirectDeal.newBuilder()
                 .setDirectDealId(10 * i + j);
             if (j >= 3) {
-              deal.setFixedCpmMicros(12000);
+              deal.setFixedCpmMicros(1200000);
             }
             mad.addDirectDeal(deal);
           }

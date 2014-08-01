@@ -44,14 +44,14 @@ class TestUtil {
   private TestUtil() {
   }
 
-  public static BidRequest.Builder newBidRequest(String id, int... adGroupMincpm) {
+  public static BidRequest.Builder newBidRequest(String id, Object... adGroupMincpm) {
     BidRequest.Builder request = BidRequest.newBuilder().setId(id);
 
     for (int i = 0; i < adGroupMincpm.length; i += 3) {
       String adid = String.valueOf(adGroupMincpm[i + 0]);
       request.addImp(Impression.newBuilder()
           .setId(adid)
-          .setBidfloor(adGroupMincpm[i + 2])
+          .setBidfloor(((Number) adGroupMincpm[i + 2]).floatValue())
           .setBanner(Banner.newBuilder()
               .setId(adid)
               .setW(728)

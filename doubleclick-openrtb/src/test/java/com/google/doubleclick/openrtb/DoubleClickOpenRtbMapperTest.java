@@ -58,7 +58,7 @@ public class DoubleClickOpenRtbMapperTest {
   @Test
   public void testResponse() {
     Doubleclick.BidResponse.Builder dcResponse = mapper.toNative(
-        TestUtil.newBidRequest("1", 1, 1, 100).build(),
+        TestUtil.newBidRequest("1", 1, 1, 1.0).build(),
         BidResponse.newBuilder()
             .setBidid("bidid")
             .addSeatbid(SeatBid.newBuilder()
@@ -71,7 +71,7 @@ public class DoubleClickOpenRtbMapperTest {
     assertEquals(1, ad.getAdslotCount());
     assertEquals(1, ad.getAdslot(0).getId());
     assertFalse(ad.getAdslot(0).hasAdgroupId());
-    assertEquals(1000, ad.getAdslot(0).getMaxCpmMicros());
+    assertEquals(1200000, ad.getAdslot(0).getMaxCpmMicros());
   }
 
   @Test(expected = MapperException.class)
@@ -287,7 +287,7 @@ public class DoubleClickOpenRtbMapperTest {
     assertEquals(2, pmp.getDealsCount());
     PMP.DirectDeal deal = pmp.getDeals(1);
     assertEquals("33", deal.getId());
-    assertEquals(12000f, deal.getBidfloor(), 1e-6);
+    assertEquals(1.2, deal.getBidfloor(), 1e-9);
   }
 
   @Test

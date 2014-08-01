@@ -188,6 +188,6 @@ public class DoubleClickValidatorTest {
     return Bid.newBuilder()
         .setId("1")
         .setImpid("1")
-        .setPrice(100.0f);
+        .setPrice(100.0);
   }
 }
