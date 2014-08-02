@@ -32,7 +32,7 @@ Building via Maven will NOT work with JDK 8, because the projects
 use error-prone which is not yet JDK 8-compatible.  You can work
 around this by defining the property m2e.version to any value
 (error-prone doesn't play well with m2e either, and we cannot use
-a proper profile rule for <jdk>!1.8</jdk> because, you guessed,
+a proper profile rule for `<jdk>!1.8</jdk>` because, you guessed,
 this also breaks m2e). JDK 8 support is coming soon for error-prone
 so this hack for non-Eclipse builds should be temporary.
 
@@ -40,10 +40,21 @@ so this hack for non-Eclipse builds should be temporary.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.6.3, 02-08-2014
+
+* Update DoubleClick protocol to v51.
+* Map User.gender/age from new UserDemographics data.
+* Decrypt HyperlocalSet, keep in a link extension, and map Geo.lat/lon.
+* Map Video.mimes and Video.companionad.mimes.
+* DoubleClickCrypto: IDFA/Hyperlocal now correct; big general review.
+* Fixed mapping of price and bidfloor properties to use currency units
+  (which is the standard). Previous code used micros, that was a legacy
+  from this code's DoubleClick roots, but was not OpenRTB-compliant.
+
 # Version 0.6.2, 25-07-2014
 
 * DoubleClickCrypto: optimize memory usage in Base64 encoding/decoding;
-  fix support for IDFA, which may also need
+  some initial fixes for IDFA/Hyperlocal but still broken in some cases.
 * Remove dependency on buggy, unsupported opencsv; using custom parser.
 * DoubleClickOpenRtbMapper: Fix semi-transparent branded channels.
 
@@ -51,8 +62,7 @@ RELEASE NOTES
 
 * Remove depedency from Guice! The libraries still supports all
   JSR-305 DI frameworks, but now only uses javax.inject.
-* doubleClick-core: DoubleClick protocol updated to v50;
-  doubleclick-openrtb: We can now map app.content.userrating, app.name.
+* DoubleClick protocol v50; map app.content.userrating, app.name.
 * Build system improvements (Maven, Eclipse, NetBeans).
 * Improved OpenRtbSnippetProcessor handling of macro dependencies;
   see new documentation about this in OpenRtbMacros.
