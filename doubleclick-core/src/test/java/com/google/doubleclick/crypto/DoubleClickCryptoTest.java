@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNull;
 
 import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
 import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
@@ -113,7 +114,7 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testCreateNonce() {
-    assertArrayEquals(NONCE, baseCrypto.createNonce(NONCE_TIMESTAMP, NONCE_SERVERID));
+    assertArrayEquals(NONCE, baseCrypto.createInitVector(NONCE_TIMESTAMP, NONCE_SERVERID));
   }
 
   @Test
@@ -125,17 +126,17 @@ public class DoubleClickCryptoTest {
           (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
           (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
         },
-        baseCrypto.createNonce(null, NONCE_SERVERID));
+        baseCrypto.createInitVector(null, NONCE_SERVERID));
   }
 
   @Test
   public void testEncrypt_noNonce() {
-    baseCrypto.initPlaintext(8, null);
+    baseCrypto.initPlainData(8, null);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testEncrypt_badNonce() {
-    baseCrypto.initPlaintext(8, new byte[] { 0 } );
+    baseCrypto.initPlainData(8, new byte[] { 0 } );
   }
 
   @Test
@@ -193,15 +194,15 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testIdfa_dataRange() {
-    // Smaller data possible
+    // Smallest data possible
     idfaCrypto.encryptIdfa(createData(1), NONCE);
-    // Bigger data possible: 768 sections = 15360 bytes
-    idfaCrypto.encryptIdfa(createData(20 * 768), NONCE);
+    // Biggest data possible: 769 sections = 15380 bytes
+    idfaCrypto.encryptIdfa(createData(20 * 769), NONCE);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testIdfa_dataTooBig() {
-    idfaCrypto.encryptIdfa(createData(20 * 768 + 1), NONCE);
+    idfaCrypto.encryptIdfa(createData(20 * 769 + 1), NONCE);
   }
 
   @Test
@@ -245,8 +246,9 @@ public class DoubleClickCryptoTest {
   }
 
   @Test
-  public void testHyperlocalDecrypt() {
+  public void testHyperlocalDecrypt() throws InvalidProtocolBufferException {
     byte[] decrypted = hyperlocalCrypto.decryptHyperlocal(CIPHER_HYPERLOCAL);
+    HyperlocalSet.parseFrom(decrypted);
     assertArrayEquals(PLAIN_HYPERLOCAL, decrypted);
   }
 
@@ -260,13 +262,14 @@ public class DoubleClickCryptoTest {
     // Smallest data possible. Note: createHyperlocal(0) would fail because
     // an empty protobut message serializes to byte[0], which fails to encrypt.
     hyperlocalCrypto.encryptHyperlocal(createHyperlocal(1), NONCE);
-    // Biggest data possible: 15311 bytes, max is 15360 (768*20)
-    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(307), NONCE);
+    // Biggest data possible: 15362 bytes, max is 15380 (768*20)
+    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(308), NONCE);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testHyperlocal_dataTooBig() {
-    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(308), NONCE);
+    // 15412 bytes, max is 15380 (768*20)
+    hyperlocalCrypto.encryptHyperlocal(createHyperlocal(309), NONCE);
   }
 
   @Test

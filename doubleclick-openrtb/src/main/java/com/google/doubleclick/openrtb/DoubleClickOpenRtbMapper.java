@@ -83,6 +83,7 @@ public class DoubleClickOpenRtbMapper
   private static final Pattern SEMITRANSPARENT_CHANNEL =
       Pattern.compile("pack-(brand|semi|anon)-([^\\-]+)::(.+)");
   private static final Joiner versionJoiner = Joiner.on(".").skipNulls();
+  private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
 
   private final DoubleClickMetadata metadata;
   private final DoubleClickCrypto.Hyperlocal hyperlocalCrypto;
@@ -204,7 +205,7 @@ public class DoubleClickOpenRtbMapper
 
     Doubleclick.BidResponse.Ad.AdSlot.Builder dcSlot = dcAd.addAdslotBuilder()
         .setId(Integer.parseInt(bid.getImpid()))
-        .setMaxCpmMicros((long) bid.getPrice());
+        .setMaxCpmMicros((long) (bid.getPrice() * MICROS_PER_CURRENCY_UNIT));
     if (dcImpSlot.getMatchingAdDataCount() > 1) {
       if (bid.hasCid()) {
         dcSlot.setAdgroupId(Long.parseLong(bid.getCid()));
@@ -319,7 +320,7 @@ public class DoubleClickOpenRtbMapper
       Impression.Builder imp = request.addImpBuilder()
           .setId(String.valueOf(dcSlot.getId()));
 
-      Float bidFloor = null;
+      Long bidFloor = null;
 
       for (Doubleclick.BidRequest.AdSlot.MatchingAdData dcAdData :
           dcSlot.getMatchingAdDataList()) {
@@ -337,7 +338,7 @@ public class DoubleClickOpenRtbMapper
       }
 
       if (bidFloor != null) {
-        imp.setBidfloor(bidFloor);
+        imp.setBidfloor(((double) bidFloor) / MICROS_PER_CURRENCY_UNIT);
       }
 
       if (dcRequest.getMobile().hasIsInterstitialRequest()) {
@@ -399,7 +400,7 @@ public class DoubleClickOpenRtbMapper
         DirectDeal.Builder deal = DirectDeal.newBuilder()
             .setId(String.valueOf(dcDeal.getDirectDealId()));
         if (dcDeal.hasFixedCpmMicros()) {
-          deal.setBidfloor(dcDeal.getFixedCpmMicros());
+          deal.setBidfloor(dcDeal.getFixedCpmMicros() / ((double) MICROS_PER_CURRENCY_UNIT));
         }
         pmp.addDeals(deal);
       }
@@ -420,6 +421,10 @@ public class DoubleClickOpenRtbMapper
         .setMinduration(dcVideo.getMinAdDuration())
         .setMaxduration(dcVideo.getMaxAdDuration())
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
+
+    if (dcVideo.getAllowedVideoFormatsCount() != 0) {
+      video.addAllMimes(VideoMimeMapper.toOpenRtb(dcVideo.getAllowedVideoFormatsList()));
+    }
 
     if (dcSlot.hasSlotVisibility()) {
       video.setPos(AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility()));
@@ -445,12 +450,13 @@ public class DoubleClickOpenRtbMapper
           : dcVideo.getCompanionSlotList()) {
         Banner.Builder companion = Banner.newBuilder();
         setSize(companion, dcCompSlot.getWidthList(), dcCompSlot.getHeightList());
-        video.addCompanionad(companion);
 
-        for (Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat dcCompSlotFmt
-            : dcCompSlot.getCreativeFormatList()) {
-          companionTypes.add(CompanionTypeMapper.toOpenRtb(dcCompSlotFmt));
+        if (dcCompSlot.getCreativeFormatCount() != 0) {
+          companion.addAllMimes(BannerMimeMapper.toOpenRtb(dcCompSlot.getCreativeFormatList()));
+          companionTypes.addAll(CompanionTypeMapper.toOpenRtb(dcCompSlot.getCreativeFormatList()));
         }
+
+        video.addCompanionad(companion);
       }
 
       if (!companionTypes.isEmpty()) {
@@ -580,6 +586,7 @@ public class DoubleClickOpenRtbMapper
       try {
         HyperlocalSet hyperlocalSet = HyperlocalSet.parseFrom(hyperlocalCrypto.decryptHyperlocal(
             dcRequest.getEncryptedHyperlocalSet().toByteArray()));
+        geo.setExtension(DcExt.hyperLocal, hyperlocalSet);
         if (hyperlocalSet.hasCenterPoint()) {
           Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
           if (center.hasLatitude() && center.hasLongitude()) {

@@ -37,7 +37,7 @@ public class MapperUtil {
   };
 
   @SuppressWarnings("unchecked")
-  public static <T> ImmutableSet<T>[] multimapToSetArray(
+  public static <T> ImmutableSet<T>[] multimapIntToSets(
       ImmutableMultimap<Integer, T> mmap) {
     int iMax = Collections.max(mmap.keySet());
     ImmutableSet<T>[] setArray = new ImmutableSet[iMax + 1];
@@ -50,6 +50,23 @@ public class MapperUtil {
   public static <T> ImmutableCollection<T> get(ImmutableSet<T>[] sets, int i) {
     return i >= 0 && i < sets.length && sets[i] != null
         ? sets[i]
+        : ImmutableSet.<T>of();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <E extends Enum<E>, T> ImmutableSet<T>[] multimapEnumToSets(
+      ImmutableMultimap<E, T> mmap) {
+    E iMax = Collections.max(mmap.keySet());
+    ImmutableSet<T>[] setArray = new ImmutableSet[iMax.ordinal() + 1];
+    for (E key : mmap.keySet()) {
+      setArray[key.ordinal()] = ImmutableSet.copyOf(mmap.get(key));
+    }
+    return setArray;
+  }
+
+  public static <E extends Enum<E>, T> ImmutableCollection<T> get(ImmutableSet<T>[] sets, E e) {
+    return e != null && e.ordinal() < sets.length && sets[e.ordinal()] != null
+        ? sets[e.ordinal()]
         : ImmutableSet.<T>of();
   }
 
