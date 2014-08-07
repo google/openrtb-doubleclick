@@ -20,14 +20,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.doubleclick.DcExt;
-import com.google.doubleclick.Doubleclick;
-import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtb.BidRequest;
-import com.google.openrtb.OpenRtb.BidRequest.Impression;
-import com.google.openrtb.OpenRtb.BidRequest.Publisher;
-import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
-import com.google.openrtb.util.OpenRtbUtils;
+import com.google.doubleclick.Doubleclick.BidRequest;
+import com.google.doubleclick.Doubleclick.BidResponse;
+import com.google.protobuf.MessageLiteOrBuilder;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -38,13 +33,13 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 /**
- * Validates a pair of {@link BidRequest} and its corresponding
- * {@link com.google.openrtb.OpenRtb.BidResponse.Builder}.
+ * Validates a pair of {@link BidRequest} and its corresponding {@link BidResponse}.
  * Bids with any validation problems will cause debug logs and metric updates.
  * Fatal validation errors (that would cause the bid to be rejected by DoubleClick Ad Exchange)
  * will also be removed from the response.
@@ -52,7 +47,7 @@ import javax.inject.Inject;
 public class DoubleClickValidator {
   private static final Logger logger =
       LoggerFactory.getLogger(DoubleClickValidator.class);
-  private static final String GDN = "1";
+  private static final int GDN = 1;
   public static final int CREATIVE_FLASH = 34;
   public static final int CREATIVE_NON_FLASH = 50;
 
@@ -66,7 +61,6 @@ public class DoubleClickValidator {
   private final Counter invalidSensCat = new Counter();
   private final Counter invalidAttrTotal = new Counter();
   private final Counter unknownAttrTotal = new Counter();
-  private final Counter fragmentUsesReserved = new Counter();
 
   @Inject
   public DoubleClickValidator(
@@ -90,101 +84,142 @@ public class DoubleClickValidator {
         invalidAttrTotal);
     metricRegistry.register(MetricRegistry.name(getClass(), "unknown-attr-total"),
         unknownAttrTotal);
-    metricRegistry.register(MetricRegistry.name(getClass(), "fragment-uses-reserved-field"),
-        fragmentUsesReserved);
   }
 
-  public void validate(final OpenRtb.BidRequest request, final OpenRtb.BidResponse.Builder response) {
-    OpenRtbUtils.filterBids(response, new Predicate<Bid>() {
-      @Override public boolean apply(Bid bid) {
-        return validate(request, bid);
-      }});
+  public boolean validate(final BidRequest request, final BidResponse.Builder response) {
+    boolean ok = true;
+    for (final BidResponse.Ad.Builder ad : response.getAdBuilderList()) {
+      List<BidResponse.Ad.AdSlot.Builder> adslots = ad.getAdslotBuilderList();
+      List<BidResponse.Ad.AdSlot.Builder> filteredAdslots = filter(adslots,
+          new Predicate<BidResponse.Ad.AdSlot.Builder>() {
+            @Override public boolean apply(BidResponse.Ad.AdSlot.Builder adslot) {
+              return validate(request, ad, adslot);
+            }});
+      if (filteredAdslots != adslots) {
+        ok = false;
+        ad.clearAdslot();
+        for (BidResponse.Ad.AdSlot.Builder filteredAdslot : filteredAdslots) {
+          ad.addAdslot(filteredAdslot);
+        }
+      }
+    }
+    if (!ok) {
+      List<BidResponse.Ad.Builder> ads = response.getAdBuilderList();
+      response.clearAd();
+      for (BidResponse.Ad.Builder ad : ads) {
+        if (ad.getAdslotCount() != 0) {
+          response.addAd(ad);
+        }
+      }
+    }
+    return ok;
   }
 
-  public boolean validate(OpenRtb.BidRequest request, Bid bid) {
-    Doubleclick.BidResponse.Ad adExt = bid.hasExtension(DcExt.ad)
-        ? bid.getExtension(DcExt.ad)
-        : null;
-    Impression imp = OpenRtbUtils.impWithId(request, bid.getImpid());
-    if (imp == null) {
+  public boolean validate(
+      BidRequest request, BidResponse.Ad.Builder ad, BidResponse.Ad.AdSlot.Builder adslot) {
+    BidRequest.AdSlot reqSlot = findRequestSlot(request, adslot.getId());
+    if (reqSlot == null) {
       unmatchedImp.inc();
       if (logger.isDebugEnabled()) {
-        logger.warn("Impresson id doesn't match any AdSlot (impression): {}", bid.getImpid());
+        logger.warn("Response AdSlot id (impression) doesn't match request: {}", adslot.getId());
       }
       return false;
     }
-    Doubleclick.BidRequest.AdSlot adSlot = imp.getExtension(DcExt.adSlot);
     boolean valid = true;
 
-    if (adSlot.getExcludedAttributeList().contains(CREATIVE_FLASH)) {
-      if (adExt == null
-          || !adExt.getAttributeList().contains(CREATIVE_NON_FLASH)) {
+    if (reqSlot.getExcludedAttributeList().contains(CREATIVE_FLASH)) {
+      if (!ad.getAttributeList().contains(CREATIVE_NON_FLASH)) {
         needsNonflashAttr.inc();
         if (logger.isDebugEnabled()) {
-          logger.debug("Ad needs attribute {}\n{}",
+          logger.debug("Request Ad (impression) needs attribute {}\n{}",
               DoubleClickMetadata.toString(
                   metadata.getBuyerDeclarableCreativeAttributes(),
                   CREATIVE_NON_FLASH),
-                  bid);
+                  ad);
         }
         valid = false;
       }
     }
 
-    if (adExt == null) {
-      return valid;
-    }
-
     List<Integer> bad;
-    Publisher publisher = request.hasSite()
-        ? request.getSite().getPublisher()
-        : request.getApp().getPublisher();
-    ImmutableMap<Integer, String> metaVendors = GDN.equals(publisher.getId())
+    ImmutableMap<Integer, String> metaVendors = request.getSellerNetworkId() == GDN
         ? metadata.getGdnVendors()
         : metadata.getVendors();
 
     if (!(bad = checkAttributes(
-        adSlot.getAllowedVendorTypeList(), adExt.getVendorTypeList(),
+        reqSlot.getAllowedVendorTypeList(), ad.getVendorTypeList(),
         metaVendors, true)).isEmpty()) {
-      logger.debug("Bid rejected, contains not-allowed {} types {}:\n{}",
-          GDN.equals(publisher.getId()) ? "GDN vendors" : "vendors", bad, bid);
+      logger.debug("Ad rejected, contains not-allowed {} types {}:\n{}",
+          request.getSellerNetworkId() == GDN ? "GDN vendors" : "vendors", bad, ad);
       invalidVendor.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getAllowedRestrictedCategoryList(), adExt.getRestrictedCategoryList(),
+        reqSlot.getAllowedRestrictedCategoryList(), ad.getRestrictedCategoryList(),
         metadata.getRestrictedCategories(), true)).isEmpty()) {
-      logger.debug("Bid rejected, contains invalid restricted categories {}:\n{}", bad, bid);
+      logger.debug("Ad rejected, contains invalid restricted categories {}:\n{}", bad, ad);
       invalidRestrCat.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getExcludedProductCategoryList(), adExt.getCategoryList(),
+        reqSlot.getExcludedProductCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("Bid rejected, contains excluded product categories {}:\n{}", bad, bid);
+      logger.debug("Ad rejected, contains excluded product categories {}:\n{}", bad, ad);
       invalidProdCat.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getExcludedSensitiveCategoryList(), adExt.getCategoryList(),
+        reqSlot.getExcludedSensitiveCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("Bid rejected, contains excluded sensitive categories {}:\n{}", bad, bid);
+      logger.debug("Ad rejected, contains excluded sensitive categories {}:\n{}", bad, ad);
       invalidSensCat.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getExcludedAttributeList(), adExt.getAttributeList(),
+        reqSlot.getExcludedAttributeList(), ad.getAttributeList(),
         metadata.getBuyerDeclarableCreativeAttributes(), false)).isEmpty()) {
-      logger.debug("Bid rejected, contains excluded creative attributes {}:\n{}", bad, bid);
+      logger.debug("Ad rejected, contains excluded creative attributes {}:\n{}", bad, ad);
       invalidCreatAttr.inc();
       valid = false;
     }
 
     return valid;
+  }
+
+  // Identical to ProtoUtils.filter(), avoiding dependency from openrtb-core
+  protected static <M extends MessageLiteOrBuilder>
+  List<M> filter(List<M> objs, Predicate<M> filter) {
+    for (ListIterator<M> iter = objs.listIterator(); iter.hasNext(); ) {
+      if (!filter.apply(iter.next())) {
+        List<M> filtered = new ArrayList<>(objs.size() - 1);
+        filtered.addAll(objs.subList(0, iter.previousIndex()));
+
+        while (iter.hasNext()) {
+          M obj = iter.next();
+
+          if (filter.apply(obj)) {
+            filtered.add(obj);
+          }
+        }
+
+        return filtered;
+      }
+    }
+
+    return objs;
+  }
+
+  protected static BidRequest.AdSlot findRequestSlot(BidRequest request, int adslotId) {
+    for (BidRequest.AdSlot adslot : request.getAdslotList()) {
+      if (adslot.getId() == adslotId) {
+        return adslot;
+      }
+    }
+    return null;
   }
 
   protected <T> List<T> checkAttributes(List<T> reqAttrs,

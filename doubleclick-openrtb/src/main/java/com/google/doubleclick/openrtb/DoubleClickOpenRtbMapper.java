@@ -331,6 +331,15 @@ public class DoubleClickOpenRtbMapper
               : min(bidFloor, dcAdData.getMinimumCpmMicros());
         }
 
+        for (Doubleclick.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule dcPricingRule :
+            dcAdData.getPricingRuleList()) {
+          if (dcPricingRule.hasMinimumCpmMicros()) {
+            bidFloor = (bidFloor == null)
+                ? dcPricingRule.getMinimumCpmMicros()
+                : min(bidFloor, dcPricingRule.getMinimumCpmMicros());
+          }
+        }
+
         PMP.Builder pmp = buildPmp(dcAdData);
         if (pmp != null) {
           imp.setPmp(pmp);

@@ -26,6 +26,8 @@ import com.google.doubleclick.util.DoubleClickMetadata.CountryCodes;
 import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget;
 import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget.TargetType;
 import com.google.doubleclick.util.DoubleClickMetadata.ResourceTransport;
+import com.google.doubleclick.util.DoubleClickMetadata.Transport;
+import com.google.doubleclick.util.DoubleClickMetadata.URLConnectionTransport;
 
 import org.junit.Test;
 
@@ -97,10 +99,19 @@ public class DoubleClickMetadataTest {
   }
 
   @Test
-  public void testTransport() throws IOException {
+  public void testResourceTransport() throws IOException {
     ResourceTransport transport = new ResourceTransport();
     transport.setResourceName("/adx-openrtb/countries.txt");
     assertEquals("/adx-openrtb/countries.txt", transport.getResourceName());
-    try (InputStream is = transport.open(null)) {}
+    try (InputStream is = transport.open(null)) {
+    }
+  }
+
+  @Test
+  public void testJavaNetTransport() throws IOException {
+    Transport transport = new URLConnectionTransport();
+    try (InputStream is = transport.open(
+        "https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt")) {
+    }
   }
 }

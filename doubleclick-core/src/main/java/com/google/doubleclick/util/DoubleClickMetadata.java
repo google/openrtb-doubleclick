@@ -565,7 +565,16 @@ public class DoubleClickMetadata {
    * Object that can load the content of an URL as a stream.
    */
   public static interface Transport {
-    InputStream open(String uri) throws IOException;
+    InputStream open(String url) throws IOException;
+  }
+
+  /**
+   * Implementation of {@link Transport} using the java.net APIs.
+   */
+  public static class URLConnectionTransport implements Transport {
+    @Override public InputStream open(String url) throws IOException {
+      return new URL(url).openStream();
+    }
   }
 
   /**
