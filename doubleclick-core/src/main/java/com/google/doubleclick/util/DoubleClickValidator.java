@@ -37,6 +37,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Validates a pair of {@link BidRequest} and its corresponding {@link BidResponse}.
@@ -44,6 +45,7 @@ import javax.inject.Inject;
  * Fatal validation errors (that would cause the bid to be rejected by DoubleClick Ad Exchange)
  * will also be removed from the response.
  */
+@Singleton
 public class DoubleClickValidator {
   private static final Logger logger =
       LoggerFactory.getLogger(DoubleClickValidator.class);
@@ -87,24 +89,39 @@ public class DoubleClickValidator {
   }
 
   public boolean validate(final BidRequest request, final BidResponse.Builder response) {
-    boolean ok = true;
-    for (final BidResponse.Ad.Builder ad : response.getAdBuilderList()) {
+    boolean hasBad = false;
+    boolean hasEmpty = false;
+    List<BidResponse.Ad.Builder> ads = response.getAdBuilderList();
+    for (int iAd = 0; iAd < ads.size(); ++iAd) {
+      final BidResponse.Ad.Builder ad = ads.get(iAd);
       List<BidResponse.Ad.AdSlot.Builder> adslots = ad.getAdslotBuilderList();
-      List<BidResponse.Ad.AdSlot.Builder> filteredAdslots = filter(adslots,
-          new Predicate<BidResponse.Ad.AdSlot.Builder>() {
-            @Override public boolean apply(BidResponse.Ad.AdSlot.Builder adslot) {
-              return validate(request, ad, adslot);
-            }});
-      if (filteredAdslots != adslots) {
-        ok = false;
-        ad.clearAdslot();
-        for (BidResponse.Ad.AdSlot.Builder filteredAdslot : filteredAdslots) {
-          ad.addAdslot(filteredAdslot);
+      if (adslots.isEmpty()) {
+        hasEmpty = true;
+        if (logger.isDebugEnabled()) {
+          logger.debug("Ad #{} removed, clean but empty adslot", iAd);
+        }
+      } else {
+        List<BidResponse.Ad.AdSlot.Builder> filteredAdslots = filter(adslots,
+            new Predicate<BidResponse.Ad.AdSlot.Builder>() {
+          @Override public boolean apply(BidResponse.Ad.AdSlot.Builder adslot) {
+            return validate(request, ad, adslot);
+          }});
+        if (filteredAdslots != adslots) {
+          hasBad = true;
+          ad.clearAdslot();
+          if (filteredAdslots.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+              logger.debug("Ad #{} removed, all adslot values rejected", iAd);
+            }
+          } else {
+            for (BidResponse.Ad.AdSlot.Builder filteredAdslot : filteredAdslots) {
+              ad.addAdslot(filteredAdslot);
+            }
+          }
         }
       }
     }
-    if (!ok) {
-      List<BidResponse.Ad.Builder> ads = response.getAdBuilderList();
+    if (hasBad || hasEmpty) {
       response.clearAd();
       for (BidResponse.Ad.Builder ad : ads) {
         if (ad.getAdslotCount() != 0) {
@@ -112,7 +129,7 @@ public class DoubleClickValidator {
         }
       }
     }
-    return ok;
+    return hasBad;
   }
 
   public boolean validate(
@@ -121,7 +138,7 @@ public class DoubleClickValidator {
     if (reqSlot == null) {
       unmatchedImp.inc();
       if (logger.isDebugEnabled()) {
-        logger.warn("Response AdSlot id (impression) doesn't match request: {}", adslot.getId());
+        logger.debug("AdSlot {} rejected, unmatched id", logId(adslot));
       }
       return false;
     }
@@ -131,11 +148,11 @@ public class DoubleClickValidator {
       if (!ad.getAttributeList().contains(CREATIVE_NON_FLASH)) {
         needsNonflashAttr.inc();
         if (logger.isDebugEnabled()) {
-          logger.debug("Request Ad (impression) needs attribute {}\n{}",
+          logger.debug("{} rejected, ad.attribute needs value: {}",
+              logId(adslot),
               DoubleClickMetadata.toString(
                   metadata.getBuyerDeclarableCreativeAttributes(),
-                  CREATIVE_NON_FLASH),
-                  ad);
+                  CREATIVE_NON_FLASH));
         }
         valid = false;
       }
@@ -149,8 +166,8 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getAllowedVendorTypeList(), ad.getVendorTypeList(),
         metaVendors, true)).isEmpty()) {
-      logger.debug("Ad rejected, contains not-allowed {} types {}:\n{}",
-          request.getSellerNetworkId() == GDN ? "GDN vendors" : "vendors", bad, ad);
+      logger.debug("{} rejected, unknown or not-allowed ad.vendor_type values: {}",
+          logId(adslot), request.getSellerNetworkId() == GDN ? "GDN " : "", bad);
       invalidVendor.inc();
       valid = false;
     }
@@ -158,7 +175,8 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getAllowedRestrictedCategoryList(), ad.getRestrictedCategoryList(),
         metadata.getRestrictedCategories(), true)).isEmpty()) {
-      logger.debug("Ad rejected, contains invalid restricted categories {}:\n{}", bad, ad);
+      logger.debug("{} rejected, unknown or not-allowed ad.restricted_category values: {}",
+          logId(adslot), bad);
       invalidRestrCat.inc();
       valid = false;
     }
@@ -166,7 +184,8 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getExcludedProductCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("Ad rejected, contains excluded product categories {}:\n{}", bad, ad);
+      logger.debug("{} rejected, unknown or excluded product ad.category values: {}",
+          logId(adslot), bad);
       invalidProdCat.inc();
       valid = false;
     }
@@ -174,7 +193,8 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getExcludedSensitiveCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("Ad rejected, contains excluded sensitive categories {}:\n{}", bad, ad);
+      logger.debug("{} rejected, unknown or excluded sensitive ad.category values: {}",
+          logId(adslot), bad);
       invalidSensCat.inc();
       valid = false;
     }
@@ -182,12 +202,17 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getExcludedAttributeList(), ad.getAttributeList(),
         metadata.getBuyerDeclarableCreativeAttributes(), false)).isEmpty()) {
-      logger.debug("Ad rejected, contains excluded creative attributes {}:\n{}", bad, ad);
+      logger.debug("{} rejected, unknown or excluded ad.attribute values: {}",
+          logId(adslot), bad);
       invalidCreatAttr.inc();
       valid = false;
     }
 
     return valid;
+  }
+
+  protected static String logId(BidResponse.Ad.AdSlot.Builder adslot) {
+    return "AdSlot " + adslot.getId();
   }
 
   // Identical to ProtoUtils.filter(), avoiding dependency from openrtb-core
