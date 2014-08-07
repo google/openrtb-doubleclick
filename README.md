@@ -7,6 +7,10 @@ and associated facilities such as crypto and metadata.  The second
 module, doubleclick-openrtb, provides client-side mapping between
 DoubleClick's model/protocol and OpenRTB, and validation support.
 
+For questions and general discussion, please join [openrtb-doubleclick]
+(https://groups.google.com/forum/#!forum/openrtb-doubleclick).
+Use the Github project's issue tracker for bug reports or RFEs.
+
 
 BUILDING NOTES
 ----------------------------------------------------------------------
