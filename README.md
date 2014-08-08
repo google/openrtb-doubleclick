@@ -40,6 +40,15 @@ so this hack for non-Eclipse builds should be temporary.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.6.4, 06-08-2014
+
+* Remove dependency from apache-commons-codec! Using Guava's base64.
+* DoubleClickValidator improved (better logs) and refactored to not
+  depend on OpenRTB; moved to the doubleclick-core module.
+* Provide a DoubleClickMetadata.URLConnectionTransport.
+  Added missing two methods in the mapper interface
+- No need anymore to checkout the openrtb project for building
+
 # Version 0.6.3, 02-08-2014
 
 * Update DoubleClick protocol to v51.

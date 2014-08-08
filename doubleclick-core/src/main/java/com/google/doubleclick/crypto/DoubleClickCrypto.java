@@ -19,11 +19,9 @@ package com.google.doubleclick.crypto;
 import static java.lang.Math.min;
 
 import com.google.common.base.Objects;
+import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.BaseNCodec;
-import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,22 +89,22 @@ public class DoubleClickCrypto {
 
   /**
    * Decodes data, from string to binary form.
-   * The default implementation performs websafe-base64 decoding.
+   * The default implementation performs websafe-base64 decoding (RFC 3548).
    */
   protected @Nullable byte[] decode(@Nullable String data) {
     return data == null
         ? null
-        : CryptoBase64.forSize(data.length()).decode(data);
+        : BaseEncoding.base64Url().decode(data);
   }
 
   /**
    * Encodes data, from binary form to string.
-   * The default implementation performs websafe-base64 encoding.
+   * The default implementation performs websafe-base64 encoding (RFC 3548).
    */
   protected @Nullable String encode(@Nullable byte[] data) {
     return data == null
         ? null
-        : StringUtils.newStringUtf8(CryptoBase64.forSize(data.length).encode(data));
+        : BaseEncoding.base64Url().encode(data);
   }
 
   /**
@@ -548,25 +546,6 @@ public class DoubleClickCrypto {
     public byte[] decryptHyperlocal(byte[] hyperlocalCipher) {
       byte[] plainData = decrypt(hyperlocalCipher);
       return Arrays.copyOfRange(plainData, PAYLOAD_BASE, plainData.length - SIGNATURE_SIZE);
-    }
-  }
-
-  /**
-   * Helper subclass to work around Base64's very bad defaults for buffer sizes.
-   */
-  static class CryptoBase64 extends Base64 {
-    static final int SMALL_SIZE = 64;
-    static final CryptoBase64 small = new CryptoBase64(SMALL_SIZE);
-    final int defaultBufferSize;
-    CryptoBase64(int defaultBufferSize) {
-      super(BaseNCodec.MIME_CHUNK_SIZE, null, true);
-      this.defaultBufferSize = defaultBufferSize;
-    }
-    @Override protected int getDefaultBufferSize() {
-      return defaultBufferSize;
-    }
-    static CryptoBase64 forSize(int size) {
-      return size <= SMALL_SIZE ? small : new CryptoBase64(size);
     }
   }
 }

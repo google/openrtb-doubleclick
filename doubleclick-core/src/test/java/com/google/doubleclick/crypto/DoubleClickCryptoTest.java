@@ -22,11 +22,11 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
 import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
 
 import java.util.Date;
@@ -40,9 +40,9 @@ public class DoubleClickCryptoTest {
 
   static final DoubleClickCrypto.Keys KEYS = new DoubleClickCrypto.Keys(
       new SecretKeySpec(
-          Base64.decodeBase64("sIxwz7yw62yrfoLGt12lIHKuYrK/S5kLuApI2BQe7Ac="), "HmacSHA1"),
+          BaseEncoding.base64Url().decode("sIxwz7yw62yrfoLGt12lIHKuYrK_S5kLuApI2BQe7Ac="), "HmacSHA1"),
       new SecretKeySpec(
-          Base64.decodeBase64("v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
+          BaseEncoding.base64Url().decode("v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
   static final long PLAIN_PRICE = 0x000000002A512000L;
   static final Date INITV_TIMESTAMP = new Date(0x0F1E2D3C4B5A6978L);
   static final long INITV_SERVERID = 0x0123456789ABCDEFL;
@@ -52,9 +52,9 @@ public class DoubleClickCryptoTest {
     (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
     (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
   };
-  static final String CIPHER_PRICE = "5nmwvgAM0UABI0VniavN72_sy3TQFLWhVys-IA";
+  static final String CIPHER_PRICE = "5nmwvgAM0UABI0VniavN72_sy3TQFLWhVys-IA==";
   static final byte[] PLAIN_IDFA = new byte[]{ 0,1,2,3,4,5,6,7 };
-  static final String CIPHER_IDFA = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmeDOf7A";
+  static final String CIPHER_IDFA = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmeDOf7A==";
   static final byte[] PLAIN_ADID = new byte[]{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
   static final byte[] CIPHER_ADID = new byte[]{
     (byte) 0xE6, (byte) 0x79, (byte) 0xB0, (byte) 0xBE,
