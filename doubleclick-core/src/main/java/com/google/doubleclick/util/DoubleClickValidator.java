@@ -20,14 +20,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.doubleclick.DcExt;
-import com.google.doubleclick.Doubleclick;
-import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtb.BidRequest;
-import com.google.openrtb.OpenRtb.BidRequest.Impression;
-import com.google.openrtb.OpenRtb.BidRequest.Publisher;
-import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
-import com.google.openrtb.util.OpenRtbUtils;
+import com.google.doubleclick.Doubleclick.BidRequest;
+import com.google.doubleclick.Doubleclick.BidResponse;
+import com.google.protobuf.MessageLiteOrBuilder;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -38,21 +33,23 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
- * Validates a pair of {@link BidRequest} and its corresponding
- * {@link com.google.openrtb.OpenRtb.BidResponse.Builder}.
+ * Validates a pair of {@link BidRequest} and its corresponding {@link BidResponse}.
  * Bids with any validation problems will cause debug logs and metric updates.
  * Fatal validation errors (that would cause the bid to be rejected by DoubleClick Ad Exchange)
  * will also be removed from the response.
  */
+@Singleton
 public class DoubleClickValidator {
   private static final Logger logger =
       LoggerFactory.getLogger(DoubleClickValidator.class);
-  private static final String GDN = "1";
+  private static final int GDN = 1;
   public static final int CREATIVE_FLASH = 34;
   public static final int CREATIVE_NON_FLASH = 50;
 
@@ -66,7 +63,6 @@ public class DoubleClickValidator {
   private final Counter invalidSensCat = new Counter();
   private final Counter invalidAttrTotal = new Counter();
   private final Counter unknownAttrTotal = new Counter();
-  private final Counter fragmentUsesReserved = new Counter();
 
   @Inject
   public DoubleClickValidator(
@@ -90,101 +86,165 @@ public class DoubleClickValidator {
         invalidAttrTotal);
     metricRegistry.register(MetricRegistry.name(getClass(), "unknown-attr-total"),
         unknownAttrTotal);
-    metricRegistry.register(MetricRegistry.name(getClass(), "fragment-uses-reserved-field"),
-        fragmentUsesReserved);
   }
 
-  public void validate(final OpenRtb.BidRequest request, final OpenRtb.BidResponse.Builder response) {
-    OpenRtbUtils.filterBids(response, new Predicate<Bid>() {
-      @Override public boolean apply(Bid bid) {
-        return validate(request, bid);
-      }});
+  public boolean validate(final BidRequest request, final BidResponse.Builder response) {
+    boolean hasBad = false;
+    boolean hasEmpty = false;
+    List<BidResponse.Ad.Builder> ads = response.getAdBuilderList();
+    for (int iAd = 0; iAd < ads.size(); ++iAd) {
+      final BidResponse.Ad.Builder ad = ads.get(iAd);
+      List<BidResponse.Ad.AdSlot.Builder> adslots = ad.getAdslotBuilderList();
+      if (adslots.isEmpty()) {
+        hasEmpty = true;
+        if (logger.isDebugEnabled()) {
+          logger.debug("Ad #{} removed, clean but empty adslot", iAd);
+        }
+      } else {
+        List<BidResponse.Ad.AdSlot.Builder> filteredAdslots = filter(adslots,
+            new Predicate<BidResponse.Ad.AdSlot.Builder>() {
+          @Override public boolean apply(BidResponse.Ad.AdSlot.Builder adslot) {
+            return validate(request, ad, adslot);
+          }});
+        if (filteredAdslots != adslots) {
+          hasBad = true;
+          ad.clearAdslot();
+          if (filteredAdslots.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+              logger.debug("Ad #{} removed, all adslot values rejected", iAd);
+            }
+          } else {
+            for (BidResponse.Ad.AdSlot.Builder filteredAdslot : filteredAdslots) {
+              ad.addAdslot(filteredAdslot);
+            }
+          }
+        }
+      }
+    }
+    if (hasBad || hasEmpty) {
+      response.clearAd();
+      for (BidResponse.Ad.Builder ad : ads) {
+        if (ad.getAdslotCount() != 0) {
+          response.addAd(ad);
+        }
+      }
+    }
+    return hasBad;
   }
 
-  public boolean validate(OpenRtb.BidRequest request, Bid bid) {
-    Doubleclick.BidResponse.Ad adExt = bid.hasExtension(DcExt.ad)
-        ? bid.getExtension(DcExt.ad)
-        : null;
-    Impression imp = OpenRtbUtils.impWithId(request, bid.getImpid());
-    if (imp == null) {
+  public boolean validate(
+      BidRequest request, BidResponse.Ad.Builder ad, BidResponse.Ad.AdSlot.Builder adslot) {
+    BidRequest.AdSlot reqSlot = findRequestSlot(request, adslot.getId());
+    if (reqSlot == null) {
       unmatchedImp.inc();
       if (logger.isDebugEnabled()) {
-        logger.warn("Impresson id doesn't match any AdSlot (impression): {}", bid.getImpid());
+        logger.debug("AdSlot {} rejected, unmatched id", logId(adslot));
       }
       return false;
     }
-    Doubleclick.BidRequest.AdSlot adSlot = imp.getExtension(DcExt.adSlot);
     boolean valid = true;
 
-    if (adSlot.getExcludedAttributeList().contains(CREATIVE_FLASH)) {
-      if (adExt == null
-          || !adExt.getAttributeList().contains(CREATIVE_NON_FLASH)) {
+    if (reqSlot.getExcludedAttributeList().contains(CREATIVE_FLASH)) {
+      if (!ad.getAttributeList().contains(CREATIVE_NON_FLASH)) {
         needsNonflashAttr.inc();
         if (logger.isDebugEnabled()) {
-          logger.debug("Ad needs attribute {}\n{}",
+          logger.debug("{} rejected, ad.attribute needs value: {}",
+              logId(adslot),
               DoubleClickMetadata.toString(
                   metadata.getBuyerDeclarableCreativeAttributes(),
-                  CREATIVE_NON_FLASH),
-                  bid);
+                  CREATIVE_NON_FLASH));
         }
         valid = false;
       }
     }
 
-    if (adExt == null) {
-      return valid;
-    }
-
     List<Integer> bad;
-    Publisher publisher = request.hasSite()
-        ? request.getSite().getPublisher()
-        : request.getApp().getPublisher();
-    ImmutableMap<Integer, String> metaVendors = GDN.equals(publisher.getId())
+    ImmutableMap<Integer, String> metaVendors = request.getSellerNetworkId() == GDN
         ? metadata.getGdnVendors()
         : metadata.getVendors();
 
     if (!(bad = checkAttributes(
-        adSlot.getAllowedVendorTypeList(), adExt.getVendorTypeList(),
+        reqSlot.getAllowedVendorTypeList(), ad.getVendorTypeList(),
         metaVendors, true)).isEmpty()) {
-      logger.debug("Bid rejected, contains not-allowed {} types {}:\n{}",
-          GDN.equals(publisher.getId()) ? "GDN vendors" : "vendors", bad, bid);
+      logger.debug("{} rejected, unknown or not-allowed ad.vendor_type values: {}",
+          logId(adslot), request.getSellerNetworkId() == GDN ? "GDN " : "", bad);
       invalidVendor.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getAllowedRestrictedCategoryList(), adExt.getRestrictedCategoryList(),
+        reqSlot.getAllowedRestrictedCategoryList(), ad.getRestrictedCategoryList(),
         metadata.getRestrictedCategories(), true)).isEmpty()) {
-      logger.debug("Bid rejected, contains invalid restricted categories {}:\n{}", bad, bid);
+      logger.debug("{} rejected, unknown or not-allowed ad.restricted_category values: {}",
+          logId(adslot), bad);
       invalidRestrCat.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getExcludedProductCategoryList(), adExt.getCategoryList(),
+        reqSlot.getExcludedProductCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("Bid rejected, contains excluded product categories {}:\n{}", bad, bid);
+      logger.debug("{} rejected, unknown or excluded product ad.category values: {}",
+          logId(adslot), bad);
       invalidProdCat.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getExcludedSensitiveCategoryList(), adExt.getCategoryList(),
+        reqSlot.getExcludedSensitiveCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("Bid rejected, contains excluded sensitive categories {}:\n{}", bad, bid);
+      logger.debug("{} rejected, unknown or excluded sensitive ad.category values: {}",
+          logId(adslot), bad);
       invalidSensCat.inc();
       valid = false;
     }
 
     if (!(bad = checkAttributes(
-        adSlot.getExcludedAttributeList(), adExt.getAttributeList(),
+        reqSlot.getExcludedAttributeList(), ad.getAttributeList(),
         metadata.getBuyerDeclarableCreativeAttributes(), false)).isEmpty()) {
-      logger.debug("Bid rejected, contains excluded creative attributes {}:\n{}", bad, bid);
+      logger.debug("{} rejected, unknown or excluded ad.attribute values: {}",
+          logId(adslot), bad);
       invalidCreatAttr.inc();
       valid = false;
     }
 
     return valid;
+  }
+
+  protected static String logId(BidResponse.Ad.AdSlot.Builder adslot) {
+    return "AdSlot " + adslot.getId();
+  }
+
+  // Identical to ProtoUtils.filter(), avoiding dependency from openrtb-core
+  protected static <M extends MessageLiteOrBuilder>
+  List<M> filter(List<M> objs, Predicate<M> filter) {
+    for (ListIterator<M> iter = objs.listIterator(); iter.hasNext(); ) {
+      if (!filter.apply(iter.next())) {
+        List<M> filtered = new ArrayList<>(objs.size() - 1);
+        filtered.addAll(objs.subList(0, iter.previousIndex()));
+
+        while (iter.hasNext()) {
+          M obj = iter.next();
+
+          if (filter.apply(obj)) {
+            filtered.add(obj);
+          }
+        }
+
+        return filtered;
+      }
+    }
+
+    return objs;
+  }
+
+  protected static BidRequest.AdSlot findRequestSlot(BidRequest request, int adslotId) {
+    for (BidRequest.AdSlot adslot : request.getAdslotList()) {
+      if (adslot.getId() == adslotId) {
+        return adslot;
+      }
+    }
+    return null;
   }
 
   protected <T> List<T> checkAttributes(List<T> reqAttrs,

@@ -17,7 +17,9 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.doubleclick.Doubleclick;
+import com.google.doubleclick.Doubleclick.BidRequest;
 import com.google.openrtb.OpenRtb;
+import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.mapper.OpenRtbMapper;
 
 import javax.annotation.Nullable;
@@ -35,11 +37,21 @@ public class NullDoubleClickOpenRtbMapper
   @Override
   public Doubleclick.BidResponse.Builder toNative(
       OpenRtb.BidRequest request, OpenRtb.BidResponse response) {
-    return Doubleclick.BidResponse.newBuilder();
+    return null;
   }
 
   @Override
   public @Nullable OpenRtb.BidRequest toOpenRtb(Doubleclick.BidRequest dcRequest) {
+    return null;
+  }
+
+  @Override
+  public BidRequest toNative(com.google.openrtb.OpenRtb.BidRequest request) {
+    return null;
+  }
+
+  @Override
+  public BidResponse toOpenRtb(BidRequest request, BidRequest response) {
     return null;
   }
 }

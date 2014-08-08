@@ -42,6 +42,11 @@
       <artifactId>javax.inject</artifactId>
       <version>${injectVersion}</version>
     </dependency>
+    <dependency>
+      <groupId>com.codahale.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>${metricsVersion}</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
