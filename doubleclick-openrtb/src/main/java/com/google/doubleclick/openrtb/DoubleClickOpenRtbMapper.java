@@ -24,6 +24,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.Doubleclick;
+import com.google.doubleclick.Doubleclick.BidRequest;
 import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
 import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
 import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
@@ -48,6 +49,7 @@ import com.google.openrtb.OpenRtb.BidRequest.Publisher;
 import com.google.openrtb.OpenRtb.BidRequest.Regulations;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidRequest.User;
+import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.ContentCategory;
@@ -786,5 +788,21 @@ public class DoubleClickOpenRtbMapper
         }
       }
     }
+  }
+
+  /**
+   * Not implemented yet!
+   */
+  @Override
+  public BidRequest toNative(com.google.openrtb.OpenRtb.BidRequest request) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Not implemented yet!
+   */
+  @Override
+  public BidResponse toOpenRtb(BidRequest request, BidRequest response) {
+    throw new UnsupportedOperationException();
   }
 }

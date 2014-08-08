@@ -118,6 +118,25 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+            <version>${downloadMavenPluginVersion}</version>
+            <executions>
+              <execution>
+                <id>get-includes</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
+                <configuration>
+                  <url>${openrtbSource}/openrtb-core/src/main/protobuf/openrtb.proto</url>
+                  <outputDirectory>${protobufGenerated}/include</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
@@ -136,7 +155,7 @@
                       <arg value="--java_out=${protobufGenerated}" />
                       <arg value="-I${protobufSource}" />
                       <arg value="-I${protobufSource}/../../../../doubleclick-core/src/main/protobuf/" />
-                      <arg value="-I${protobufSource}/../../../../../openrtb/openrtb-core/src/main/protobuf/" />
+                      <arg value="-I${protobufGenerated}/include" />
                       <arg line="${proto.files}" />
                     </exec>
                   </tasks>

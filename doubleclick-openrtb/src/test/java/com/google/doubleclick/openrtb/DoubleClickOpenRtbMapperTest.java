@@ -293,7 +293,7 @@ public class DoubleClickOpenRtbMapperTest {
   @Test
   public void testReqResp_NullMapper() {
     NullDoubleClickOpenRtbMapper mapper = NullDoubleClickOpenRtbMapper.INSTANCE;
-    assertNotNull(mapper.toNative(
+    assertNull(mapper.toNative(
         OpenRtb.BidRequest.getDefaultInstance(), OpenRtb.BidResponse.getDefaultInstance()));
     assertNull(mapper.toOpenRtb(TestData.newRequest()));
   }
