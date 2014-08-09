@@ -43,7 +43,7 @@ public class DoubleClickCryptoTest {
           BaseEncoding.base64Url().decode("sIxwz7yw62yrfoLGt12lIHKuYrK_S5kLuApI2BQe7Ac="), "HmacSHA1"),
       new SecretKeySpec(
           BaseEncoding.base64Url().decode("v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
-  static final long PLAIN_PRICE = 0x000000002A512000L;
+  static final double PLAIN_PRICE = 1.2;
   static final Date INITV_TIMESTAMP = new Date(0x0F1E2D3C4B5A6978L);
   static final long INITV_SERVERID = 0x0123456789ABCDEFL;
   static final byte[] INITV = new byte[] {
@@ -52,7 +52,7 @@ public class DoubleClickCryptoTest {
     (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
     (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
   };
-  static final String CIPHER_PRICE = "5nmwvgAM0UABI0VniavN72_sy3TQFLWhVys-IA==";
+  static final String CIPHER_PRICE = "5nmwvgAM0UABI0VniavN72_sy3T6V9ohlpvOpA==";
   static final byte[] PLAIN_IDFA = new byte[]{ 0,1,2,3,4,5,6,7 };
   static final String CIPHER_IDFA = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmeDOf7A==";
   static final byte[] PLAIN_ADID = new byte[]{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
@@ -157,39 +157,37 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testPriceEncrypt() {
-    String cryptoData = priceCrypto.encodePrice(PLAIN_PRICE, INITV);
+    String cryptoData = priceCrypto.encodePriceValue(PLAIN_PRICE, INITV);
     assertEquals(CIPHER_PRICE, cryptoData);
   }
 
   @Test
   public void testPriceDecrypt() {
-    long decryptedPrice = priceCrypto.decodePrice(CIPHER_PRICE);
-    assertEquals(PLAIN_PRICE, decryptedPrice);
+    double decryptedPrice = priceCrypto.decodePriceValue(CIPHER_PRICE);
+    assertEquals(PLAIN_PRICE, decryptedPrice, 1e-9);
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testPriceDecrypt_badData() {
-    long decryptedPrice = priceCrypto.decodePrice("garbage");
-    assertEquals(PLAIN_PRICE, decryptedPrice);
+    priceCrypto.decodePriceMillis("garbage");
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testPriceDecrypt_empty() {
-    long decryptedPrice = priceCrypto.decodePrice("");
-    assertEquals(PLAIN_PRICE, decryptedPrice);
+    priceCrypto.decodePriceMillis("");
   }
 
   @Test(expected = DoubleClickCryptoException.class)
   public void testPriceDecrypt_wrongKeys() {
     new DoubleClickCrypto.Price(
             new DoubleClickCrypto.Keys(KEYS.getIntegrityKey(), KEYS.getEncryptionKey()))
-        .decodePrice(CIPHER_PRICE);
+        .decodePriceMillis(CIPHER_PRICE);
   }
 
   @Test
   public void testPriceRecrypt() {
-    String encrypted = priceCrypto.encodePrice(PLAIN_PRICE, INITV);
-    assertEquals(PLAIN_PRICE, priceCrypto.decodePrice(encrypted));
+    String encrypted = priceCrypto.encodePriceValue(PLAIN_PRICE, INITV);
+    assertEquals(PLAIN_PRICE, priceCrypto.decodePriceValue(encrypted), 1e-9);
   }
 
   // DoubleClickCrypto.Idfa
