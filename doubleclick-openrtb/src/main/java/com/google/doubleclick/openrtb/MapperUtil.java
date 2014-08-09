@@ -19,6 +19,7 @@ package com.google.doubleclick.openrtb;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.BaseEncoding;
 import com.google.common.net.InetAddresses;
 import com.google.protobuf.ByteString;
 
@@ -32,9 +33,6 @@ import java.util.Collections;
  * Utilities for Mappers.
  */
 public class MapperUtil {
-  private static final char[] HEX = new char[] {
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-  };
 
   @SuppressWarnings("unchecked")
   public static <T> ImmutableSet<T>[] multimapIntToSets(
@@ -70,40 +68,6 @@ public class MapperUtil {
         : ImmutableSet.<T>of();
   }
 
-  public static String toHexString(ByteString bytes) {
-    StringBuilder sb = new StringBuilder(bytes.size() * 2);
-    toHexString(bytes, 0, bytes.size(), sb);
-    return sb.toString();
-  }
-
-  public static void toHexString(ByteString bytes, int from, int to, StringBuilder sb) {
-    for (int i = from; i < to; ++i) {
-      toHexString(bytes.byteAt(i), sb);
-    }
-  }
-
-  protected static void toHexString(int b, StringBuilder sb) {
-    sb.append(HEX[(b >> 4) & 0x0F]);
-    sb.append(HEX[b & 0x0F]);
-  }
-
-  public static ByteString toByteString(String str) {
-    ByteString.Output bs = ByteString.newOutput(str.length() / 2);
-
-    for (int i = 0; i < str.length(); ) {
-      char c1 = str.charAt(i++);
-      char c2 = str.charAt(i++);
-      int b = (parseHexDigit(c1) << 4) | parseHexDigit(c2);
-      bs.write(b);
-    }
-
-    return bs.toByteString();
-  }
-
-  private static int parseHexDigit(char c) {
-    return c <= '9' ? c - '0' : c - 'A' + 10;
-  }
-
   public static String toIpv4String(ByteString bytes) {
     StringBuilder sb = new StringBuilder(bytes.size() * 4);
 
@@ -127,7 +91,7 @@ public class MapperUtil {
       bytes.copyTo(ipv6, 0);
       return InetAddresses.toAddrString(InetAddress.getByAddress(ipv6));
     } catch (UnknownHostException e) {
-      throw new IllegalArgumentException("ip=" + toHexString(bytes));
+      throw new IllegalArgumentException("ip=" + BaseEncoding.base16().encode(bytes.toByteArray()));
     }
   }
 
