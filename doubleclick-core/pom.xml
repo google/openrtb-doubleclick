@@ -33,11 +33,6 @@
       <version>${slf4jVersion}</version>
     </dependency>
     <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>${commonsCodecVersion}</version>
-    </dependency>
-    <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
       <version>${injectVersion}</version>

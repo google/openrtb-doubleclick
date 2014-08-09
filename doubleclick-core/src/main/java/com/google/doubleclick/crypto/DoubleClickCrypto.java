@@ -19,11 +19,9 @@ package com.google.doubleclick.crypto;
 import static java.lang.Math.min;
 
 import com.google.common.base.Objects;
+import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.BaseNCodec;
-import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +76,8 @@ public class DoubleClickCrypto {
   private static final int COUNTER_PAGESIZE = 20;
   private static final int COUNTER_SECTIONS = 3*256 + 1;
 
+  private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
+
   private final Keys keys;
 
   /**
@@ -91,22 +91,22 @@ public class DoubleClickCrypto {
 
   /**
    * Decodes data, from string to binary form.
-   * The default implementation performs websafe-base64 decoding.
+   * The default implementation performs websafe-base64 decoding (RFC 3548).
    */
   protected @Nullable byte[] decode(@Nullable String data) {
     return data == null
         ? null
-        : CryptoBase64.forSize(data.length()).decode(data);
+        : BaseEncoding.base64Url().decode(data);
   }
 
   /**
    * Encodes data, from binary form to string.
-   * The default implementation performs websafe-base64 encoding.
+   * The default implementation performs websafe-base64 encoding (RFC 3548).
    */
   protected @Nullable String encode(@Nullable byte[] data) {
     return data == null
         ? null
-        : StringUtils.newStringUtf8(CryptoBase64.forSize(data.length).encode(data));
+        : BaseEncoding.base64Url().encode(data);
   }
 
   /**
@@ -347,12 +347,12 @@ public class DoubleClickCrypto {
     /**
      * Encrypts the winning price.
      *
-     * @param priceValue the price
+     * @param priceValue the price in millis (1/1000th of the currency unit)
      * @param initVector up to 16 bytes of nonce data
      * @return encrypted price
      * @throws DoubleClickCryptoException if the encryption fails
      */
-    public byte[] encryptPrice(long priceValue, @Nullable byte[] initVector) {
+    public byte[] encryptPriceMillis(long priceValue, @Nullable byte[] initVector) {
       byte[] plainData = initPlainData(PAYLOAD_SIZE, initVector);
       ByteBuffer.wrap(plainData).putLong(PAYLOAD_BASE, priceValue);
       return encrypt(plainData);
@@ -362,10 +362,10 @@ public class DoubleClickCrypto {
      * Decrypts the winning price.
      *
      * @param priceCipher encrypted price
-     * @return the price value
+     * @return the price value in millis (1/1000th of the currency unit)
      * @throws DoubleClickCryptoException if the decryption fails
      */
-    public long decryptPrice(byte[] priceCipher) {
+    public long decryptPriceMillis(byte[] priceCipher) {
       if (priceCipher.length != (OVERHEAD_SIZE + PAYLOAD_SIZE)) {
         throw new DoubleClickCryptoException("Price is " + priceCipher.length
             + " bytes, should be " + (OVERHEAD_SIZE + PAYLOAD_SIZE));
@@ -378,13 +378,36 @@ public class DoubleClickCrypto {
     /**
      * Encrypts and encodes the winning price.
      *
+     * @param priceMillis the price in millis (1/1000th of the currency unit)
+     * @param initVector up to 16 bytes of nonce data
+     * @return encrypted price, encoded as websafe-base64
+     * @throws DoubleClickCryptoException if the encryption fails
+     */
+    public String encodePriceMillis(long priceMillis, @Nullable byte[] initVector) {
+      return encode(encryptPriceMillis(priceMillis, initVector));
+    }
+
+    /**
+     * Encrypts and encodes the winning price.
+     *
      * @param priceValue the price
      * @param initVector up to 16 bytes of nonce data
      * @return encrypted price, encoded as websafe-base64
      * @throws DoubleClickCryptoException if the encryption fails
      */
-    public String encodePrice(long priceValue, @Nullable byte[] initVector) {
-      return encode(encryptPrice(priceValue, initVector));
+    public String encodePriceValue(double priceValue, @Nullable byte[] initVector) {
+      return encodePriceMillis((long) (priceValue * MICROS_PER_CURRENCY_UNIT), initVector);
+    }
+
+    /**
+     * Decodes and decrypts the winning price.
+     *
+     * @param priceCipher encrypted price, encoded as websafe-base64
+     * @return the price value in millis (1/1000th of the currency unit)
+     * @throws DoubleClickCryptoException if the decryption fails
+     */
+    public long decodePriceMillis(String priceCipher) {
+      return decryptPriceMillis(decode(priceCipher));
     }
 
     /**
@@ -394,8 +417,8 @@ public class DoubleClickCrypto {
      * @return the price value
      * @throws DoubleClickCryptoException if the decryption fails
      */
-    public long decodePrice(String priceCipher) {
-      return decryptPrice(decode(priceCipher));
+    public double decodePriceValue(String priceCipher) {
+      return decodePriceMillis(priceCipher) / ((double) MICROS_PER_CURRENCY_UNIT);
     }
   }
 
@@ -548,25 +571,6 @@ public class DoubleClickCrypto {
     public byte[] decryptHyperlocal(byte[] hyperlocalCipher) {
       byte[] plainData = decrypt(hyperlocalCipher);
       return Arrays.copyOfRange(plainData, PAYLOAD_BASE, plainData.length - SIGNATURE_SIZE);
-    }
-  }
-
-  /**
-   * Helper subclass to work around Base64's very bad defaults for buffer sizes.
-   */
-  static class CryptoBase64 extends Base64 {
-    static final int SMALL_SIZE = 64;
-    static final CryptoBase64 small = new CryptoBase64(SMALL_SIZE);
-    final int defaultBufferSize;
-    CryptoBase64(int defaultBufferSize) {
-      super(BaseNCodec.MIME_CHUNK_SIZE, null, true);
-      this.defaultBufferSize = defaultBufferSize;
-    }
-    @Override protected int getDefaultBufferSize() {
-      return defaultBufferSize;
-    }
-    static CryptoBase64 forSize(int size) {
-      return size <= SMALL_SIZE ? small : new CryptoBase64(size);
     }
   }
 }
