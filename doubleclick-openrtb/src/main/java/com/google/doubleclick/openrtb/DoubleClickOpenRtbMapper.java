@@ -22,6 +22,7 @@ import static java.lang.Math.min;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.Doubleclick;
 import com.google.doubleclick.Doubleclick.BidRequest;
@@ -232,7 +233,7 @@ public class DoubleClickOpenRtbMapper
   @Override
   public OpenRtb.BidRequest toOpenRtb(Doubleclick.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
-        .setId(MapperUtil.toHexString(dcRequest.getId()));
+        .setId(BaseEncoding.base16().encode(dcRequest.getId().toByteArray()));
 
     if (dcRequest.getIsPing()) {
       return request.build();
@@ -535,9 +536,9 @@ public class DoubleClickOpenRtbMapper
       }
       if ((coppa && dcMobile.hasConstrainedUsageEncryptedHashedIdfa())
           || (!coppa && dcMobile.hasEncryptedHashedIdfa())) {
-        device.setDpidmd5(MapperUtil.toHexString(coppa
-            ? dcMobile.getConstrainedUsageEncryptedHashedIdfa()
-            : dcMobile.getEncryptedHashedIdfa()));
+        device.setDpidmd5(BaseEncoding.base16().encode((coppa
+        ? dcMobile.getConstrainedUsageEncryptedHashedIdfa()
+        : dcMobile.getEncryptedHashedIdfa()).toByteArray()));
       }
       if (dcMobile.hasModel()) {
         device.setModel(dcMobile.getModel());

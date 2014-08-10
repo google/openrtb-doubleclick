@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.Doubleclick;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot;
@@ -275,7 +276,7 @@ public class DoubleClickOpenRtbMapperTest {
         .build();
     OpenRtb.BidRequest request = mapper.toOpenRtb(dcRequest);
     assertEquals(
-        OpenRtb.BidRequest.newBuilder().setId(MapperUtil.toHexString(dcRequest.getId())).build(),
+        OpenRtb.BidRequest.newBuilder().setId(BaseEncoding.base16().encode(dcRequest.getId().toByteArray())).build(),
         request);
   }
 

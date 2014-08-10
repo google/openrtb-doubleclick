@@ -283,23 +283,9 @@ public class DoubleClickCrypto {
         .append(": initVector={timestamp ")
             .append(DateFormat.getDateTimeInstance().format(timestamp))
             .append(", serverId ").append(serverId)
-        .append("}\ninput  =").append(toHexString(inData))
-        .append("\noutput =").append(toHexString(workBytes))
+        .append("}\ninput  =").append(BaseEncoding.base16().encode(inData))
+        .append("\noutput =").append(BaseEncoding.base16().encode(workBytes))
         .toString();
-  }
-
-  private static String toHexString(byte[] bytes) {
-    StringBuilder sb = new StringBuilder("[");
-
-    for (byte b : bytes) {
-      sb.append(Integer.toHexString(b >> 4 & 0xF)).append(Integer.toHexString(b & 0xF)).append(' ');
-    }
-
-    if (bytes.length != 0) {
-      sb.setLength(sb.length() - 1);
-    }
-
-    return sb.append("]").toString();
   }
 
   /**
