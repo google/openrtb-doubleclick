@@ -31,6 +31,7 @@ import com.google.doubleclick.Doubleclick.BidRequest.Mobile.DeviceOsVersion;
 import com.google.doubleclick.Doubleclick.BidRequest.Mobile.MobileDeviceType;
 import com.google.doubleclick.Doubleclick.BidRequest.UserDataTreatment;
 import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
+import com.google.doubleclick.Doubleclick.BidRequest.Vertical;
 import com.google.doubleclick.Doubleclick.BidRequest.Video;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
@@ -94,6 +95,11 @@ public class TestData {
         .setAnonymousId("mysite.com")
         .setUrl("mysite.com/newsfeed")
         .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"))
+        .addAllDetectedVertical(sublist(size,
+            Vertical.newBuilder().setId(10).setWeight(0.25f).build(),
+            Vertical.newBuilder().setId(12).setWeight(0.33f).build(),
+            Vertical.newBuilder().setId(15).setWeight(0.75f).build(),
+            Vertical.newBuilder().setId(20).setWeight(0.99f).build()))
         .setEncryptedHyperlocalSet(ByteString.copyFrom(
             new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS).encryptHyperlocal(
                 HyperlocalSet.newBuilder()

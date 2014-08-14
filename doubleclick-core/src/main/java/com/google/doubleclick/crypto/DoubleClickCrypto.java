@@ -16,6 +16,7 @@
 
 package com.google.doubleclick.crypto;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.min;
 
 import com.google.common.base.Objects;
@@ -28,28 +29,30 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.Nullable;
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
-import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 
 /**
 * Encryption and decryption support for the DoubleClick Ad Exchange RTB protocol.
 * <p>
-* Encrypted information is in the general format:
+* Encrypted payloads are wrapped by "packages" in the general format:
 * <code>
 * initVector:16 || E(payload:?) || I(signature:4)
 * </code>
 * <br>where:
 * <ol>
-*   <li>initVector = timeMillis:4 || timeMicros:4 || serverId:8 (AdX convention)</li>
-*   <li>E(payload) = payload ^ hmac(encryptionKey, initVector) for each max-20-byte block</li>
-*   <li>I(signature) = hmac(integrityKey, payload || initVector)[0..3]</li>
+*   <li>{@code initVector = timestamp:8 || serverId:8} (AdX convention)</li>
+*   <li>{@code E(payload) = payload ^ hmac(encryptionKey, initVector)} per max-20-byte block</li>
+*   <li>{@code I(signature) = hmac(integrityKey, payload || initVector)[0..3]}</li>
 * </ol>
 */
 public class DoubleClickCrypto {
@@ -60,10 +63,8 @@ public class DoubleClickCrypto {
   public static final int INITV_BASE = 0;
   /** Initialization vector size. */
   public static final int INITV_SIZE = 16;
-  /** Seconds subfield offset in the initialization vector. */
-  public static final int INITV_SECS_OFFSET = 0;
-  /** Microseconds subfield offset in the initialization vector. */
-  public static final int INITV_MICROS_OFFSET = 4;
+  /** Timestamp subfield offset in the initialization vector. */
+  public static final int INITV_TIMESTAMP_OFFSET = 0;
   /** ServerId subfield offset in the initialization vector. */
   public static final int INITV_SERVERID_OFFSET = 8;
   /** Payload offset in the crypto package. */
@@ -79,6 +80,7 @@ public class DoubleClickCrypto {
   private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
 
   private final Keys keys;
+  private final ThreadLocalRandom fastRandom = ThreadLocalRandom.current();
 
   /**
    * Initializes with the encryption keys.
@@ -112,19 +114,18 @@ public class DoubleClickCrypto {
   /**
    * Decrypts data.
    *
-   * @param cipherData initVector || E(payload) || I(signature:4)
-   * @return initVector || payload || I'(signature)
+   * @param cipherData {@code initVector || E(payload) || I(signature)}
+   * @return {@code initVector || payload || I'(signature)}
    * Where I'(signature) == I(signature) for success, different for failure
-   * @throws DoubleClickCryptoException if the decryption fails
    */
-  public byte[] decrypt(byte[] cipherData) {
-    if (cipherData.length < OVERHEAD_SIZE) {
-      throw new DoubleClickCryptoException("Invalid cipherData, " + cipherData.length + " bytes");
-    }
+  public byte[] decrypt(byte[] cipherData) throws SignatureException {
+    checkArgument(cipherData.length >= OVERHEAD_SIZE,
+        "Invalid cipherData, %s bytes", cipherData.length);
 
     // workBytes := initVector || E(payload) || I(signature)
     byte[] workBytes = cipherData.clone();
     ByteBuffer workBuffer = ByteBuffer.wrap(workBytes);
+    boolean success = false;
 
     try {
       // workBytes := initVector || payload || I(signature)
@@ -135,7 +136,7 @@ public class DoubleClickCrypto {
       workBuffer.putInt(workBytes.length - SIGNATURE_SIZE, confirmationSignature);
 
       if (confirmationSignature != integritySignature) {
-        throw new DoubleClickCryptoException("Signature mismatch: "
+        throw new SignatureException("Signature mismatch: "
             + Integer.toHexString(confirmationSignature)
             + " vs " + Integer.toHexString(integritySignature));
       }
@@ -144,30 +145,29 @@ public class DoubleClickCrypto {
         logger.debug(dump("Decrypted", cipherData, workBytes));
       }
 
+      success = true;
       return workBytes;
-    } catch (InvalidKeyException | NoSuchAlgorithmException | ShortBufferException e) {
-      if (logger.isWarnEnabled()) {
+    } finally {
+      if (!success && logger.isWarnEnabled()) {
         logger.warn(dump("Decrypted (failed)", cipherData, workBytes));
       }
-      throw new DoubleClickCryptoException(e);
     }
   }
 
   /**
    * Encrypts data.
    *
-   * @param plainData initVector || payload || zeros:4
-   * @return initVector || E(payload) || I(signature)
-   * @throws DoubleClickCryptoException if the encryption fails
+   * @param plainData {@code initVector || payload || zeros:4}
+   * @return {@code initVector || E(payload) || I(signature)}
    */
   public byte[] encrypt(byte[] plainData) {
-    if (plainData.length < OVERHEAD_SIZE) {
-      throw new DoubleClickCryptoException("Invalid plainData, " + plainData.length + " bytes");
-    }
+    checkArgument(plainData.length >= OVERHEAD_SIZE,
+        "Invalid plainData, %s bytes", plainData.length);
 
     // workBytes := initVector || payload || zeros:4
     byte[] workBytes = plainData.clone();
     ByteBuffer workBuffer = ByteBuffer.wrap(workBytes);
+    boolean success = false;
 
     try {
       // workBytes := initVector || payload || I(signature)
@@ -180,27 +180,34 @@ public class DoubleClickCrypto {
         logger.debug(dump("Encrypted", plainData, workBytes));
       }
 
+      success = true;
       return workBytes;
-    } catch (InvalidKeyException | NoSuchAlgorithmException | ShortBufferException e) {
-      if (logger.isWarnEnabled()) {
+    } finally {
+      if (!success && logger.isWarnEnabled()) {
         logger.warn(dump("Encrypted (failed)", plainData, workBytes));
       }
-      throw new DoubleClickCryptoException(e);
     }
   }
 
   /**
-   * Creates the initialization vector from component { timestamp, serverId } fields.
+   * Creates the initialization vector from component {@code (timestamp, serverId)} fields.
    * This is the format used by DoubleClick, and it's a good format generally,
    * even though the initialization vector can be any random data (a cryptographic nonce).
+   * <p>
+   * NOTE: Follow the advice from
+   * https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-price#detecting_stale
+   * by using a high-resolution timestamp; also if the {@code serverId} is not necessary, providing
+   * a random value there helps further to prevent replay attacks. In all methods that have
+   * a {@code initVector} parameter, passing null will cause {@code (current time, random)}
+   * to be used (so if you really want all-zeros {@code initVector}, e.g. in unit tests to make
+   * results reproducible, pass a zero-filled array).
    */
   public byte[] createInitVector(@Nullable Date timestamp, long serverId) {
     byte[] initVector = new byte[INITV_SIZE];
     ByteBuffer byteBuffer = ByteBuffer.wrap(initVector);
 
     if (timestamp != null) {
-      byteBuffer.putInt(INITV_SECS_OFFSET, (int) (timestamp.getTime() / 1000));
-      byteBuffer.putInt(INITV_MICROS_OFFSET, (int) (timestamp.getTime() % 1000 * 1000));
+      byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, timestamp.getTime());
     }
 
     byteBuffer.putLong(INITV_SERVERID_OFFSET, serverId);
@@ -208,53 +215,80 @@ public class DoubleClickCrypto {
   }
 
   /**
-   * Packages plaintext payload for encryption; returns initVector || payload || zeros:4.
+   * Returns the {@code timestamp} field from encrypted or decrypted data. Assumes that its
+   * initialization vector has the structure {@code (timestamp, serverId)}.
+   *
+   * @param data Encrypted or decrypted data (the initialization vector is never encrypted)
+   * @return Timestamp subfield of the initialization vector.
+   */
+  public Date getTimestamp(byte[] data) {
+    return new Date(ByteBuffer.wrap(data).getLong(INITV_BASE + INITV_TIMESTAMP_OFFSET));
+  }
+
+  /**
+   * Returns the {@code serverId} field from encrypted or decrypted data. Assumes that its
+   * initialization vector has the structure {@code (timestamp, serverId)}.
+   *
+   * @param data Encrypted or decrypted data (the initialization vector is never encrypted)
+   * @return Timestamp subfield of the initialization vector.
+   */
+  public long getServerId(byte[] data) {
+    return ByteBuffer.wrap(data).getLong(INITV_BASE + INITV_SERVERID_OFFSET);
+  }
+
+  /**
+   * Packages plaintext payload for encryption; returns {@code initVector || payload || zeros:4}.
    */
   protected byte[] initPlainData(int payloadSize, @Nullable byte[] initVector) {
     byte[] plainData = new byte[OVERHEAD_SIZE + payloadSize];
 
-    if (initVector != null) {
-      if (initVector.length != INITV_SIZE) {
-        throw new DoubleClickCryptoException(
-            "InitVector is " + initVector.length + " bytes, should be " + INITV_SIZE);
-      }
-
-      System.arraycopy(initVector, 0, plainData, INITV_BASE, INITV_SIZE);
+    if (initVector == null) {
+      ByteBuffer byteBuffer = ByteBuffer.wrap(plainData);
+      byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, System.nanoTime());
+      byteBuffer.putLong(INITV_SERVERID_OFFSET, fastRandom.nextLong());
+    } else {
+      System.arraycopy(initVector, 0, plainData, INITV_BASE, min(INITV_SIZE, initVector.length));
     }
 
     return plainData;
   }
 
   /**
-   * payload = payload ^ hmac(encryptionKey, initVector || counterBytes) per max-20-byte blocks.
+   * {@code payload = payload ^ hmac(encryptionKey, initVector || counterBytes)}
+   * per max-20-byte blocks.
    */
-  private void xorPayloadToHmacPad(byte[] workBytes)
-      throws NoSuchAlgorithmException, InvalidKeyException, ShortBufferException {
+  private void xorPayloadToHmacPad(byte[] workBytes) {
     int payloadSize = workBytes.length - OVERHEAD_SIZE;
     int sections = (payloadSize + COUNTER_PAGESIZE - 1) / COUNTER_PAGESIZE;
-    if (sections > COUNTER_SECTIONS) {
-      throw new DoubleClickCryptoException("Payload is " + payloadSize
-          + " bytes, exceeds limit of " + COUNTER_PAGESIZE * COUNTER_SECTIONS);
-    }
+    checkArgument(sections <= COUNTER_SECTIONS, "Payload is %s bytes, exceeds limit of %s",
+        payloadSize, COUNTER_PAGESIZE * COUNTER_SECTIONS);
 
-    Mac encryptionHmac = Mac.getInstance("HmacSHA1");
+    Mac encryptionHmac = createMac();
+
     byte[] pad = new byte[COUNTER_PAGESIZE + 3];
     int counterSize = 0;
 
     for (int section = 0; section < sections; ++section) {
       int sectionBase = section * COUNTER_PAGESIZE;
       int sectionSize = min(payloadSize - sectionBase, COUNTER_PAGESIZE);
-      encryptionHmac.reset();
-      encryptionHmac.init(keys.getEncryptionKey());
-      encryptionHmac.update(workBytes, INITV_BASE, INITV_SIZE);
-      if (counterSize != 0) {
-        encryptionHmac.update(pad, COUNTER_PAGESIZE, counterSize);
+
+      try {
+        encryptionHmac.reset();
+        encryptionHmac.init(keys.getEncryptionKey());
+        encryptionHmac.update(workBytes, INITV_BASE, INITV_SIZE);
+        if (counterSize != 0) {
+          encryptionHmac.update(pad, COUNTER_PAGESIZE, counterSize);
+        }
+        encryptionHmac.doFinal(pad, 0);
+      } catch (ShortBufferException | InvalidKeyException e) {
+        throw new IllegalStateException(e);
       }
-      encryptionHmac.doFinal(pad, 0);
 
       for (int i = 0; i < sectionSize; ++i) {
         workBytes[PAYLOAD_BASE + sectionBase + i] ^= pad[i];
       }
+
+      Arrays.fill(pad, 0, COUNTER_PAGESIZE, (byte) 0);
 
       if (counterSize == 0 || ++pad[COUNTER_PAGESIZE + counterSize - 1] == 0) {
         ++counterSize;
@@ -262,21 +296,32 @@ public class DoubleClickCrypto {
     }
   }
 
+  private static Mac createMac() {
+    try {
+      return Mac.getInstance("HmacSHA1");
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   /**
-   * Return signature = hmac(integrityKey, payload || initVector)
+   * {@code signature = hmac(integrityKey, payload || initVector)}
    */
-  private int hmacSignature(byte[] workBytes) throws NoSuchAlgorithmException, InvalidKeyException {
-    Mac integrityHmac = Mac.getInstance("HmacSHA1");
-    integrityHmac.init(keys.getIntegrityKey());
-    integrityHmac.update(workBytes, PAYLOAD_BASE, workBytes.length - OVERHEAD_SIZE);
-    integrityHmac.update(workBytes, INITV_BASE, INITV_SIZE);
-    return Ints.fromByteArray(integrityHmac.doFinal());
+  private int hmacSignature(byte[] workBytes) {
+    try {
+      Mac integrityHmac = createMac();
+      integrityHmac.init(keys.getIntegrityKey());
+      integrityHmac.update(workBytes, PAYLOAD_BASE, workBytes.length - OVERHEAD_SIZE);
+      integrityHmac.update(workBytes, INITV_BASE, INITV_SIZE);
+      return Ints.fromByteArray(integrityHmac.doFinal());
+    } catch (InvalidKeyException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   private static String dump(String header, byte[] inData, byte[] workBytes) {
     ByteBuffer initvBuffer = ByteBuffer.wrap(workBytes, INITV_BASE, INITV_SIZE);
-    Date timestamp = new Date(initvBuffer.getInt(INITV_BASE + INITV_SECS_OFFSET) * 1000L
-        + initvBuffer.getInt(INITV_BASE + INITV_MICROS_OFFSET) / 1000);
+    Date timestamp = new Date(initvBuffer.getLong(INITV_BASE + INITV_TIMESTAMP_OFFSET));
     long serverId = initvBuffer.getLong(INITV_BASE + INITV_SERVERID_OFFSET);
     return new StringBuilder()
         .append(header)
@@ -292,20 +337,44 @@ public class DoubleClickCrypto {
    * Holds the keys used to configure DoubleClick cryptography.
    */
   public static class Keys {
-    private final SecretKeySpec encryptionKey;
-    private final SecretKeySpec integrityKey;
+    private final SecretKey encryptionKey;
+    private final SecretKey integrityKey;
 
-    public Keys(SecretKeySpec encryptionKey, SecretKeySpec integrityKey) {
+    public Keys(SecretKey encryptionKey, SecretKey integrityKey) throws InvalidKeyException {
       this.encryptionKey = encryptionKey;
       this.integrityKey = integrityKey;
+
+      // Forces early failure if any of the keys are not good.
+      // This allows us to spare callers from InvalidKeyException in several methods.
+      Mac hmac = DoubleClickCrypto.createMac();
+      hmac.init(encryptionKey);
+      hmac.reset();
+      hmac.init(integrityKey);
+      hmac.reset();
     }
 
-    public SecretKeySpec getEncryptionKey() {
+    public SecretKey getEncryptionKey() {
       return encryptionKey;
     }
 
-    public SecretKeySpec getIntegrityKey() {
+    public SecretKey getIntegrityKey() {
       return integrityKey;
+    }
+
+    @Override
+    public int hashCode() {
+      return encryptionKey.hashCode() ^ integrityKey.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == this) {
+        return true;
+      } else if (!(obj instanceof Keys)) {
+        return false;
+      }
+      Keys other = (Keys) obj;
+      return encryptionKey.equals(other.encryptionKey) && integrityKey.equals(other.integrityKey);
     }
 
     @Override public String toString() {
@@ -333,12 +402,12 @@ public class DoubleClickCrypto {
     /**
      * Encrypts the winning price.
      *
-     * @param priceValue the price in millis (1/1000th of the currency unit)
+     * @param priceValue the price in micros (1/1.000.000th of the currency unit)
      * @param initVector up to 16 bytes of nonce data
      * @return encrypted price
-     * @throws DoubleClickCryptoException if the encryption fails
+     * @see #createInitVector(Date, long)
      */
-    public byte[] encryptPriceMillis(long priceValue, @Nullable byte[] initVector) {
+    public byte[] encryptPriceMicros(long priceValue, @Nullable byte[] initVector) {
       byte[] plainData = initPlainData(PAYLOAD_SIZE, initVector);
       ByteBuffer.wrap(plainData).putLong(PAYLOAD_BASE, priceValue);
       return encrypt(plainData);
@@ -348,14 +417,11 @@ public class DoubleClickCrypto {
      * Decrypts the winning price.
      *
      * @param priceCipher encrypted price
-     * @return the price value in millis (1/1000th of the currency unit)
-     * @throws DoubleClickCryptoException if the decryption fails
+     * @return the price value in micros (1/1.000.000th of the currency unit)
      */
-    public long decryptPriceMillis(byte[] priceCipher) {
-      if (priceCipher.length != (OVERHEAD_SIZE + PAYLOAD_SIZE)) {
-        throw new DoubleClickCryptoException("Price is " + priceCipher.length
-            + " bytes, should be " + (OVERHEAD_SIZE + PAYLOAD_SIZE));
-      }
+    public long decryptPriceMicros(byte[] priceCipher) throws SignatureException {
+      checkArgument(priceCipher.length == (OVERHEAD_SIZE + PAYLOAD_SIZE),
+          "Price is %s bytes, should be %s", priceCipher.length, (OVERHEAD_SIZE + PAYLOAD_SIZE));
 
       byte[] plainData = decrypt(priceCipher);
       return ByteBuffer.wrap(plainData).getLong(PAYLOAD_BASE);
@@ -364,36 +430,35 @@ public class DoubleClickCrypto {
     /**
      * Encrypts and encodes the winning price.
      *
-     * @param priceMillis the price in millis (1/1000th of the currency unit)
-     * @param initVector up to 16 bytes of nonce data
+     * @param priceMicros the price in micros (1/1.000.000th of the currency unit)
+     * @param initVector up to 16 bytes of nonce data, or {@code null} for default
+     * generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted price, encoded as websafe-base64
-     * @throws DoubleClickCryptoException if the encryption fails
      */
-    public String encodePriceMillis(long priceMillis, @Nullable byte[] initVector) {
-      return encode(encryptPriceMillis(priceMillis, initVector));
+    public String encodePriceMicros(long priceMicros, @Nullable byte[] initVector) {
+      return encode(encryptPriceMicros(priceMicros, initVector));
     }
 
     /**
      * Encrypts and encodes the winning price.
      *
      * @param priceValue the price
-     * @param initVector up to 16 bytes of nonce data
+     * @param initVector up to 16 bytes of nonce data, or {@code null} for default
+     * generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted price, encoded as websafe-base64
-     * @throws DoubleClickCryptoException if the encryption fails
      */
     public String encodePriceValue(double priceValue, @Nullable byte[] initVector) {
-      return encodePriceMillis((long) (priceValue * MICROS_PER_CURRENCY_UNIT), initVector);
+      return encodePriceMicros((long) (priceValue * MICROS_PER_CURRENCY_UNIT), initVector);
     }
 
     /**
      * Decodes and decrypts the winning price.
      *
      * @param priceCipher encrypted price, encoded as websafe-base64
-     * @return the price value in millis (1/1000th of the currency unit)
-     * @throws DoubleClickCryptoException if the decryption fails
+     * @return the price value in micros (1/1.000.000th of the currency unit)
      */
-    public long decodePriceMillis(String priceCipher) {
-      return decryptPriceMillis(decode(priceCipher));
+    public long decodePriceMicros(String priceCipher) throws SignatureException {
+      return decryptPriceMicros(decode(priceCipher));
     }
 
     /**
@@ -401,10 +466,9 @@ public class DoubleClickCrypto {
      *
      * @param priceCipher encrypted price, encoded as websafe-base64
      * @return the price value
-     * @throws DoubleClickCryptoException if the decryption fails
      */
-    public double decodePriceValue(String priceCipher) {
-      return decodePriceMillis(priceCipher) / ((double) MICROS_PER_CURRENCY_UNIT);
+    public double decodePriceValue(String priceCipher) throws SignatureException {
+      return decodePriceMicros(priceCipher) / ((double) MICROS_PER_CURRENCY_UNIT);
     }
   }
 
@@ -426,15 +490,13 @@ public class DoubleClickCrypto {
      * Encrypts the Advertising Id.
      *
      * @param adidPlain the AdId
-     * @param initVector up to 16 bytes of nonce data
+     * @param initVector up to 16 bytes of nonce data, or {@code null} for default
+     * generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted AdId
-     * @throws DoubleClickCryptoException if the encryption fails
      */
     public byte[] encryptAdId(byte[] adidPlain, @Nullable byte[] initVector) {
-      if (adidPlain.length != PAYLOAD_SIZE) {
-        throw new DoubleClickCryptoException(
-            "AdId is " + adidPlain.length + " bytes, should be " + PAYLOAD_SIZE);
-      }
+      checkArgument(adidPlain.length == PAYLOAD_SIZE,
+            "AdId is %s bytes, should be %s", adidPlain.length, PAYLOAD_SIZE);
 
       byte[] plainData = initPlainData(PAYLOAD_SIZE, initVector);
       System.arraycopy(adidPlain, 0, plainData, PAYLOAD_BASE, PAYLOAD_SIZE);
@@ -446,13 +508,10 @@ public class DoubleClickCrypto {
      *
      * @param adidCipher encrypted AdId
      * @return the AdId
-     * @throws DoubleClickCryptoException if the decryption fails
      */
-    public byte[] decryptAdId(byte[] adidCipher) {
-      if (adidCipher.length != (OVERHEAD_SIZE + PAYLOAD_SIZE)) {
-        throw new DoubleClickCryptoException(
-            "AdId is " + adidCipher.length + " bytes, should be " + (OVERHEAD_SIZE + PAYLOAD_SIZE));
-      }
+    public byte[] decryptAdId(byte[] adidCipher) throws SignatureException {
+      checkArgument(adidCipher.length == (OVERHEAD_SIZE + PAYLOAD_SIZE),
+            "AdId is %s bytes, should be %s", adidCipher.length, (OVERHEAD_SIZE + PAYLOAD_SIZE));
 
       byte[] plainData = decrypt(adidCipher);
       return Arrays.copyOfRange(plainData, PAYLOAD_BASE, plainData.length - SIGNATURE_SIZE);
@@ -475,9 +534,9 @@ public class DoubleClickCrypto {
      * Encrypts the IDFA.
      *
      * @param idfaPlain the IDFA
-     * @param initVector up to 16 bytes of nonce data
+     * @param initVector up to 16 bytes of nonce data, or {@code null} for default
+     * generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted IDFA
-     * @throws DoubleClickCryptoException if the encryption fails
      */
     public byte[] encryptIdfa(byte[] idfaPlain, @Nullable byte[] initVector) {
       byte[] plainData = initPlainData(idfaPlain.length, initVector);
@@ -490,9 +549,8 @@ public class DoubleClickCrypto {
      *
      * @param idfaCipher encrypted IDFA
      * @return the IDFA
-     * @throws DoubleClickCryptoException if the decryption fails
      */
-    public byte[] decryptIdfa(byte[] idfaCipher) {
+    public byte[] decryptIdfa(byte[] idfaCipher) throws SignatureException {
       byte[] plainData = decrypt(idfaCipher);
       return Arrays.copyOfRange(plainData, PAYLOAD_BASE, plainData.length - SIGNATURE_SIZE);
     }
@@ -501,9 +559,9 @@ public class DoubleClickCrypto {
      * Encrypts and encodes the IDFA.
      *
      * @param idfaPlain the IDFA
-     * @param initVector up to 16 bytes of nonce data
+     * @param initVector up to 16 bytes of nonce data, or {@code null} for default
+     * generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted IDFA, websafe-base64 encoded
-     * @throws DoubleClickCryptoException if the encryption fails
      */
     public String encodeIdfa(byte[] idfaPlain, @Nullable byte[] initVector) {
       return encode(encryptIdfa(idfaPlain, initVector));
@@ -514,15 +572,14 @@ public class DoubleClickCrypto {
      *
      * @param idfaCipher encrypted IDFA, websafe-base64 encoded
      * @return the IDFA
-     * @throws DoubleClickCryptoException if the decryption fails
      */
-    public byte[] decodeIdfa(String idfaCipher) {
+    public byte[] decodeIdfa(String idfaCipher) throws SignatureException {
       return decryptIdfa(decode(idfaCipher));
     }
   }
 
   /**
-   * Encryption for HyperlocalSet geofence information.
+   * Encryption for {@code HyperlocalSet} geofence information.
    * <p> See
    * <a href="https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-hyperlocal">
    * Decrypting Hyperlocal Targeting Signals</a>.
@@ -534,12 +591,12 @@ public class DoubleClickCrypto {
     }
 
     /**
-     * Encrypts the serialized HyperlocalSet.
+     * Encrypts the serialized {@code HyperlocalSet}.
      *
-     * @param hyperlocalPlain the HyperlocalSet
-     * @param initVector up to 16 bytes of nonce data
-     * @return encrypted HyperlocalSet
-     * @throws DoubleClickCryptoException if the encryption fails
+     * @param hyperlocalPlain the {@code HyperlocalSet}
+     * @param initVector up to 16 bytes of nonce data, or {@code null} for default
+     * generated data (see {@link #createInitVector(Date, long)}
+     * @return encrypted {@code HyperlocalSet}
      */
     public byte[] encryptHyperlocal(byte[] hyperlocalPlain, @Nullable byte[] initVector) {
       byte[] plainData = initPlainData(hyperlocalPlain.length, initVector);
@@ -548,13 +605,12 @@ public class DoubleClickCrypto {
     }
 
     /**
-     * Decrypts the serialized HyperlocalSet.
+     * Decrypts the serialized {@code HyperlocalSet}.
      *
-     * @param hyperlocalCipher encrypted HyperlocalSet
-     * @return the HyperLocalSet
-     * @throws DoubleClickCryptoException if the decryption fails
+     * @param hyperlocalCipher encrypted {@code HyperlocalSet}
+     * @return the {@code HyperLocalSet}
      */
-    public byte[] decryptHyperlocal(byte[] hyperlocalCipher) {
+    public byte[] decryptHyperlocal(byte[] hyperlocalCipher) throws SignatureException {
       byte[] plainData = decrypt(hyperlocalCipher);
       return Arrays.copyOfRange(plainData, PAYLOAD_BASE, plainData.length - SIGNATURE_SIZE);
     }

@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
 public class BannerMimeMapper {
   private static ImmutableMap<String, CreativeFormat> openrtbToDc =
       ImmutableMap.<String, CreativeFormat>builder()
-          .put("image/x-flv", CreativeFormat.FLASH_CREATIVE)
+          .put("video/x-flv", CreativeFormat.FLASH_CREATIVE)
           .put("image/gif", CreativeFormat.IMAGE_CREATIVE)
           .put("image/jpeg", CreativeFormat.IMAGE_CREATIVE)
           .put("image/png", CreativeFormat.IMAGE_CREATIVE)

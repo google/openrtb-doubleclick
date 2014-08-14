@@ -38,13 +38,13 @@ public class AdPositionMapper {
   public static SlotVisibility toDoubleClick(AdPosition openrtb) {
     switch (openrtb) {
       case ABOVE_THE_FOLD:
-        return SlotVisibility.ABOVE_THE_FOLD;
-      case BELOW_THE_FOLD:
-        return SlotVisibility.BELOW_THE_FOLD;
       case HEADER:     // Mobile only
       case FOOTER:     // Mobile only
       case SIDEBAR:    // Mobile only
       case FULLSCREEN: // Mobile only
+        return SlotVisibility.ABOVE_THE_FOLD;
+      case BELOW_THE_FOLD:
+        return SlotVisibility.BELOW_THE_FOLD;
       case POSITION_UNKNOWN:
       default:
         return SlotVisibility.NO_DETECTION;

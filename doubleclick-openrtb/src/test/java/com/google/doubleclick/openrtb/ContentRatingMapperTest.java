@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.doubleclick.crypto;
+package com.google.doubleclick.openrtb;
 
-import javax.annotation.Nullable;
+import static org.junit.Assert.assertEquals;
 
-/**
- * An Exception thrown by {@link DoubleClickCrypto} (or its nested classes)
- * if some encryption or decryption operation fails.
- */
-public class DoubleClickCryptoException extends RuntimeException {
-  public DoubleClickCryptoException(@Nullable String message) {
-    super(message);
-  }
+import com.google.common.collect.ImmutableList;
 
-  public DoubleClickCryptoException(@Nullable Throwable cause) {
-    super(cause);
+import org.junit.Test;
+
+public class ContentRatingMapperTest {
+  @Test
+  public void testMapper() {
+    assertEquals(
+        "DV-UNRATED",
+        ContentRatingMapper.toOpenRtb(ImmutableList.of(39, 40, 41, 42, 43)));
+    assertEquals(
+        (Integer) 40,
+        ContentRatingMapper.toDoubleClick("DV-PG"));
   }
 }

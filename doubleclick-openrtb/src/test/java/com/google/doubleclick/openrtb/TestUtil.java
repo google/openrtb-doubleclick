@@ -31,15 +31,25 @@ import com.google.protobuf.ByteString;
 
 import com.codahale.metrics.MetricRegistry;
 
+import java.security.InvalidKeyException;
+
 import javax.crypto.spec.SecretKeySpec;
 
 class TestUtil {
   public static final String DEFAULT_URI = "http://example.com";
   public static final ByteString REQUEST_ID = ByteString.copyFromUtf8("01234567");
-  public static final DoubleClickCrypto.Keys KEYS = new DoubleClickCrypto.Keys(
-      new SecretKeySpec(new byte[32], "HmacSHA1"),
-      new SecretKeySpec(new byte[32], "HmacSHA1"));
+  public static final DoubleClickCrypto.Keys KEYS;
   private static DoubleClickMetadata metadata;
+
+  static {
+    try {
+      KEYS = new DoubleClickCrypto.Keys(
+          new SecretKeySpec(new byte[32], "HmacSHA1"),
+          new SecretKeySpec(new byte[32], "HmacSHA1"));
+    } catch (InvalidKeyException e) {
+      throw new ExceptionInInitializerError(e);
+    }
+  }
 
   private TestUtil() {
   }
@@ -92,6 +102,6 @@ class TestUtil {
         getMetadata(),
         new DoubleClickCrypto.Hyperlocal(KEYS),
         ImmutableList.of(DoubleClickLinkMapper.INSTANCE))
-            .toOpenRtb(dcRequest);
+            .toOpenRtbBidRequest(dcRequest).build();
   }
 }

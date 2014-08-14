@@ -18,17 +18,20 @@ package com.google.doubleclick.crypto;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
 import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
+import com.google.doubleclick.TestUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import org.junit.Test;
 
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
 import java.util.Date;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -38,13 +41,9 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class DoubleClickCryptoTest {
 
-  static final DoubleClickCrypto.Keys KEYS = new DoubleClickCrypto.Keys(
-      new SecretKeySpec(
-          BaseEncoding.base64Url().decode("sIxwz7yw62yrfoLGt12lIHKuYrK_S5kLuApI2BQe7Ac="), "HmacSHA1"),
-      new SecretKeySpec(
-          BaseEncoding.base64Url().decode("v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
+  static final DoubleClickCrypto.Keys KEYS = createKeys();
   static final double PLAIN_PRICE = 1.2;
-  static final Date INITV_TIMESTAMP = new Date(0x0F1E2D3C4B5A6978L);
+  static final Date INITV_TIMESTAMP = new Date(0xE679B0BE000CD140L);
   static final long INITV_SERVERID = 0x0123456789ABCDEFL;
   static final byte[] INITV = new byte[] {
     (byte) 0xE6, (byte) 0x79, (byte) 0xB0, (byte) 0xBE,
@@ -85,14 +84,19 @@ public class DoubleClickCryptoTest {
   static final DoubleClickCrypto.Hyperlocal hyperlocalCrypto =
       new DoubleClickCrypto.Hyperlocal(KEYS);
 
-  // DoubleClickCrypto
-
-  @Test
-  public void testDoubleClickCryptoException() {
-    DoubleClickCryptoException e1 = new DoubleClickCryptoException("1");
-    DoubleClickCryptoException e2 = new DoubleClickCryptoException(new NullPointerException());
-    assertNotEquals(e1, e2);
+  private static DoubleClickCrypto.Keys createKeys() {
+    try {
+      return new DoubleClickCrypto.Keys(
+          new SecretKeySpec(
+              BaseEncoding.base64Url().decode("sIxwz7yw62yrfoLGt12lIHKuYrK_S5kLuApI2BQe7Ac="), "HmacSHA1"),
+          new SecretKeySpec(
+              BaseEncoding.base64Url().decode("v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
+    } catch (InvalidKeyException e) {
+      throw new ExceptionInInitializerError(e);
+    }
   }
+
+  // DoubleClickCrypto
 
   @Test
   public void testEncodeDecode() {
@@ -104,7 +108,7 @@ public class DoubleClickCryptoTest {
     assertArrayEquals(data, baseCrypto.decode(encoded));
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testEncryptBytes_empty() {
     baseCrypto.encrypt(new byte[0]);
   }
@@ -116,19 +120,31 @@ public class DoubleClickCryptoTest {
         baseCrypto.encrypt(new byte[DoubleClickCrypto.OVERHEAD_SIZE]).length);
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
-  public void testDecryptBytes_empty() {
+  @Test(expected = IllegalArgumentException.class)
+  public void testDecryptBytes_empty() throws GeneralSecurityException {
     baseCrypto.decrypt(new byte[0]);
   }
 
   @Test
-  public void testDecryptBytes_noData() {
+  public void testDecryptBytes_noData() throws GeneralSecurityException {
     baseCrypto.decrypt(baseCrypto.encrypt(new byte[DoubleClickCrypto.OVERHEAD_SIZE]));
   }
 
   @Test
   public void testCreateNonce() {
     assertArrayEquals(INITV, baseCrypto.createInitVector(INITV_TIMESTAMP, INITV_SERVERID));
+    assertEquals(INITV_TIMESTAMP, baseCrypto.getTimestamp(INITV));
+    assertEquals(INITV_SERVERID, baseCrypto.getServerId(INITV));
+  }
+
+  @Test
+  public void testKeys() throws InvalidKeyException {
+    SecretKeySpec key1 = new SecretKeySpec(new byte[]{0}, "HmacSHA1");
+    SecretKeySpec key2 = new SecretKeySpec(new byte[]{1}, "HmacSHA1");
+    DoubleClickCrypto.Keys keys1 = new DoubleClickCrypto.Keys(key1, key1);
+    DoubleClickCrypto.Keys keys2 = new DoubleClickCrypto.Keys(key1, key1);
+    DoubleClickCrypto.Keys keys3 = new DoubleClickCrypto.Keys(key1, key2);
+    TestUtil.testCommonMethods(keys1, keys2, keys3);
   }
 
   @Test
@@ -148,9 +164,11 @@ public class DoubleClickCryptoTest {
     baseCrypto.initPlainData(8, null);
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
-  public void testEncrypt_badNonce() {
-    baseCrypto.initPlainData(8, new byte[] { 0 } );
+  @Test
+  public void testEncrypt_nonceSize() {
+    baseCrypto.initPlainData(8, new byte[0]);
+    baseCrypto.initPlainData(8, new byte[DoubleClickCrypto.INITV_SIZE]);
+    baseCrypto.initPlainData(8, new byte[DoubleClickCrypto.INITV_SIZE * 10]);
   }
 
   // DoubleClickCrypto.Price
@@ -162,30 +180,30 @@ public class DoubleClickCryptoTest {
   }
 
   @Test
-  public void testPriceDecrypt() {
+  public void testPriceDecrypt() throws SignatureException {
     double decryptedPrice = priceCrypto.decodePriceValue(CIPHER_PRICE);
     assertEquals(PLAIN_PRICE, decryptedPrice, 1e-9);
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
-  public void testPriceDecrypt_badData() {
-    priceCrypto.decodePriceMillis("garbage");
+  @Test(expected = IllegalArgumentException.class)
+  public void testPriceDecrypt_badData() throws SignatureException {
+    priceCrypto.decodePriceMicros("garbage");
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
-  public void testPriceDecrypt_empty() {
-    priceCrypto.decodePriceMillis("");
+  @Test(expected = IllegalArgumentException.class)
+  public void testPriceDecrypt_empty() throws SignatureException {
+    priceCrypto.decodePriceMicros("");
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
-  public void testPriceDecrypt_wrongKeys() {
+  @Test(expected = SignatureException.class)
+  public void testPriceDecrypt_wrongKeys() throws InvalidKeyException, SignatureException {
     new DoubleClickCrypto.Price(
             new DoubleClickCrypto.Keys(KEYS.getIntegrityKey(), KEYS.getEncryptionKey()))
-        .decodePriceMillis(CIPHER_PRICE);
+        .decodePriceMicros(CIPHER_PRICE);
   }
 
   @Test
-  public void testPriceRecrypt() {
+  public void testPriceRecrypt() throws SignatureException {
     String encrypted = priceCrypto.encodePriceValue(PLAIN_PRICE, INITV);
     assertEquals(PLAIN_PRICE, priceCrypto.decodePriceValue(encrypted), 1e-9);
   }
@@ -198,7 +216,7 @@ public class DoubleClickCryptoTest {
   }
 
   @Test
-  public void testIdfaDecrypt() {
+  public void testIdfaDecrypt() throws SignatureException {
     byte[] decrypted = idfaCrypto.decodeIdfa(CIPHER_IDFA);
     assertArrayEquals(PLAIN_IDFA, decrypted);
   }
@@ -211,13 +229,13 @@ public class DoubleClickCryptoTest {
     idfaCrypto.encryptIdfa(createData(20 * 769), INITV);
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testIdfa_dataTooBig() {
     idfaCrypto.encryptIdfa(createData(20 * 769 + 1), INITV);
   }
 
   @Test
-  public void testIdfaRecrypt() {
+  public void testIdfaRecrypt() throws SignatureException {
     String encrypted = idfaCrypto.encodeIdfa(PLAIN_IDFA, INITV);
     assertArrayEquals(PLAIN_IDFA, idfaCrypto.decodeIdfa(encrypted));
   }
@@ -229,24 +247,24 @@ public class DoubleClickCryptoTest {
     assertArrayEquals(CIPHER_ADID, adidCrypto.encryptAdId(PLAIN_ADID, INITV));
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testAdidEncrypt_badSize() {
     adidCrypto.encryptAdId(new byte[1], INITV);
   }
 
   @Test
-  public void testAdidDecrypt() {
+  public void testAdidDecrypt() throws SignatureException {
     byte[] decrypted = adidCrypto.decryptAdId(CIPHER_ADID);
     assertArrayEquals(PLAIN_ADID, decrypted);
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
-  public void testAdidDecrypt_badSize() {
+  @Test(expected = IllegalArgumentException.class)
+  public void testAdidDecrypt_badSize() throws SignatureException {
     adidCrypto.decryptAdId(new byte[1]);
   }
 
   @Test
-  public void testAdidRecrypt() {
+  public void testAdidRecrypt() throws SignatureException {
     byte[] encrypted = adidCrypto.encryptAdId(PLAIN_ADID, INITV);
     assertArrayEquals(PLAIN_ADID, adidCrypto.decryptAdId(encrypted));
   }
@@ -261,7 +279,7 @@ public class DoubleClickCryptoTest {
   }
 
   @Test
-  public void testHyperlocalDecrypt() throws InvalidProtocolBufferException {
+  public void testHyperlocalDecrypt() throws InvalidProtocolBufferException, SignatureException {
     byte[] decrypted = hyperlocalCrypto.decryptHyperlocal(CIPHER_HYPERLOCAL);
     HyperlocalSet.parseFrom(decrypted);
     assertArrayEquals(PLAIN_HYPERLOCAL, decrypted);
@@ -270,20 +288,20 @@ public class DoubleClickCryptoTest {
   @Test
   public void testHyperlocal_dataRange() {
     // Smallest data possible. Note: createHyperlocal(0) would fail because
-    // an empty protobut message serializes to byte[0], which fails to encrypt.
+    // an empty protobuf message serializes to byte[0], which fails to encrypt.
     hyperlocalCrypto.encryptHyperlocal(createHyperlocal(1), INITV);
     // Biggest data possible: 15362 bytes, max is 15380 (768*20)
     hyperlocalCrypto.encryptHyperlocal(createHyperlocal(308), INITV);
   }
 
-  @Test(expected = DoubleClickCryptoException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testHyperlocal_dataTooBig() {
     // 15412 bytes, max is 15380 (768*20)
     hyperlocalCrypto.encryptHyperlocal(createHyperlocal(309), INITV);
   }
 
   @Test
-  public void testHyperlocalRecrypt() {
+  public void testHyperlocalRecrypt() throws SignatureException {
     byte[] encrypted = hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, INITV);
     assertArrayEquals(PLAIN_HYPERLOCAL, hyperlocalCrypto.decryptHyperlocal(encrypted));
   }

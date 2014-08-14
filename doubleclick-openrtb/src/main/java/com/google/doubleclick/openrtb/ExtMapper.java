@@ -28,30 +28,31 @@ public abstract class ExtMapper {
   protected ExtMapper() {
   }
 
-  public void toOpenRtb(Doubleclick.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
+  public void toOpenRtbBidRequest(
+      Doubleclick.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
   }
 
-  public void toOpenRtb(Doubleclick.BidRequest dcRequest,
+  public void toOpenRtbDevice(Doubleclick.BidRequest dcRequest,
       OpenRtb.BidRequest.Device.Builder device) {
   }
 
-  public void toOpenRtb(Doubleclick.BidRequest.AdSlot dcSlot,
+  public void toOpenRtbImpression(Doubleclick.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Impression.Builder imp) {
   }
 
-  public void toOpenRtb(Doubleclick.BidRequest.AdSlot dcSlot,
+  public void toOpenRtbBanner(Doubleclick.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Impression.Banner.Builder banner) {
   }
 
-  public void toOpenRtb(Doubleclick.BidRequest.Video dcVideo,
+  public void toOpenRtbVideo(Doubleclick.BidRequest.Video dcVideo,
       OpenRtb.BidRequest.Impression.Video.Builder video) {
   }
 
-  public void toOpenRtb(Doubleclick.BidRequest.AdSlot.MatchingAdData dcAdData,
+  public void toOpenRtbPMP(Doubleclick.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
   }
 
-  public void toNative(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
+  public void toNativeAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
       OpenRtb.BidResponse.SeatBid.Bid bid, Doubleclick.BidResponse.Ad.Builder dcAd) {
   }
 }
