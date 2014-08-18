@@ -23,7 +23,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * Maps between AdX's {@link detected_content_label} and OpenRTB's {@link contentrating}.
+ * Maps between AdX's {@code detected_content_label} and OpenRTB's {@code contentrating}.
  */
 public class ContentRatingMapper {
   private static ImmutableMap<String, Integer> openrtbToDc =

@@ -331,18 +331,30 @@ public class DoubleClickMetadata {
           // in a few records like "Burgos" / "Province of Burgos,Castile and Leon,Spain").
 
           String parentName;
-          if (name.indexOf(',') == -1) {
-            int pos = canonicalName.indexOf(',');
-            parentName = pos == -1 ? null : canonicalName.substring(pos + 1);
+          int pos = name.indexOf(',');
+          if (pos == -1) {
+            int canonPos = canonicalName.indexOf(',');
+            parentName = canonPos == -1 ? null : canonicalName.substring(canonPos + 1);
           } else {
-            int pos = name.length() + 1;
-            if (pos == canonicalName.length()) {
+            int commas = 1;
+            for (int i = pos + 1; i < name.length(); ++i) {
+              if (name.charAt(i) == ',') {
+                ++commas;
+              }
+            }
+            int canonPos;
+            for (canonPos = 0; canonPos < canonicalName.length() && commas >= 0; ++canonPos) {
+              if (canonicalName.charAt(canonPos) == ',') {
+                --commas;
+              }
+            }
+            if (commas == 0) {
               parentName = null;
-            } else if (canonicalName.charAt(pos - 1) == ',') {
-              parentName = canonicalName.substring(pos);
+            } else if (commas != -1 || canonPos == canonicalName.length()) {
+              logger.warn("Impossible to resolve parent, ignoring: {}", record);
+              continue;
             } else {
-              logger.warn("Impossible to resolve record's parent, ignoring: {}", line);
-              continue; // don't put in nextData
+              parentName = canonicalName.substring(canonPos + 1);
             }
           }
           GeoTarget parent;

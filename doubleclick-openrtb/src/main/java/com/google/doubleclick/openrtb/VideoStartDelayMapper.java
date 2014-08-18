@@ -19,7 +19,7 @@ package com.google.doubleclick.openrtb;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VideoStartDelay;
 
 /**
- * Maps between AdX's {@link videoad_start_delay} and OpenRTB's {@link Video.startdelay}.
+ * Maps between AdX's {@code videoad_start_delay} and OpenRTB's {@code startdelay}.
  */
 public class VideoStartDelayMapper {
   public static int toOpenRtb(int dc) {

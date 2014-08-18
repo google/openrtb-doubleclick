@@ -96,9 +96,7 @@ public class DoubleClickCrypto {
    * The default implementation performs websafe-base64 decoding (RFC 3548).
    */
   protected @Nullable byte[] decode(@Nullable String data) {
-    return data == null
-        ? null
-        : BaseEncoding.base64Url().decode(data);
+    return data == null ? null : BaseEncoding.base64Url().decode(data);
   }
 
   /**
@@ -106,9 +104,7 @@ public class DoubleClickCrypto {
    * The default implementation performs websafe-base64 encoding (RFC 3548).
    */
   protected @Nullable String encode(@Nullable byte[] data) {
-    return data == null
-        ? null
-        : BaseEncoding.base64Url().encode(data);
+    return data == null ? null : BaseEncoding.base64Url().encode(data);
   }
 
   /**
@@ -473,7 +469,7 @@ public class DoubleClickCrypto {
   }
 
   /**
-   * Encryption for advertising ID.
+   * Encryption for Advertising ID.
    * <p> See
    * <a href="https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-advertising-id">
    * Decrypting Advertising ID</a>.
