@@ -201,10 +201,10 @@ public class DoubleClickOpenRtbMapperTest {
 
   @Test
   public void testRequest() {
-    for (int test = 0; test < 6 * 0b1000; ++test) {
-      // -1=NO_SLOT, 0=no size, 1, 2=multisize/1 MAD, 3=2 MAD/1 deal, 4=3 MAD/2 deals
-      int size = (test % 6) - 1;
-      int flags = test / 6;
+    for (int test = 0; test < 10 * 0b1000; ++test) {
+      // -1=NO_SLOT, 0=no size, 1, 2=multisize/1 MAD, 3=2 MAD/1 deal, 4..8=3 MAD/2 deals
+      int size = (test % 0b1000) - 1;
+      int flags = test & 0b0111;
       boolean mobile = (flags & 0b1) != 0;
       boolean video = (flags & 0b1) != 0;
       boolean coppa = (flags & 0b1) != 0;
@@ -224,7 +224,7 @@ public class DoubleClickOpenRtbMapperTest {
 
       Doubleclick.BidRequest.Builder dcRequest = TestData.newRequest(size, coppa);
       if (mobile) {
-        dcRequest.setMobile(TestData.newMobile());
+        dcRequest.setMobile(TestData.newMobile(size));
       }
       if (video) {
         dcRequest.setVideo(TestData.newVideo(size));
@@ -245,10 +245,12 @@ public class DoubleClickOpenRtbMapperTest {
         assertEquals(testDesc, video, imp.hasVideo());
         assertNotEquals(testDesc, video, imp.hasBanner());
         if (video) {
-          Banner compAd = imp.getVideo().getCompanionad(0);
-          assertEquals(testDesc, size > 1,
-              compAd.hasWmin() && compAd.hasWmax() && compAd.hasHmin() && compAd.hasHmax());
-          assertNotEquals(testDesc, size != 1, compAd.hasW() && compAd.hasH());
+          if (imp.getVideo().getCompanionadCount() != 0) {
+            Banner compAd = imp.getVideo().getCompanionad(0);
+            assertEquals(testDesc, size > 1,
+                compAd.hasWmin() && compAd.hasWmax() && compAd.hasHmin() && compAd.hasHmax());
+            assertNotEquals(testDesc, size != 1, compAd.hasW() && compAd.hasH());
+          }
         } else {
           Banner banner = imp.getBanner();
           assertEquals(testDesc, size > 1,
@@ -320,6 +322,9 @@ public class DoubleClickOpenRtbMapperTest {
     extMapper.toOpenRtbVideo(
         Doubleclick.BidRequest.Video.getDefaultInstance(),
         OpenRtb.BidRequest.Impression.Video.newBuilder());
+    extMapper.toOpenRtbPMP(
+        Doubleclick.BidRequest.AdSlot.MatchingAdData.getDefaultInstance(),
+        OpenRtb.BidRequest.Impression.PMP.newBuilder());
     extMapper.toNativeAd(
         OpenRtb.BidRequest.getDefaultInstance(),
         OpenRtb.BidResponse.getDefaultInstance(),

@@ -20,9 +20,11 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.doubleclick.Doubleclick.BidRequest;
+import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
+import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData.DirectDeal;
 import com.google.doubleclick.Doubleclick.BidResponse;
-import com.google.protobuf.MessageLiteOrBuilder;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -33,9 +35,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -55,6 +57,7 @@ public class DoubleClickValidator {
 
   private final DoubleClickMetadata metadata;
   private final Counter unmatchedImp = new Counter();
+  private final Counter unmatchedDeal = new Counter();
   private final Counter needsNonflashAttr = new Counter();
   private final Counter invalidCreatAttr = new Counter();
   private final Counter invalidVendor = new Counter();
@@ -70,6 +73,8 @@ public class DoubleClickValidator {
     this.metadata = metadata;
     metricRegistry.register(MetricRegistry.name(getClass(), "unmatched-imp"),
         unmatchedImp);
+    metricRegistry.register(MetricRegistry.name(getClass(), "unmatched-deal"),
+        unmatchedDeal);
     metricRegistry.register(MetricRegistry.name(getClass(), "needs-nonflash-attr"),
         needsNonflashAttr);
     metricRegistry.register(MetricRegistry.name(getClass(), "invalid-creative-attr"),
@@ -92,24 +97,27 @@ public class DoubleClickValidator {
     boolean hasBad = false;
     boolean hasEmpty = false;
     List<BidResponse.Ad.Builder> ads = response.getAdBuilderList();
+
     for (int iAd = 0; iAd < ads.size(); ++iAd) {
       final BidResponse.Ad.Builder ad = ads.get(iAd);
       List<BidResponse.Ad.AdSlot.Builder> adslots = ad.getAdslotBuilderList();
+
       if (adslots.isEmpty()) {
         hasEmpty = true;
         if (logger.isDebugEnabled()) {
           logger.debug("Ad #{} removed, clean but empty adslot", iAd);
         }
       } else {
-        List<BidResponse.Ad.AdSlot.Builder> filteredAdslots = filter(adslots,
+        Iterable<BidResponse.Ad.AdSlot.Builder> filteredAdslots = ProtoUtils.filter(adslots,
             new Predicate<BidResponse.Ad.AdSlot.Builder>() {
           @Override public boolean apply(BidResponse.Ad.AdSlot.Builder adslot) {
             return validate(request, ad, adslot);
           }});
+
         if (filteredAdslots != adslots) {
           hasBad = true;
           ad.clearAdslot();
-          if (filteredAdslots.isEmpty()) {
+          if (Iterables.isEmpty(filteredAdslots)) {
             if (logger.isDebugEnabled()) {
               logger.debug("Ad #{} removed, all adslot values rejected", iAd);
             }
@@ -121,12 +129,17 @@ public class DoubleClickValidator {
         }
       }
     }
+
     if (hasBad || hasEmpty) {
-      response.clearAd();
+      List<BidResponse.Ad.Builder> adsNew = new ArrayList<>(ads.size());
       for (BidResponse.Ad.Builder ad : ads) {
         if (ad.getAdslotCount() != 0) {
-          response.addAd(ad);
+          adsNew.add(ad);
         }
+      }
+      response.clearAd();
+      for (BidResponse.Ad.Builder ad : adsNew) {
+        response.addAd(ad);
       }
     }
     return hasBad;
@@ -144,15 +157,25 @@ public class DoubleClickValidator {
     }
     boolean valid = true;
 
+    if (adslot.hasDealId()) {
+      DirectDeal deal = findDeal(reqSlot, adslot.getDealId());
+      if (deal == null) {
+        unmatchedDeal.inc();
+        if (logger.isDebugEnabled()) {
+          logger.debug("AdSlot {} rejected, unmatched dealid: {}",
+              logId(adslot), adslot.getDealId());
+        }
+        return false;
+      }
+    }
+
     if (reqSlot.getExcludedAttributeList().contains(CREATIVE_FLASH)) {
       if (!ad.getAttributeList().contains(CREATIVE_NON_FLASH)) {
         needsNonflashAttr.inc();
         if (logger.isDebugEnabled()) {
           logger.debug("{} rejected, ad.attribute needs value: {}",
-              logId(adslot),
-              DoubleClickMetadata.toString(
-                  metadata.getBuyerDeclarableCreativeAttributes(),
-                  CREATIVE_NON_FLASH));
+              logId(adslot), DoubleClickMetadata.toString(
+                  metadata.getBuyerDeclarableCreativeAttributes(), CREATIVE_NON_FLASH));
         }
         valid = false;
       }
@@ -166,8 +189,10 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getAllowedVendorTypeList(), ad.getVendorTypeList(),
         metaVendors, true)).isEmpty()) {
-      logger.debug("{} rejected, unknown or not-allowed ad.vendor_type values: {}",
-          logId(adslot), request.getSellerNetworkId() == GDN ? "GDN " : "", bad);
+      if (logger.isDebugEnabled()) {
+        logger.debug("{} rejected, unknown or not-allowed ad.vendor_type values: {}",
+            logId(adslot), request.getSellerNetworkId() == GDN ? "GDN " : "", bad);
+      }
       invalidVendor.inc();
       valid = false;
     }
@@ -175,8 +200,10 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getAllowedRestrictedCategoryList(), ad.getRestrictedCategoryList(),
         metadata.getRestrictedCategories(), true)).isEmpty()) {
-      logger.debug("{} rejected, unknown or not-allowed ad.restricted_category values: {}",
-          logId(adslot), bad);
+      if (logger.isDebugEnabled()) {
+        logger.debug("{} rejected, unknown or not-allowed ad.restricted_category values: {}",
+            logId(adslot), bad);
+      }
       invalidRestrCat.inc();
       valid = false;
     }
@@ -184,8 +211,10 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getExcludedProductCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("{} rejected, unknown or excluded product ad.category values: {}",
-          logId(adslot), bad);
+      if (logger.isDebugEnabled()) {
+        logger.debug("{} rejected, unknown or excluded product ad.category values: {}",
+            logId(adslot), bad);
+      }
       invalidProdCat.inc();
       valid = false;
     }
@@ -193,8 +222,10 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getExcludedSensitiveCategoryList(), ad.getCategoryList(),
         metadata.getAllCategories(), false)).isEmpty()) {
-      logger.debug("{} rejected, unknown or excluded sensitive ad.category values: {}",
-          logId(adslot), bad);
+      if (logger.isDebugEnabled()) {
+        logger.debug("{} rejected, unknown or excluded sensitive ad.category values: {}",
+            logId(adslot), bad);
+      }
       invalidSensCat.inc();
       valid = false;
     }
@@ -202,8 +233,10 @@ public class DoubleClickValidator {
     if (!(bad = checkAttributes(
         reqSlot.getExcludedAttributeList(), ad.getAttributeList(),
         metadata.getBuyerDeclarableCreativeAttributes(), false)).isEmpty()) {
-      logger.debug("{} rejected, unknown or excluded ad.attribute values: {}",
-          logId(adslot), bad);
+      if (logger.isDebugEnabled()) {
+        logger.debug("{} rejected, unknown or excluded ad.attribute values: {}",
+            logId(adslot), bad);
+      }
       invalidCreatAttr.inc();
       valid = false;
     }
@@ -211,31 +244,19 @@ public class DoubleClickValidator {
     return valid;
   }
 
-  protected static String logId(BidResponse.Ad.AdSlot.Builder adslot) {
-    return "AdSlot " + adslot.getId();
-  }
-
-  // Identical to ProtoUtils.filter(), avoiding dependency from openrtb-core
-  protected static <M extends MessageLiteOrBuilder>
-  List<M> filter(List<M> objs, Predicate<M> filter) {
-    for (ListIterator<M> iter = objs.listIterator(); iter.hasNext(); ) {
-      if (!filter.apply(iter.next())) {
-        List<M> filtered = new ArrayList<>(objs.size() - 1);
-        filtered.addAll(objs.subList(0, iter.previousIndex()));
-
-        while (iter.hasNext()) {
-          M obj = iter.next();
-
-          if (filter.apply(obj)) {
-            filtered.add(obj);
-          }
+  protected static @Nullable DirectDeal findDeal(BidRequest.AdSlot reqSlot, long dealId) {
+    for (MatchingAdData reqMad : reqSlot.getMatchingAdDataList()) {
+      for (DirectDeal reqDeal : reqMad.getDirectDealList()) {
+        if (reqDeal.hasDirectDealId() && reqDeal.getDirectDealId() == dealId) {
+          return reqDeal;
         }
-
-        return filtered;
       }
     }
+    return null;
+  }
 
-    return objs;
+  protected static String logId(BidResponse.Ad.AdSlot.Builder adslot) {
+    return "AdSlot " + adslot.getId();
   }
 
   protected static BidRequest.AdSlot findRequestSlot(BidRequest request, int adslotId) {
