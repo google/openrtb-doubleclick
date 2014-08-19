@@ -18,6 +18,7 @@ package com.google.doubleclick.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
@@ -44,6 +45,7 @@ public class DoubleClickMetadataTest {
     DoubleClickMetadata metadata = new DoubleClickMetadata(
         new DoubleClickMetadata.ResourceTransport());
 
+    assertNotNull(metadata.toString());
     assertEquals("1: CreativeAttribute1",
         DoubleClickMetadata.toString(metadata.getPublisherExcludableCreativeAttributes(), 1));
     assertEquals("1: CreativeAttribute1",
@@ -62,6 +64,10 @@ public class DoubleClickMetadataTest {
         DoubleClickMetadata.toString(metadata.getGdnVendors(), 1));
     assertEquals("1: GDN",
         DoubleClickMetadata.toString(metadata.getSellerNetworks(), 1));
+    assertEquals("1: ContentLabel1",
+        DoubleClickMetadata.toString(metadata.getContentLabels(), 1));
+    assertEquals("1: /Vertical1",
+        DoubleClickMetadata.toString(metadata.getPublisherVerticals(), 1));
     assertEquals("9999: <invalid>",
         DoubleClickMetadata.toString(metadata.getSensitiveCategories(), 9999));
     assertEquals("United States", metadata.getGeoTarget(1023191).getParent().getParent().getName());

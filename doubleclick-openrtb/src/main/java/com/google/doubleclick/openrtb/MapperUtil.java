@@ -16,6 +16,8 @@
 
 package com.google.doubleclick.openrtb;
 
+import static java.lang.Math.min;
+
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -69,16 +71,17 @@ public class MapperUtil {
   }
 
   public static String toIpv4String(ByteString bytes) {
-    StringBuilder sb = new StringBuilder(bytes.size() * 4);
+    StringBuilder sb = new StringBuilder(15);
+    int size = min(3, bytes.size());
 
-    for (int i = 0; i < bytes.size(); ++i) {
+    for (int i = 0; i < size; ++i) {
       if (i != 0) {
         sb.append('.');
       }
       sb.append(bytes.byteAt(i) & 0xFF);
     }
 
-    if (bytes.size() == 3) {
+    while (size++ < 4) {
       sb.append(".0");
     }
 
@@ -88,7 +91,7 @@ public class MapperUtil {
   public static String toIpv6String(ByteString bytes) {
     try {
       byte[] ipv6 = new byte[16];
-      bytes.copyTo(ipv6, 0);
+      bytes.copyTo(ipv6, 0, 0, min(12, bytes.size()));
       return InetAddresses.toAddrString(InetAddress.getByAddress(ipv6));
     } catch (UnknownHostException e) {
       throw new IllegalArgumentException("ip=" + BaseEncoding.base16().encode(bytes.toByteArray()));

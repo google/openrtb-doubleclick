@@ -18,9 +18,8 @@ package com.google.doubleclick.openrtb;
 
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.Doubleclick;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot;
 import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Builder;
+import com.google.openrtb.OpenRtb.BidRequest.Impression;
 
 /**
  * Extension mapper for DoubleClick "Link"extensions: each OpenRTB object will have an
@@ -33,28 +32,29 @@ public class DoubleClickLinkMapper extends ExtMapper {
   private DoubleClickLinkMapper() {
   }
 
-  @Override public void toOpenRtb(Doubleclick.BidRequest dcRequest,
+  @Override public void toOpenRtbBidRequest(Doubleclick.BidRequest dcRequest,
       OpenRtb.BidRequest.Builder request) {
     request.setExtension(DcExt.bidRequest, dcRequest);
   }
 
-  @Override public void toOpenRtb(AdSlot dcSlot, Builder imp) {
+  @Override public void toOpenRtbImpression(
+      Doubleclick.BidRequest.AdSlot dcSlot, Impression.Builder imp) {
     imp.setExtension(DcExt.adSlot, dcSlot);
   }
 
-  @Override public void toOpenRtb(Doubleclick.BidRequest.Video dcVideo,
+  @Override public void toOpenRtbVideo(Doubleclick.BidRequest.Video dcVideo,
       OpenRtb.BidRequest.Impression.Video.Builder video) {
     video.setExtension(DcExt.video, dcVideo);
   }
 
-  @Override public void toOpenRtb(Doubleclick.BidRequest dcRequest,
+  @Override public void toOpenRtbDevice(Doubleclick.BidRequest dcRequest,
       OpenRtb.BidRequest.Device.Builder device) {
     if (dcRequest.hasMobile()) {
       device.setExtension(DcExt.mobile, dcRequest.getMobile());
     }
   }
 
-  @Override public void toOpenRtb(Doubleclick.BidRequest.AdSlot.MatchingAdData dcAdData,
+  @Override public void toOpenRtbPMP(Doubleclick.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
     pmp.setExtension(DcExt.adData, dcAdData);
   }

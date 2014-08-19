@@ -17,7 +17,6 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.doubleclick.Doubleclick;
-import com.google.doubleclick.Doubleclick.BidRequest;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.mapper.OpenRtbMapper;
@@ -28,30 +27,30 @@ import javax.annotation.Nullable;
  * Dummy implementation of {@link OpenRtbMapper}, maps all messages to {@code null}.
  */
 public class NullDoubleClickOpenRtbMapper
-    implements OpenRtbMapper<Doubleclick.BidRequest, Doubleclick.BidResponse.Builder> {
+    implements OpenRtbMapper<
+        Doubleclick.BidRequest, Doubleclick.BidResponse,
+        Doubleclick.BidRequest.Builder, Doubleclick.BidResponse.Builder> {
   public static final NullDoubleClickOpenRtbMapper INSTANCE = new NullDoubleClickOpenRtbMapper();
 
   private NullDoubleClickOpenRtbMapper() {
   }
 
-  @Override
-  public Doubleclick.BidResponse.Builder toNative(
+  @Override public Doubleclick.BidResponse.Builder toNativeBidResponse(
       OpenRtb.BidRequest request, OpenRtb.BidResponse response) {
     return null;
   }
 
-  @Override
-  public @Nullable OpenRtb.BidRequest toOpenRtb(Doubleclick.BidRequest dcRequest) {
+  @Override public @Nullable OpenRtb.BidRequest.Builder
+  toOpenRtbBidRequest(Doubleclick.BidRequest dcRequest) {
     return null;
   }
 
-  @Override
-  public BidRequest toNative(com.google.openrtb.OpenRtb.BidRequest request) {
+  @Override public Doubleclick.BidRequest.Builder toNativeBidRequest(OpenRtb.BidRequest request) {
     return null;
   }
 
-  @Override
-  public BidResponse toOpenRtb(BidRequest request, BidRequest response) {
+  @Override public BidResponse.Builder toOpenRtbBidResponse(
+      Doubleclick.BidRequest request, Doubleclick.BidResponse response) {
     return null;
   }
 }

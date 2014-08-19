@@ -24,7 +24,7 @@ import com.google.openrtb.OpenRtb.CreativeAttribute;
 import java.util.Collection;
 
 /**
- * Maps between AdX creative attributes and OpenRTB's creative attributes.
+ * Maps between AdX creative attributes and OpenRTB's {@link CreativeAttribute}.
  */
 public class CreativeAttributeMapper {
   private static ImmutableMultimap<CreativeAttribute, Integer> openrtbToDc =

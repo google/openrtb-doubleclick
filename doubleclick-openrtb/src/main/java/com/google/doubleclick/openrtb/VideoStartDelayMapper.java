@@ -16,33 +16,33 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic.Gender;
+import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VideoStartDelay;
 
 /**
- * Maps between AdX's {@link Gender} and OpenRTB's {@code gender}.
+ * Maps between AdX's {@code videoad_start_delay} and OpenRTB's {@code startdelay}.
  */
-public class GenderMapper {
-  public static String toOpenRtb(Gender dc) {
+public class VideoStartDelayMapper {
+  public static int toOpenRtb(int dc) {
     switch (dc) {
-      case MALE:
-        return "M";
-      case FEMALE:
-        return "F";
-      case UNKNOWN:
+      case 0:
+        return VideoStartDelay.PRE_ROLL_VALUE;
+      case -1:
+        return VideoStartDelay.GENERIC_POST_ROLL_VALUE;
       default:
-        return "O";
+        return dc;
     }
   }
 
-  public static Gender toDoubleClick(String gender) {
-    switch (gender) {
-      case "M":
-        return Gender.MALE;
-      case "F":
-        return Gender.FEMALE;
-      case "O":
+  public static int toDoubleClick(int openrtb) {
+    switch (openrtb) {
+      case VideoStartDelay.PRE_ROLL_VALUE:
+        return 0;
+      case VideoStartDelay.GENERIC_MID_ROLL_VALUE:
+        return 1;
+      case VideoStartDelay.GENERIC_POST_ROLL_VALUE:
+        return -1;
       default:
-        return Gender.UNKNOWN;
+        return openrtb;
     }
   }
 }

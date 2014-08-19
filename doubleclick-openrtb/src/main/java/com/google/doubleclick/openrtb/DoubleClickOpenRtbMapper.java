@@ -25,16 +25,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.Doubleclick;
-import com.google.doubleclick.Doubleclick.BidRequest;
-import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
-import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
-import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
-import com.google.doubleclick.crypto.DoubleClickCryptoException;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest.App;
 import com.google.openrtb.OpenRtb.BidRequest.Content;
+import com.google.openrtb.OpenRtb.BidRequest.Data;
+import com.google.openrtb.OpenRtb.BidRequest.Data.Segment;
 import com.google.openrtb.OpenRtb.BidRequest.Device;
 import com.google.openrtb.OpenRtb.BidRequest.Geo;
 import com.google.openrtb.OpenRtb.BidRequest.Impression;
@@ -50,7 +47,6 @@ import com.google.openrtb.OpenRtb.BidRequest.Publisher;
 import com.google.openrtb.OpenRtb.BidRequest.Regulations;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidRequest.User;
-import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.ContentCategory;
@@ -67,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -79,8 +76,9 @@ import javax.inject.Inject;
 /**
  * Mapping between the DoubleClick and OpenRTB models.
  */
-public class DoubleClickOpenRtbMapper
-    implements OpenRtbMapper<Doubleclick.BidRequest, Doubleclick.BidResponse.Builder> {
+public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
+    Doubleclick.BidRequest, Doubleclick.BidResponse,
+    Doubleclick.BidRequest.Builder, Doubleclick.BidResponse.Builder> {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickOpenRtbMapper.class);
   private static final String YOUTUBE_AFV_USER_ID = "afv_user_id_";
   private static final Pattern SEMITRANSPARENT_CHANNEL =
@@ -110,19 +108,20 @@ public class DoubleClickOpenRtbMapper
     this.metadata = metadata;
     this.hyperlocalCrypto = hyperlocalCrypto;
     this.extMappers = ImmutableList.copyOf(extMappers);
-    metricRegistry.register(MetricRegistry.name(getClass(), "missing-crid"), missingCrid);
-    metricRegistry.register(MetricRegistry.name(getClass(), "invalid-imp"), invalidImp);
-    metricRegistry.register(MetricRegistry.name(getClass(), "missing-size"), missingSize);
-    metricRegistry.register(MetricRegistry.name(getClass(), "no-video-or-banner"), noVideoOrBanner);
-    metricRegistry.register(MetricRegistry.name(getClass(), "coppa-treatment"), coppaTreatment);
-    metricRegistry.register(MetricRegistry.name(getClass(), "no-imp"), noImp);
-    metricRegistry.register(MetricRegistry.name(getClass(), "invalid-geoid"), invalidGeoId);
-    metricRegistry.register(MetricRegistry.name(getClass(), "invalid-hyperlocal"), invalidHyperlocal);
-    metricRegistry.register(MetricRegistry.name(getClass(), "no-cid"), noCid);
+    Class<? extends DoubleClickOpenRtbMapper> cls = getClass();
+    metricRegistry.register(MetricRegistry.name(cls, "missing-crid"), missingCrid);
+    metricRegistry.register(MetricRegistry.name(cls, "invalid-imp"), invalidImp);
+    metricRegistry.register(MetricRegistry.name(cls, "missing-size"), missingSize);
+    metricRegistry.register(MetricRegistry.name(cls, "no-video-or-banner"), noVideoOrBanner);
+    metricRegistry.register(MetricRegistry.name(cls, "coppa-treatment"), coppaTreatment);
+    metricRegistry.register(MetricRegistry.name(cls, "no-imp"), noImp);
+    metricRegistry.register(MetricRegistry.name(cls, "invalid-geoid"), invalidGeoId);
+    metricRegistry.register(MetricRegistry.name(cls, "invalid-hyperlocal"), invalidHyperlocal);
+    metricRegistry.register(MetricRegistry.name(cls, "no-cid"), noCid);
   }
 
   @Override
-  public Doubleclick.BidResponse.Builder toNative(
+  public Doubleclick.BidResponse.Builder toNativeBidResponse(
     OpenRtb.BidRequest request, OpenRtb.BidResponse response) {
     checkNotNull(request);
     Doubleclick.BidResponse.Builder dcResponse = Doubleclick.BidResponse.newBuilder();
@@ -224,19 +223,19 @@ public class DoubleClickOpenRtbMapper
     dcAd.addAllAttribute(CreativeAttributeMapper.toDoubleClick(bid.getAttrList()));
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toNative(request, response, bid, dcAd);
+      extMapper.toNativeAd(request, response, bid, dcAd);
     }
 
     return dcAd;
   }
 
   @Override
-  public OpenRtb.BidRequest toOpenRtb(Doubleclick.BidRequest dcRequest) {
+  public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(Doubleclick.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
         .setId(BaseEncoding.base16().encode(dcRequest.getId().toByteArray()));
 
     if (dcRequest.getIsPing()) {
-      return request.build();
+      return request;
     }
 
     boolean coppa = false;
@@ -268,12 +267,11 @@ public class DoubleClickOpenRtbMapper
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtb(dcRequest, request);
+      extMapper.toOpenRtbBidRequest(dcRequest, request);
     }
 
     return request
-        .setTmax(100)
-        .build();
+        .setTmax(100);
   }
 
   protected User.Builder buildUser(Doubleclick.BidRequest dcRequest, boolean coppa) {
@@ -297,7 +295,7 @@ public class DoubleClickOpenRtbMapper
     }
 
     if (dcRequest.hasUserDemographic()) {
-      UserDemographic dcUser = dcRequest.getUserDemographic();
+      Doubleclick.BidRequest.UserDemographic dcUser = dcRequest.getUserDemographic();
 
       if (dcUser.hasGender()) {
         user.setGender(GenderMapper.toOpenRtb(dcUser.getGender()));
@@ -313,6 +311,23 @@ public class DoubleClickOpenRtbMapper
         Calendar today = Calendar.getInstance();
         user.setYob(today.get(Calendar.YEAR) - age);
       }
+    }
+
+    if (dcRequest.getDetectedVerticalCount() != 0) {
+      Data.Builder data = OpenRtb.BidRequest.Data.newBuilder()
+          .setId("DetectedVerticals")
+          .setName("DoubleClick");
+      for (Doubleclick.BidRequest.Vertical dcVertical : dcRequest.getDetectedVerticalList()) {
+        Segment.Builder segment = Segment.newBuilder()
+            .setId(String.valueOf(dcVertical.getId()))
+            .setValue(String.valueOf(dcVertical.getWeight()));
+        String name = metadata.getPublisherVerticals().get(dcVertical.getId());
+        if (name != null) {
+          segment.setName(name);
+        }
+        data.addSegment(segment);
+      }
+      user.addData(data);
     }
 
     return user;
@@ -368,7 +383,7 @@ public class DoubleClickOpenRtbMapper
       }
 
       for (ExtMapper extMapper : extMappers) {
-        extMapper.toOpenRtb(dcSlot, imp);
+        extMapper.toOpenRtbImpression(dcSlot, imp);
       }
     }
 
@@ -393,8 +408,10 @@ public class DoubleClickOpenRtbMapper
       banner.addApi(ApiFramework.MRAID);
     }
 
+    banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
+
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtb(dcSlot, banner);
+      extMapper.toOpenRtbBanner(dcSlot, banner);
     }
 
     return banner;
@@ -419,7 +436,7 @@ public class DoubleClickOpenRtbMapper
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtb(dcAdData, pmp);
+      extMapper.toOpenRtbPMP(dcAdData, pmp);
     }
 
     return pmp;
@@ -442,7 +459,7 @@ public class DoubleClickOpenRtbMapper
       video.setPos(AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility()));
     }
     if (dcVideo.hasVideoadStartDelay()) {
-      video.setStartdelay(dcVideo.getVideoadStartDelay());
+      video.setStartdelay(VideoStartDelayMapper.toDoubleClick(dcVideo.getVideoadStartDelay()));
     }
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
       video.addApi(ApiFramework.MRAID);
@@ -477,7 +494,7 @@ public class DoubleClickOpenRtbMapper
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtb(dcVideo, video);
+      extMapper.toOpenRtbVideo(dcVideo, video);
     }
 
     return video;
@@ -559,7 +576,7 @@ public class DoubleClickOpenRtbMapper
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtb(dcRequest, device);
+      extMapper.toOpenRtbDevice(dcRequest, device);
     }
 
     return device;
@@ -596,17 +613,18 @@ public class DoubleClickOpenRtbMapper
 
     if (dcRequest.hasEncryptedHyperlocalSet() && hyperlocalCrypto != null) {
       try {
-        HyperlocalSet hyperlocalSet = HyperlocalSet.parseFrom(hyperlocalCrypto.decryptHyperlocal(
-            dcRequest.getEncryptedHyperlocalSet().toByteArray()));
+        Doubleclick.BidRequest.HyperlocalSet hyperlocalSet = Doubleclick.BidRequest.HyperlocalSet
+            .parseFrom(hyperlocalCrypto.decryptHyperlocal(
+                dcRequest.getEncryptedHyperlocalSet().toByteArray()));
         geo.setExtension(DcExt.hyperLocal, hyperlocalSet);
         if (hyperlocalSet.hasCenterPoint()) {
-          Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
+          Doubleclick.BidRequest.Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
           if (center.hasLatitude() && center.hasLongitude()) {
             geo.setLat(center.getLatitude());
             geo.setLon(center.getLongitude());
           }
         }
-      } catch (InvalidProtocolBufferException | DoubleClickCryptoException e) {
+      } catch (InvalidProtocolBufferException | SignatureException e) {
         invalidHyperlocal.inc();
         logger.warn("Invalid encrypted_hyperlocal_set: {}", e.toString());
       }
@@ -767,6 +785,11 @@ public class DoubleClickOpenRtbMapper
       content.setLanguage(sb.toString());
     }
 
+    String rating = ContentRatingMapper.toOpenRtb(dcRequest.getDetectedContentLabelList());
+    if (rating != null) {
+      content.setContentrating(rating);
+    }
+
     return content;
   }
 
@@ -795,7 +818,7 @@ public class DoubleClickOpenRtbMapper
    * Not implemented yet!
    */
   @Override
-  public BidRequest toNative(com.google.openrtb.OpenRtb.BidRequest request) {
+  public Doubleclick.BidRequest.Builder toNativeBidRequest(OpenRtb.BidRequest request) {
     throw new UnsupportedOperationException();
   }
 
@@ -803,7 +826,8 @@ public class DoubleClickOpenRtbMapper
    * Not implemented yet!
    */
   @Override
-  public BidResponse toOpenRtb(BidRequest request, BidRequest response) {
+  public OpenRtb.BidResponse.Builder toOpenRtbBidResponse(
+      Doubleclick.BidRequest request, Doubleclick.BidResponse response) {
     throw new UnsupportedOperationException();
   }
 }

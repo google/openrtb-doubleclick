@@ -17,12 +17,12 @@
 package com.google.doubleclick.openrtb;
 
 import static java.lang.Math.min;
-import static java.util.Arrays.asList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.Doubleclick;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
+import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule;
 import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.SlotVisibility;
 import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
 import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
@@ -31,6 +31,7 @@ import com.google.doubleclick.Doubleclick.BidRequest.Mobile.DeviceOsVersion;
 import com.google.doubleclick.Doubleclick.BidRequest.Mobile.MobileDeviceType;
 import com.google.doubleclick.Doubleclick.BidRequest.UserDataTreatment;
 import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
+import com.google.doubleclick.Doubleclick.BidRequest.Vertical;
 import com.google.doubleclick.Doubleclick.BidRequest.Video;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot;
 import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
@@ -85,7 +86,6 @@ public class TestData {
   public static Doubleclick.BidRequest.Builder newRequest(int size, boolean coppa) {
     Doubleclick.BidRequest.Builder req = Doubleclick.BidRequest.newBuilder()
         .setId(TestUtil.REQUEST_ID)
-        .setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ))
         .setGoogleUserId("john")
         .setConstrainedUsageGoogleUserId("j")
         .setHostedMatchData(ByteString.EMPTY)
@@ -94,6 +94,11 @@ public class TestData {
         .setAnonymousId("mysite.com")
         .setUrl("mysite.com/newsfeed")
         .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"))
+        .addAllDetectedVertical(sublist(size,
+            Vertical.newBuilder().setId(10).setWeight(0.25f).build(),
+            Vertical.newBuilder().setId(12).setWeight(0.33f).build(),
+            Vertical.newBuilder().setId(15).setWeight(0.75f).build(),
+            Vertical.newBuilder().setId(20).setWeight(0.99f).build()))
         .setEncryptedHyperlocalSet(ByteString.copyFrom(
             new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS).encryptHyperlocal(
                 HyperlocalSet.newBuilder()
@@ -105,6 +110,12 @@ public class TestData {
             .setGender(UserDemographic.Gender.FEMALE)
             .setAgeLow(18)
             .setAgeHigh(24));
+    if (size % 2 == 0) {
+      req.setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ));
+    } else {
+      req.setIp(ByteString.copyFrom(new byte[] {
+          0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x1F, 0x2F, 0x3F, 0x4F, 0x5F, 0x6F } ));
+    }
     if (size != NO_SLOT) {
       AdSlot.Builder adSlot = AdSlot.newBuilder()
           .setId(1)
@@ -117,6 +128,7 @@ public class TestData {
           .addAllExcludedProductCategory(sublist(size, 13, 14))
           .addAllTargetableChannel(sublist(size, "afv_user_id_PewDiePie", "pack-anon-x::y"));
       for (int i = 1; i < size; ++i) {
+        adSlot.setAdBlockKey(i);
         MatchingAdData.Builder mad = MatchingAdData.newBuilder()
             .setAdgroupId(100 + i);
         if (i >= 2) {
@@ -128,6 +140,12 @@ public class TestData {
               deal.setFixedCpmMicros(1200000);
             }
             mad.addDirectDeal(deal);
+
+            BuyerPricingRule.Builder rule = BuyerPricingRule.newBuilder();
+            if (j >= 3) {
+              rule.setMinimumCpmMicros(1200000);
+            }
+            mad.addPricingRule(rule);
           }
         }
         adSlot.addMatchingAdData(mad);
@@ -140,8 +158,8 @@ public class TestData {
     return req;
   }
 
-  static Mobile.Builder newMobile() {
-    return Mobile.newBuilder()
+  static Mobile.Builder newMobile(int size) {
+    Mobile.Builder mobile = Mobile.newBuilder()
         .setAppId("com.mygame")
         .setCarrierId(77777)
         .setPlatform("Android")
@@ -153,11 +171,15 @@ public class TestData {
         .setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY)
         .setAppName("Tic-Tac-Toe")
         .setAppRating(4.2f);
+    if (size % 2 == 0) {
+      mobile.setIsInterstitialRequest(true);
+    }
+    return mobile;
   }
 
   static Video.Builder newVideo(int size) {
     Video.Builder video = Video.newBuilder()
-        .addAllAllowedVideoFormats(asList(VideoFormat.VIDEO_FLASH, VideoFormat.VIDEO_HTML5))
+        .addAllAllowedVideoFormats(sublist(size, VideoFormat.VIDEO_FLASH, VideoFormat.VIDEO_HTML5))
         .setMinAdDuration(15)
         .setMaxAdDuration(60)
         .setVideoadStartDelay(5);

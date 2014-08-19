@@ -67,6 +67,8 @@ public class DoubleClickMetadata {
   private final ImmutableMap<Integer, String> buyDecCreativeAttributes;
   private final ImmutableMap<Integer, String> allCreativeAttributes;
   private final ImmutableMap<Integer, String> sellerNetworks;
+  private final ImmutableMap<Integer, String> contentLabels;
+  private final ImmutableMap<Integer, String> publisherVerticals;
   private final ImmutableMap<Integer, GeoTarget> targetsByCriteriaId;
   private final ImmutableMap<GeoTarget.CanonicalKey, GeoTarget> targetsByCanonicalKey;
   private final ImmutableMap<Object, CountryCodes> countryCodes;
@@ -87,6 +89,8 @@ public class DoubleClickMetadata {
         load(transport, ADX_DICT + "buyer-declarable-creative-attributes.txt"));
     allCreativeAttributes = ImmutableMap.copyOf(attrs);
     sellerNetworks = load(transport, ADX_DICT + "seller-network-ids.txt");
+    contentLabels = load(transport, ADX_DICT + "content-labels.txt");
+    publisherVerticals = load(transport, ADX_DICT + "publisher-verticals.txt");
     targetsByCriteriaId = loadGeoTargets(transport, ADX_DICT + "geo-table.csv");
     HashMap<GeoTarget.CanonicalKey, GeoTarget> byKey = new HashMap<>();
     for (GeoTarget target : targetsByCriteriaId.values()) {
@@ -186,6 +190,23 @@ public class DoubleClickMetadata {
   }
 
   /**
+   * Dictionary file used in the detected_content_labels field of BidRequest.
+   */
+  public ImmutableMap<Integer, String> getContentLabels() {
+    return contentLabels;
+  }
+
+  /**
+   * Dictionary file used in the detected_vertical field of BidRequest.
+   * This field specifies the verticals (similar to keywords) of the page on which
+   * the ad will be shown. Google generates this field by crawling the page and
+   * determining which verticals are used.
+   */
+  public ImmutableMap<Integer, String> getPublisherVerticals() {
+    return publisherVerticals;
+  }
+
+  /**
    * Formats a code to the corresponding description from its domain.
    */
   public static String toString(Map<Integer, String> metadata, int code) {
@@ -226,6 +247,8 @@ public class DoubleClickMetadata {
         .add("pubExcCreativeAttributes#", pubExcCreativeAttributes.size())
         .add("buyDecCreativeAttributes#", buyDecCreativeAttributes.size())
         .add("sellerNetworks#", sellerNetworks.size())
+        .add("contentLabels#", contentLabels.size())
+        .add("publisherVerticals#", publisherVerticals.size())
         .add("targetsByCriteriaId#", targetsByCriteriaId.size())
         .add("countryCodes#", countryCodes.size())
         .toString();
@@ -308,18 +331,30 @@ public class DoubleClickMetadata {
           // in a few records like "Burgos" / "Province of Burgos,Castile and Leon,Spain").
 
           String parentName;
-          if (name.indexOf(',') == -1) {
-            int pos = canonicalName.indexOf(',');
-            parentName = pos == -1 ? null : canonicalName.substring(pos + 1);
+          int pos = name.indexOf(',');
+          if (pos == -1) {
+            int canonPos = canonicalName.indexOf(',');
+            parentName = canonPos == -1 ? null : canonicalName.substring(canonPos + 1);
           } else {
-            int pos = name.length() + 1;
-            if (pos == canonicalName.length()) {
+            int commas = 1;
+            for (int i = pos + 1; i < name.length(); ++i) {
+              if (name.charAt(i) == ',') {
+                ++commas;
+              }
+            }
+            int canonPos;
+            for (canonPos = 0; canonPos < canonicalName.length() && commas >= 0; ++canonPos) {
+              if (canonicalName.charAt(canonPos) == ',') {
+                --commas;
+              }
+            }
+            if (commas == 0) {
               parentName = null;
-            } else if (canonicalName.charAt(pos - 1) == ',') {
-              parentName = canonicalName.substring(pos);
+            } else if (commas != -1 || canonPos == canonicalName.length()) {
+              logger.warn("Impossible to resolve parent, ignoring: {}", record);
+              continue;
             } else {
-              logger.warn("Impossible to resolve record's parent, ignoring: {}", line);
-              continue; // don't put in nextData
+              parentName = canonicalName.substring(canonPos + 1);
             }
           }
           GeoTarget parent;
