@@ -29,6 +29,15 @@ yet compatible with JDK 8 (once built, the library works with JDK 8).
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.6.5, 18-08-2014
+
+- Crypto reviews: javax.security's exceptions; initVector improvements;
+  fix block cypher for >1 blocks; Price method names (millis/micros).
+- Metadata: content-labels, publisher-verticals; better GeoTable parser.
+- Mapper: Fix AdPosition & Banner.mimes; add Content.contentrating,
+  User.data.segment, Banner.expdir, Video.startdelay (special values).
+- DoubleClickValidator: validates dealId; optimizations.
+
 # Version 0.6.4, 10-08-2014
 
 * Remove dependency from apache-commons-codec!
