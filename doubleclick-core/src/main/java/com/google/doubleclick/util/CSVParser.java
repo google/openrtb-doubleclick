@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.util;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -128,7 +128,7 @@ class CSVParser {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).omitNullValues()
+    return MoreObjects.toStringHelper(this).omitNullValues()
         .add("separator", separator == NONE ? null : "0x" + Integer.toHexString(separator))
         .add("quote", quote == NONE ? null : "0x" + Integer.toHexString(quote))
         .add("escape", escape == NONE ? null : "0x" + Integer.toHexString(escape))

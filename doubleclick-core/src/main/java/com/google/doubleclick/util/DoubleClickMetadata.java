@@ -17,7 +17,7 @@
 package com.google.doubleclick.util;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget.TargetType;
 
@@ -238,7 +238,7 @@ public class DoubleClickMetadata {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).omitNullValues()
+    return MoreObjects.toStringHelper(this).omitNullValues()
         .add("vendors#", vendors.size())
         .add("gdnVendorTypes#", gdnVendors.size())
         .add("sensitiveCategories#", adSensitiveCategories.size())
@@ -527,7 +527,7 @@ public class DoubleClickMetadata {
 
     @Override
     public String toString() {
-      return Objects.toStringHelper(this).omitNullValues()
+      return MoreObjects.toStringHelper(this).omitNullValues()
           .add("criteriaId", criteriaId)
           .add("name", name)
           .add("canonicalName", key.canonicalName)
@@ -690,7 +690,7 @@ public class DoubleClickMetadata {
 
     @Override
     public String toString() {
-      return Objects.toStringHelper(this).omitNullValues()
+      return MoreObjects.toStringHelper(this).omitNullValues()
           .add("numeric", numeric)
           .add("alpha2", alpha2)
           .add("alpha3", alpha3)

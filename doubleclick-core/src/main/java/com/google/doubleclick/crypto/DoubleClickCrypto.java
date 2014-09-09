@@ -19,7 +19,7 @@ package com.google.doubleclick.crypto;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.min;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
 
@@ -374,7 +374,7 @@ public class DoubleClickCrypto {
     }
 
     @Override public String toString() {
-      return Objects.toStringHelper(this).omitNullValues()
+      return MoreObjects.toStringHelper(this).omitNullValues()
           .add("encryptionKey", encryptionKey.getAlgorithm() + '/' + encryptionKey.getFormat())
           .add("integrityKey", integrityKey.getAlgorithm() + '/' + integrityKey.getFormat())
           .toString();
