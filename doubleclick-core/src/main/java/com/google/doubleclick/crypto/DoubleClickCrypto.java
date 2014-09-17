@@ -54,6 +54,8 @@ import javax.inject.Inject;
 *   <li>{@code E(payload) = payload ^ hmac(encryptionKey, initVector)} per max-20-byte block</li>
 *   <li>{@code I(signature) = hmac(integrityKey, payload || initVector)[0..3]}</li>
 * </ol>
+* <p>
+* This class, and all nested classes / subclasses, are threadsafe.
 */
 public class DoubleClickCrypto {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickCrypto.class);
@@ -326,6 +328,13 @@ public class DoubleClickCrypto {
             .append(", serverId ").append(serverId)
         .append("}\ninput  =").append(BaseEncoding.base16().encode(inData))
         .append("\noutput =").append(BaseEncoding.base16().encode(workBytes))
+        .toString();
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).omitNullValues()
+        .add("keys", keys)
         .toString();
   }
 

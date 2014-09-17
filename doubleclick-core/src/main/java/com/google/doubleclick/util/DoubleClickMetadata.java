@@ -50,6 +50,9 @@ import javax.inject.Singleton;
  * <p>
  * Note: validation is lenient: invalid codes are logged, but no failure is raised here
  * if the bidder is using old metadata. If a code is really invalid, AdX may reject the bid.
+ * <p>
+ * This class is threadsafe, as well as all nested helper classes. It's recommended to create
+ * a single instance because its initialization can be slow (up to a few seconds).
  */
 @Singleton
 public class DoubleClickMetadata {
