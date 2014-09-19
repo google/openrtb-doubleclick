@@ -23,7 +23,13 @@ import "doubleclick.proto";
 
 //
 // OpenRTB Extensions for DoubleClick Ad Exchange (ID=101..109).
-// These "Link" extensions are internal only, not used on-wire.
+//
+// These "Link" extensions are for in-memory / internal use only, not for on-wire messages.
+// This is because the DoubleClick Ad Exchange doesn't yet support OpenRTB on the wire
+// (so there's no point in providing support to map these to JSON either).
+// Even if this support is added in the future, it won't look anything like this, would
+// require different message types instead of just reusing the native protocol's messages
+// (only fields that don't map well to OpenRTB would need extensions).
 //
 
 extend com.google.openrtb.BidRequest {
@@ -56,7 +62,12 @@ extend com.google.openrtb.BidRequest.Impression.PMP {
   optional com.google.doubleclick.BidRequest.AdSlot.MatchingAdData adData = 101;
 }
 
+extend com.google.openrtb.BidResponse {
+  /** Reference to the corresponding node in the DoubleClick response. */
+  optional com.google.doubleclick.BidResponse bidResponse = 101;
+}
+
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
-  /** Reference to the corresponding node in the DoubleClick request. */
+  /** Reference to the corresponding node in the DoubleClick response. */
   optional com.google.doubleclick.BidResponse.Ad ad = 101;
 }
