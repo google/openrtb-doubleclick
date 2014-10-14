@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.doubleclick;
 option java_outer_classname = "Doubleclick";
 
-// Synchronized with v.51:
+// Synchronized with v.52:
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2014 Google Inc. All Rights Reserved.
@@ -90,7 +90,7 @@ message BidRequest {
   optional string user_agent = 6;
 
   // Geo information.  These use a subset of the codes used in the AdWords API.
-  // See the geo-tables.csv table in the technical documentation for a list of
+  // See the geo-table.csv table in the technical documentation for a list of
   // ids.  The geo_criteria_id field replaces the deprecated country, region,
   // city, and metro fields.
   optional int32 geo_criteria_id = 39;
@@ -195,8 +195,9 @@ message BidRequest {
   // request.
   optional string anonymous_id = 19;
 
-  // The two or 5 letter code for the languages of the page or the user.  The
-  // documentation for the codes is at
+  // Detected user languages, based on the language of the web page, the browser
+  // settings, and other signals. The order is arbitrary.  The codes are 2 or 5
+  // letters and are documented at
   // https://developers.google.com/adwords/api/docs/appendix/languagecodes
   repeated string detected_language = 12;
 
@@ -387,6 +388,12 @@ message BidRequest {
     // If this is not set or has value <= 0, there is no minimum duration.
     optional int32 min_ad_duration = 8;
 
+    // The maximum number of ads in an Adx video pod.  A non-zero value
+    // indicates that the current ad slot is a video pod that can show multiple
+    // video ads.  Actual number of video ads shown can be less than or equal to
+    // this value but cannot exceed it.
+    optional int32 max_ads_in_pod = 12;
+
     // The type of inventory from which request is sent.
     enum InventoryType {
       WEB_VIDEO = 0;
@@ -496,7 +503,7 @@ message BidRequest {
     repeated int32 height = 3;
 
     // The disallowed attribute ids for the ads that can show in this slot.  See
-    // the publisher-excluded-creative-attributes.txt file in the technical
+    // the publisher-excludable-creative-attributes.txt file in the technical
     // documentation for a list of ids.
     repeated int32 excluded_attribute = 4 [packed=true];
 
