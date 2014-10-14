@@ -29,6 +29,14 @@ yet compatible with JDK 8 (once built, the library works with JDK 8).
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.6.6, 14-10-2014
+
+* DoubleClick proto v.52.
+* Mapper: Much better mapping of IAB categories.
+* New link extension DcExt.bidResponse.
+* Javadocs for thead safety.
+* Update Guava library.
+
 # Version 0.6.5, 18-08-2014
 
 - Crypto reviews: javax.security's exceptions; initVector improvements;
