@@ -17,7 +17,7 @@
 package com.google.doubleclick.util;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget.TargetType;
 
@@ -50,6 +50,9 @@ import javax.inject.Singleton;
  * <p>
  * Note: validation is lenient: invalid codes are logged, but no failure is raised here
  * if the bidder is using old metadata. If a code is really invalid, AdX may reject the bid.
+ * <p>
+ * This class is threadsafe, as well as all nested helper classes. It's recommended to create
+ * a single instance because its initialization can be slow (up to a few seconds).
  */
 @Singleton
 public class DoubleClickMetadata {
@@ -238,7 +241,7 @@ public class DoubleClickMetadata {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).omitNullValues()
+    return MoreObjects.toStringHelper(this).omitNullValues()
         .add("vendors#", vendors.size())
         .add("gdnVendorTypes#", gdnVendors.size())
         .add("sensitiveCategories#", adSensitiveCategories.size())
@@ -527,7 +530,7 @@ public class DoubleClickMetadata {
 
     @Override
     public String toString() {
-      return Objects.toStringHelper(this).omitNullValues()
+      return MoreObjects.toStringHelper(this).omitNullValues()
           .add("criteriaId", criteriaId)
           .add("name", name)
           .add("canonicalName", key.canonicalName)
@@ -690,7 +693,7 @@ public class DoubleClickMetadata {
 
     @Override
     public String toString() {
-      return Objects.toStringHelper(this).omitNullValues()
+      return MoreObjects.toStringHelper(this).omitNullValues()
           .add("numeric", numeric)
           .add("alpha2", alpha2)
           .add("alpha3", alpha3)

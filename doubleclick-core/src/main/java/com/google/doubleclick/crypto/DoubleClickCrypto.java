@@ -19,7 +19,7 @@ package com.google.doubleclick.crypto;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.min;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
 
@@ -54,6 +54,8 @@ import javax.inject.Inject;
 *   <li>{@code E(payload) = payload ^ hmac(encryptionKey, initVector)} per max-20-byte block</li>
 *   <li>{@code I(signature) = hmac(integrityKey, payload || initVector)[0..3]}</li>
 * </ol>
+* <p>
+* This class, and all nested classes / subclasses, are threadsafe.
 */
 public class DoubleClickCrypto {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickCrypto.class);
@@ -329,6 +331,13 @@ public class DoubleClickCrypto {
         .toString();
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).omitNullValues()
+        .add("keys", keys)
+        .toString();
+  }
+
   /**
    * Holds the keys used to configure DoubleClick cryptography.
    */
@@ -374,7 +383,7 @@ public class DoubleClickCrypto {
     }
 
     @Override public String toString() {
-      return Objects.toStringHelper(this).omitNullValues()
+      return MoreObjects.toStringHelper(this).omitNullValues()
           .add("encryptionKey", encryptionKey.getAlgorithm() + '/' + encryptionKey.getFormat())
           .add("integrityKey", integrityKey.getAlgorithm() + '/' + integrityKey.getFormat())
           .toString();
