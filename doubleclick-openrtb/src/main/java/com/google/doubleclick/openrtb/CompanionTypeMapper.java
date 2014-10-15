@@ -17,7 +17,7 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
 
 import java.util.Collection;

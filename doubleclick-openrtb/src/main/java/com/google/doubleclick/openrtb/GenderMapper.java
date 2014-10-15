@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic.Gender;
+import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic.Gender;
 
 /**
  * Maps between AdX's {@link Gender} and OpenRTB's {@code gender}.

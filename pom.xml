@@ -152,8 +152,12 @@
           <excludePackageNames />
           <groups>
             <group>
-              <title>OpenRTB for DoubleClick Ad Exchange</title>
-              <packages>com.google.doubleclick:com.google.doubleclick.crypto:com.google.doubleclick.openrtb:com.google.doubleclick.util</packages>
+              <title>DoubleClick Utilities</title>
+              <packages>com.google.protos.adx:com.google.doubleclick:com.google.doubleclick.crypto:com.google.doubleclick.util</packages>
+            </group>
+            <group>
+              <title>DoubleClick OpenRTB support</title>
+              <packages>com.google.doubleclick.openrtb</packages>
             </group>
           </groups>
         </configuration>

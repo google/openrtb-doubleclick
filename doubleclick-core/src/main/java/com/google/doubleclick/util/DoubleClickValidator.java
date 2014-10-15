@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.doubleclick.Doubleclick.BidRequest;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData.DirectDeal;
-import com.google.doubleclick.Doubleclick.BidResponse;
+import com.google.protos.adx.NetworkBid.BidRequest;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal;
+import com.google.protos.adx.NetworkBid.BidResponse;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;

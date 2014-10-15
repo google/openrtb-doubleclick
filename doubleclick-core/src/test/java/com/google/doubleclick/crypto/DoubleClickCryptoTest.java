@@ -22,10 +22,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import com.google.common.io.BaseEncoding;
-import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
-import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
 import com.google.doubleclick.TestUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
+import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
 
 import org.junit.Test;
 
