@@ -165,13 +165,20 @@ public class DoubleClickValidatorTest {
         .build();
 
     BidResponse.Builder goodResp = BidResponse.newBuilder().addAd(testBid()
-        .addAttribute(DoubleClickValidator.CREATIVE_SSL));
+        .addAttribute(DoubleClickValidator.CREATIVE_SSL)
+        .addClickThroughUrl("https://safe.com"));
     validator.validate(request, goodResp);
     assertFalse(Iterables.isEmpty(bids(goodResp)));
 
     BidResponse.Builder badResp1 = BidResponse.newBuilder().addAd(testBid());
     validator.validate(request, badResp1);
     assertTrue(Iterables.isEmpty(bids(badResp1)));
+
+    BidResponse.Builder badResp2 = BidResponse.newBuilder().addAd(testBid()
+        .addAttribute(DoubleClickValidator.CREATIVE_SSL)
+        .addClickThroughUrl("http://unsafe.com"));
+    validator.validate(request, badResp2);
+    assertTrue(Iterables.isEmpty(bids(badResp2)));
   }
 
   @Test

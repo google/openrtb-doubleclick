@@ -17,5 +17,4 @@
 /**
  * DoubleClick RTB model.
  */
-@javax.annotation.ParametersAreNonnullByDefault
-package com.google.doubleclick;
+package com.google.protos.adx;

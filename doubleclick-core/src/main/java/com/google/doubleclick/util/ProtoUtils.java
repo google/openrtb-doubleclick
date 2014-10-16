@@ -63,7 +63,7 @@ final class ProtoUtils {
         ? ((Collection<?>) objs).size() - 1 : 10;
     List<M> filtered = (firstDiscarded == 0) ? null : new ArrayList<M>(initialCapacity);
 
-        Iterator<M> iter = objs.iterator();
+    Iterator<M> iter = objs.iterator();
     for (int i = 0; i < firstDiscarded; ++i) {
       filtered.add(iter.next());
     }
