@@ -57,25 +57,25 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.11</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>0.6.6</openrtbVersion>
+    <openrtbVersion>0.6.7-SNAPSHOT</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/0.6.6</openrtbSource>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/master</openrtbSource>
     <protobufVersion>2.5.0</protobufVersion>
     <slf4jVersion>1.7.7</slf4jVersion>
 
     <!-- Plugin versions -->
     <buildHelperMavenPluginVersion>1.8</buildHelperMavenPluginVersion>
     <coberturaMavenPluginVersion>2.6</coberturaMavenPluginVersion>
-    <compilerMavenPluginVersion>3.1</compilerMavenPluginVersion>
+    <compilerMavenPluginVersion>3.2</compilerMavenPluginVersion>
     <dependencyMavenPluginVersion>2.8</dependencyMavenPluginVersion>
     <downloadMavenPluginVersion>1.2.0</downloadMavenPluginVersion>
     <gitCommitIdPluginVersion>2.1.7</gitCommitIdPluginVersion>
     <gpgMavenPluginVersion>1.5</gpgMavenPluginVersion>
     <jarMavenPluginVersion>2.5</jarMavenPluginVersion>
-    <javadocMavenPluginVersion>2.9.1</javadocMavenPluginVersion>
+    <javadocMavenPluginVersion>2.10.1</javadocMavenPluginVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <releaseMavenPluginVersion>2.5</releaseMavenPluginVersion>
+    <releaseMavenPluginVersion>2.5.1</releaseMavenPluginVersion>
     <siteMavenPluginVersion>3.4</siteMavenPluginVersion>
     <surefireMavenPluginVersion>2.17</surefireMavenPluginVersion>
 
