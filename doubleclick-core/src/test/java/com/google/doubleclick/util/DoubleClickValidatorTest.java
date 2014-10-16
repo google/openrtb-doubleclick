@@ -153,6 +153,28 @@ public class DoubleClickValidatorTest {
   }
 
   @Test
+  public void testSSL() {
+    BidRequest request = BidRequest.newBuilder()
+        .setId(ByteString.copyFromUtf8("0"))
+        .addAdslot(BidRequest.AdSlot.newBuilder()
+            .setId(1)
+            .addWidth(200)
+            .addHeight(50)
+            .addMatchingAdData(MatchingAdData.newBuilder().setAdgroupId(10))
+            .addExcludedAttribute(DoubleClickValidator.CREATIVE_NON_SSL))
+        .build();
+
+    BidResponse.Builder goodResp = BidResponse.newBuilder().addAd(testBid()
+        .addAttribute(DoubleClickValidator.CREATIVE_SSL));
+    validator.validate(request, goodResp);
+    assertFalse(Iterables.isEmpty(bids(goodResp)));
+
+    BidResponse.Builder badResp1 = BidResponse.newBuilder().addAd(testBid());
+    validator.validate(request, badResp1);
+    assertTrue(Iterables.isEmpty(bids(badResp1)));
+  }
+
+  @Test
   public void testNoImp() {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(BidResponse.Ad.newBuilder()
         .addAdslot(BidResponse.Ad.AdSlot.newBuilder()

@@ -29,6 +29,12 @@ yet compatible with JDK 8 (once built, the library works with JDK 8).
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.6.7, 16-10-2014
+
+* Fix namespace of Doubleclick proto to Google standard: replace all
+  com.google.doubleclick.Doubleclick->com.google.protos.adx.NetworkBid.
+* DoubleClickValidator validates SSL-enabled ads.
+
 # Version 0.6.6, 14-10-2014
 
 * DoubleClick proto v.52.
