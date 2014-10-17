@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.doubleclick.Doubleclick.BidRequest.Mobile.MobileDeviceType;
+import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
 
 /**

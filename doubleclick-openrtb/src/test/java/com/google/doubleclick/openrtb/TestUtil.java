@@ -17,7 +17,6 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.common.collect.ImmutableList;
-import com.google.doubleclick.Doubleclick;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb.BidRequest;
@@ -28,6 +27,7 @@ import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.BidOrBuilder;
 import com.google.protobuf.ByteString;
+import com.google.protos.adx.NetworkBid;
 
 import com.codahale.metrics.MetricRegistry;
 
@@ -93,10 +93,10 @@ class TestUtil {
     return metadata;
   }
 
-  public static BidRequest newBidRequest(Doubleclick.BidRequestOrBuilder adxRequest) {
-    Doubleclick.BidRequest dcRequest = adxRequest instanceof Doubleclick.BidRequest
-        ? (Doubleclick.BidRequest) adxRequest
-        : ((Doubleclick.BidRequest.Builder) adxRequest).build();
+  public static BidRequest newBidRequest(NetworkBid.BidRequestOrBuilder adxRequest) {
+    NetworkBid.BidRequest dcRequest = adxRequest instanceof NetworkBid.BidRequest
+        ? (NetworkBid.BidRequest) adxRequest
+        : ((NetworkBid.BidRequest.Builder) adxRequest).build();
     return new DoubleClickOpenRtbMapper(
         new MetricRegistry(),
         getMetadata(),

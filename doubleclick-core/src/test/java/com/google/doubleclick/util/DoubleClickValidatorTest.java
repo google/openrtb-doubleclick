@@ -23,11 +23,11 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.doubleclick.Doubleclick.BidRequest;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData.DirectDeal;
-import com.google.doubleclick.Doubleclick.BidResponse;
 import com.google.protobuf.ByteString;
+import com.google.protos.adx.NetworkBid.BidRequest;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal;
+import com.google.protos.adx.NetworkBid.BidResponse;
 
 import com.codahale.metrics.MetricRegistry;
 
@@ -150,6 +150,35 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder badResp1 = BidResponse.newBuilder().addAd(testBid());
     validator.validate(request, badResp1);
     assertTrue(Iterables.isEmpty(bids(badResp1)));
+  }
+
+  @Test
+  public void testSSL() {
+    BidRequest request = BidRequest.newBuilder()
+        .setId(ByteString.copyFromUtf8("0"))
+        .addAdslot(BidRequest.AdSlot.newBuilder()
+            .setId(1)
+            .addWidth(200)
+            .addHeight(50)
+            .addMatchingAdData(MatchingAdData.newBuilder().setAdgroupId(10))
+            .addExcludedAttribute(DoubleClickValidator.CREATIVE_NON_SSL))
+        .build();
+
+    BidResponse.Builder goodResp = BidResponse.newBuilder().addAd(testBid()
+        .addAttribute(DoubleClickValidator.CREATIVE_SSL)
+        .addClickThroughUrl("https://safe.com"));
+    validator.validate(request, goodResp);
+    assertFalse(Iterables.isEmpty(bids(goodResp)));
+
+    BidResponse.Builder badResp1 = BidResponse.newBuilder().addAd(testBid());
+    validator.validate(request, badResp1);
+    assertTrue(Iterables.isEmpty(bids(badResp1)));
+
+    BidResponse.Builder badResp2 = BidResponse.newBuilder().addAd(testBid()
+        .addAttribute(DoubleClickValidator.CREATIVE_SSL)
+        .addClickThroughUrl("http://unsafe.com"));
+    validator.validate(request, badResp2);
+    assertTrue(Iterables.isEmpty(bids(badResp2)));
   }
 
   @Test

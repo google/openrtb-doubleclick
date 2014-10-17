@@ -16,8 +16,8 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.doubleclick.Doubleclick;
 import com.google.openrtb.OpenRtb;
+import com.google.protos.adx.NetworkBid;
 
 /**
  * Extension mapper for {@link DoubleClickOpenRtbMapper}. The core mapper only handles the
@@ -29,30 +29,30 @@ public abstract class ExtMapper {
   }
 
   public void toOpenRtbBidRequest(
-      Doubleclick.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
+      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
   }
 
-  public void toOpenRtbDevice(Doubleclick.BidRequest dcRequest,
+  public void toOpenRtbDevice(NetworkBid.BidRequest dcRequest,
       OpenRtb.BidRequest.Device.Builder device) {
   }
 
-  public void toOpenRtbImpression(Doubleclick.BidRequest.AdSlot dcSlot,
+  public void toOpenRtbImpression(NetworkBid.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Impression.Builder imp) {
   }
 
-  public void toOpenRtbBanner(Doubleclick.BidRequest.AdSlot dcSlot,
+  public void toOpenRtbBanner(NetworkBid.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Impression.Banner.Builder banner) {
   }
 
-  public void toOpenRtbVideo(Doubleclick.BidRequest.Video dcVideo,
+  public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
       OpenRtb.BidRequest.Impression.Video.Builder video) {
   }
 
-  public void toOpenRtbPMP(Doubleclick.BidRequest.AdSlot.MatchingAdData dcAdData,
+  public void toOpenRtbPMP(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
   }
 
   public void toNativeAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
-      OpenRtb.BidResponse.SeatBid.Bid bid, Doubleclick.BidResponse.Ad.Builder dcAd) {
+      OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
   }
 }

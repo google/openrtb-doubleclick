@@ -19,26 +19,26 @@ package com.google.doubleclick.openrtb;
 import static java.lang.Math.min;
 
 import com.google.common.collect.ImmutableList;
-import com.google.doubleclick.Doubleclick;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.SlotVisibility;
-import com.google.doubleclick.Doubleclick.BidRequest.Hyperlocal;
-import com.google.doubleclick.Doubleclick.BidRequest.HyperlocalSet;
-import com.google.doubleclick.Doubleclick.BidRequest.Mobile;
-import com.google.doubleclick.Doubleclick.BidRequest.Mobile.DeviceOsVersion;
-import com.google.doubleclick.Doubleclick.BidRequest.Mobile.MobileDeviceType;
-import com.google.doubleclick.Doubleclick.BidRequest.UserDataTreatment;
-import com.google.doubleclick.Doubleclick.BidRequest.UserDemographic;
-import com.google.doubleclick.Doubleclick.BidRequest.Vertical;
-import com.google.doubleclick.Doubleclick.BidRequest.Video;
-import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot;
-import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
-import com.google.doubleclick.Doubleclick.BidRequest.Video.VideoFormat;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.protobuf.ByteString;
+import com.google.protos.adx.NetworkBid;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
+import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
+import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
+import com.google.protos.adx.NetworkBid.BidRequest.Mobile;
+import com.google.protos.adx.NetworkBid.BidRequest.Mobile.DeviceOsVersion;
+import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
+import com.google.protos.adx.NetworkBid.BidRequest.UserDataTreatment;
+import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
+import com.google.protos.adx.NetworkBid.BidRequest.Vertical;
+import com.google.protos.adx.NetworkBid.BidRequest.Video;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class TestData {
     return bid;
   }
 
-  public static Doubleclick.BidRequest newRequest() {
+  public static NetworkBid.BidRequest newRequest() {
     return newRequest(0, false).build();
   }
 
@@ -83,8 +83,8 @@ public class TestData {
     return sizes.build();
   }
 
-  public static Doubleclick.BidRequest.Builder newRequest(int size, boolean coppa) {
-    Doubleclick.BidRequest.Builder req = Doubleclick.BidRequest.newBuilder()
+  public static NetworkBid.BidRequest.Builder newRequest(int size, boolean coppa) {
+    NetworkBid.BidRequest.Builder req = NetworkBid.BidRequest.newBuilder()
         .setId(TestUtil.REQUEST_ID)
         .setGoogleUserId("john")
         .setConstrainedUsageGoogleUserId("j")

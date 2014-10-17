@@ -18,7 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import static org.junit.Assert.assertSame;
 
-import com.google.doubleclick.Doubleclick.BidRequest.Mobile.MobileDeviceType;
+import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
 
 import org.junit.Test;

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.doubleclick.Doubleclick.BidRequest.Video.CompanionSlot.CreativeFormat;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import org.junit.Test;
 

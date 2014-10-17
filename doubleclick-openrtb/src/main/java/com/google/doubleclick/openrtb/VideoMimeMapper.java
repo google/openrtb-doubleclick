@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.doubleclick.Doubleclick.BidRequest.Video.VideoFormat;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
 
 import java.util.Collection;
 

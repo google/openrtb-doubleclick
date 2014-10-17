@@ -164,7 +164,7 @@
                 <configuration>
                   <compilerId>javac</compilerId>
                   <includes>
-                    <include>com/google/doubleclick/Doubleclick.java</include>
+                    <include>com/google/protos/adx/NetworkBid.java</include>
                   </includes>
                 </configuration>
               </execution>
@@ -176,7 +176,7 @@
                   <compilerId>javac-with-errorprone</compilerId>
                   <forceJavacCompilerUse>true</forceJavacCompilerUse>
                   <excludes>
-                    <exclude>com/google/doubleclick/Doubleclick.java</exclude>
+                    <exclude>com/google/protos/adx/NetworkBid.java</exclude>
                   </excludes>
                 </configuration>
               </execution>

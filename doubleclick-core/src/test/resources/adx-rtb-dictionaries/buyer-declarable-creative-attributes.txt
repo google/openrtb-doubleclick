@@ -3,4 +3,5 @@
 3 CreativeAttribute3
 32 MraidType: Mraid 1.0
 34 RichMediaCapabilityType: RichMediaCapabilityFlash
+47 RichMediaCapabilityType: RichMediaCapabilitySSL
 50 RichMediaCapabilityType: RichMediaCapabilityNonFlash

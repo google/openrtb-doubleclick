@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.doubleclick.Doubleclick.BidRequest;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData;
-import com.google.doubleclick.Doubleclick.BidRequest.AdSlot.MatchingAdData.DirectDeal;
-import com.google.doubleclick.Doubleclick.BidResponse;
+import com.google.protos.adx.NetworkBid.BidRequest;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal;
+import com.google.protos.adx.NetworkBid.BidResponse;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -56,13 +56,17 @@ public class DoubleClickValidator {
   private static final Logger logger =
       LoggerFactory.getLogger(DoubleClickValidator.class);
   private static final int GDN = 1;
-  public static final int CREATIVE_FLASH = 34;
-  public static final int CREATIVE_NON_FLASH = 50;
+  static final int CREATIVE_FLASH = 34;
+  static final int CREATIVE_NON_FLASH = 50;
+  static final int CREATIVE_SSL = 47;
+  static final int CREATIVE_NON_SSL = 48;
 
   private final DoubleClickMetadata metadata;
   private final Counter unmatchedImp = new Counter();
   private final Counter unmatchedDeal = new Counter();
   private final Counter needsNonflashAttr = new Counter();
+  private final Counter needsSslAttr = new Counter();
+  private final Counter sslWithHttp = new Counter();
   private final Counter invalidCreatAttr = new Counter();
   private final Counter invalidVendor = new Counter();
   private final Counter invalidProdCat = new Counter();
@@ -81,6 +85,10 @@ public class DoubleClickValidator {
         unmatchedDeal);
     metricRegistry.register(MetricRegistry.name(getClass(), "needs-nonflash-attr"),
         needsNonflashAttr);
+    metricRegistry.register(MetricRegistry.name(getClass(), "needs-ssl-attr"),
+        needsSslAttr);
+    metricRegistry.register(MetricRegistry.name(getClass(), "ssl-with-http"),
+        sslWithHttp);
     metricRegistry.register(MetricRegistry.name(getClass(), "invalid-creative-attr"),
         invalidCreatAttr);
     metricRegistry.register(MetricRegistry.name(getClass(), "invalid-vendor"),
@@ -182,6 +190,28 @@ public class DoubleClickValidator {
                   metadata.getBuyerDeclarableCreativeAttributes(), CREATIVE_NON_FLASH));
         }
         valid = false;
+      }
+    }
+
+    if (reqSlot.getExcludedAttributeList().contains(CREATIVE_NON_SSL)) {
+      if (!ad.getAttributeList().contains(CREATIVE_SSL)) {
+        needsSslAttr.inc();
+        if (logger.isDebugEnabled()) {
+          logger.debug("{} rejected, ad.attribute needs value: {}",
+              logId(adslot), DoubleClickMetadata.toString(
+                  metadata.getBuyerDeclarableCreativeAttributes(), CREATIVE_SSL));
+        }
+        valid = false;
+      }
+      for (String ctr : ad.getClickThroughUrlList()) {
+        if (ctr.startsWith("http:")) {
+          sslWithHttp.inc();
+          if (logger.isDebugEnabled()) {
+            logger.debug("{} rejected, SSL-enabled ad cannot use HTTP URL: {}",
+                logId(adslot), ctr);
+          }
+          valid = false;
+        }
       }
     }
 
