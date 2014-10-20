@@ -57,10 +57,10 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.11</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>0.7.0</openrtbVersion>
+    <openrtbVersion>0.7.1</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/0.7.0</openrtbSource>
-    <protobufVersion>2.5.0</protobufVersion>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/0.7.1</openrtbSource>
+    <protobufVersion>2.6.0</protobufVersion>
     <slf4jVersion>1.7.7</slf4jVersion>
 
     <!-- Plugin versions -->
