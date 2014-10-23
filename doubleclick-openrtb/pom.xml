@@ -75,7 +75,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>${buildHelperMavenPluginVersion}</version>
         <executions>
           <execution>
             <phase>generate-sources</phase>
@@ -92,7 +91,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
-        <version>${coberturaMavenPluginVersion}</version>
         <configuration>
           <format>xml</format>
           <format>html</format>
@@ -120,7 +118,6 @@
           <plugin>
             <groupId>com.googlecode.maven-download-plugin</groupId>
             <artifactId>download-maven-plugin</artifactId>
-            <version>${downloadMavenPluginVersion}</version>
             <executions>
               <execution>
                 <id>get-includes</id>
