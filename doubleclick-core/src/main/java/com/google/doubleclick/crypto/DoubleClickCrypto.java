@@ -146,8 +146,8 @@ public class DoubleClickCrypto {
       success = true;
       return workBytes;
     } finally {
-      if (!success && logger.isWarnEnabled()) {
-        logger.warn(dump("Decrypted (failed)", cipherData, workBytes));
+      if (!success && logger.isDebugEnabled()) {
+        logger.debug(dump("Decrypted (failed)", cipherData, workBytes));
       }
     }
   }
@@ -181,8 +181,8 @@ public class DoubleClickCrypto {
       success = true;
       return workBytes;
     } finally {
-      if (!success && logger.isWarnEnabled()) {
-        logger.warn(dump("Encrypted (failed)", plainData, workBytes));
+      if (!success && logger.isDebugEnabled()) {
+        logger.debug(dump("Encrypted (failed)", plainData, workBytes));
       }
     }
   }

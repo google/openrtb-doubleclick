@@ -90,45 +90,63 @@ public class TestData {
         .setConstrainedUsageGoogleUserId("j")
         .setHostedMatchData(ByteString.EMPTY)
         .setConstrainedUsageHostedMatchData(ByteString.EMPTY)
-        .setGeoCriteriaId(9058770)
-        .setAnonymousId("mysite.com")
-        .setUrl("mysite.com/newsfeed")
+        .addAllDetectedContentLabel(sublist(size, 40, 41, 999))
         .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"))
         .addAllDetectedVertical(sublist(size,
-            Vertical.newBuilder().setId(10).setWeight(0.25f).build(),
-            Vertical.newBuilder().setId(12).setWeight(0.33f).build(),
-            Vertical.newBuilder().setId(15).setWeight(0.75f).build(),
-            Vertical.newBuilder().setId(20).setWeight(0.99f).build()))
-        .setEncryptedHyperlocalSet(ByteString.copyFrom(
-            new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS).encryptHyperlocal(
-                HyperlocalSet.newBuilder()
-                    .setCenterPoint(Hyperlocal.Point.newBuilder()
-                        .setLatitude(45)
-                        .setLongitude(90))
-                    .build().toByteArray(), new byte[16])))
-        .setUserDemographic(UserDemographic.newBuilder()
-            .setGender(UserDemographic.Gender.FEMALE)
-            .setAgeLow(18)
-            .setAgeHigh(24));
-    if (size % 2 == 0) {
-      req.setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ));
-    } else {
-      req.setIp(ByteString.copyFrom(new byte[] {
-          0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x1F, 0x2F, 0x3F, 0x4F, 0x5F, 0x6F } ));
+            Vertical.newBuilder().setId(1).setWeight(0.25f).build(),
+            Vertical.newBuilder().setId(99).setWeight(0.33f).build(),
+            Vertical.newBuilder().setId(2).setWeight(0.75f).build(),
+            Vertical.newBuilder().setId(99).setWeight(0.99f).build()));
+    if (size == 1) {
+      req
+          .setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ))
+          .setUserAgent("Chrome")
+          .setGeoCriteriaId(9058770)
+          .setAnonymousId("mysite.com")
+          .setSellerNetworkId(1);
+    } else if (size == 2) {
+      req
+          .setIp(ByteString.copyFrom(new byte[] {
+              0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x1F, 0x2F, 0x3F, 0x4F, 0x5F, 0x6F } ))
+          .setUrl("mysite.com/newsfeed")
+          .setPostalCode("10011")
+          .setUserDemographic(UserDemographic.newBuilder()
+              .setGender(UserDemographic.Gender.FEMALE)
+              .setAgeLow(18)
+              .setAgeHigh(24))
+          .setEncryptedHyperlocalSet(ByteString.copyFrom(new byte[]{1,2,3} /* bad */));
+    } else if (size == 3) {
+      req
+          .setUserDemographic(UserDemographic.newBuilder())
+          .setPostalCodePrefix("100")
+          .setEncryptedHyperlocalSet(ByteString.copyFrom(
+              new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS).encryptHyperlocal(
+                  HyperlocalSet.newBuilder()
+                      .setCenterPoint(Hyperlocal.Point.newBuilder()
+                          .setLatitude(45)
+                          .setLongitude(90))
+                      .build().toByteArray(), new byte[16])));
+    } else if (size >= 4) {
+      req
+          .setGeoCriteriaId(0 /* bad */)
+          .setEncryptedHyperlocalSet(ByteString.copyFrom(
+              new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS).encryptHyperlocal(
+                  HyperlocalSet.newBuilder().build().toByteArray(), new byte[16])));
     }
     if (size != NO_SLOT) {
       AdSlot.Builder adSlot = AdSlot.newBuilder()
           .setId(1)
-          .setSlotVisibility(SlotVisibility.ABOVE_THE_FOLD)
           .addAllWidth(createSizes(size, 100))
           .addAllHeight(createSizes(size, 200))
           .addAllAllowedVendorType(sublist(size, 10, 94, 97))
           .addAllExcludedSensitiveCategory(sublist(size, 0, 3, 4))
-          .addAllExcludedAttribute(sublist(size, 1, 2, 3))
-          .addAllExcludedProductCategory(sublist(size, 13, 14))
-          .addAllTargetableChannel(sublist(size, "afv_user_id_PewDiePie", "pack-anon-x::y"));
+          .addAllExcludedAttribute(sublist(size, 1, 2, 3, 32 /* MraidType: Mraid 1.0 */))
+          .addAllExcludedProductCategory(sublist(size, 1, 2, 999));
       for (int i = 1; i < size; ++i) {
-        adSlot.setAdBlockKey(i);
+        adSlot
+            .setAdBlockKey(i)
+            .setSlotVisibility(SlotVisibility.ABOVE_THE_FOLD)
+            .addTargetableChannel(size % 2 == 0 ? "afv_user_id_PewDiePie" : "pack-anon-x::y");
         MatchingAdData.Builder mad = MatchingAdData.newBuilder()
             .setAdgroupId(100 + i);
         if (i >= 2) {
@@ -159,20 +177,19 @@ public class TestData {
   }
 
   static Mobile.Builder newMobile(int size) {
-    Mobile.Builder mobile = Mobile.newBuilder()
-        .setAppId("com.mygame")
-        .setCarrierId(77777)
-        .setPlatform("Android")
-        .setMobileDeviceType(MobileDeviceType.HIGHEND_PHONE)
-        .setOsVersion(DeviceOsVersion.newBuilder()
-            .setOsVersionMajor(3).setOsVersionMinor(2).setOsVersionMicro(1))
-        .setModel("MotoX")
-        .setEncryptedHashedIdfa(ByteString.EMPTY)
-        .setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY)
-        .setAppName("Tic-Tac-Toe")
-        .setAppRating(4.2f);
+    Mobile.Builder mobile = Mobile.newBuilder();
     if (size % 2 == 0) {
-      mobile.setIsInterstitialRequest(true);
+      mobile
+          .setAppId("com.mygame")
+          .setMobileDeviceType(MobileDeviceType.HIGHEND_PHONE)
+          .setOsVersion(DeviceOsVersion.newBuilder()
+              .setOsVersionMajor(3).setOsVersionMinor(2).setOsVersionMicro(1))
+          .setModel("MotoX")
+          .setEncryptedHashedIdfa(ByteString.EMPTY)
+          .setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY)
+          .setAppName("Tic-Tac-Toe")
+          .setAppRating(4.2f)
+          .setIsInterstitialRequest(true);
     }
     return mobile;
   }
@@ -181,13 +198,13 @@ public class TestData {
     Video.Builder video = Video.newBuilder()
         .addAllAllowedVideoFormats(sublist(size, VideoFormat.VIDEO_FLASH, VideoFormat.VIDEO_HTML5))
         .setMinAdDuration(15)
-        .setMaxAdDuration(60)
-        .setVideoadStartDelay(5);
+        .setMaxAdDuration(60);
     if (size != NO_SLOT) {
       CompanionSlot.Builder compSlot = CompanionSlot.newBuilder()
           .addAllWidth(createSizes(size, 100))
           .addAllHeight(createSizes(size, 200));
       if (size >= 2) {
+        video.setVideoadStartDelay(5);
         compSlot.addCreativeFormat(CreativeFormat.IMAGE_CREATIVE);
       }
       video.addCompanionSlot(compSlot);

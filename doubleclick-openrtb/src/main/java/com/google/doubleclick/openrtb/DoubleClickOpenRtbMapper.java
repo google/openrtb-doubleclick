@@ -395,7 +395,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (request.getImpCount() == 0) {
       noImp.inc();
-      logger.warn("Request has no impressions");
+      logger.debug("Request has no impressions");
     }
   }
 
@@ -630,7 +630,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
             geo.setLon(center.getLongitude());
           }
         }
-      } catch (InvalidProtocolBufferException | SignatureException e) {
+      } catch (InvalidProtocolBufferException | SignatureException | IllegalArgumentException e) {
         invalidHyperlocal.inc();
         logger.warn("Invalid encrypted_hyperlocal_set: {}", e.toString());
       }

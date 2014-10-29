@@ -270,7 +270,11 @@ public class DoubleClickMetadata {
         Matcher matcher = pattern.matcher(record);
 
         if (matcher.matches()) {
-          builder.put(Integer.parseInt(matcher.group(1)), matcher.group(2));
+          try {
+            builder.put(Integer.parseInt(matcher.group(1)), matcher.group(2));
+          } catch (NumberFormatException e) {
+            logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
+          }
         }
       }
 
@@ -355,7 +359,7 @@ public class DoubleClickMetadata {
               if (commas == 0) {
                 parentName = null;
               } else if (commas != -1 || canonPos == canonicalName.length()) {
-                logger.warn("Impossible to resolve parent, ignoring: {}", record);
+                logger.debug("Impossible to resolve parent, ignoring: {}", record);
                 continue;
               } else {
                 parentName = canonicalName.substring(canonPos + 1);

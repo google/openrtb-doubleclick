@@ -201,70 +201,69 @@ public class DoubleClickOpenRtbMapperTest {
 
   @Test
   public void testRequest() {
-    for (int test = 0; test < 10 * 0b1000; ++test) {
-      // -1=NO_SLOT, 0=no size, 1, 2=multisize/1 MAD, 3=2 MAD/1 deal, 4..8=3 MAD/2 deals
-      int size = (test % 0b1000) - 1;
-      int flags = test & 0b0111;
-      boolean mobile = (flags & 0b1) != 0;
-      boolean video = (flags & 0b1) != 0;
-      boolean coppa = (flags & 0b1) != 0;
-      boolean multiBid = (flags & 0b10) != 0;
-      boolean linkExt = (flags & 0b100) != 0;
-      String testDesc = String.format("mobile=%s, video=%s, coppa=%s, link=%s, multi=%s/%s",
-          mobile, video, coppa, linkExt, size, multiBid);
-      ImmutableList.Builder<ExtMapper> extMappers = ImmutableList.builder();
-      if (linkExt) {
-        extMappers.add(DoubleClickLinkMapper.INSTANCE);
-      }
-      DoubleClickOpenRtbMapper mapper = new DoubleClickOpenRtbMapper(
-          new MetricRegistry(),
-          TestUtil.getMetadata(),
-          new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
-          extMappers.build());
-
-      NetworkBid.BidRequest.Builder dcRequest = TestData.newRequest(size, coppa);
-      if (mobile) {
-        dcRequest.setMobile(TestData.newMobile(size));
-      }
-      if (video) {
-        dcRequest.setVideo(TestData.newVideo(size));
-      }
-      BidRequest request = mapper.toOpenRtbBidRequest(dcRequest.build()).build();
-
-      assertEquals(testDesc, coppa, request.getRegs().hasCoppa());
-      assertEquals(testDesc, coppa, request.getRegs().getCoppa() == Flag.YES);
-
-      if (size == TestData.NO_SLOT) {
-        assertEquals(0, request.getImpCount());
-        BidResponse response = TestUtil.newBidResponse();
-        NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
-        assertEquals(0, dcResponse.getAdCount());
-      } else {
-        Impression imp = request.getImp(0);
-        assertEquals(testDesc, mobile, request.getDevice().hasOs());
-        assertEquals(testDesc, video, imp.hasVideo());
-        assertNotEquals(testDesc, video, imp.hasBanner());
-        if (video) {
-          if (imp.getVideo().getCompanionadCount() != 0) {
-            Banner compAd = imp.getVideo().getCompanionad(0);
-            assertEquals(testDesc, size > 1,
-                compAd.hasWmin() && compAd.hasWmax() && compAd.hasHmin() && compAd.hasHmax());
-            assertNotEquals(testDesc, size != 1, compAd.hasW() && compAd.hasH());
-          }
-        } else {
-          Banner banner = imp.getBanner();
-          assertEquals(testDesc, size > 1,
-              banner.hasWmin() && banner.hasWmax() && banner.hasHmin() && banner.hasHmax());
-          assertNotEquals(testDesc, size != 1, banner.hasW() && banner.hasH());
-        }
-
-        Bid.Builder bid = TestData.newBid(multiBid);
-        BidResponse response = TestUtil.newBidResponse(bid);
-        NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
+    // -1=NO_SLOT, 0=no size, 1, 2=multisize/1 MAD, 3=2 MAD/1 deal, 4..8=3 MAD/2 deals
+    for (int size = -1; size <= 8; ++size) {
+      for (int flags = 0; flags < 0b10000; ++flags) {
+        boolean coppa = (flags & 0b1) != 0;
+        boolean mobile = (flags & 0b1) != 0;
+        boolean video = (flags & 0b10) != 0;
+        boolean multiBid = (flags & 0b100) != 0;
+        boolean linkExt = (flags & 0b100) != 0;
+        String testDesc = String.format("mobile=%s, video=%s, coppa=%s, link=%s, multi=%s/%s",
+            mobile, video, coppa, linkExt, size, multiBid);
+        ImmutableList.Builder<ExtMapper> extMappers = ImmutableList.builder();
         if (linkExt) {
-          Ad ad = dcResponse.getAd(0);
-          assertEquals(testDesc, size > 1 && multiBid, ad.hasWidth());
-          assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasAdgroupId());
+          extMappers.add(DoubleClickLinkMapper.INSTANCE);
+        }
+        DoubleClickOpenRtbMapper mapper = new DoubleClickOpenRtbMapper(
+            new MetricRegistry(),
+            TestUtil.getMetadata(),
+            new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
+            extMappers.build());
+
+        NetworkBid.BidRequest.Builder dcRequest = TestData.newRequest(size, coppa);
+        if (mobile) {
+          dcRequest.setMobile(TestData.newMobile(size));
+        }
+        if (video) {
+          dcRequest.setVideo(TestData.newVideo(size));
+        }
+        BidRequest request = mapper.toOpenRtbBidRequest(dcRequest.build()).build();
+
+        assertEquals(testDesc, coppa, request.getRegs().hasCoppa());
+        assertEquals(testDesc, coppa, request.getRegs().getCoppa() == Flag.YES);
+
+        if (size == TestData.NO_SLOT) {
+          assertEquals(0, request.getImpCount());
+          BidResponse response = TestUtil.newBidResponse();
+          NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
+          assertEquals(0, dcResponse.getAdCount());
+        } else {
+          Impression imp = request.getImp(0);
+          assertEquals(testDesc, video, imp.hasVideo());
+          assertNotEquals(testDesc, video, imp.hasBanner());
+          if (video) {
+            if (imp.getVideo().getCompanionadCount() != 0) {
+              Banner compAd = imp.getVideo().getCompanionad(0);
+              assertEquals(testDesc, size > 1,
+                  compAd.hasWmin() && compAd.hasWmax() && compAd.hasHmin() && compAd.hasHmax());
+              assertNotEquals(testDesc, size != 1, compAd.hasW() && compAd.hasH());
+            }
+          } else {
+            Banner banner = imp.getBanner();
+            assertEquals(testDesc, size > 1,
+                banner.hasWmin() && banner.hasWmax() && banner.hasHmin() && banner.hasHmax());
+            assertNotEquals(testDesc, size != 1, banner.hasW() && banner.hasH());
+          }
+
+          Bid.Builder bid = TestData.newBid(multiBid);
+          BidResponse response = TestUtil.newBidResponse(bid);
+          NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
+          if (linkExt) {
+            Ad ad = dcResponse.getAd(0);
+            assertEquals(testDesc, size > 1 && multiBid, ad.hasWidth());
+            assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasAdgroupId());
+          }
         }
       }
     }

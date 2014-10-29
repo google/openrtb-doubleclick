@@ -29,6 +29,13 @@ yet compatible with JDK 8 (once built, the library works with JDK 8).
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.7.2, 29-10-2014
+
+* Updated to Protocol Buffers 2.6.1 (bugfix, doesn't require rebuilds).
+* DoubleClickMetadata more resilient to bad resources.
+* DoubleClick protocol v.54.
+* Test & logging reviews.
+
 # Version 0.7.1, 20-10-2014
 
 * Updated to Protocol Buffers 2.6.0. Full rebuild recommended, the
