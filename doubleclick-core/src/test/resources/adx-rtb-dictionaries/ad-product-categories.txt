@@ -1,3 +1,4 @@
 1 ProductCategory1
 2 ProductCategory2
 3 ProductCategory3
+NotANumber UnparseableProductCategory
