@@ -264,10 +264,10 @@ public class DoubleClickMetadata {
     try (InputStream isMetadata = transport.open(resourceName)) {
       ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
       BufferedReader rd  = new BufferedReader(new InputStreamReader(isMetadata));
-      String line;
+      String record;
 
-      while ((line = rd.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line);
+      while ((record = rd.readLine()) != null) {
+        Matcher matcher = pattern.matcher(record);
 
         if (matcher.matches()) {
           builder.put(Integer.parseInt(matcher.group(1)), matcher.group(2));
@@ -307,80 +307,86 @@ public class DoubleClickMetadata {
       // Cycle through all data three times (one per hierarchy level), anything left is discarded.
       for (int cycle = 1; cycle <= 3; ++cycle, data = nextData, nextData = new ArrayList<>()) {
         for (String record : data) {
-          List<String> fields = csvParser.parseCsv(record);
-          if (fields.size() != 7) {
-            continue;
-          }
-          Integer criteriaId = Integer.valueOf(fields.get(0));
-          String name = fields.get(1);
-          String canonicalName = fields.get(2);
-          String countryCode = fields.get(5);
-          String targetType = fields.get(6);
-
-          // Parent IDs are legacy, and some records are inconsistent, so we following AdX's docs
-          // and build hierarchy by the canonical names. Notice that canonical names are not always
-          // unique for leaf records, e.g. "New York,New York,United States" can be either the
-          // City (1023191) or the County (9058761); that's why we need the TargetType to compose
-          // a unique CanonicalKey. But parent records are unique, e.g. "New York,United States"
-          // = State (21167), which is parent for both NY/City and NY/County. The hierarchy by
-          // parent IDs can be different, eg: NY/City < Queens/County < NY/State <- US/Country.
-
-          // To make this even more interesting, we can have records like this:
-          // name          = "Champaign & Springfield-Decatur,IL"
-          // canonicalName = "Champaign & Springfield-Decatur,IL,Illinois,United States"
-          // Simply using the first comma to split the parent's canonical name will not work,
-          // so we need a special case: if the name contains a comma, use its length as a prefix
-          // for splitting. (Cannot use this rule for every record either, because that would fail
-          // in a few records like "Burgos" / "Province of Burgos,Castile and Leon,Spain").
-
-          String parentName;
-          int pos = name.indexOf(',');
-          if (pos == -1) {
-            int canonPos = canonicalName.indexOf(',');
-            parentName = canonPos == -1 ? null : canonicalName.substring(canonPos + 1);
-          } else {
-            int commas = 1;
-            for (int i = pos + 1; i < name.length(); ++i) {
-              if (name.charAt(i) == ',') {
-                ++commas;
-              }
-            }
-            int canonPos;
-            for (canonPos = 0; canonPos < canonicalName.length() && commas >= 0; ++canonPos) {
-              if (canonicalName.charAt(canonPos) == ',') {
-                --commas;
-              }
-            }
-            if (commas == 0) {
-              parentName = null;
-            } else if (commas != -1 || canonPos == canonicalName.length()) {
-              logger.warn("Impossible to resolve parent, ignoring: {}", record);
+          try {
+            List<String> fields = csvParser.parseCsv(record);
+            if (fields.size() != 7) {
               continue;
+            }
+            Integer criteriaId = Integer.valueOf(fields.get(0));
+            String name = fields.get(1);
+            String canonicalName = fields.get(2);
+            String countryCode = fields.get(5);
+            String targetType = fields.get(6);
+
+            // Parent IDs are legacy, and some records are inconsistent, so we following AdX's docs
+            // and build hierarchy by the canonical names. Notice canonical names are not always
+            // unique for leaf records, e.g. "New York,New York,United States" can be either the
+            // City (1023191) or the County (9058761); that's why we need the TargetType to compose
+            // a unique CanonicalKey. But parent records are unique, e.g. "New York,United States"
+            // = State (21167), which is parent for both NY/City and NY/County. The hierarchy by
+            // parent IDs can be different, eg: NY/City < Queens/County < NY/State <- US/Country.
+
+            // To make this even more interesting, we can have records like this:
+            // name          = "Champaign & Springfield-Decatur,IL"
+            // canonicalName = "Champaign & Springfield-Decatur,IL,Illinois,United States"
+            // Simply using the first comma to split the parent's canonical name will not work,
+            // so we need a special case: if the name contains a comma, use its length as a prefix
+            // for splitting. (Cannot use this rule for every record either, because that would fail
+            // in a few records like "Burgos" / "Province of Burgos,Castile and Leon,Spain").
+
+            String parentName;
+            int pos = name.indexOf(',');
+            if (pos == -1) {
+              int canonPos = canonicalName.indexOf(',');
+              parentName = canonPos == -1 ? null : canonicalName.substring(canonPos + 1);
             } else {
-              parentName = canonicalName.substring(canonPos + 1);
+              int commas = 1;
+              for (int i = pos + 1; i < name.length(); ++i) {
+                if (name.charAt(i) == ',') {
+                  ++commas;
+                }
+              }
+              int canonPos;
+              for (canonPos = 0; canonPos < canonicalName.length() && commas >= 0; ++canonPos) {
+                if (canonicalName.charAt(canonPos) == ',') {
+                  --commas;
+                }
+              }
+              if (commas == 0) {
+                parentName = null;
+              } else if (commas != -1 || canonPos == canonicalName.length()) {
+                logger.warn("Impossible to resolve parent, ignoring: {}", record);
+                continue;
+              } else {
+                parentName = canonicalName.substring(canonPos + 1);
+              }
             }
-          }
-          GeoTarget parent;
-          if (parentName == null) {
-            parent = null;
-          } else {
-            parent = parentMap.get(parentName);
-            if (parent == null) {
-              nextData.add(record);
-              continue;
+            GeoTarget parent;
+            if (parentName == null) {
+              parent = null;
+            } else {
+              parent = parentMap.get(parentName);
+              if (parent == null) {
+                nextData.add(record);
+                continue;
+              }
             }
-          }
 
-          GeoTarget geoTarget = new GeoTarget(
-              criteriaId,
-              name,
-              canonicalName,
-              parent,
-              countryCode,
-              TargetType.valueOf(toEnumName(targetType)));
-          map.put(criteriaId, geoTarget);
-          // May overwrite duplicates for leaf targets, but only non-leafs will have lookups
-          parentMap.put(canonicalName, geoTarget);
+            GeoTarget geoTarget = new GeoTarget(
+                criteriaId,
+                name,
+                canonicalName,
+                parent,
+                countryCode,
+                TargetType.valueOf(toEnumName(targetType)));
+            map.put(criteriaId, geoTarget);
+            // May overwrite duplicates for leaf targets, but only non-leafs will have lookups
+            parentMap.put(canonicalName, geoTarget);
+          } catch (IllegalArgumentException e) {
+            if (cycle == 1) {
+              logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
+            }
+          }
         }
       }
 
