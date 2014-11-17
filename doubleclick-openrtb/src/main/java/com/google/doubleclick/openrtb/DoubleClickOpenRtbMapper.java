@@ -62,7 +62,6 @@ import com.codahale.metrics.MetricRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
@@ -292,12 +291,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if ((coppa && dcRequest.hasConstrainedUsageHostedMatchData())
         || (!coppa && dcRequest.hasHostedMatchData())) {
-      try {
-        ByteString dcHMD = coppa
-            ? dcRequest.getConstrainedUsageHostedMatchData()
-            : dcRequest.getHostedMatchData();
-        user.setCustomdata(MapperUtil.decodeUri(dcHMD.toString("US-ASCII")));
-      } catch (UnsupportedEncodingException e) {}
+      ByteString dcHMD = coppa
+          ? dcRequest.getConstrainedUsageHostedMatchData()
+          : dcRequest.getHostedMatchData();
+      user.setCustomdata(BaseEncoding.base16().encode(dcHMD.toByteArray()));
     }
 
     if (dcRequest.hasUserDemographic()) {
