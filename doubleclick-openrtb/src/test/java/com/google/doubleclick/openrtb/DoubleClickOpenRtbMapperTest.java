@@ -232,6 +232,9 @@ public class DoubleClickOpenRtbMapperTest {
 
         assertEquals(testDesc, coppa, request.getRegs().hasCoppa());
         assertEquals(testDesc, coppa, request.getRegs().getCoppa() == Flag.YES);
+        assertEquals(
+            coppa ? "" : "EC22E69CC8B04ACABB6CD4DA88FB33B6",
+            request.getUser().getCustomdata());
 
         if (size == TestData.NO_SLOT) {
           assertEquals(0, request.getImpCount());

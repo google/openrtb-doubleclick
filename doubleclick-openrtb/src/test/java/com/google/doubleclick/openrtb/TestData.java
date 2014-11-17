@@ -88,7 +88,12 @@ public class TestData {
         .setId(TestUtil.REQUEST_ID)
         .setGoogleUserId("john")
         .setConstrainedUsageGoogleUserId("j")
-        .setHostedMatchData(ByteString.EMPTY)
+        .setHostedMatchData(ByteString.copyFrom(new byte[]{
+            (byte) 0xEC, (byte) 0x22, (byte) 0xE6, (byte) 0x9C,
+            (byte) 0xC8, (byte) 0xB0, (byte) 0x4A, (byte) 0xCA,
+            (byte) 0xBB, (byte) 0x6C, (byte) 0xD4, (byte) 0xDA,
+            (byte) 0x88, (byte) 0xFB, (byte) 0x33, (byte) 0xB6
+        }))
         .setConstrainedUsageHostedMatchData(ByteString.EMPTY)
         .addAllDetectedContentLabel(sublist(size, 40, 41, 999))
         .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"))
