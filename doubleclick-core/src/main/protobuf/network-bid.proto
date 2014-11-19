@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.54:
+// Synchronized with v.54: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2014 Google Inc. All Rights Reserved.
@@ -858,6 +858,10 @@ message BidResponse {
       optional int64 deal_id = 5 [default = 0];
     }
     repeated AdSlot adslot = 3;
+
+    // The URL to be called to record an impression.  This is only supported for
+    // ads for mobile in-app requests.
+    optional string impression_tracking_url = 19;
 
     // These are deprecated.  Please do not set.
     optional int64 DEPRECATED_creative_id = 8;
