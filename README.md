@@ -29,6 +29,13 @@ yet compatible with JDK 8 (once built, the library works with JDK 8).
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.7.4, 21-11-2014
+
+* DoubleClick proto v57.  Notice that the major new in this update is
+  native ads, but the corresponding OpenRTB spec is not finalized so
+  there's no DoubleClick/OpenRTB mapping support at this time.
+* Maps DoubleClick's new IFramingState to OpenRTB topframe.
+
 # Version 0.7.3, 17-11-2014
 
 * Fix mapping of BidRequest.User.customdata.
