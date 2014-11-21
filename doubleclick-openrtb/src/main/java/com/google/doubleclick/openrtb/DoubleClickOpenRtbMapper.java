@@ -227,6 +227,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     dcAd.addAllAttribute(CreativeAttributeMapper.toDoubleClick(bid.getAttrList()));
 
+    if (bid.hasNurl()) {
+      dcAd.setImpressionTrackingUrl(bid.getNurl());
+    }
+
     for (ExtMapper extMapper : extMappers) {
       extMapper.toNativeAd(request, response, bid, dcAd);
     }
@@ -412,6 +416,13 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
+
+    if (dcSlot.hasIframingState()) {
+      Flag f = IFramingStateMapper.toOpenRtb(dcSlot.getIframingState());
+      if (f != null) {
+        banner.setTopframe(f);
+      }
+    }
 
     for (ExtMapper extMapper : extMappers) {
       extMapper.toOpenRtbBanner(dcSlot, banner);

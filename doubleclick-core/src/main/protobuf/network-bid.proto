@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.54:
+// Synchronized with v.57: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2014 Google Inc. All Rights Reserved.
@@ -510,7 +510,9 @@ message BidRequest {
     // The allowed vendor types.  See the vendors.txt file in the technical
     // documentation for a list of ids.  When the seller_network is GDN, the
     // vendor ids listed in gdn-vendors.txt in the supporting technical
-    // documentation are also allowed.
+    // documentation are also allowed.  Note that this field does not apply
+    // to deals with block overrides
+    // (see https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 allowed_vendor_type = 6 [packed=true];
 
     // The disallowed sensitive ad categories.  See the
@@ -613,6 +615,77 @@ message BidRequest {
     // The default value -1 indicates that historical viewability data is not
     // available.
     optional int32 viewability = 21 [default = -1];
+
+    // iFraming state of the ad slot on the webpage where it is present.
+    enum IFramingState {
+      UNKNOWN_IFRAME_STATE = 0;
+      NO_IFRAME = 1;
+      SAME_DOMAIN_IFRAME = 2;
+      CROSS_DOMAIN_IFRAME = 3;
+    };
+    optional IFramingState iframing_state = 19 [default = UNKNOWN_IFRAME_STATE];
+
+    // iFrame depth of the ad slot on the webpage where it is present.
+    // Currently only set for video ad requests.
+    enum IFramingDepth {
+      UNKNOWN_IFRAME_DEPTH = 0;
+      NOT_IN_IFRAME = 1;
+      ONE_IFRAME = 2;
+      MULTIPLE_IFRAME = 3;
+     };
+    optional IFramingDepth iframing_depth = 20 [default = UNKNOWN_IFRAME_DEPTH];
+
+    // A native ad consists of pieces that are rendered by the publisher.  A
+    // publisher may support multiple distinct native ad templates.  If any
+    // native templates exist, you must set the native_ad field in the response,
+    // and must not set html_snippet, video_url or snippet_template.
+    //
+    message NativeAdTemplate {
+      // Defines the bits used in required_fields and recommended_fields.  There
+      // is one bit for each of the fields in BidResponse.Ad.NativeAd
+      enum Fields {
+        HEADLINE = 0x1;
+        BODY = 0x2;
+        CALL_TO_ACTION = 0x4;
+        ADVERTISER = 0x8;
+        IMAGE = 0x10;
+        LOGO = 0x20;
+        APP_ICON = 0x40;
+        STAR_RATING = 0x80;
+        PRICE = 0x100;
+        STORE = 0x200;
+      }
+
+      // Bitfield describing which fields are required by the publisher.  Bid
+      // responses with no value for these fields will be rejected.  Click and
+      // view tracking urls are always implicitly required.
+      optional int64 required_fields = 1;
+
+      // Bitfield describing which fields are recommended by the publisher.  All
+      // recommended fields are supported, but not all recommended fields are
+      // required.
+      optional int64 recommended_fields = 2;
+
+      // max_safe_length indicates the maximum number of Unicode characters that
+      // are guaranteed to be shown without truncation.  Longer strings may or
+      // may not be truncated by the publisher during rendering.
+      optional int32 headline_max_safe_length = 3;
+      optional int32 body_max_safe_length = 4;
+      optional int32 call_to_action_max_safe_length = 5;
+      optional int32 advertiser_max_safe_length = 6;
+      optional int32 store_max_safe_length = 14;
+      optional int32 price_max_safe_length = 15;
+
+      // Image widths and heights are specified in pixels.  You may provide a
+      // larger image in the response.
+      optional int32 image_width = 7;
+      optional int32 image_height = 8;
+      optional int32 logo_width = 9;
+      optional int32 logo_height = 10;
+      optional int32 app_icon_width = 11;
+      optional int32 app_icon_height = 12;
+    }
+    repeated NativeAdTemplate native_ad_template = 51;
 
     // These are deprecated.  Please ignore.
     repeated int32 DEPRECATED_allowed_attribute = 5;
@@ -858,6 +931,10 @@ message BidResponse {
       optional int64 deal_id = 5 [default = 0];
     }
     repeated AdSlot adslot = 3;
+
+    // The URL to be called to record an impression.  This is only supported for
+    // ads for mobile in-app requests.
+    optional string impression_tracking_url = 19;
 
     // These are deprecated.  Please do not set.
     optional int64 DEPRECATED_creative_id = 8;
