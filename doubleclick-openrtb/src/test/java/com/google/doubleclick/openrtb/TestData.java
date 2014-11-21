@@ -24,6 +24,8 @@ import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingDepth;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
@@ -151,10 +153,13 @@ public class TestData {
         adSlot
             .setAdBlockKey(i)
             .setSlotVisibility(SlotVisibility.ABOVE_THE_FOLD)
-            .addTargetableChannel(size % 2 == 0 ? "afv_user_id_PewDiePie" : "pack-anon-x::y");
+            .addTargetableChannel(size % 2 == 0 ? "afv_user_id_PewDiePie" : "pack-anon-x::y")
+            .setIframingState(i == 1 ? IFramingState.NO_IFRAME : IFramingState.SAME_DOMAIN_IFRAME);
         MatchingAdData.Builder mad = MatchingAdData.newBuilder()
             .setAdgroupId(100 + i);
         if (i >= 2) {
+          adSlot.setIframingDepth( // Only used by video, but keep things simple
+              i == 2 ? IFramingDepth.ONE_IFRAME : IFramingDepth.MULTIPLE_IFRAME);
           mad.setMinimumCpmMicros(10000 + i);
           for (int j = 2; j <= i; ++j) {
             MatchingAdData.DirectDeal.Builder deal = MatchingAdData.DirectDeal.newBuilder()

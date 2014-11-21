@@ -257,6 +257,7 @@ public class DoubleClickOpenRtbMapperTest {
             assertEquals(testDesc, size > 1,
                 banner.hasWmin() && banner.hasWmax() && banner.hasHmin() && banner.hasHmax());
             assertNotEquals(testDesc, size != 1, banner.hasW() && banner.hasH());
+            assertEquals(size >= 2, banner.hasTopframe());
           }
 
           Bid.Builder bid = TestData.newBid(multiBid);
