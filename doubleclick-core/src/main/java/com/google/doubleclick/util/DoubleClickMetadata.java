@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -304,7 +305,7 @@ public class DoubleClickMetadata {
 
       Map<Integer, GeoTarget> map = new LinkedHashMap<>();
       Map<String, GeoTarget> parentMap = new LinkedHashMap<>();
-      CSVParser csvParser = new CSVParser(',');
+      CSVParser csvParser = CSVParser.csvParser();
 
       // Some records fail to match the parent by canonical name, for example
       // "Zalau,Salaj County,Romania", the parent record is "Salaj,Romania".
@@ -312,7 +313,7 @@ public class DoubleClickMetadata {
       for (int cycle = 1; cycle <= 3; ++cycle, data = nextData, nextData = new ArrayList<>()) {
         for (String record : data) {
           try {
-            List<String> fields = csvParser.parseCsv(record);
+            List<String> fields = csvParser.parse(record);
             if (fields.size() != 7) {
               continue;
             }
@@ -386,7 +387,7 @@ public class DoubleClickMetadata {
             map.put(criteriaId, geoTarget);
             // May overwrite duplicates for leaf targets, but only non-leafs will have lookups
             parentMap.put(canonicalName, geoTarget);
-          } catch (IllegalArgumentException e) {
+          } catch (ParseException | IllegalArgumentException e) {
             if (cycle == 1) {
               logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
             }
@@ -406,19 +407,23 @@ public class DoubleClickMetadata {
 
     try (InputStream is = DoubleClickMetadata.class.getResourceAsStream(resourceName)) {
       BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-      CSVParser csvParser = new CSVParser('\t');
+      CSVParser csvParser = CSVParser.tsvParser();
       Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
-      String line;
+      String record;
 
-      while ((line = rd.readLine()) != null) {
+      while ((record = rd.readLine()) != null) {
 
-        if (pattern.matcher(line).matches()) {
-          List<String> fields = csvParser.parseCsv(line);
-          CountryCodes codes = new CountryCodes(
-              Integer.parseInt(fields.get(0)), fields.get(2), fields.get(3));
-          map.put(codes.getNumeric(), codes);
-          map.put(codes.getAlpha2(), codes);
-          map.put(codes.getAlpha3(), codes);
+        if (pattern.matcher(record).matches()) {
+          try {
+            List<String> fields = csvParser.parse(record);
+            CountryCodes codes = new CountryCodes(
+                Integer.parseInt(fields.get(0)), fields.get(2), fields.get(3));
+            map.put(codes.getNumeric(), codes);
+            map.put(codes.getAlpha2(), codes);
+            map.put(codes.getAlpha3(), codes);
+          } catch (ParseException | IllegalArgumentException e) {
+            logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
+          }
         }
       }
     } catch (IOException e) {
