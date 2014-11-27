@@ -44,7 +44,6 @@ class CSVParser {
   final char escape;
   final String empty;
   final boolean trim;
-  final boolean singleQuote;
 
   /**
    * Creates a CSV parser (or TSV, but let's not get picky about naming).
@@ -58,33 +57,27 @@ class CSVParser {
    * between "no value at all" and "empty string value". The normal value for RFC-compliant CSV
    * or TSP parsing is the empty string, which causes no distinction between empty and zero-length.
    * @param trim If {@code true}, trims whitespaces in the start or end of all fields.
-   * @param singleQuote If {@code true}, allows quoted fields to contain unquoted internal quotes,
-   * e.g. ["My name is "John""]. In this case the parser detects the last, "external" quote when
-   * the following character is the separator or end of line. One side effect of this format is
-   * that internal quotes cannot be followed by a separator (unless the separator is escaped...).
    */
-  public CSVParser(char separator, char quote, char escape, @Nullable String empty,
-      boolean trim, boolean singleQuote) {
+  public CSVParser(char separator, char quote, char escape, @Nullable String empty, boolean trim) {
     this.separator = separator;
     this.quote = quote;
     this.escape = escape;
     this.empty = empty;
     this.trim = trim;
-    this.singleQuote = singleQuote;
   }
 
   /**
    * Returns a RFC 4180-compliant CSV parser.
    */
   public static CSVParser csvParser() {
-    return new CSVParser(',', '"', NUL, "", false, false);
+    return new CSVParser(',', '"', NUL, "", false);
   }
 
   /**
    * Returns an IANA-standard TSV parser.
    */
   public static CSVParser tsvParser() {
-    return new CSVParser('\t', NUL, NUL, "", false, false);
+    return new CSVParser('\t', NUL, NUL, "", false);
   }
 
   /**
@@ -96,11 +89,16 @@ class CSVParser {
     boolean afterEscape = false;
     boolean afterSeparator = false;
     boolean outerQuote = false;
+    boolean afterEndField = false;
     StringBuilder sb = new StringBuilder();
 
     for (int i = 0; ; ++i) {
       char c = (i == line.length()) ? EOT : line.charAt(i);
-      if (afterEscape) {
+      if (afterEndField && c != separator && c != EOT) {
+        if (!trim || c != ' ') {
+          throw new ParseException("Extraneous character after end of quoted field", i);
+        }
+      } else if (afterEscape) {
         if (c == EOT) {
           // [abc\^]
           throw new ParseException("Escape not followed by a character", i);
@@ -113,10 +111,11 @@ class CSVParser {
         if (outerQuote && !afterQuote) {
           // ["abc,...] => abc,...
           sb.append(c);
+          afterSeparator = false;
         } else {
           // [abc,...] => {abc, ...}
           endCol(cols, sb, i, outerQuote, afterQuote);
-          afterQuote = afterEscape = outerQuote = false;
+          afterQuote = afterEscape = afterEndField = outerQuote = false;
           afterSeparator = true;
         }
       } else if (c == EOT) {
@@ -129,16 +128,11 @@ class CSVParser {
       } else if (c == escape) {
         // [...\...]
         afterEscape = true;
+        afterSeparator = false;
       } else if (c == quote) {
-        if (afterQuote && outerQuote && singleQuote) {
-          // Two consecutive quotes inside quoted string, but in single-quote mode and
-          // we don't yet know if the second quote is finishing the field or is also internal.
-          // Print to output the first quote, but keep the second hanging (afterQuote set).
-          sb.append(quote);
-        } else if (afterQuote && outerQuote && !singleQuote) {
-          // Two consecutive quotes inside quoted string, but in RFC mode (not single-quote)
-          // so the pair has to be internal (the second quote cannot be terminating the field).
-          // Consume both quotes producing a single output quote.
+        if (afterQuote && outerQuote) {
+          // Two consecutive quotes inside quoted string, so the pair has to be internal
+          // (the second quote cannot be terminating the field).
           sb.append(quote);
           afterQuote = false;
         } else if (sb.length() == 0 && !outerQuote) {
@@ -153,14 +147,19 @@ class CSVParser {
         } else {
           afterQuote = true;
         }
+        afterSeparator = false;
+      } else if (c == ' ' && trim
+          && ((!outerQuote && sb.length() == 0) // Trimmed space before field
+              || afterEndField)) {              // Trimmed space after field
+      } else if (c == ' ' && trim && afterQuote) {
+        afterEndField = true;
+      } else if (outerQuote && afterQuote) {
+        // ["abc"x]
+        throw new ParseException("Extraneous character after end of quoted field", i);
       } else {
         // Common character.
-        if (afterQuote) {
-          // This will only happen when outerQuote && singleQuote
-          sb.append(quote);
-          afterQuote = false;
-        }
         sb.append(c);
+        afterSeparator = false;
       }
     }
   }
@@ -171,23 +170,14 @@ class CSVParser {
     if (outerQuote && !afterQuote) {
       throw new ParseException("Field starts with quote but ends unquoted", i);
     }
+    if (trim && !outerQuote) {
+      while (sb.length() != 0 && sb.charAt(sb.length() - 1) == ' ') {
+        sb.setLength(sb.length() - 1);
+      }
+    }
     // Drop trailing whitespace, if any; like: ["xyz"   ,] or [xyz   ,]
-    cols.add(sb.length() == 0 && !outerQuote
-        ? empty
-        : trim ? trim(sb) : sb.toString());
+    cols.add(!outerQuote && sb.length() == 0 ? empty : sb.toString());
     sb.setLength(0);
-  }
-
-  private static String trim(StringBuilder sb) {
-    int first = 0;
-    int last = sb.length() - 1;
-    while ((first <= last) && (sb.charAt(first) <= ' ')) {
-        ++first;
-    }
-    while ((first <= last) && (sb.charAt(last) <= ' ')) {
-        --last;
-    }
-    return sb.substring(first,  last + 1);
   }
 
   @Override
@@ -196,9 +186,8 @@ class CSVParser {
         .add("separator", separator == NUL ? null : "0x" + Integer.toHexString(separator))
         .add("quote", quote == NUL ? null : "0x" + Integer.toHexString(quote))
         .add("escape", escape == NUL ? null : "0x" + Integer.toHexString(escape))
-        .add("empty", empty)
+        .add("empty", String.valueOf(empty))
         .add("trim", trim)
-        .add("singleQuote", singleQuote)
         .toString();
   }
 }

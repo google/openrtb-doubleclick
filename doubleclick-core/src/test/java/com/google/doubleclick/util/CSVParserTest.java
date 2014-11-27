@@ -16,6 +16,7 @@
 
 package com.google.doubleclick.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -32,8 +33,10 @@ public class CSVParserTest {
   @Test
   public void testRfcCSV() throws ParseException {
     CSVParser csvParser = CSVParser.csvParser();
+    checkNotNull(csvParser.toString());
     checkParse(csvParser, "");
     checkParse(csvParser, "**", "");
+    checkParse(csvParser, "****", "*");
     checkParse(csvParser, ",,", "", "", "");
     checkParse(csvParser, "x", "x");
     checkParse(csvParser, "x y,z", "x y", "z");
@@ -48,27 +51,21 @@ public class CSVParserTest {
   }
 
   @Test
-  public void testSingleQuote() throws ParseException {
-    CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "", false, true);
-    checkParse(csvParser, "*x*y*z*", "x*y*z");
-  }
-
-  @Test(expected = ParseException.class)
-  public void testSingleQuote_bad() throws ParseException {
-    CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "", false, true);
-    checkParse(csvParser, "x*y*z", "x*y*z");
-  }
-
-  @Test
   public void testTrim() throws ParseException {
-    CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "", true, false);
-    checkParse(csvParser, " ,a , b, c ", "", "a", "b", "c");
+    CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "", true);
+    checkParse(csvParser, " , a , * b * , c ", "", "a", " b ", "c");
   }
 
   @Test
   public void testEmpty() throws ParseException {
-    CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "!", false, false);
-    checkParse(csvParser, ",**,", null, "", null);
+    CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "!", false);
+    checkParse(csvParser, ",**,* *,", "!", "", " ", "!");
+  }
+
+  @Test
+  public void testTrimEmpty() throws ParseException {
+    CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "!", true);
+    checkParse(csvParser, " , ** , * * , ", "!", "", " ", "!");
   }
 
   @Test
@@ -86,20 +83,44 @@ public class CSVParserTest {
 
   @Test(expected = ParseException.class)
   public void testEolInsideQuotes1() throws ParseException {
-    CSVParser csvParser = new CSVParser(',', '*', '/', null, false, false);
+    CSVParser csvParser = new CSVParser(',', '*', '/', null, false);
     csvParser.parse("*");
   }
 
   @Test(expected = ParseException.class)
   public void testEolInsideQuotes2() throws ParseException {
-    CSVParser csvParser = new CSVParser(',', '*', '/', null, false, false);
+    CSVParser csvParser = new CSVParser(',', '*', '/', null, false);
     csvParser.parse("*x*y*z");
   }
 
   @Test(expected = ParseException.class)
   public void testEolInsideQuotes3() throws ParseException {
-    CSVParser csvParser = new CSVParser(',', '*', '/', null, false, false);
+    CSVParser csvParser = new CSVParser(',', '*', '/', null, false);
     csvParser.parse("x*y*z*");
+  }
+
+  @Test(expected = ParseException.class)
+  public void testEolAfterEscape() throws ParseException {
+    CSVParser csvParser = new CSVParser(',', '*', '/', null, false);
+    csvParser.parse("/");
+  }
+
+  @Test(expected = ParseException.class)
+  public void testExtraneousCharAtEnd() throws ParseException {
+    CSVParser csvParser = new CSVParser(',', '*', '/', null, false);
+    csvParser.parse("*x*k");
+  }
+
+  @Test(expected = ParseException.class)
+  public void testTrimExtraneousCharAtEnd() throws ParseException {
+    CSVParser csvParser = new CSVParser(',', '*', '/', null, true);
+    csvParser.parse("*x* k");
+  }
+
+  @Test(expected = ParseException.class)
+  public void testExtraneousCharAtStart() throws ParseException {
+    CSVParser csvParser = new CSVParser(',', '*', '/', null, false);
+    csvParser.parse("k*x");
   }
 
   static void checkParse(CSVParser csvParser, String input, String... expected)

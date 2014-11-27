@@ -305,7 +305,7 @@ public class DoubleClickMetadata {
 
       Map<Integer, GeoTarget> map = new LinkedHashMap<>();
       Map<String, GeoTarget> parentMap = new LinkedHashMap<>();
-      CSVParser csvParser = new CSVParser(',', '\"', CSVParser.NUL, "", true, true);
+      CSVParser csvParser = CSVParser.csvParser();
 
       // Some records fail to match the parent by canonical name, for example
       // "Zalau,Salaj County,Romania", the parent record is "Salaj,Romania".
