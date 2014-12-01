@@ -19,6 +19,7 @@ package com.google.doubleclick.openrtb;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.util.Arrays.asList;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -49,7 +50,6 @@ import com.google.openrtb.OpenRtb.BidRequest.User;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.ContentCategory;
-import com.google.openrtb.OpenRtb.Flag;
 import com.google.openrtb.mapper.OpenRtbMapper;
 import com.google.openrtb.util.OpenRtbUtils;
 import com.google.protobuf.ByteString;
@@ -231,6 +231,11 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       dcAd.setImpressionTrackingUrl(bid.getNurl());
     }
 
+    if (bid.hasCat()) {
+      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(
+          asList(ContentCategory.valueOf(bid.getCat()))));
+    }
+
     for (ExtMapper extMapper : extMappers) {
       extMapper.toNativeAd(request, response, bid, dcAd);
     }
@@ -256,7 +261,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
     if (coppa) {
       coppaTreatment.inc();
-      request.setRegs(Regulations.newBuilder().setCoppa(Flag.YES));
+      request.setRegs(Regulations.newBuilder().setCoppa(true));
     }
 
     request.setDevice(buildDevice(dcRequest, coppa));
@@ -279,6 +284,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       extMapper.toOpenRtbBidRequest(dcRequest, request);
     }
 
+    if (dcRequest.hasIsTest()) {
+      request.setTest(dcRequest.getIsTest());
+    }
     return request
         .setTmax(100);
   }
@@ -376,7 +384,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
 
       if (dcRequest.getMobile().hasIsInterstitialRequest()) {
-        imp.setInstl(dcRequest.getMobile().getIsInterstitialRequest() ? Flag.YES : Flag.NO);
+        imp.setInstl(dcRequest.getMobile().getIsInterstitialRequest());
       }
 
       if (dcSlot.hasAdBlockKey()) {
@@ -418,7 +426,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
 
     if (dcSlot.hasIframingState()) {
-      Flag f = IFramingStateMapper.toOpenRtb(dcSlot.getIframingState());
+      Boolean f = IFramingStateMapper.toOpenRtb(dcSlot.getIframingState());
       if (f != null) {
         banner.setTopframe(f);
       }
@@ -562,14 +570,26 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcRequest.hasMobile()) {
       NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
-      if (dcMobile.hasCarrierId()) {
-        device.setCarrier(String.valueOf(dcMobile.getCarrierId()));
+
+      if ((coppa && dcMobile.hasConstrainedUsageEncryptedAdvertisingId())
+          || (!coppa && dcMobile.hasEncryptedAdvertisingId())) {
+        device.setIfa(BaseEncoding.base16().encode((coppa
+            ? dcMobile.getConstrainedUsageEncryptedAdvertisingId()
+            : dcMobile.getEncryptedAdvertisingId()).toByteArray()));
+        device.setLmt(false);
       }
-      if ((coppa && dcMobile.hasConstrainedUsageEncryptedHashedIdfa())
+      else if ((coppa && dcMobile.hasConstrainedUsageEncryptedHashedIdfa())
           || (!coppa && dcMobile.hasEncryptedHashedIdfa())) {
         device.setDpidmd5(BaseEncoding.base16().encode((coppa
-        ? dcMobile.getConstrainedUsageEncryptedHashedIdfa()
-        : dcMobile.getEncryptedHashedIdfa()).toByteArray()));
+            ? dcMobile.getConstrainedUsageEncryptedHashedIdfa()
+            : dcMobile.getEncryptedHashedIdfa()).toByteArray()));
+        device.setLmt(false);
+      } else {
+        device.setLmt(true);
+      }
+
+      if (dcMobile.hasCarrierId()) {
+        device.setCarrier(String.valueOf(dcMobile.getCarrierId()));
       }
       if (dcMobile.hasModel()) {
         device.setModel(dcMobile.getModel());
@@ -586,6 +606,15 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
       if (dcMobile.hasMobileDeviceType()) {
         device.setDevicetype(DeviceTypeMapper.toOpenRtb(dcMobile.getMobileDeviceType()));
+      }
+      if (dcMobile.hasScreenWidth()) {
+        device.setW(dcMobile.getScreenWidth());
+      }
+      if (dcMobile.hasScreenHeight()) {
+        device.setH(dcMobile.getScreenHeight());
+      }
+      if (dcMobile.hasDevicePixelRatioMillis()) {
+        device.setPxratio(dcMobile.getDevicePixelRatioMillis() / 1000.0);
       }
     }
 
@@ -644,6 +673,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
     }
 
+    if (dcRequest.hasTimezoneOffset()) {
+      geo.setUtcoffset(dcRequest.getTimezoneOffset());
+    }
+
     return geo;
   }
 
@@ -700,6 +733,11 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   protected Site.Builder buildSite(NetworkBid.BidRequest dcRequest) {
     Site.Builder site = Site.newBuilder();
     site.setContent(buildContent(dcRequest));
+    NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
+
+    if (dcMobile.hasIsMobileWebOptimized()) {
+      site.setMobile(dcMobile.getIsMobileWebOptimized());
+    }
 
     if (dcRequest.hasUrl()) {
       site.setPage(dcRequest.getUrl());

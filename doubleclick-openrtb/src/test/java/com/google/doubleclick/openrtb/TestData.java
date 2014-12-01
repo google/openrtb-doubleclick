@@ -21,6 +21,7 @@ import static java.lang.Math.min;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.openrtb.OpenRtb.ContentCategory;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
@@ -60,6 +61,7 @@ public class TestData {
       bid.setDealid("5");
       bid.setW(200);
       bid.setH(220);
+      bid.setCat(ContentCategory.IAB1.name());
     }
     return bid;
   }
@@ -97,6 +99,7 @@ public class TestData {
             (byte) 0x88, (byte) 0xFB, (byte) 0x33, (byte) 0xB6
         }))
         .setConstrainedUsageHostedMatchData(ByteString.EMPTY)
+        .setIsTest(false)
         .addAllDetectedContentLabel(sublist(size, 40, 41, 999))
         .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"))
         .addAllDetectedVertical(sublist(size,
@@ -109,6 +112,7 @@ public class TestData {
           .setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ))
           .setUserAgent("Chrome")
           .setGeoCriteriaId(9058770)
+          .setTimezoneOffset(3600)
           .setAnonymousId("mysite.com")
           .setSellerNetworkId(1);
     } else if (size == 2) {
@@ -195,11 +199,16 @@ public class TestData {
           .setOsVersion(DeviceOsVersion.newBuilder()
               .setOsVersionMajor(3).setOsVersionMinor(2).setOsVersionMicro(1))
           .setModel("MotoX")
+          .setEncryptedAdvertisingId(ByteString.EMPTY)
           .setEncryptedHashedIdfa(ByteString.EMPTY)
           .setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY)
           .setAppName("Tic-Tac-Toe")
           .setAppRating(4.2f)
-          .setIsInterstitialRequest(true);
+          .setIsInterstitialRequest(true)
+          .setScreenHeight(1024)
+          .setScreenWidth(800)
+          .setDevicePixelRatioMillis(1500)
+          .setIsMobileWebOptimized(false);
     }
     return mobile;
   }
