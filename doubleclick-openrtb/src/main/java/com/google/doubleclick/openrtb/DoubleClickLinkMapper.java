@@ -18,7 +18,6 @@ package com.google.doubleclick.openrtb;
 
 import com.google.doubleclick.DcExt;
 import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtb.BidRequest.Impression;
 import com.google.protos.adx.NetworkBid;
 
 /**
@@ -38,7 +37,7 @@ public class DoubleClickLinkMapper extends ExtMapper {
   }
 
   @Override public void toOpenRtbImpression(
-      NetworkBid.BidRequest.AdSlot dcSlot, Impression.Builder imp) {
+      NetworkBid.BidRequest.AdSlot dcSlot, OpenRtb.BidRequest.Impression.Builder imp) {
     imp.setExtension(DcExt.adSlot, dcSlot);
   }
 
@@ -57,5 +56,12 @@ public class DoubleClickLinkMapper extends ExtMapper {
   @Override public void toOpenRtbPMP(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
     pmp.setExtension(DcExt.adData, dcAdData);
+  }
+
+  @Override public void toOpenRtbGeo(NetworkBid.BidRequest dcRequest,
+      OpenRtb.BidRequest.Geo.Builder geo, NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
+    if (hyperlocalSet != null) {
+      geo.setExtension(DcExt.hyperLocal, hyperlocalSet);
+    }
   }
 }

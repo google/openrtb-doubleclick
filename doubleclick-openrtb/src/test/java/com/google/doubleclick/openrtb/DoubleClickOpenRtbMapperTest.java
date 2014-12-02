@@ -144,6 +144,21 @@ public class DoubleClickOpenRtbMapperTest {
   }
 
   @Test
+  public void testResponse_videoAd_missingSize() {
+    OpenRtb.BidRequest request = TestUtil.newBidRequest(
+        TestData.newRequest(3, false).setVideo(TestData.newVideo(0)));
+    Bid bid = TestData.newBid(false)
+        .setAdm("http://my-video")
+        .setCrid("creativeId")
+        .build();
+    assertEquals(3, request.getImp(0).getExtension(DcExt.adSlot).getWidthCount());
+    assertFalse(request.getImp(0).getVideo().hasW());
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(
+        request, TestUtil.newBidResponse(bid), bid);
+    assertFalse(ad.hasWidth());
+  }
+
+  @Test
   public void testResponse_htmlSnippetTemplateAd() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(TestData.newRequest());
     Bid bid = TestData.newBid(false)
@@ -208,8 +223,8 @@ public class DoubleClickOpenRtbMapperTest {
         boolean video = (flags & 0b10) != 0;
         boolean multiBid = (flags & 0b100) != 0;
         boolean linkExt = (flags & 0b100) != 0;
-        String testDesc = String.format("mobile=%s, video=%s, coppa=%s, link=%s, multi=%s/%s",
-            mobile, video, coppa, linkExt, size, multiBid);
+        String testDesc = String.format("mobile=%s, video=%s, coppa=%s, link=%s, size=%s%s",
+            mobile, video, coppa, linkExt, size, multiBid ? "/full" : "");
         ImmutableList.Builder<ExtMapper> extMappers = ImmutableList.builder();
         if (linkExt) {
           extMappers.add(DoubleClickLinkMapper.INSTANCE);
@@ -222,7 +237,7 @@ public class DoubleClickOpenRtbMapperTest {
 
         NetworkBid.BidRequest.Builder dcRequest = TestData.newRequest(size, coppa);
         if (mobile) {
-          dcRequest.setMobile(TestData.newMobile(size));
+          dcRequest.setMobile(TestData.newMobile(size, coppa));
         }
         if (video) {
           dcRequest.setVideo(TestData.newVideo(size));
@@ -259,12 +274,12 @@ public class DoubleClickOpenRtbMapperTest {
             assertEquals(size >= 2, banner.hasTopframe());
           }
 
-          Bid.Builder bid = TestData.newBid(multiBid);
+          Bid.Builder bid = TestData.newBid(multiBid || imp.getInstl());
           BidResponse response = TestUtil.newBidResponse(bid);
           NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
           if (linkExt) {
             Ad ad = dcResponse.getAd(0);
-            assertEquals(testDesc, size > 1 && multiBid, ad.hasWidth());
+            assertEquals(testDesc, (size > 1 && multiBid) || imp.getInstl(), ad.hasWidth());
             assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasAdgroupId());
           }
         }
@@ -286,12 +301,13 @@ public class DoubleClickOpenRtbMapperTest {
 
   @Test
   public void testRequest_deals() {
-    NetworkBid.BidRequest dcRequest = TestData.newRequest(4, false).build();
+    NetworkBid.BidRequest dcRequest = TestData.newRequest(5, false).build();
     OpenRtb.BidRequest request = mapper.toOpenRtbBidRequest(dcRequest).build();
     PMP pmp = request.getImp(0).getPmp();
+    assertEquals(3, pmp.getExtension(DcExt.adData).getDirectDealCount());
     assertEquals(2, pmp.getDealsCount());
-    PMP.DirectDeal deal = pmp.getDeals(1);
-    assertEquals("33", deal.getId());
+    PMP.Deal deal = pmp.getDeals(1);
+    assertEquals("44", deal.getId());
     assertEquals(1.2, deal.getBidfloor(), 1e-9);
   }
 

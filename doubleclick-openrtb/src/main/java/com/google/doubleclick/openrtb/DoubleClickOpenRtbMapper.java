@@ -38,7 +38,7 @@ import com.google.openrtb.OpenRtb.BidRequest.Impression;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.ApiFramework;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP.DirectDeal;
+import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP.Deal;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.Linearity;
@@ -175,13 +175,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (matchingImp.hasVideo()) {
       dcAd.setVideoUrl(bid.getAdm());
 
-      if (multisize) {
+      if (multisize || matchingImp.getInstl()) {
         if (bid.hasW() && bid.hasH()) {
           dcAd.setWidth(bid.getW());
           dcAd.setHeight(bid.getH());
         } else {
           missingSize.inc();
-          logger.debug("Missing size in a Bid created for multisize Video impression: {}", bid);
+          logger.debug("Missing size in a Bid created for {} Video impression: {}",
+              multisize ? "multisize" : "interstitial", bid);
         }
       }
     } else if (matchingImp.hasBanner()) {
@@ -196,13 +197,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         }
       }
 
-      if (multisize) {
+      if (multisize || matchingImp.getInstl()) {
         if (bid.hasW() && bid.hasH()) {
           dcAd.setWidth(bid.getW());
           dcAd.setHeight(bid.getH());
         } else {
           missingSize.inc();
-          logger.debug("Missing size in a Bid created for multisize Banner impression: {}", bid);
+          logger.debug("Missing size in a Bid created for {} Banner impression: {}",
+              multisize ? "multisize" : "interstitial", bid);
         }
       }
     } else {
@@ -448,7 +450,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     for (NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal dcDeal
         : dcAdData.getDirectDealList()) {
       if (dcDeal.hasDirectDealId()) {
-        DirectDeal.Builder deal = DirectDeal.newBuilder()
+        Deal.Builder deal = Deal.newBuilder()
             .setId(String.valueOf(dcDeal.getDirectDealId()));
         if (dcDeal.hasFixedCpmMicros()) {
           deal.setBidfloor(dcDeal.getFixedCpmMicros() / ((double) MICROS_PER_CURRENCY_UNIT));
@@ -468,7 +470,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       NetworkBid.BidRequest.AdSlot dcSlot, NetworkBid.BidRequest.Video dcVideo) {
     Video.Builder video = Video.newBuilder()
         .setLinearity(Linearity.LINEAR)
-        .setProtocol(Protocol.VAST_3_0)
+        .addProtocols(Protocol.VAST_2_0)
+        .addProtocols(Protocol.VAST_3_0)
         .setMinduration(dcVideo.getMinAdDuration())
         .setMaxduration(dcVideo.getMaxAdDuration())
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
@@ -632,6 +635,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     Geo.Builder geo = Geo.newBuilder();
+    NetworkBid.BidRequest.HyperlocalSet hyperlocalSet = null;
 
     if (dcRequest.hasPostalCode()) {
       geo.setZip(dcRequest.getPostalCode());
@@ -656,10 +660,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcRequest.hasEncryptedHyperlocalSet() && hyperlocalCrypto != null) {
       try {
-        NetworkBid.BidRequest.HyperlocalSet hyperlocalSet = NetworkBid.BidRequest.HyperlocalSet
+        hyperlocalSet = NetworkBid.BidRequest.HyperlocalSet
             .parseFrom(hyperlocalCrypto.decryptHyperlocal(
                 dcRequest.getEncryptedHyperlocalSet().toByteArray()));
-        geo.setExtension(DcExt.hyperLocal, hyperlocalSet);
         if (hyperlocalSet.hasCenterPoint()) {
           NetworkBid.BidRequest.Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
           if (center.hasLatitude() && center.hasLongitude()) {
@@ -675,6 +678,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcRequest.hasTimezoneOffset()) {
       geo.setUtcoffset(dcRequest.getTimezoneOffset());
+    }
+
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbGeo(dcRequest, geo, hyperlocalSet);
     }
 
     return geo;
