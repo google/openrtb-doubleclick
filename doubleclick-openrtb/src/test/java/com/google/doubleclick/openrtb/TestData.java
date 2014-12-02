@@ -21,6 +21,7 @@ import static java.lang.Math.min;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.openrtb.OpenRtb.ContentCategory;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
@@ -47,7 +48,7 @@ import java.util.List;
 public class TestData {
   static final int NO_SLOT = -1;
 
-  public static Bid.Builder newBid(boolean size) {
+  public static Bid.Builder newBid(boolean full) {
     Bid.Builder bid = Bid.newBuilder()
         .setId("0")
         .setImpid("1")
@@ -55,11 +56,14 @@ public class TestData {
         .setCrid("4")
         .setPrice(1.2)
         .setAdm("<blink>hello world</blink>");
-    if (size) {
-      bid.setCid("3");
-      bid.setDealid("5");
-      bid.setW(200);
-      bid.setH(220);
+    if (full) {
+      bid
+          .setCid("3")
+          .setDealid("5")
+          .setW(200)
+          .setH(220)
+          .setNurl("http://impression.com")
+          .setCat(ContentCategory.IAB1.name());
     }
     return bid;
   }
@@ -88,15 +92,7 @@ public class TestData {
   public static NetworkBid.BidRequest.Builder newRequest(int size, boolean coppa) {
     NetworkBid.BidRequest.Builder req = NetworkBid.BidRequest.newBuilder()
         .setId(TestUtil.REQUEST_ID)
-        .setGoogleUserId("john")
-        .setConstrainedUsageGoogleUserId("j")
-        .setHostedMatchData(ByteString.copyFrom(new byte[]{
-            (byte) 0xEC, (byte) 0x22, (byte) 0xE6, (byte) 0x9C,
-            (byte) 0xC8, (byte) 0xB0, (byte) 0x4A, (byte) 0xCA,
-            (byte) 0xBB, (byte) 0x6C, (byte) 0xD4, (byte) 0xDA,
-            (byte) 0x88, (byte) 0xFB, (byte) 0x33, (byte) 0xB6
-        }))
-        .setConstrainedUsageHostedMatchData(ByteString.EMPTY)
+        .setIsTest(false)
         .addAllDetectedContentLabel(sublist(size, 40, 41, 999))
         .addAllDetectedLanguage(sublist(size, "en", "en_US", "pt", "pt_BR"))
         .addAllDetectedVertical(sublist(size,
@@ -109,6 +105,7 @@ public class TestData {
           .setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ))
           .setUserAgent("Chrome")
           .setGeoCriteriaId(9058770)
+          .setTimezoneOffset(3600)
           .setAnonymousId("mysite.com")
           .setSellerNetworkId(1);
     } else if (size == 2) {
@@ -162,9 +159,9 @@ public class TestData {
               i == 2 ? IFramingDepth.ONE_IFRAME : IFramingDepth.MULTIPLE_IFRAME);
           mad.setMinimumCpmMicros(10000 + i);
           for (int j = 2; j <= i; ++j) {
-            MatchingAdData.DirectDeal.Builder deal = MatchingAdData.DirectDeal.newBuilder()
-                .setDirectDealId(10 * i + j);
+            MatchingAdData.DirectDeal.Builder deal = MatchingAdData.DirectDeal.newBuilder();
             if (j >= 3) {
+              deal.setDirectDealId(10 * i + j);
               deal.setFixedCpmMicros(1200000);
             }
             mad.addDirectDeal(deal);
@@ -182,11 +179,21 @@ public class TestData {
     }
     if (coppa) {
       req.addUserDataTreatment(UserDataTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT);
+      req.setConstrainedUsageGoogleUserId("j");
+      req.setConstrainedUsageHostedMatchData(ByteString.EMPTY);
+    } else {
+      req.setGoogleUserId("john");
+      req.setHostedMatchData(ByteString.copyFrom(new byte[]{
+          (byte) 0xEC, (byte) 0x22, (byte) 0xE6, (byte) 0x9C,
+          (byte) 0xC8, (byte) 0xB0, (byte) 0x4A, (byte) 0xCA,
+          (byte) 0xBB, (byte) 0x6C, (byte) 0xD4, (byte) 0xDA,
+          (byte) 0x88, (byte) 0xFB, (byte) 0x33, (byte) 0xB6
+      }));
     }
     return req;
   }
 
-  static Mobile.Builder newMobile(int size) {
+  static Mobile.Builder newMobile(int size, boolean coppa) {
     Mobile.Builder mobile = Mobile.newBuilder();
     if (size % 2 == 0) {
       mobile
@@ -195,11 +202,31 @@ public class TestData {
           .setOsVersion(DeviceOsVersion.newBuilder()
               .setOsVersionMajor(3).setOsVersionMinor(2).setOsVersionMicro(1))
           .setModel("MotoX")
+          .setEncryptedAdvertisingId(ByteString.EMPTY)
           .setEncryptedHashedIdfa(ByteString.EMPTY)
-          .setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY)
           .setAppName("Tic-Tac-Toe")
           .setAppRating(4.2f)
-          .setIsInterstitialRequest(true);
+          .setIsInterstitialRequest(true)
+          .setScreenHeight(1024)
+          .setScreenWidth(800)
+          .setDevicePixelRatioMillis(1500)
+          .setCarrierId(10)
+          .setPlatform("android")
+          .setIsMobileWebOptimized(false);
+
+      if (size % 4 == 0) {
+        if (coppa) {
+          mobile.setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY);
+        } else {
+          mobile.setEncryptedHashedIdfa(ByteString.EMPTY);
+        }
+      } else {
+        if (coppa) {
+          mobile.setConstrainedUsageEncryptedAdvertisingId(ByteString.EMPTY);
+        } else {
+          mobile.setEncryptedAdvertisingId(ByteString.EMPTY);
+        }
+      }
     }
     return mobile;
   }

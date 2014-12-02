@@ -29,12 +29,31 @@ yet compatible with JDK 8 (once built, the library works with JDK 8).
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.7.5, 02-12-2014
+
+* Partial support for OpenRTB 2.3! The missing item is Native ads,
+  which depends on the OpenRTB Native 1.0 spec (proposed final draft
+  at this time). This support will come in a future update.
+  (Meanwhile you can bid on native ads with DoubleClick's protocol.)
+  - Maps OpenRTB Bid.cat / DC Ad.category
+  - Maps DC BidRequest.isTest / OpenRTB BidRequest.test
+  - Maps DC Mobile.[constrainedUsage]encryptedAdvertisingId
+    / OpenRTB Device.ifa; also, sets OpenRTB Device.lmt
+  - Maps DC Mobile.screenWidth/screenHeight / OpenRTB Device.w/h
+  - Maps DC Mobile.devicePixelRatioMillis / OpenRTB Device.pxratio
+  - Maps DC BidRequest.timezoneOffset / OpenRTB Geo.utcoffset
+  - Maps DC Mobile.mobileWebOptimized / OpenRTB Site.mobile
+* Fix BidResponse mapping, was broken for non-multisize, interstitial
+  video impression (DoubleClick requires setting width/height).
+* Improvements and cleanups in the internal CSVParser.
+
 # Version 0.7.4, 21-11-2014
 
 * DoubleClick proto v57.  Notice that the major new in this update is
   native ads, but the corresponding OpenRTB spec is not finalized so
   there's no DoubleClick/OpenRTB mapping support at this time.
-* Maps DoubleClick's new IFramingState to OpenRTB topframe.
+  - Maps DC IFramingState / OpenRTB topframe.
+  - Maps OpenRTB Bid.nurl / DC Ad.impressionTrackingUrl
 
 # Version 0.7.3, 17-11-2014
 

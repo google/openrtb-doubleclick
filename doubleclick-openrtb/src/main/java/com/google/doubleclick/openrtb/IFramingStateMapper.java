@@ -16,7 +16,6 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.Flag;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
 
 import javax.annotation.Nullable;
@@ -25,30 +24,29 @@ import javax.annotation.Nullable;
  * Maps between AdX's IFramingState and OpenRTB's topframe.
  */
 public class IFramingStateMapper {
-  public static @Nullable Flag toOpenRtb(IFramingState dc) {
+  public static @Nullable Boolean toOpenRtb(IFramingState dc) {
     switch (dc) {
       case NO_IFRAME:
-        return Flag.NO;
+        return false;
       case SAME_DOMAIN_IFRAME:
       case CROSS_DOMAIN_IFRAME:
-        return Flag.YES;
+        return true;
       case UNKNOWN_IFRAME_STATE:
       default:
         return null;
     }
   }
 
-  public static @Nullable IFramingState toDoubleClick(@Nullable Flag openrtb) {
+  public static @Nullable IFramingState toDoubleClick(@Nullable Boolean openrtb) {
     if (openrtb == null) {
       return IFramingState.UNKNOWN_IFRAME_STATE;
     }
-    switch (openrtb) {
-      case NO:
-        return IFramingState.NO_IFRAME;
-      case YES:
-        return IFramingState.CROSS_DOMAIN_IFRAME;
-      default:
-        return null;
+    if (openrtb == false) {
+      return IFramingState.NO_IFRAME;
+    } else if (openrtb == true) {
+      return IFramingState.CROSS_DOMAIN_IFRAME;
+    } else {
+      return null;
     }
   }
 }

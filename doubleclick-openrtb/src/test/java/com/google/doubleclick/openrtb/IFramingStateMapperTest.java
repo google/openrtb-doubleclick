@@ -16,9 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertSame;
 
-import com.google.openrtb.OpenRtb.Flag;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
 
 import org.junit.Test;
@@ -27,13 +27,13 @@ public class IFramingStateMapperTest {
   @Test
   public void testMapper() {
     assertSame(
-        Flag.NO,
+        false,
         IFramingStateMapper.toOpenRtb(IFramingState.NO_IFRAME));
     assertSame(
         IFramingState.NO_IFRAME,
-        IFramingStateMapper.toDoubleClick(Flag.NO));
+        IFramingStateMapper.toDoubleClick(false));
 
-    for (Flag openrtb : Flag.values()) {
+    for (boolean openrtb : asList(false, true)) {
       IFramingStateMapper.toDoubleClick(openrtb);
     }
     for (IFramingState dc : IFramingState.values()) {
