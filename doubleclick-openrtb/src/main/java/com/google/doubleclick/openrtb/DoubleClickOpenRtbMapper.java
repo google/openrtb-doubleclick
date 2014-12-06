@@ -422,7 +422,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
-      banner.addApi(ApiFramework.MRAID);
+      banner.addApi(ApiFramework.MRAID_1);
     }
 
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
@@ -487,7 +487,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       video.setStartdelay(VideoStartDelayMapper.toDoubleClick(dcVideo.getVideoadStartDelay()));
     }
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
-      video.addApi(ApiFramework.MRAID);
+      video.addApi(ApiFramework.MRAID_1);
     }
 
     if (dcSlot.getWidthCount() == 1) {
