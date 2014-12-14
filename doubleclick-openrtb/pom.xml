@@ -120,13 +120,24 @@
             <artifactId>download-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>get-includes</id>
+                <id>include-openrtb-proto</id>
                 <phase>initialize</phase>
                 <goals>
                   <goal>wget</goal>
                 </goals>
                 <configuration>
                   <url>${openrtbSource}/openrtb-core/src/main/protobuf/openrtb.proto</url>
+                  <outputDirectory>${protobufGenerated}/include</outputDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>include-openrtb-native-proto</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
+                <configuration>
+                  <url>${openrtbSource}/openrtb-core/src/main/protobuf/openrtb-native.proto</url>
                   <outputDirectory>${protobufGenerated}/include</outputDirectory>
                 </configuration>
               </execution>

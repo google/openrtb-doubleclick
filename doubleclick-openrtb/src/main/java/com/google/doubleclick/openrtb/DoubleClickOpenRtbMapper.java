@@ -50,6 +50,7 @@ import com.google.openrtb.OpenRtb.BidRequest.User;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.ContentCategory;
+import com.google.openrtb.OpenRtbNative.NativeRequest;
 import com.google.openrtb.mapper.OpenRtbMapper;
 import com.google.openrtb.util.OpenRtbUtils;
 import com.google.protobuf.ByteString;
@@ -397,6 +398,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         imp.setVideo(buildVideo(dcSlot, dcRequest.getVideo()));
       } else {
         imp.setBanner(buildBanner(dcSlot));
+      }
+
+      if (dcSlot.getNativeAdTemplateCount() != 0) {
+        imp.setNative(buildNative(dcSlot));
       }
 
       for (ExtMapper extMapper : extMappers) {
@@ -871,6 +876,141 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         }
       }
     }
+  }
+
+  protected Impression.Native.Builder buildNative(NetworkBid.BidRequest.AdSlot dcSlot) {
+    Impression.Native.Builder impNativ = Impression.Native.newBuilder().setVer("1.0");
+    NativeRequest.Builder nativReq = NativeRequest.newBuilder().setVer("1.0");
+    int id = 0;
+
+    for (NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ : dcSlot.getNativeAdTemplateList()) {
+      long req = dcNativ.getRequiredFields();
+      long bits = dcNativ.getRecommendedFields() | req;
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0);
+        NativeRequest.Asset.Title.Builder title = NativeRequest.Asset.Title.newBuilder();
+        if (dcNativ.hasHeadlineMaxSafeLength()) {
+          title.setLen(dcNativ.getHeadlineMaxSafeLength());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setTitle(title)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0);
+        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
+            .setType(NativeRequest.Asset.Data.DataAssetType.DESC_VALUE);
+        if (dcNativ.hasBodyMaxSafeLength()) {
+          data.setLen(dcNativ.getBodyMaxSafeLength());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0);
+        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
+            .setType(NativeRequest.Asset.Data.DataAssetType.CTATEXT_VALUE);
+        if (dcNativ.hasCallToActionMaxSafeLength()) {
+          data.setLen(dcNativ.getCallToActionMaxSafeLength());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0);
+        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
+            .setType(NativeRequest.Asset.Data.DataAssetType.SPONSORED_VALUE);
+        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0);
+        NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
+            .setType(NativeRequest.Asset.Image.ImageAssetType.MAIN_VALUE);
+        if (dcNativ.hasImageWidth()) {
+          image.setWmin(dcNativ.getImageWidth());
+        }
+        if (dcNativ.hasImageHeight()) {
+          image.setHmin(dcNativ.getImageHeight());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setImg(image)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0);
+        NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
+            .setType(NativeRequest.Asset.Image.ImageAssetType.LOGO_VALUE);
+        if (dcNativ.hasLogoWidth()) {
+          image.setWmin(dcNativ.getLogoWidth());
+        }
+        if (dcNativ.hasLogoHeight()) {
+          image.setHmin(dcNativ.getLogoHeight());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setImg(image)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0);
+        NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
+            .setType(NativeRequest.Asset.Image.ImageAssetType.ICON_VALUE);
+        if (dcNativ.hasAppIconWidth()) {
+          image.setWmin(dcNativ.getAppIconWidth());
+        }
+        if (dcNativ.hasAppIconHeight()) {
+          image.setHmin(dcNativ.getAppIconHeight());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setImg(image)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0);
+        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
+            .setType(NativeRequest.Asset.Data.DataAssetType.RATING_VALUE);
+        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0);
+        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
+            .setType(NativeRequest.Asset.Data.DataAssetType.PRICE_VALUE);
+        if (dcNativ.hasPriceMaxSafeLength()) {
+          data.setLen(dcNativ.getPriceMaxSafeLength());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+      }
+
+      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0) {
+        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
+            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0);
+        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
+            .setType(NativeRequest.Asset.Data.DataAssetType.ADDRESS_VALUE);
+        if (dcNativ.hasStoreMaxSafeLength()) {
+          data.setLen(dcNativ.getStoreMaxSafeLength());
+        }
+        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+      }
+    }
+
+    return impNativ.setRequest(nativReq);
+  }
+
+  protected NativeRequest.Asset.Builder extMapNative(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
+      NativeRequest.Asset.Builder asset) {
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbNative(dcNativ, asset);
+    }
+
+    return asset;
   }
 
   /**

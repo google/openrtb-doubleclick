@@ -29,6 +29,7 @@ import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingDepth;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.NativeAdTemplate;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
 import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
@@ -158,6 +159,7 @@ public class TestData {
           adSlot.setIframingDepth( // Only used by video, but keep things simple
               i == 2 ? IFramingDepth.ONE_IFRAME : IFramingDepth.MULTIPLE_IFRAME);
           mad.setMinimumCpmMicros(10000 + i);
+          newNative(adSlot, i >= 3);
           for (int j = 2; j <= i; ++j) {
             MatchingAdData.DirectDeal.Builder deal = MatchingAdData.DirectDeal.newBuilder();
             if (j >= 3) {
@@ -247,5 +249,47 @@ public class TestData {
       video.addCompanionSlot(compSlot);
     }
     return video;
+  }
+
+  static void newNative(AdSlot.Builder adSlot, boolean req) {
+    NativeAdTemplate.Builder[] assets = {
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.HEADLINE_VALUE)
+            .setHeadlineMaxSafeLength(10),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.BODY_VALUE)
+            .setBodyMaxSafeLength(10),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE)
+            .setCallToActionMaxSafeLength(10),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.ADVERTISER_VALUE)
+            .setAdvertiserMaxSafeLength(10),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.IMAGE_VALUE)
+            .setImageWidth(100).setImageHeight(200),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.LOGO_VALUE)
+            .setLogoWidth(100).setLogoHeight(200),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.APP_ICON_VALUE)
+            .setAppIconWidth(100).setAppIconHeight(200),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.STAR_RATING_VALUE),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.PRICE_VALUE)
+            .setPriceMaxSafeLength(10),
+        NativeAdTemplate.newBuilder()
+            .setRecommendedFields(NativeAdTemplate.Fields.STORE_VALUE)
+            .setStoreMaxSafeLength(10),
+    };
+
+    for (NativeAdTemplate.Builder asset : assets) {
+      if (req) {
+        asset.setRequiredFields(asset.getRecommendedFields());
+        asset.clearRequiredFields();
+      }
+      adSlot.addNativeAdTemplate(asset);
+    }
   }
 }

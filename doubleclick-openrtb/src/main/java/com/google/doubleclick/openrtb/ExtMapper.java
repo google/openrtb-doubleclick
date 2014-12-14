@@ -18,6 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest.Geo.Builder;
+import com.google.openrtb.OpenRtbNative;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest;
 import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
@@ -41,6 +42,10 @@ public abstract class ExtMapper {
 
   public void toOpenRtbImpression(NetworkBid.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Impression.Builder imp) {
+  }
+
+  public void toOpenRtbNative(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ, OpenRtbNative.NativeRequest.Asset.Builder asset) {
   }
 
   public void toOpenRtbBanner(NetworkBid.BidRequest.AdSlot dcSlot,
