@@ -55,7 +55,7 @@
     <gpg.skip>true</gpg.skip>
     <guavaVersion>18.0</guavaVersion>
     <injectVersion>1</injectVersion>
-    <junitVersion>4.11</junitVersion>
+    <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
     <openrtbVersion>0.7.4-SNAPSHOT</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->

@@ -17,11 +17,8 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtb.BidRequest.Geo.Builder;
 import com.google.openrtb.OpenRtbNative;
 import com.google.protos.adx.NetworkBid;
-import com.google.protos.adx.NetworkBid.BidRequest;
-import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
 
 /**
  * Extension mapper for {@link DoubleClickOpenRtbMapper}. The core mapper only handles the
@@ -60,10 +57,11 @@ public abstract class ExtMapper {
       OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
   }
 
-  public void toNativeAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
-      OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
+  public void toOpenRtbGeo(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo,
+      NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
   }
 
-  public void toOpenRtbGeo(BidRequest dcRequest, Builder geo, HyperlocalSet hyperlocalSet) {
+  public void toNativeAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
+      OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
   }
 }
