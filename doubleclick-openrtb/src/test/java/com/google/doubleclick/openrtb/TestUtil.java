@@ -26,6 +26,7 @@ import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.BidOrBuilder;
+import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
 
@@ -100,6 +101,7 @@ class TestUtil {
     return new DoubleClickOpenRtbMapper(
         new MetricRegistry(),
         getMetadata(),
+        OpenRtbJsonFactory.create(),
         new DoubleClickCrypto.Hyperlocal(KEYS),
         ImmutableList.of(DoubleClickLinkMapper.INSTANCE))
             .toOpenRtbBidRequest(dcRequest).build();

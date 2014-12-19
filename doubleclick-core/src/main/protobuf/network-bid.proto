@@ -848,14 +848,74 @@ message BidResponse {
     };
     repeated TemplateParameter template_parameter = 13;
 
-    // The set of destination URLs for the snippet.  This should include the
-    // URLs that the user will go to if they click on the displayed ad, and any
-    // URLs that are visible in the rendered ad.  It should not include
-    // intermediate calls to the adserver that are unrelated to the final
-    // landing page.  This data is used for post-filtering of publisher-blocked
-    // URLs among other things.  A BidResponse that returns a snippet or video
-    // ad but declares no click_through_url will be discarded.  Only set this
-    // field if html_snippet or video_url are set.
+    // The content of a native ad.  Native ads consist of multiple building
+    // blocks, which are rendered by the publisher.  Only one of the following
+    // should be set: html_snippet, video_url, snippet_template, or native_ad.
+    // Only set this field if the BidRequest is for a native ad
+    // (BidRequest.adslot.native is present).
+    //
+    message NativeAd {
+      // A short title for the ad.
+      optional string headline = 1;
+
+      // A long description of the ad.
+      optional string body = 2;
+
+      // A label for the button that the user is supposed to click
+      optional string call_to_action = 3;
+
+      // The name of the advertiser or sponsor, to be displayed in the ad
+      // creative.
+      optional string advertiser = 4;
+
+      message Image {
+        optional string url = 1;
+
+        // Image width and height are specified in pixels.  You may provide a
+        // larger image than was requested, so long as the aspect ratio is
+        // preserved.
+        optional int32 width = 2;
+        optional int32 height = 3;
+      }
+
+      // A large image.
+      optional Image image = 5;
+
+      // A smaller image, for the advertiser's logo.
+      optional Image logo = 6;
+
+      // The app icon, for app download ads.
+      optional Image app_icon = 7;
+
+      // The app rating in the app store.  Must be in the range [0-5].
+      optional double star_rating = 8;
+
+      // The URLs are called when the impression is rendered.  The SDK pings
+      // impression urls on a background thread and ignores the contents of the
+      // response.
+      repeated string impression_tracking_url = 9;
+
+      // The URL to use for click tracking.  The SDK pings click tracking url
+      // on a background thread.  When resolving the url, HTTP 30x redirects
+      // are followed.  The SDK ignores the contents of the response.
+      optional string click_tracking_url = 11;
+
+      // The price of the promoted app including the currency info.
+      optional string price = 10;
+
+      // The URL to the app store to purchase/download the promoted app.
+      optional string store = 12;
+    };
+    optional NativeAd native_ad = 18;
+
+    // The set of destination URLs for the snippet or native ad.  This should
+    // include the URLs that the user will go to if they click on the displayed
+    // ad, and any URLs that are visible in the rendered ad.  It should not
+    // include intermediate calls to the adserver that are unrelated to the
+    // final landing page.  This data is used for post-filtering of
+    // publisher-blocked URLs among other things.  A BidResponse that returns a
+    // snippet or video ad but declares no click_through_url will be discarded.
+    // Only set this field if html_snippet or video_url or native_ad are set.
     repeated string click_through_url = 4;
 
     // All vendor types for the ads that may be shown from this snippet.  You
