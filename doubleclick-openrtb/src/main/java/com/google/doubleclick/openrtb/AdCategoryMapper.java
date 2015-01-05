@@ -51,7 +51,7 @@ public class AdCategoryMapper {
     Map<ContentCategory, String> names = new HashMap<>();
 
     try (InputStream isMetadata = AdCategoryMapper.class.getResourceAsStream(
-        "/adx-openrtb/category-mapping-smartclip.txt")) {
+        "/adx-openrtb/category-mapping-openrtb.txt")) {
       for (String line : CharStreams.readLines(new InputStreamReader(isMetadata))) {
         Matcher matcher = pattern.matcher(line);
 
