@@ -149,7 +149,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected NetworkBid.BidResponse.Ad.Builder buildResponseAd(
-      OpenRtb.BidRequest request, OpenRtb.BidResponse response, final Bid bid) {
+      OpenRtb.BidRequest request, OpenRtb.BidResponse response, Bid bid) {
     NetworkBid.BidResponse.Ad.Builder dcAd;
 
     if (bid.hasExtension(DcExt.ad)) {
@@ -173,22 +173,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
           "Impresson.id doesn't match any request impression: %s", bid.getImpid());
     }
 
-    NetworkBid.BidRequest.AdSlot dcImpSlot = matchingImp.getExtension(DcExt.adSlot);
-    boolean multisize = dcImpSlot.getWidthCount() > 1;
-
     if (matchingImp.hasVideo()) {
       dcAd.setVideoUrl(bid.getAdm());
-
-      if (multisize || matchingImp.getInstl()) {
-        if (bid.hasW() && bid.hasH()) {
-          dcAd.setWidth(bid.getW());
-          dcAd.setHeight(bid.getH());
-        } else {
-          missingSize.inc();
-          logger.debug("Missing size in a Bid created for {} Video impression: {}",
-              multisize ? "multisize" : "interstitial", bid);
-        }
-      }
+      setAdSize(bid, dcAd, matchingImp);
     } else if (matchingImp.hasBanner()) {
       if (dcAd.getTemplateParameterCount() == 0) {
         dcAd.setHtmlSnippet(bid.getAdm());
@@ -200,17 +187,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
           dcAd.setSnippetTemplate(bid.getAdm());
         }
       }
-
-      if (multisize || matchingImp.getInstl()) {
-        if (bid.hasW() && bid.hasH()) {
-          dcAd.setWidth(bid.getW());
-          dcAd.setHeight(bid.getH());
-        } else {
-          missingSize.inc();
-          logger.debug("Missing size in a Bid created for {} Banner impression: {}",
-              multisize ? "multisize" : "interstitial", bid);
-        }
-      }
+      setAdSize(bid, dcAd, matchingImp);
     } else if (matchingImp.hasNative()) {
       dcAd.setNativeAd(nativeMapper.buildNativeResponse(bid, matchingImp));
     } else {
@@ -221,7 +198,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     NetworkBid.BidResponse.Ad.AdSlot.Builder dcSlot = dcAd.addAdslotBuilder()
         .setId(Integer.parseInt(bid.getImpid()))
         .setMaxCpmMicros((long) (bid.getPrice() * MICROS_PER_CURRENCY_UNIT));
-    if (dcImpSlot.getMatchingAdDataCount() > 1) {
+    if (matchingImp.getExtension(DcExt.adSlot).getMatchingAdDataCount() > 1) {
       if (bid.hasCid()) {
         dcSlot.setAdgroupId(Long.parseLong(bid.getCid()));
       } else {
@@ -249,6 +226,22 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     return dcAd;
+  }
+
+  protected void setAdSize(
+      Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd, Impression matchingImp) {
+    boolean multisize = matchingImp.getExtension(DcExt.adSlot).getWidthCount() > 1;
+
+    if (multisize || matchingImp.getInstl()) {
+      if (bid.hasW() && bid.hasH()) {
+        dcAd.setWidth(bid.getW());
+        dcAd.setHeight(bid.getH());
+      } else {
+        missingSize.inc();
+        logger.debug("Missing size in a Bid created for {} impression: {}",
+            multisize ? "multisize" : "interstitial", bid);
+      }
+    }
   }
 
   @Override
@@ -817,8 +810,15 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       return null;
     }
 
-    return Publisher.newBuilder()
+    Publisher.Builder publisher = Publisher.newBuilder()
         .setId(String.valueOf(dcRequest.getSellerNetworkId()));
+
+    String sellerNetwork = metadata.getSellerNetworks().get(dcRequest.getSellerNetworkId());
+    if (sellerNetwork != null) {
+      publisher.setName(sellerNetwork);
+    }
+
+    return publisher;
   }
 
   protected String findChannelId(NetworkBid.BidRequest dcRequest) {
