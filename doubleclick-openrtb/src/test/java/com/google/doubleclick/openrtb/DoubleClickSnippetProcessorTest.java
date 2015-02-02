@@ -1,0 +1,73 @@
+/*
+ * Copyright 2015 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.doubleclick.openrtb;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
+import com.google.doubleclick.util.DoubleClickMacros;
+import com.google.openrtb.OpenRtb.BidRequest;
+import com.google.openrtb.OpenRtb.BidRequest.Impression;
+import com.google.openrtb.OpenRtb.BidResponse;
+import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
+import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.openrtb.snippet.OpenRtbMacros;
+import com.google.openrtb.snippet.SnippetProcessorContext;
+
+import org.junit.Test;
+
+/**
+ * Tests for {@link DoubleClickSnippetProcessor}.
+ */
+public class DoubleClickSnippetProcessorTest {
+
+  @Test
+  public void testProcessor() {
+    assertEquals(
+        DoubleClickMacros.WINNING_PRICE.key(),
+        process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_PRICE.key()));
+  }
+
+  @Test
+  public void testNullProcessor() {
+    assertSame(
+        OpenRtbMacros.AUCTION_PRICE.key(),
+        process(DoubleClickSnippetProcessor.DC_NULL, OpenRtbMacros.AUCTION_PRICE.key()));
+  }
+
+  private String process(DoubleClickSnippetProcessor processor, String snippet) {
+    BidRequest request = BidRequest.newBuilder()
+        .setId("1")
+        .addImp(Impression.newBuilder()
+            .setId("1")).build();
+    BidResponse response = createBidResponse(snippet);
+    return processor.process(
+        new SnippetProcessorContext(request, response, response.getSeatbid(0).getBid(0)), snippet);
+  }
+
+  private static BidResponse createBidResponse(String snippet) {
+    Bid.Builder bid = Bid.newBuilder()
+        .setId("bid1")
+        .setImpid("1")
+        .setPrice(1000);
+    return BidResponse.newBuilder()
+        .addSeatbid(SeatBid.newBuilder()
+            .setSeat("seat1")
+            .addBid(bid))
+        .build();
+  }
+}
