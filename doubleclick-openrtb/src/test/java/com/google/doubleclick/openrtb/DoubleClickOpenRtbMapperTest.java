@@ -36,6 +36,7 @@ import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
 import com.google.protos.adx.NetworkBid.BidResponse.Ad;
@@ -248,7 +249,7 @@ public class DoubleClickOpenRtbMapperTest {
         assertEquals(testDesc, coppa, request.getRegs().getCoppa());
         assertEquals(
             coppa ? "" : "EC22E69CC8B04ACABB6CD4DA88FB33B6",
-            request.getUser().getCustomdata());
+            request.getUser().getBuyeruid());
 
         if (size == TestData.NO_SLOT) {
           assertEquals(0, request.getImpCount());

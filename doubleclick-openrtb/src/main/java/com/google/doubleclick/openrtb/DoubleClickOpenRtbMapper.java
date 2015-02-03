@@ -308,7 +308,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       ByteString dcHMD = coppa
           ? dcRequest.getConstrainedUsageHostedMatchData()
           : dcRequest.getHostedMatchData();
-      user.setCustomdata(BaseEncoding.base16().encode(dcHMD.toByteArray()));
+      user.setBuyeruid(dcHMD.toStringUtf8());
     }
 
     if (dcRequest.hasUserDemographic()) {
