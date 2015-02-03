@@ -47,6 +47,7 @@ import java.util.List;
 
 public class TestData {
   static final int NO_SLOT = -1;
+  public static final ByteString HOSTED_MATCH_ID = ByteString.copyFromUtf8("EC22E69CC8B04ACABB6CD4DA88FB33B6");
 
   public static Bid.Builder newBid(boolean full) {
     Bid.Builder bid = Bid.newBuilder()
@@ -183,12 +184,7 @@ public class TestData {
       req.setConstrainedUsageHostedMatchData(ByteString.EMPTY);
     } else {
       req.setGoogleUserId("john");
-      req.setHostedMatchData(ByteString.copyFrom(new byte[]{
-          (byte) 0xEC, (byte) 0x22, (byte) 0xE6, (byte) 0x9C,
-          (byte) 0xC8, (byte) 0xB0, (byte) 0x4A, (byte) 0xCA,
-          (byte) 0xBB, (byte) 0x6C, (byte) 0xD4, (byte) 0xDA,
-          (byte) 0x88, (byte) 0xFB, (byte) 0x33, (byte) 0xB6
-      }));
+      req.setHostedMatchData(HOSTED_MATCH_ID);
     }
     return req;
   }
