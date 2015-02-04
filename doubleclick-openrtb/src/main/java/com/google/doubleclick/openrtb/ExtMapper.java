@@ -51,33 +51,25 @@ public abstract class ExtMapper {
       OpenRtb.BidRequest.Impression.Builder imp) {
   }
 
-  public void toOpenRtbNative(
-      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
-      OpenRtbNative.NativeRequest.Asset.Builder asset) {
-  }
-
   public void toOpenRtbBanner(NetworkBid.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Impression.Banner.Builder banner) {
-  }
-
-  public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
-      OpenRtb.BidRequest.Impression.Video.Builder video) {
   }
 
   public void toOpenRtbPMP(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
   }
 
+  public void toOpenRtbNative(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
+      OpenRtbNative.NativeRequest.Asset.Builder asset) {
+  }
+
+  public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
+      OpenRtb.BidRequest.Impression.Video.Builder video) {
+  }
+
   public void toOpenRtbGeo(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo,
       NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
-  }
-
-  public void toOpenRtbPublisher(
-      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Publisher.Builder publisher) {
-  }
-
-  public void toOpenRtbContent(
-      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Content.Builder content) {
   }
 
   public void toNativeAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,

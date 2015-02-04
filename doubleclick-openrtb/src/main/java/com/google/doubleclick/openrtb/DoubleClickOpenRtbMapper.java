@@ -831,10 +831,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       publisher.setName(sellerNetwork);
     }
 
-    for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtbPublisher(dcRequest, publisher);
-    }
-
     return publisher;
   }
 
@@ -872,10 +868,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     String rating = ContentRatingMapper.toOpenRtb(dcRequest.getDetectedContentLabelList());
     if (rating != null) {
       content.setContentrating(rating);
-    }
-
-    for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtbContent(dcRequest, content);
     }
 
     return content;
