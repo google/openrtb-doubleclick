@@ -281,15 +281,16 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       request.setUser(user);
     }
 
+    if (dcRequest.hasIsTest()) {
+      request.setTest(dcRequest.getIsTest());
+    }
+    request.setTmax(100);
+
     for (ExtMapper extMapper : extMappers) {
       extMapper.toOpenRtbBidRequest(dcRequest, request);
     }
 
-    if (dcRequest.hasIsTest()) {
-      request.setTest(dcRequest.getIsTest());
-    }
-    return request
-        .setTmax(100);
+    return request;
   }
 
   protected User.Builder buildUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
@@ -344,6 +345,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         data.addSegment(segment);
       }
       user.addData(data);
+    }
+
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbBidRequest(dcRequest, user);
     }
 
     return user;
@@ -765,6 +770,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       site.setPublisher(pub);
     }
 
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbSite(dcRequest, site);
+    }
+
     return site;
   }
 
@@ -802,6 +811,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       app.setPublisher(pub);
     }
 
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbApp(dcRequest, app);
+    }
+
     return app;
   }
 
@@ -816,6 +829,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     String sellerNetwork = metadata.getSellerNetworks().get(dcRequest.getSellerNetworkId());
     if (sellerNetwork != null) {
       publisher.setName(sellerNetwork);
+    }
+
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbPublisher(dcRequest, publisher);
     }
 
     return publisher;
@@ -855,6 +872,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     String rating = ContentRatingMapper.toOpenRtb(dcRequest.getDetectedContentLabelList());
     if (rating != null) {
       content.setContentrating(rating);
+    }
+
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbContent(dcRequest, content);
     }
 
     return content;
