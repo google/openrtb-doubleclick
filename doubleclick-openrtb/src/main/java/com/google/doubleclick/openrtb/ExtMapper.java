@@ -33,7 +33,7 @@ public abstract class ExtMapper {
       NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
   }
 
-  public void toOpenRtbBidRequest(
+  public void toOpenRtbUser(
       NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.User.Builder user) {
   }
 

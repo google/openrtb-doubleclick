@@ -348,7 +348,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtbBidRequest(dcRequest, user);
+      extMapper.toOpenRtbUser(dcRequest, user);
     }
 
     return user;
