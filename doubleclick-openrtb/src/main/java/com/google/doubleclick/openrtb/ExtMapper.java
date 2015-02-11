@@ -17,10 +17,8 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtb.BidRequest.Geo.Builder;
+import com.google.openrtb.OpenRtbNative;
 import com.google.protos.adx.NetworkBid;
-import com.google.protos.adx.NetworkBid.BidRequest;
-import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
 
 /**
  * Extension mapper for {@link DoubleClickOpenRtbMapper}. The core mapper only handles the
@@ -35,6 +33,16 @@ public abstract class ExtMapper {
       NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
   }
 
+  public void toOpenRtbUser(
+      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.User.Builder user) {
+  }
+
+  public void toOpenRtbSite(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Site.Builder site) {
+  }
+
+  public void toOpenRtbApp(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.App.Builder app) {
+  }
+
   public void toOpenRtbDevice(NetworkBid.BidRequest dcRequest,
       OpenRtb.BidRequest.Device.Builder device) {
   }
@@ -47,18 +55,24 @@ public abstract class ExtMapper {
       OpenRtb.BidRequest.Impression.Banner.Builder banner) {
   }
 
-  public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
-      OpenRtb.BidRequest.Impression.Video.Builder video) {
-  }
-
   public void toOpenRtbPMP(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
   }
 
-  public void toNativeAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
-      OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
+  public void toOpenRtbNative(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
+      OpenRtbNative.NativeRequest.Asset.Builder asset) {
   }
 
-  public void toOpenRtbGeo(BidRequest dcRequest, Builder geo, HyperlocalSet hyperlocalSet) {
+  public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
+      OpenRtb.BidRequest.Impression.Video.Builder video) {
+  }
+
+  public void toOpenRtbGeo(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo,
+      NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
+  }
+
+  public void toNativeAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
+      OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
   }
 }

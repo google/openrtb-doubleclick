@@ -1,3 +1,23 @@
+// This file contains the mapping from IAB (OpenRTB standard category ID (where
+// ID is the enum value from contentads/bidder/proto/openrtb.proto) and
+// name, to AdX category ID and name. Pipe is used as
+// separator. Leading and trailing whitespaces in second and fourth
+// column are stripped. There should be no quotes around strings.
+//
+// This is a one way mapping from IAB categories to broader AdX categories
+// that work for category blocking.
+// category "Sleep Disorders" means all creatives with the (AdX) category
+// "Health Conditions & Concerns" will get blocked.
+//
+// Everything over "379" in this list is unmapped.
+//
+// Second column is not used but is useful for creators, users and maintainers.
+// Fourth column is used to verify that creators entered correct AdX ID and
+// name. Smoke tests shall catch if AdX ID is non-existent and if mapping from
+// AdX ID to name is non-existent.
+//
+// Example: IAB2 (Automotive) has enum value 9, so it is listed here under 9.
+//
 // IAB Category enum ID|IAB Category Name|Adx Category ID|Adx Category Name
 1|Arts & Entertainment|10013|/Arts & Entertainment
 1|Arts & Entertainment|10105|Entertainment Industry
@@ -6,7 +26,7 @@
 4|Fine Art|13388|/Arts & Entertainment/Visual Art & Design
 5|Humor|10106|/Arts & Entertainment/Humor & Jokes
 6|Movies|13417|/Arts & Entertainment/Movies & Films
-7|Music|10109|/Arts & Entertainment/Music & Audio
+7|Music|13379|Ringtones & Ringtone Makers
 8|Television|12143|Televisions
 8|Television|13536|Film & TV Industry
 8|Television|10557|TV Shows & Programs
@@ -63,9 +83,7 @@
 38|Construction|12590|Power Tools
 39|Forestry|11083|Forestry
 39|Forestry|12366|Logging & Milling
-40|Government|13414|Government
-40|Government|13876|State & Local Government
-40|Government|13508|Government Ministries
+40|Government|12014|Lotteries *Mopub IAB categorization.
 41|Green Solutions|10295|/Business & Industrial/Energy Industry
 41|Green Solutions|10028|/Family & Community/Community Service & Social Organizations
 41|Green Solutions|13731|/Business & Industrial/Building Construction & Maintenance/Eco-Friendly Building & Construction
@@ -335,7 +353,7 @@
 154|Board Games/Puzzles|10672|/Hobbies & Leisure/Toys & Games/Games
 155|Candle & Soap Making|11533|Candles & Incense
 155|Candle & Soap Making|10131|Arts & Craft
-156|Card Games|11943|/Hobbies & Leisure/Toys & Games/Games/Card Games
+156|Card Games|32|Gambling *Mopub IAB categorization
 157|Chess|11946|/Hobbies & Leisure/Toys & Games/Games/Strategy Games
 158|Cigars|10080|/Food & Groceries/Tobacco
 158|Cigars|10138|/Hobbies & Leisure/Cigar & Tobacco Collecting
@@ -465,6 +483,8 @@
 213|Tax Planning|12387|Tax Preparation & Planning
 213|Tax Planning|11093|/Finance/Accounting & Auditing
 214|Society|10002|Family & Community
+214|Society|11496|Social Networks & Online Communities *MOPUB IAB Categorization
+215|Dating|4|Dating
 215|Dating|10239|Dating & Marriage Matching/Dating Directories & Sites
 215|Dating|10240|Dating & Marriage Matching
 215|Dating|13715|Dating & Marriage Matching/Personals

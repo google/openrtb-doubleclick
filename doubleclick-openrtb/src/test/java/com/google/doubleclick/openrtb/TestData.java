@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.ContentCategory;
+import com.google.openrtb.OpenRtbNative.NativeResponse;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
@@ -29,6 +30,8 @@ import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingDepth;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.NativeAdTemplate;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Builder;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
 import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
@@ -68,8 +71,47 @@ public class TestData {
     return bid;
   }
 
+  public static NativeResponse.Builder newNativeResponse(int size) {
+    NativeResponse.Builder nativ = NativeResponse.newBuilder().setVer("1.0")
+        .setLink(NativeResponse.Link.newBuilder().setUrl("http://herewego"));
+    if (size != NO_SLOT) {
+      nativ
+          .addAssets(newRespAssetTitle(1, "title"))
+          .addAssets(newRespAssetData(2, "body"))
+          .addAssets(newRespAssetData(3, "ctatext"))
+          .addAssets(newRespAssetData(4, "advertiser"))
+          .addAssets(newRespAssetImage(5, size, "http://image"))
+          .addAssets(newRespAssetImage(6, size, "http://logo"))
+          .addAssets(newRespAssetImage(7, size, "http://appicon"))
+          .addAssets(newRespAssetData(8, "4.5"))
+          .addAssets(newRespAssetData(9, "$9.99"))
+          .addAssets(newRespAssetData(10, "store"));
+    }
+    return nativ;
+  }
+
+  static NativeResponse.Asset.Builder newRespAssetImage(int id, int size, String url) {
+    NativeResponse.Asset.Image.Builder img = NativeResponse.Asset.Image.newBuilder();
+    if (size >= 1) {
+      img.setUrl(url).setW(100).setH(200);
+    }
+    return NativeResponse.Asset.newBuilder().setId(id).setImg(img);
+  }
+
+  static NativeResponse.Asset.Builder newRespAssetData(int id, String value) {
+    return NativeResponse.Asset.newBuilder()
+        .setId(id)
+        .setData(NativeResponse.Asset.Data.newBuilder().setValue(value));
+  }
+
+  static NativeResponse.Asset.Builder newRespAssetTitle(int id, String text) {
+    return NativeResponse.Asset.newBuilder()
+        .setId(id)
+        .setTitle(NativeResponse.Asset.Title.newBuilder().setText(text));
+  }
+
   public static NetworkBid.BidRequest newRequest() {
-    return newRequest(0, false).build();
+    return newRequest(0, false, false).build();
   }
 
   static List<Integer> createSizes(int size, int base) {
@@ -89,7 +131,7 @@ public class TestData {
     return sizes.build();
   }
 
-  public static NetworkBid.BidRequest.Builder newRequest(int size, boolean coppa) {
+  public static NetworkBid.BidRequest.Builder newRequest(int size, boolean coppa, boolean nativ) {
     NetworkBid.BidRequest.Builder req = NetworkBid.BidRequest.newBuilder()
         .setId(TestUtil.REQUEST_ID)
         .setIsTest(false)
@@ -175,6 +217,10 @@ public class TestData {
         }
         adSlot.addMatchingAdData(mad);
       }
+
+      if (nativ) {
+        newNative(adSlot, size);
+      }
       req.addAdslot(adSlot);
     }
     if (coppa) {
@@ -247,5 +293,44 @@ public class TestData {
       video.addCompanionSlot(compSlot);
     }
     return video;
+  }
+
+  static void newNative(AdSlot.Builder adSlot, int size) {
+    NativeAdTemplate.Builder[] assets = {
+        newNativeAdTemplate(NativeAdTemplate.Fields.HEADLINE_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.BODY_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.ADVERTISER_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.IMAGE_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.LOGO_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.APP_ICON_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.STAR_RATING_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.PRICE_VALUE),
+        newNativeAdTemplate(NativeAdTemplate.Fields.STORE_VALUE),
+    };
+
+    if (size >= 1) {
+      assets[0 /* HEADLINE   */].setHeadlineMaxSafeLength(10);
+      assets[1 /* BODY       */].setBodyMaxSafeLength(10);
+      assets[2 /* CTA        */].setCallToActionMaxSafeLength(10);
+      assets[3 /* ADVERTISER */].setAdvertiserMaxSafeLength(10);
+      assets[4 /* IMAGE      */].setImageWidth(100).setImageHeight(200);
+      assets[5 /* LOGO       */].setLogoWidth(100).setLogoHeight(200);
+      assets[6 /* APP_ICON   */].setAppIconWidth(100).setAppIconHeight(200);
+      assets[8 /* PRICE      */].setPriceMaxSafeLength(10);
+      assets[9 /* STORE      */].setStoreMaxSafeLength(10);
+    }
+
+    for (NativeAdTemplate.Builder asset : assets) {
+      if (size >= 2) {
+        asset.setRequiredFields(asset.getRecommendedFields());
+        asset.clearRequiredFields();
+      }
+      adSlot.addNativeAdTemplate(asset);
+    }
+  }
+
+  static Builder newNativeAdTemplate(int field) {
+    return NativeAdTemplate.newBuilder().setRecommendedFields(field);
   }
 }

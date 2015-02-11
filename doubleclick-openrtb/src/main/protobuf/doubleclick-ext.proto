@@ -19,6 +19,7 @@ package com.google.doubleclick;
 option java_outer_classname = "DcExt";
 
 import "openrtb.proto";
+import "openrtb-native.proto";
 import "network-bid.proto";
 
 //
@@ -60,6 +61,11 @@ extend com.google.openrtb.BidRequest.Impression.Video {
 extend com.google.openrtb.BidRequest.Impression.PMP {
   /** Reference to the corresponding node in the DoubleClick request. */
   optional com.google.protos.adx.BidRequest.AdSlot.MatchingAdData adData = 101;
+}
+
+extend com.google.openrtb.NativeRequest.Asset {
+  /** Reference to the corresponding node in the DoubleClick request. */
+  optional com.google.protos.adx.BidRequest.AdSlot.NativeAdTemplate nativ = 101;
 }
 
 extend com.google.openrtb.BidResponse {
