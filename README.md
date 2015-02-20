@@ -27,6 +27,15 @@ line after checkout or after any mvn clean.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+# Version 0.8.0-beta, 20-02-2015
+
+* Support for Native Ads completed!
+* Mapping: Publisher.name.
+* ExtMapper has new methods that make easier to create mapper
+  extensions for the objects: App, Site, User.
+* DoubleClick protocol v.59, adds mediation_status.
+* Updated to latest error-prone; now Maven build works with JDK 8!
+
 # Version 0.7.5, 02-12-2014
 
 * Partial support for OpenRTB 2.3! The missing item is Native ads,
