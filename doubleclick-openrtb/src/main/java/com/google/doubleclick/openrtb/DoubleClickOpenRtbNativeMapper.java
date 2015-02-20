@@ -87,7 +87,7 @@ public class DoubleClickOpenRtbNativeMapper {
       NativeRequest natReq, NativeResponse natResp) {
     NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd =
         NetworkBid.BidResponse.Ad.NativeAd.newBuilder()
-            .addAllImpressionTrackingUrl(natResp.getImptrackerList());
+            .addAllImpressionTrackingUrl(natResp.getImptrackersList());
 
     if (natResp.hasLink()) {
       dcNatAd.setClickTrackingUrl(natResp.getLink().getUrl());
@@ -194,12 +194,12 @@ public class DoubleClickOpenRtbNativeMapper {
     int id = 0;
 
     for (NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ : dcSlot.getNativeAdTemplateList()) {
-      long req = dcNativ.getRequiredFields();
-      long bits = dcNativ.getRecommendedFields() | req;
+      long reqBits = dcNativ.getRequiredFields();
+      long bits = dcNativ.getRecommendedFields() | reqBits;
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE);
         NativeRequest.Asset.Title.Builder title = NativeRequest.Asset.Title.newBuilder();
         if (dcNativ.hasHeadlineMaxSafeLength()) {
           title.setLen(dcNativ.getHeadlineMaxSafeLength());
@@ -211,8 +211,8 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE);
         NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
             .setType(NativeRequest.Asset.Data.DataAssetType.DESC);
         if (dcNativ.hasBodyMaxSafeLength()) {
@@ -225,8 +225,8 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE);
         NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
             .setType(NativeRequest.Asset.Data.DataAssetType.CTATEXT);
         if (dcNativ.hasCallToActionMaxSafeLength()) {
@@ -239,16 +239,16 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE);
         NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
             .setType(NativeRequest.Asset.Data.DataAssetType.SPONSORED);
         nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE);
         NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
             .setType(NativeRequest.Asset.Image.ImageAssetType.MAIN);
         if (dcNativ.hasImageWidth()) {
@@ -261,8 +261,8 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE);
         NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
             .setType(NativeRequest.Asset.Image.ImageAssetType.LOGO);
         if (dcNativ.hasLogoWidth()) {
@@ -275,8 +275,8 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE);
         NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
             .setType(NativeRequest.Asset.Image.ImageAssetType.ICON);
         if (dcNativ.hasAppIconWidth()) {
@@ -289,16 +289,16 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE);
         NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
             .setType(NativeRequest.Asset.Data.DataAssetType.RATING);
         nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE);
         NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
             .setType(NativeRequest.Asset.Data.DataAssetType.PRICE);
         if (dcNativ.hasPriceMaxSafeLength()) {
@@ -311,8 +311,8 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder().setId(++id).setReq(
-            (req & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0);
+        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
+            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE);
         NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
             .setType(NativeRequest.Asset.Data.DataAssetType.ADDRESS);
         if (dcNativ.hasStoreMaxSafeLength()) {
@@ -326,6 +326,12 @@ public class DoubleClickOpenRtbNativeMapper {
     }
 
     return impNativ.setRequest(nativReq);
+  }
+
+  private static NativeRequest.Asset.Builder newAsset(int id, long reqBits, int bit) {
+    return NativeRequest.Asset.newBuilder()
+        .setId(id)
+        .setRequired((reqBits & bit) != 0);
   }
 
   protected NativeRequest.Asset.Builder extMapNative(
