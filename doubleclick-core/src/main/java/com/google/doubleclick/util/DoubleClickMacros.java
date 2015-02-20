@@ -74,39 +74,39 @@ public enum DoubleClickMacros {
   // Cookie matching macros, see https://developers.google.com/ad-exchange/rtb/cookie-guide
 
   /**
-   * <google user id>
+   * {@code <google user id>}
    */
   GOOGLE_GID("%%GOOGLE_GID%%", true),
   /**
-   * &google_gid=<google user id>
+   * {@code &google_gid=<google user id>}
    */
   GOOGLE_GID_PAIR("%%GOOGLE_GID_PAIR%%", true),
   /**
-   * <cookie version number>
+   * {@code <cookie version number>}
    */
   GOOGLE_CVER("%%GOOGLE_CVER%%", true),
   /**
-   * &cver=<cookie version number>
+   * {@code &cver=<cookie version number>}
    */
   GOOGLE_CVER_PAIR("%%GOOGLE_CVER_PAIR%%", true),
   /**
-   * <error id>
+   * {@code <error id>}
    */
   GOOGLE_ERROR("%%GOOGLE_ERROR%%", true),
   /**
-   * &google_error=<error id>
+   * {@code &google_error=<error id>}
    */
   GOOGLE_ERROR_PAIR("%%GOOGLE_ERROR_PAIR%%", true),
   /**
-   * <pixel match data>
+   * {@code <pixel match data>}
    */
   GOOGLE_PUSH("%%GOOGLE_PUSH%%", true),
   /**
-   * &google_push=<pixel match data>
+   * {@code &google_push=<pixel match data>}
    */
   GOOGLE_PUSH_PAIR("%%GOOGLE_PUSH_PAIR%%", true),
   /**
-   * google_gid=<google user id>&cver=<cookie version number>&google_error=<error id>
+   * {@code google_gid=<google user id>&cver=<cookie version number>&google_error=<error id>}
    */
   GOOGLE_ALL_PARAMS("%%GOOGLE_ALL_PARAMS%%", true)
   ;

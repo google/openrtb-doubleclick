@@ -492,7 +492,7 @@ public class DoubleClickMetadata {
      * by DoubleClick documentation, you shouldn't trust the "Parent Criteria IDs" column
      * so that's not even mapped to this model class).
      * <p>
-     * Example: (New York city target) => (New York state)
+     * Example: (New York city target) returns (New York state)
      */
     public final @Nullable GeoTarget getParent() {
       return parent;
@@ -511,7 +511,7 @@ public class DoubleClickMetadata {
     /**
      * The target type.
      * <p>
-     * Example: (New York city target) => {@link TargetType#CITY}
+     * Example: (New York city target) returns {@link TargetType#CITY}
      */
     public final TargetType getTargetType() {
       return key.targetType;
@@ -520,7 +520,7 @@ public class DoubleClickMetadata {
     /**
      * Finds an ancestor of a specific type, if possible.
      * <p>
-     * Example: (New York city target, {@link TargetType#COUNTRY}) => (US country target)
+     * Example: (New York city target, {@link TargetType#COUNTRY}) returns (US country target)
      */
     public @Nullable GeoTarget getAncestor(TargetType targetType) {
       for (GeoTarget currTarget = this; currTarget != null; currTarget = currTarget.getParent()) {
