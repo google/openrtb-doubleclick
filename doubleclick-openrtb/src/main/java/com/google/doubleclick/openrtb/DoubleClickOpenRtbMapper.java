@@ -247,7 +247,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   @Override
   public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
-        .setId(BaseEncoding.base16().encode(dcRequest.getId().toByteArray()));
+        .setId(BaseEncoding.base64Url().omitPadding().encode(dcRequest.getId().toByteArray()));
 
     if (dcRequest.getIsPing()) {
       return request;
@@ -308,7 +308,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       ByteString dcHMD = coppa
           ? dcRequest.getConstrainedUsageHostedMatchData()
           : dcRequest.getHostedMatchData();
-      user.setCustomdata(BaseEncoding.base16().encode(dcHMD.toByteArray()));
+      user.setCustomdata(BaseEncoding.base64Url().omitPadding().encode(dcHMD.toByteArray()));
     }
 
     if (dcRequest.hasUserDemographic()) {
