@@ -30,10 +30,10 @@ RELEASE NOTES
 # Version 0.8.0-beta, 20-02-2015
 
 * Support for Native Ads completed!
-* Mapping: Publisher.name.
-* ExtMapper has new methods that make easier to create mapper
-  extensions for the objects: App, Site, User.
-* DoubleClick protocol v.59, adds mediation_status.
+* Maps `Publisher.name`.
+* `ExtMapper` has new methods that make easier to create mapper
+  extensions for the objects: `App`, `Site`, `User`.
+* DoubleClick protocol v.59, adds `mediation_status`.
 * Updated to latest error-prone; now Maven build works with JDK 8!
 
 # Version 0.7.5, 02-12-2014
@@ -42,34 +42,34 @@ RELEASE NOTES
   which depends on the OpenRTB Native 1.0 spec (proposed final draft
   at this time). This support will come in a future update.
   (Meanwhile you can bid on native ads with DoubleClick's protocol.)
-  - Maps OpenRTB Bid.cat / DC Ad.category
-  - Maps DC BidRequest.isTest / OpenRTB BidRequest.test
-  - Maps DC Mobile.[constrainedUsage]encryptedAdvertisingId
-    / OpenRTB Device.ifa; also, sets OpenRTB Device.lmt
-  - Maps DC Mobile.screenWidth/screenHeight / OpenRTB Device.w/h
-  - Maps DC Mobile.devicePixelRatioMillis / OpenRTB Device.pxratio
-  - Maps DC BidRequest.timezoneOffset / OpenRTB Geo.utcoffset
-  - Maps DC Mobile.mobileWebOptimized / OpenRTB Site.mobile
-* Fix BidResponse mapping, was broken for non-multisize, interstitial
-  video impression (DoubleClick requires setting width/height).
-* Improvements and cleanups in the internal CSVParser.
+  - Maps OpenRTB `Bid.cat` / DC `Ad.category`
+  - Maps DC `BidRequest.isTest` / OpenRTB `BidRequest.test`
+  - Maps DC `Mobile.[constrainedUsage]encryptedAdvertisingId`
+    / OpenRTB `Device.ifa`; also, sets OpenRTB `Device.lmt`
+  - Maps DC `Mobile.screenWidth/screenHeight` / OpenRTB `Device.w/h`
+  - Maps DC `Mobile.devicePixelRatioMillis` / OpenRTB `Device.pxratio`
+  - Maps DC `BidRequest.timezoneOffset` / OpenRTB `Geo.utcoffset`
+  - Maps DC `Mobile.mobileWebOptimized` / OpenRTB `Site.mobile`
+* Fix `BidResponse` mapping, was broken for non-multisize, interstitial
+  video impression (DoubleClick requires setting `width/height`).
+* Improvements and cleanups in the internal CSV parser.
 
 # Version 0.7.4, 21-11-2014
 
 * DoubleClick proto v57.  Notice that the major new in this update is
   native ads, but the corresponding OpenRTB spec is not finalized so
   there's no DoubleClick/OpenRTB mapping support at this time.
-  - Maps DC IFramingState / OpenRTB topframe.
-  - Maps OpenRTB Bid.nurl / DC Ad.impressionTrackingUrl
+  - Maps DC `IFramingState` / OpenRTB `topframe`.
+  - Maps OpenRTB `Bid.nurl` / DC `Ad.impressionTrackingUrl`
 
 # Version 0.7.3, 17-11-2014
 
-* Fix mapping of BidRequest.User.customdata.
+* Fix mapping of `BidRequest.User.customdata`.
 
 # Version 0.7.2, 29-10-2014
 
 * Updated to Protocol Buffers 2.6.1 (bugfix, doesn't require rebuilds).
-* DoubleClickMetadata more resilient to bad resources.
+* `DoubleClickMetadata` more resilient to bad resources.
 * DoubleClick protocol v.54.
 * Test & logging reviews.
 
@@ -80,63 +80,63 @@ RELEASE NOTES
 
 # Version 0.7.0, 16-10-2014
 
-* Fix namespace of Doubleclick proto to Google standard: replace all
-  com.google.doubleclick.Doubleclick->com.google.protos.adx.NetworkBid.
-* DoubleClickValidator validates SSL-enabled ads.
+* Fix namespace of DoubleClick proto to Google standard: replace all
+  `com.google.doubleclick.Doubleclick`->`com.google.protos.adx.NetworkBid`.
+* `DoubleClickValidator` validates SSL-enabled ads.
 
 # Version 0.6.6, 14-10-2014
 
 * DoubleClick proto v.52.
 * Mapper: Much better mapping of IAB categories.
-* New link extension DcExt.bidResponse.
+* New link extension `DcExt.bidResponse`.
 * Javadocs for thead safety.
 * Update Guava library.
 
 # Version 0.6.5, 18-08-2014
 
-- Crypto reviews: javax.security's exceptions; initVector improvements;
-  fix block cypher for >1 blocks; Price method names (millis/micros).
+- Crypto reviews: `javax.security`'s exceptions; initVector improvements;
+  fix block cypher for >1 blocks; `Price` method names (millis/micros).
 - Metadata: content-labels, publisher-verticals; better GeoTable parser.
-- Mapper: Fix AdPosition & Banner.mimes; add Content.contentrating,
-  User.data.segment, Banner.expdir, Video.startdelay (special values).
-- DoubleClickValidator: validates dealId; optimizations.
+- Mapper: Fix `AdPosition` & `Banner.mimes`; add `Content.contentrating`,
+  `User.data.segment`, `Banner.expdir`, `Video.startdelay` (special values).
+- DoubleClickValidator: validates `deal_id`; optimizations.
 
 # Version 0.6.4, 10-08-2014
 
 * Remove dependency from apache-commons-codec!
-* DoubleClickValidator improved (better logs) and refactored to not
+* `DoubleClickValidator` improved (better logs) and refactored to not
   depend on OpenRTB; moved to the doubleclick-core module.
-* Provide a DoubleClickMetadata.URLConnectionTransport.
+* Provide a `DoubleClickMetadata.URLConnectionTransport`.
 * Added missing two methods in the mapper interface.
-* DoubleClickCrypto.Price supports micros & currency unit.
+* `DoubleClickCrypto.Price` supports micros & currency unit.
 * No need anymore to checkout the openrtb project for building.
 
 # Version 0.6.3, 02-08-2014
 
 * Update DoubleClick protocol to v51.
-* Map User.gender/age from new UserDemographics data.
-* Decrypt HyperlocalSet, keep in a link extension, and map Geo.lat/lon.
-* Map Video.mimes and Video.companionad.mimes.
-* DoubleClickCrypto: IDFA/Hyperlocal now correct; big general review.
-* Fixed mapping of price and bidfloor properties to use currency units
+* Map `User.gender/age` from new `UserDemographics` data.
+* Decrypt `HyperlocalSet`, keep in a link extension, and map `Geo.lat/lon`.
+* Map `Video.mimes` and `Video.companionad.mimes`.
+* `DoubleClickCrypto`: IDFA/Hyperlocal now correct; big general review.
+* Fixed mapping of `price` and `bidfloor` properties to use currency units
   (which is the standard). Previous code used micros, that was a legacy
-  from this code's DoubleClick roots, but was not OpenRTB-compliant.
+  from this code's DoubleClick roots but was not OpenRTB-compliant.
 
 # Version 0.6.2, 25-07-2014
 
-* DoubleClickCrypto: optimize memory usage in Base64 encoding/decoding;
+* `DoubleClickCrypto`: optimize memory usage in Base64 encoding/decoding;
   some initial fixes for IDFA/Hyperlocal but still broken in some cases.
 * Remove dependency on buggy, unsupported opencsv; using custom parser.
-* DoubleClickOpenRtbMapper: Fix semi-transparent branded channels.
+* Mapping: Fix semi-transparent branded channels.
 
 # Version 0.6.1, 15-07-2014
 
 * Remove depedency from Guice! The libraries still supports all
-  JSR-305 DI frameworks, but now only uses javax.inject.
-* DoubleClick protocol v50; map app.content.userrating, app.name.
+  JSR-305 DI frameworks, but now only uses `javax.inject`.
+* DoubleClick protocol v50; map `app.content.userrating`, `app.name`.
 * Build system improvements (Maven, Eclipse, NetBeans).
-* Improved OpenRtbSnippetProcessor handling of macro dependencies;
-  see new documentation about this in OpenRtbMacros.
+* Improved `OpenRtbSnippetProcessor` handling of macro dependencies;
+  see new documentation about this in `OpenRtbMacros`.
 
 # Version 0.6, 10-07-2014
 
