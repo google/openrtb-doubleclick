@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.openrtb.OpenRtb.CreativeAttribute;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Maps between AdX creative attributes and OpenRTB's {@link CreativeAttribute}.
@@ -63,23 +65,23 @@ public class CreativeAttributeMapper {
     return openrtbToDc.get(openrtb);
   }
 
-  public static ImmutableSet<CreativeAttribute> toOpenRtb(Collection<Integer> dcList) {
-    ImmutableSet.Builder<CreativeAttribute> openrtbSet = ImmutableSet.builder();
-
+  public static Set<CreativeAttribute> toOpenRtb(
+      Collection<Integer> dcList, Set<CreativeAttribute> openrtbSet) {
+    Set<CreativeAttribute> ret = openrtbSet == null
+        ? new LinkedHashSet<CreativeAttribute>()
+        : openrtbSet;
     for (int dc : dcList) {
-      openrtbSet.addAll(toOpenRtb(dc));
+      ret.addAll(toOpenRtb(dc));
     }
-
-    return openrtbSet.build();
+    return ret;
   }
 
-  public static ImmutableSet<Integer> toDoubleClick(Collection<CreativeAttribute> openrtbList) {
-    ImmutableSet.Builder<Integer> dcSet = ImmutableSet.builder();
-
+  public static Set<Integer> toDoubleClick(
+      Collection<CreativeAttribute> openrtbList, Set<Integer> dcSet) {
+    Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (CreativeAttribute openrtb : openrtbList) {
-      dcSet.addAll(toDoubleClick(openrtb));
+      ret.addAll(toDoubleClick(openrtb));
     }
-
-    return dcSet.build();
+    return ret;
   }
 }

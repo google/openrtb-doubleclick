@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -47,30 +49,27 @@ public class VideoMimeMapper {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
 
-  public static ImmutableSet<String> toOpenRtb(Collection<VideoFormat> dcList) {
-    ImmutableSet.Builder<String> openrtbSet = ImmutableSet.builder();
-
+  public static Set<String> toOpenRtb(Collection<VideoFormat> dcList, Set<String> openrtbSet) {
+    Set<String> ret = openrtbSet == null ? new LinkedHashSet<String>() : openrtbSet;
     for (VideoFormat dc : dcList) {
-      openrtbSet.addAll(toOpenRtb(dc));
+      ret.addAll(toOpenRtb(dc));
     }
-
-    return openrtbSet.build();
+    return ret;
   }
 
   public static @Nullable VideoFormat toDoubleClick(String openrtb) {
     return openrtbToDc.get(openrtb);
   }
 
-  public static ImmutableSet<VideoFormat> toDoubleClick(Collection<String> openrtbList) {
-    ImmutableSet.Builder<VideoFormat> dcSet = ImmutableSet.builder();
-
+  public static Set<VideoFormat> toDoubleClick(
+      Collection<String> openrtbList, Set<VideoFormat> dcSet) {
+    Set<VideoFormat> ret = dcSet == null ? new LinkedHashSet<VideoFormat>() : dcSet;
     for (String openrtb : openrtbList) {
       VideoFormat dc = toDoubleClick(openrtb);
       if (dc != null) {
-        dcSet.add(dc);
+        ret.add(dc);
       }
     }
-
-    return dcSet.build();
+    return ret;
   }
 }

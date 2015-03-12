@@ -29,9 +29,9 @@ public class BannerMimeMapperTest {
   public void testMapper() {
     assertEquals(
         ImmutableSet.of("image/gif", "image/jpeg", "image/png"),
-        BannerMimeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.IMAGE_CREATIVE)));
+        BannerMimeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.IMAGE_CREATIVE), null));
     assertEquals(
         ImmutableSet.of(CreativeFormat.IMAGE_CREATIVE),
-        BannerMimeMapper.toDoubleClick(ImmutableList.of("image/jpeg")));
+        BannerMimeMapper.toDoubleClick(ImmutableList.of("image/jpeg"), null));
   }
 }
