@@ -50,6 +50,12 @@ public enum DoubleClickMacros {
    */
   CLICK_URL_UNESC("%%CLICK_URL_UNESC%%", false),
   /**
+   * Resolves to {@code http:} or {@code https:}, depending on the inventory type.
+   * Only the HTML tag’s text provided to Ad Exchange will be adapted, so fourth-party calls
+   * outside the HTML tag’s text will not be adapted by this macro.
+   */
+  SCHEME("%%SCHEME%%", false),
+  /**
    * The url-escaped domain of the content URL or the anonymous ID for anonymous inventory.
    */
   SITE("%%SITE%%", false),

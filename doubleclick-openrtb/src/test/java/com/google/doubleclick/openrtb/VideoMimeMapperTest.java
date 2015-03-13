@@ -29,9 +29,9 @@ public class VideoMimeMapperTest {
   public void testMapper() {
     assertEquals(
         ImmutableSet.of("video/mp4", "video/webm"),
-        VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5)));
+        VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5), null));
     assertEquals(
         ImmutableSet.of(VideoFormat.VIDEO_HTML5),
-        VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm")));
+        VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm"), null));
   }
 }

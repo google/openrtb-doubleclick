@@ -29,9 +29,9 @@ public class CreativeAttributeMapperTest {
   public void testMapper() {
     assertEquals(
         ImmutableSet.of(1),
-        CreativeAttributeMapper.toDoubleClick(ImmutableList.of(CreativeAttribute.TEXT_ONLY)));
+        CreativeAttributeMapper.toDoubleClick(ImmutableList.of(CreativeAttribute.TEXT_ONLY), null));
     assertEquals(
         ImmutableSet.of(CreativeAttribute.TEXT_ONLY),
-        CreativeAttributeMapper.toOpenRtb(ImmutableList.of(1)));
+        CreativeAttributeMapper.toOpenRtb(ImmutableList.of(1), null));
   }
 }

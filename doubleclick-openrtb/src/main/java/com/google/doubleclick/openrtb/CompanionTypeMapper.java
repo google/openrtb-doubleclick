@@ -16,11 +16,12 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link CompanionType}.
@@ -48,26 +49,24 @@ public class CompanionTypeMapper {
     }
   }
 
-  public static ImmutableSet<CompanionType> toOpenRtb(Collection<CreativeFormat> dcList) {
-    ImmutableSet.Builder<CompanionType> openrtbSet = ImmutableSet.builder();
-
+  public static Set<CompanionType> toOpenRtb(
+      Collection<CreativeFormat> dcList, Set<CompanionType> openrtbSet) {
+    Set<CompanionType> ret = openrtbSet == null ? new LinkedHashSet<CompanionType>() : openrtbSet;
     for (CreativeFormat dc : dcList) {
-      openrtbSet.add(toOpenRtb(dc));
+      ret.add(toOpenRtb(dc));
     }
-
-    return openrtbSet.build();
+    return ret;
   }
 
-  public static ImmutableSet<CreativeFormat> toDoubleClick(Collection<CompanionType> openrtbList) {
-    ImmutableSet.Builder<CreativeFormat> dcSet = ImmutableSet.builder();
-
+  public static Set<CreativeFormat> toDoubleClick(
+      Collection<CompanionType> openrtbList, Set<CreativeFormat> dcSet) {
+    Set<CreativeFormat> ret = dcSet == null ? new LinkedHashSet<CreativeFormat>() : null;
     for (CompanionType openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {
-        dcSet.add(dc);
+        ret.add(dc);
       }
     }
-
-    return dcSet.build();
+    return ret;
   }
 }

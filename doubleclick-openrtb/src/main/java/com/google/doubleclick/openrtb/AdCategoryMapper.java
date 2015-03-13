@@ -31,9 +31,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
 
 /**
  * Maps between AdX's ad (product, restricted and sensitive) categories,
@@ -48,7 +53,7 @@ public class AdCategoryMapper {
   static {
     Pattern pattern = Pattern.compile("(\\d+)\\|.*\\|(\\d+)\\|.*");
     ImmutableMultimap.Builder<ContentCategory, Integer> data = ImmutableMultimap.builder();
-    Map<ContentCategory, String> names = new HashMap<>();
+    Map<ContentCategory, String> names = new LinkedHashMap<>();
 
     try (InputStream isMetadata = AdCategoryMapper.class.getResourceAsStream(
         "/adx-openrtb/category-mapping-openrtb.txt")) {
@@ -90,23 +95,21 @@ public class AdCategoryMapper {
     return openrtbToName;
   }
 
-  public static ImmutableSet<ContentCategory> toOpenRtb(Collection<Integer> dcList) {
-    ImmutableSet.Builder<ContentCategory> openrtbSet = ImmutableSet.builder();
-
+  public static Set<ContentCategory> toOpenRtb(
+      Collection<Integer> dcList, @Nullable Set<ContentCategory> openrtbSet) {
+    Set<ContentCategory> ret = openrtbSet == null ? new LinkedHashSet<ContentCategory>() : openrtbSet;
     for (int dc : dcList) {
-      openrtbSet.addAll(toOpenRtb(dc));
+      ret.addAll(toOpenRtb(dc));
     }
-
-    return openrtbSet.build();
+    return ret;
   }
 
-  public static ImmutableSet<Integer> toDoubleClick(Collection<ContentCategory> openrtbList) {
-    ImmutableSet.Builder<Integer> dcSet = ImmutableSet.builder();
-
+  public static Set<Integer> toDoubleClick(
+      Collection<ContentCategory> openrtbList, ImmutableSet<Integer> dcSet) {
+    Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (ContentCategory openrtb : openrtbList) {
-      dcSet.addAll(toDoubleClick(openrtb));
+      ret.addAll(toDoubleClick(openrtb));
     }
-
-    return dcSet.build();
+    return ret;
   }
 }

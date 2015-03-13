@@ -66,11 +66,14 @@ public class DoubleClickMetadata {
   private final ImmutableMap<Integer, String> adSensitiveCategories;
   private final ImmutableMap<Integer, String> adProductCategories;
   private final ImmutableMap<Integer, String> adRestrictedCategories;
+  private final ImmutableMap<Integer, String> agencies;
   private final ImmutableMap<Integer, String> allAdCategories;
   private final ImmutableMap<Integer, String> pubExcCreativeAttributes;
   private final ImmutableMap<Integer, String> buyDecCreativeAttributes;
   private final ImmutableMap<Integer, String> allCreativeAttributes;
+  private final ImmutableMap<Integer, String> creativeStatusCodes;
   private final ImmutableMap<Integer, String> sellerNetworks;
+  private final ImmutableMap<Integer, String> siteLists;
   private final ImmutableMap<Integer, String> contentLabels;
   private final ImmutableMap<Integer, String> publisherVerticals;
   private final ImmutableMap<Integer, GeoTarget> targetsByCriteriaId;
@@ -86,13 +89,16 @@ public class DoubleClickMetadata {
     cats.putAll(adProductCategories = load(transport, ADX_DICT + "ad-product-categories.txt"));
     cats.putAll(adRestrictedCategories = load(transport, ADX_DICT + "ad-restricted-categories.txt"));
     allAdCategories = ImmutableMap.copyOf(cats);
+    agencies = load(transport, ADX_DICT + "agencies.txt");
     HashMap<Integer, String> attrs = new HashMap<>();
     attrs.putAll(pubExcCreativeAttributes =
         load(transport, ADX_DICT + "publisher-excludable-creative-attributes.txt"));
     attrs.putAll(buyDecCreativeAttributes =
         load(transport, ADX_DICT + "buyer-declarable-creative-attributes.txt"));
     allCreativeAttributes = ImmutableMap.copyOf(attrs);
+    creativeStatusCodes = load(transport, ADX_DICT + "creative-status-codes.txt");
     sellerNetworks = load(transport, ADX_DICT + "seller-network-ids.txt");
+    siteLists = load(transport, ADX_DICT + "site-lists.txt");
     contentLabels = load(transport, ADX_DICT + "content-labels.txt");
     publisherVerticals = load(transport, ADX_DICT + "publisher-verticals.txt");
     targetsByCriteriaId = loadGeoTargets(transport, ADX_DICT + "geo-table.csv");
@@ -128,6 +134,15 @@ public class DoubleClickMetadata {
    */
   public ImmutableMap<Integer, String> getAllCreativeAttributes() {
     return allCreativeAttributes;
+  }
+
+  /**
+   * Dictionary file used in the creative_status_code field of BidRequest.BidResponseFeedback.
+   * This field lists the different reasons that a creative returned
+   * in a BidResponse may be rejected.
+   */
+  public ImmutableMap<Integer, String> getCreativeStatusCodes() {
+    return creativeStatusCodes;
   }
 
   /**
@@ -168,6 +183,14 @@ public class DoubleClickMetadata {
   }
 
   /**
+   * Dictionary file used in the agency_id field of BidResponse.
+   * This field is used to declare the agency that is associated with the ad being returned.
+   */
+  public ImmutableMap<Integer, String> getAgencies() {
+    return agencies;
+  }
+
+  /**
    * Dictionary used in the allowed_vendor_type field of BidRequest. This field lists which
    * Rich Media vendors such as Eyeblaster and Pointroll are allowed for the creative being
    * served as specified by the publisher.
@@ -191,6 +214,16 @@ public class DoubleClickMetadata {
    */
   public ImmutableMap<Integer, String> getSellerNetworks() {
     return sellerNetworks;
+  }
+
+  /**
+   * Dictionary file used in the site_list_id field of BidRequest. This field specifies the
+   * site lists to which the publisher belongs. Current options are Ad Planner 1000
+   * (a list of 1000 most visited sites on the web), and Brand Select
+   * (a list of quality publishers generated based on Google internal ranking).
+   */
+  public ImmutableMap<Integer, String> getSiteLists() {
+    return siteLists;
   }
 
   /**
@@ -243,18 +276,21 @@ public class DoubleClickMetadata {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues()
-        .add("vendors#", vendors.size())
-        .add("gdnVendorTypes#", gdnVendors.size())
-        .add("sensitiveCategories#", adSensitiveCategories.size())
-        .add("productCategories#", adProductCategories.size())
-        .add("restrictedCategories#", adRestrictedCategories.size())
-        .add("pubExcCreativeAttributes#", pubExcCreativeAttributes.size())
+        .add("agencies#", agencies.size())
         .add("buyDecCreativeAttributes#", buyDecCreativeAttributes.size())
-        .add("sellerNetworks#", sellerNetworks.size())
         .add("contentLabels#", contentLabels.size())
-        .add("publisherVerticals#", publisherVerticals.size())
-        .add("targetsByCriteriaId#", targetsByCriteriaId.size())
         .add("countryCodes#", countryCodes.size())
+        .add("creativeStatusCodes#", creativeStatusCodes.size())
+        .add("gdnVendorTypes#", gdnVendors.size())
+        .add("productCategories#", adProductCategories.size())
+        .add("pubExcCreativeAttributes#", pubExcCreativeAttributes.size())
+        .add("publisherVerticals#", publisherVerticals.size())
+        .add("restrictedCategories#", adRestrictedCategories.size())
+        .add("sellerNetworks#", sellerNetworks.size())
+        .add("sensitiveCategories#", adSensitiveCategories.size())
+        .add("siteLists#", siteLists.size())
+        .add("targetsByCriteriaId#", targetsByCriteriaId.size())
+        .add("vendors#", vendors.size())
         .toString();
   }
 

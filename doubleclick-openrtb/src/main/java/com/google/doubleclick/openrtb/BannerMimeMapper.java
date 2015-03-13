@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -51,30 +53,28 @@ public class BannerMimeMapper {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
 
-  public static ImmutableSet<String> toOpenRtb(Collection<CreativeFormat> dcList) {
-    ImmutableSet.Builder<String> openrtbSet = ImmutableSet.builder();
-
+  public static Set<String> toOpenRtb(
+      Collection<CreativeFormat> dcList, Set<String> openrtbSet) {
+    Set<String> ret = openrtbSet == null ? new LinkedHashSet<String>() : openrtbSet;
     for (CreativeFormat dc : dcList) {
-      openrtbSet.addAll(toOpenRtb(dc));
+      ret.addAll(toOpenRtb(dc));
     }
-
-    return openrtbSet.build();
+    return ret;
   }
 
   public static @Nullable CreativeFormat toDoubleClick(String openrtb) {
     return openrtbToDc.get(openrtb);
   }
 
-  public static ImmutableSet<CreativeFormat> toDoubleClick(Collection<String> openrtbList) {
-    ImmutableSet.Builder<CreativeFormat> dcSet = ImmutableSet.builder();
-
+  public static Set<CreativeFormat> toDoubleClick(
+      Collection<String> openrtbList, Set<CreativeFormat> dcSet) {
+    Set<CreativeFormat> ret = dcSet == null ? new LinkedHashSet<CreativeFormat>() : dcSet;
     for (String openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {
-        dcSet.add(dc);
+        ret.add(dc);
       }
     }
-
-    return dcSet.build();
+    return ret;
   }
 }

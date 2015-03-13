@@ -258,7 +258,7 @@ public class DoubleClickOpenRtbMapperTest {
         assertEquals(testDesc, coppa, request.getRegs().hasCoppa());
         assertEquals(testDesc, coppa, request.getRegs().getCoppa());
         assertEquals(
-            coppa ? "" : "EC22E69CC8B04ACABB6CD4DA88FB33B6",
+            coppa ? "" : "7CLmnMiwSsq7bNTaiPsztg",
             request.getUser().getCustomdata());
 
         if (size == TestData.NO_SLOT) {
@@ -303,7 +303,8 @@ public class DoubleClickOpenRtbMapperTest {
           NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
           if (linkExt) {
             Ad ad = dcResponse.getAd(0);
-            assertEquals(testDesc, ((size > 1 && multiBid) || imp.getInstl()) && !impNativ, ad.hasWidth());
+            assertEquals(testDesc,
+                ((size > 1 && multiBid) || imp.getInstl()) && !impNativ, ad.hasWidth());
             assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasAdgroupId());
           }
         }
@@ -319,7 +320,9 @@ public class DoubleClickOpenRtbMapperTest {
         .build();
     OpenRtb.BidRequest request = mapper.toOpenRtbBidRequest(dcRequest).build();
     assertEquals(
-        OpenRtb.BidRequest.newBuilder().setId(BaseEncoding.base16().encode(dcRequest.getId().toByteArray())).build(),
+        OpenRtb.BidRequest.newBuilder()
+            .setId(BaseEncoding.base64Url().omitPadding().encode(
+                dcRequest.getId().toByteArray())).build(),
         request);
   }
 

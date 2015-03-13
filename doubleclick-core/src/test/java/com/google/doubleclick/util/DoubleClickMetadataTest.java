@@ -52,18 +52,24 @@ public class DoubleClickMetadataTest {
         DoubleClickMetadata.toString(metadata.getBuyerDeclarableCreativeAttributes(), 1));
     assertEquals("1: CreativeAttribute1",
         DoubleClickMetadata.toString(metadata.getAllCreativeAttributes(), 1));
+    assertEquals("1: Creative won the auction",
+        DoubleClickMetadata.toString(metadata.getCreativeStatusCodes(), 1));
     assertEquals("1: SensitiveCategory1",
         DoubleClickMetadata.toString(metadata.getSensitiveCategories(), 1));
     assertEquals("1: RestrictedCategory1",
         DoubleClickMetadata.toString(metadata.getRestrictedCategories(), 1));
     assertEquals("1: ProductCategory1",
         DoubleClickMetadata.toString(metadata.getProductCategories(), 1));
+    assertEquals("1: NONE",
+        DoubleClickMetadata.toString(metadata.getAgencies(), 1));
     assertEquals("1: Vendor1",
         DoubleClickMetadata.toString(metadata.getVendors(), 1));
     assertEquals("1: GDNVendor1",
         DoubleClickMetadata.toString(metadata.getGdnVendors(), 1));
     assertEquals("1: GDN",
         DoubleClickMetadata.toString(metadata.getSellerNetworks(), 1));
+    assertEquals("31: Brand Select",
+        DoubleClickMetadata.toString(metadata.getSiteLists(), 31));
     assertEquals("1: ContentLabel1",
         DoubleClickMetadata.toString(metadata.getContentLabels(), 1));
     assertEquals("1: /Vertical1",

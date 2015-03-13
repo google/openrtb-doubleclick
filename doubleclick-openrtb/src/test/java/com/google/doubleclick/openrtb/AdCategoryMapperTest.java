@@ -29,9 +29,9 @@ public class AdCategoryMapperTest {
   public void testMapper() {
     assertEquals(
         ImmutableSet.of(10106),
-        AdCategoryMapper.toDoubleClick(ImmutableList.of(ContentCategory.IAB1_4)));
+        AdCategoryMapper.toDoubleClick(ImmutableList.of(ContentCategory.IAB1_4), null));
     assertEquals(
         ImmutableSet.of(ContentCategory.IAB1_4),
-        AdCategoryMapper.toOpenRtb(ImmutableList.of(10106)));
+        AdCategoryMapper.toOpenRtb(ImmutableList.of(10106), null));
   }
 }
