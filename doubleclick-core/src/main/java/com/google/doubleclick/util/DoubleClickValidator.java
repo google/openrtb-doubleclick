@@ -66,7 +66,6 @@ public class DoubleClickValidator {
   private final Counter unmatchedDeal = new Counter();
   private final Counter needsNonflashAttr = new Counter();
   private final Counter needsSslAttr = new Counter();
-  private final Counter sslWithHttp = new Counter();
   private final Counter invalidCreatAttr = new Counter();
   private final Counter invalidVendor = new Counter();
   private final Counter invalidProdCat = new Counter();
@@ -87,8 +86,6 @@ public class DoubleClickValidator {
         needsNonflashAttr);
     metricRegistry.register(MetricRegistry.name(getClass(), "needs-ssl-attr"),
         needsSslAttr);
-    metricRegistry.register(MetricRegistry.name(getClass(), "ssl-with-http"),
-        sslWithHttp);
     metricRegistry.register(MetricRegistry.name(getClass(), "invalid-creative-attr"),
         invalidCreatAttr);
     metricRegistry.register(MetricRegistry.name(getClass(), "invalid-vendor"),
@@ -202,16 +199,6 @@ public class DoubleClickValidator {
                   metadata.getBuyerDeclarableCreativeAttributes(), CREATIVE_SSL));
         }
         valid = false;
-      }
-      for (String ctr : ad.getClickThroughUrlList()) {
-        if (ctr.startsWith("http:")) {
-          sslWithHttp.inc();
-          if (logger.isDebugEnabled()) {
-            logger.debug("{} rejected, SSL-enabled ad cannot use HTTP URL: {}",
-                logId(adslot), ctr);
-          }
-          valid = false;
-        }
       }
     }
 

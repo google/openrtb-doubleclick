@@ -173,12 +173,6 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder badResp1 = BidResponse.newBuilder().addAd(testBid());
     validator.validate(request, badResp1);
     assertTrue(Iterables.isEmpty(bids(badResp1)));
-
-    BidResponse.Builder badResp2 = BidResponse.newBuilder().addAd(testBid()
-        .addAttribute(DoubleClickValidator.CREATIVE_SSL)
-        .addClickThroughUrl("http://unsafe.com"));
-    validator.validate(request, badResp2);
-    assertTrue(Iterables.isEmpty(bids(badResp2)));
   }
 
   @Test
