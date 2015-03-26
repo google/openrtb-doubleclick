@@ -310,7 +310,7 @@ public class DoubleClickMetadata {
           try {
             builder.put(Integer.parseInt(matcher.group(1)), matcher.group(2));
           } catch (NumberFormatException e) {
-            logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
+            logger.debug("Bad record, ignoring: {} - [{}]", e.toString(), record);
           }
         }
       }
