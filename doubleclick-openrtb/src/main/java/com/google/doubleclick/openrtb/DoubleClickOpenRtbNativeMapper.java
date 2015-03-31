@@ -23,6 +23,7 @@ import com.google.openrtb.OpenRtbNative.NativeRequest;
 import com.google.openrtb.OpenRtbNative.NativeResponse;
 import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.openrtb.json.OpenRtbNativeJsonReader;
+import com.google.protobuf.TextFormat;
 import com.google.protos.adx.NetworkBid;
 
 import com.codahale.metrics.Counter;
@@ -206,7 +207,10 @@ public class DoubleClickOpenRtbNativeMapper {
           nativReq.addAssets(extMapNative(dcNativ, asset.setTitle(title)));
         } else {
           incomplete.inc();
-          logger.debug("Headline ignored, missing value");
+          if (logger.isDebugEnabled()) {
+            logger.debug("Headline ignored, missing value: {}",
+                TextFormat.shortDebugString(dcNativ));
+          }
         }
       }
 
@@ -220,7 +224,10 @@ public class DoubleClickOpenRtbNativeMapper {
           nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
         } else {
           incomplete.inc();
-          logger.debug("Body ignored, missing value");
+          if (logger.isDebugEnabled()) {
+            logger.debug("Body ignored, missing value: {}",
+                TextFormat.shortDebugString(dcNativ));
+          }
         }
       }
 
@@ -234,7 +241,10 @@ public class DoubleClickOpenRtbNativeMapper {
           nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
         } else {
           incomplete.inc();
-          logger.debug("Call to action ignored, missing value");
+          if (logger.isDebugEnabled()) {
+            logger.debug("Call to action ignored, missing value: {}",
+                TextFormat.shortDebugString(dcNativ));
+          }
         }
       }
 
@@ -306,7 +316,10 @@ public class DoubleClickOpenRtbNativeMapper {
           nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
         } else {
           incomplete.inc();
-          logger.debug("Price ignored, missing value");
+          if (logger.isDebugEnabled()) {
+            logger.debug("Price ignored, missing value: {}",
+                TextFormat.shortDebugString(dcNativ));
+          }
         }
       }
 
@@ -320,7 +333,10 @@ public class DoubleClickOpenRtbNativeMapper {
           nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
         } else {
           incomplete.inc();
-          logger.debug("Store ignored, missing value");
+          if (logger.isDebugEnabled()) {
+            logger.debug("Store ignored, missing value: {}",
+                TextFormat.shortDebugString(dcNativ));
+          }
         }
       }
     }
