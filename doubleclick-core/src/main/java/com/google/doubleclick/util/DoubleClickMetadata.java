@@ -16,10 +16,9 @@
 
 package com.google.doubleclick.util;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
-import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget.TargetType;
+import com.google.doubleclick.util.GeoTarget.Type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -262,8 +260,8 @@ public class DoubleClickMetadata {
     return targetsByCriteriaId.get(criteriaId);
   }
 
-  public GeoTarget getGeoTarget(TargetType targetType, String canonicalName) {
-    return targetsByCanonicalKey.get(new GeoTarget.CanonicalKey(targetType, canonicalName));
+  public GeoTarget getGeoTarget(Type type, String canonicalName) {
+    return targetsByCanonicalKey.get(new GeoTarget.CanonicalKey(type, canonicalName));
   }
 
   /**
@@ -310,7 +308,7 @@ public class DoubleClickMetadata {
           try {
             builder.put(Integer.parseInt(matcher.group(1)), matcher.group(2));
           } catch (NumberFormatException e) {
-            logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
+            logger.trace("Bad record, ignoring: {} - [{}]", e.toString(), record);
           }
         }
       }
@@ -396,7 +394,7 @@ public class DoubleClickMetadata {
               if (commas == 0) {
                 parentName = null;
               } else if (commas != -1 || canonPos == canonicalName.length()) {
-                logger.debug("Impossible to resolve parent, ignoring: {}", record);
+                logger.trace("Impossible to resolve parent, ignoring: [{}]", record);
                 continue;
               } else {
                 parentName = canonicalName.substring(canonPos + 1);
@@ -414,24 +412,26 @@ public class DoubleClickMetadata {
             }
 
             GeoTarget geoTarget = new GeoTarget(
-                criteriaId,
-                name,
-                canonicalName,
-                parent,
-                countryCode,
-                TargetType.valueOf(toEnumName(targetType)));
+                criteriaId, name, canonicalName, parent, countryCode,
+                Type.valueOf(toEnumName(targetType)));
             map.put(criteriaId, geoTarget);
             // May overwrite duplicates for leaf targets, but only non-leafs will have lookups
             parentMap.put(canonicalName, geoTarget);
           } catch (ParseException | IllegalArgumentException e) {
             if (cycle == 1) {
-              logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
+              logger.trace("Bad record [{}]: {}", record, e.toString());
             }
           }
         }
       }
 
-      logger.debug("Records without parent, ignoring:\n{}", Joiner.on('\n').join(data));
+      if (!data.isEmpty()) {
+        logger.trace("{} records without parent, ignoring", data.size());
+        for (String d : data) {
+          logger.trace(d);
+        }
+      }
+
       return ImmutableMap.copyOf(map);
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
@@ -448,7 +448,6 @@ public class DoubleClickMetadata {
       String record;
 
       while ((record = rd.readLine()) != null) {
-
         if (pattern.matcher(record).matches()) {
           try {
             List<String> fields = csvParser.parse(record);
@@ -458,7 +457,7 @@ public class DoubleClickMetadata {
             map.put(codes.getAlpha2(), codes);
             map.put(codes.getAlpha3(), codes);
           } catch (ParseException | IllegalArgumentException e) {
-            logger.debug("Bad record, ignoring: {}\n{}", e.toString(), record);
+            logger.trace("Bad record: [{}]: {}", record, e.toString());
           }
         }
       }
@@ -470,188 +469,6 @@ public class DoubleClickMetadata {
 
   private static String toEnumName(String csvName) {
     return csvName.replace(' ', '_').toUpperCase();
-  }
-
-  /**
-   * A record from the <a href="https://developers.google.com/ad-exchange/rtb/geotargeting">
-   * Geographical Targeting</a> table.
-   */
-  public static class GeoTarget {
-    final int criteriaId;
-    final String name;
-    final CanonicalKey key;
-    final GeoTarget parent;
-    final String countryCode;
-
-    public GeoTarget(
-        int criteriaId, String name, String canonicalName, GeoTarget parent,
-        String countryCode, TargetType targetType) {
-      this.criteriaId = criteriaId;
-      this.name = name;
-      this.key = new CanonicalKey(targetType, canonicalName);
-      this.parent = parent;
-      this.countryCode = countryCode;
-    }
-
-    /**
-     * Unique and persistent assigned ID.
-     * <p>
-     * Example: 1023191.
-     */
-    public final int getCriteriaId() {
-      return criteriaId;
-    }
-
-    /**
-     * Best available English name of the geo target.
-     * <p>
-     * Example: "New York".
-     */
-    public final String getName() {
-      return name;
-    }
-
-    /**
-     * The constructed fully qualified English name consisting of the target's own name,
-     * and that of its parent and country. This field is meant only for disambiguating similar
-     * target names—it is not yet supported in LocationCriterionService
-     * (use location names or criteria IDs instead).
-     * <p>
-     * Example: "New York,New York,United States".
-     */
-    public final String getCanonicalName() {
-      return key.canonicalName;
-    }
-
-    /**
-     * The immediate parent of this target. Computed from the canonical names (as indicated
-     * by DoubleClick documentation, you shouldn't trust the "Parent Criteria IDs" column
-     * so that's not even mapped to this model class).
-     * <p>
-     * Example: (New York city target) returns (New York state)
-     */
-    public final @Nullable GeoTarget getParent() {
-      return parent;
-    }
-
-    /**
-     * The ISO-3166-1 alpha-2 country code that is associated with the target.
-     * <p>
-     * Example: "US". Notice that OpenRTB uses alpha-3 codes (like "USA"), so you may have
-     * to convert that via {@link DoubleClickMetadata#getCountryCodes()}.
-     */
-    public final String getCountryCode() {
-      return countryCode;
-    }
-
-    /**
-     * The target type.
-     * <p>
-     * Example: (New York city target) returns {@link TargetType#CITY}
-     */
-    public final TargetType getTargetType() {
-      return key.targetType;
-    }
-
-    /**
-     * Finds an ancestor of a specific type, if possible.
-     * <p>
-     * Example: (New York city target, {@link TargetType#COUNTRY}) returns (US country target)
-     */
-    public @Nullable GeoTarget getAncestor(TargetType targetType) {
-      for (GeoTarget currTarget = this; currTarget != null; currTarget = currTarget.getParent()) {
-        if (currTarget.getTargetType() == targetType) {
-          return currTarget;
-        }
-      }
-
-      return null;
-    }
-
-    @Override
-    public int hashCode() {
-      return criteriaId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return obj == this
-          || (obj instanceof GeoTarget && criteriaId == ((GeoTarget) obj).criteriaId);
-    }
-
-    @Override
-    public String toString() {
-      return MoreObjects.toStringHelper(this).omitNullValues()
-          .add("criteriaId", criteriaId)
-          .add("name", name)
-          .add("canonicalName", key.canonicalName)
-          .add("parent", parent == null ? null : parent.getCriteriaId())
-          .add("countryCode", countryCode)
-          .add("targetType", key.targetType)
-          .toString();
-    }
-
-    static class CanonicalKey {
-      final TargetType targetType;
-      final String canonicalName;
-
-      CanonicalKey(TargetType targetType, String canonicalName) {
-        this.targetType = targetType;
-        this.canonicalName = canonicalName;
-      }
-
-      @Override
-      public int hashCode() {
-        return targetType.hashCode() ^ canonicalName.hashCode();
-      }
-
-      @Override
-      public boolean equals(Object obj) {
-        if (obj == this) {
-          return true;
-        } else if (!(obj instanceof CanonicalKey)) {
-          return false;
-        }
-
-        CanonicalKey other = (CanonicalKey) obj;
-        return targetType == other.targetType
-            && canonicalName.equals(other.canonicalName);
-      }
-    }
-
-    /**
-     * Type of geo target record.
-     */
-    public static enum TargetType {
-      UNKNOWN,
-      OTHER,
-      COUNTRY,
-      REGION,
-      TERRITORY,
-      PROVINCE,
-      STATE,
-      PREFECTURE,
-      GOVERNORATE,
-      CANTON,
-      UNION_TERRITORY,
-      AUTONOMOUS_COMMUNITY,
-      DMA_REGION,
-      METRO,
-      CONGRESSIONAL_DISTRICT,
-      COUNTY,
-      MUNICIPALITY,
-      CITY,
-      POSTAL_CODE,
-      DEPARTMENT,
-      AIRPORT,
-      TV_REGION,
-      OKRUG,
-      BOROUGH,
-      CITY_REGION,  // Only to be used for Australia.
-      ARRONDISSEMENT,
-      NEIGHBORHOOD,
-      UNIVERSITY,
-    }
   }
 
   /**
@@ -689,70 +506,6 @@ public class DoubleClickMetadata {
     public InputStream open(String url) throws IOException {
       String resourceName = this.resourceName == null ? new URL(url).getPath() : this.resourceName;
       return ResourceTransport.class.getResourceAsStream(resourceName);
-    }
-  }
-
-  /**
-   * Stores ISO 3166-1 country codes.
-   */
-  public static class CountryCodes {
-    private final int numeric;
-    private final String alpha2;
-    private final String alpha3;
-
-    public CountryCodes(int numeric, String alpha2, String alpha3) {
-      this.numeric = numeric;
-      this.alpha2 = alpha2;
-      this.alpha3 = alpha3;
-    }
-
-    /**
-     * The numeric code. Example: United States = 840.
-     */
-    public final int getNumeric() {
-      return numeric;
-    }
-
-    /**
-     * The alpha-2 code. Example: United States = "US".
-     */
-    public final String getAlpha2() {
-      return alpha2;
-    }
-
-    /**
-     * The alpha-3 code. Example: United States = "USA".
-     */
-    public final String getAlpha3() {
-      return alpha3;
-    }
-
-    @Override
-    public int hashCode() {
-      return numeric;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (obj == this) {
-        return true;
-      } else if (!(obj instanceof CountryCodes)) {
-        return false;
-      }
-
-      CountryCodes other = (CountryCodes) obj;
-      return numeric == other.numeric
-          && alpha2.equals(other.alpha2)
-          && alpha3.equals(other.alpha3);
-    }
-
-    @Override
-    public String toString() {
-      return MoreObjects.toStringHelper(this).omitNullValues()
-          .add("numeric", numeric)
-          .add("alpha2", alpha2)
-          .add("alpha3", alpha3)
-          .toString();
     }
   }
 }

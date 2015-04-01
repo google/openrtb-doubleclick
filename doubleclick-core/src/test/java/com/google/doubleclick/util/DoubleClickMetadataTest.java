@@ -23,9 +23,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import com.google.doubleclick.TestUtil;
-import com.google.doubleclick.util.DoubleClickMetadata.CountryCodes;
-import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget;
-import com.google.doubleclick.util.DoubleClickMetadata.GeoTarget.TargetType;
 import com.google.doubleclick.util.DoubleClickMetadata.ResourceTransport;
 import com.google.doubleclick.util.DoubleClickMetadata.Transport;
 import com.google.doubleclick.util.DoubleClickMetadata.URLConnectionTransport;
@@ -79,20 +76,20 @@ public class DoubleClickMetadataTest {
     assertEquals("United States", metadata.getGeoTarget(1023191).getParent().getParent().getName());
     assertFalse(metadata.getTargetsByCriteriaId().isEmpty());
 
-    GeoTarget geoTarget1 = metadata.getGeoTarget(TargetType.COUNTRY, "United States");
+    GeoTarget geoTarget1 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "United States");
     GeoTarget geoTarget2 =
-        new GeoTarget(2840, "United States", "United States", null, "US", TargetType.COUNTRY);
-    GeoTarget geoTarget3 = metadata.getGeoTarget(TargetType.COUNTRY, "France");
+        new GeoTarget(2840, "United States", "United States", null, "US", GeoTarget.Type.COUNTRY);
+    GeoTarget geoTarget3 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "France");
     TestUtil.testCommonMethods(geoTarget1, geoTarget2, geoTarget3);
 
     assertEquals(2840, geoTarget1.getCriteriaId());
     assertEquals("United States", geoTarget1.getName());
     assertEquals("United States", geoTarget1.getCanonicalName());
     assertEquals("US", geoTarget1.getCountryCode());
-    assertEquals(TargetType.COUNTRY, geoTarget1.getTargetType());
-    assertSame(geoTarget1, geoTarget1.getAncestor(TargetType.COUNTRY));
-    assertNull(geoTarget1.getAncestor(TargetType.CITY));
-    TestUtil.testCommonEnum(TargetType.values());
+    assertEquals(GeoTarget.Type.COUNTRY, geoTarget1.getTargetType());
+    assertSame(geoTarget1, geoTarget1.getAncestor(GeoTarget.Type.COUNTRY));
+    assertNull(geoTarget1.getAncestor(GeoTarget.Type.CITY));
+    TestUtil.testCommonEnum(GeoTarget.Type.values());
 
     CountryCodes country1 = metadata.getCountryCodes().get("US");
     CountryCodes country2 = new CountryCodes(840, "US", "USA");
@@ -104,9 +101,9 @@ public class DoubleClickMetadataTest {
     assertEquals("US", country1.getAlpha2());
     assertEquals("USA", country1.getAlpha3());
 
-    GeoTarget.CanonicalKey canKey1 = new GeoTarget.CanonicalKey(TargetType.CITY, "A");
-    GeoTarget.CanonicalKey canKey2 = new GeoTarget.CanonicalKey(TargetType.CITY, "A");
-    GeoTarget.CanonicalKey canKey3 = new GeoTarget.CanonicalKey(TargetType.CITY, "B");
+    GeoTarget.CanonicalKey canKey1 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");
+    GeoTarget.CanonicalKey canKey2 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");
+    GeoTarget.CanonicalKey canKey3 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "B");
     TestUtil.testCommonMethods(canKey1, canKey2, canKey3);
   }
 

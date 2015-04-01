@@ -26,7 +26,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
+import com.google.doubleclick.util.CountryCodes;
 import com.google.doubleclick.util.DoubleClickMetadata;
+import com.google.doubleclick.util.GeoTarget;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest.App;
 import com.google.openrtb.OpenRtb.BidRequest.Content;
@@ -55,6 +57,7 @@ import com.google.openrtb.mapper.OpenRtbMapper;
 import com.google.openrtb.util.OpenRtbUtils;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.TextFormat;
 import com.google.protos.adx.NetworkBid;
 
 import com.codahale.metrics.Counter;
@@ -160,8 +163,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (!bid.hasCrid()) {
       missingCrid.inc();
-      throw new MapperException(
-          "Bid.crid is not set, mandatory for DoubleClick");
+      throw new MapperException("Bid.crid is not set, mandatory for DoubleClick");
     }
 
     dcAd.setBuyerCreativeId(bid.getCrid());
@@ -203,7 +205,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         dcSlot.setAdgroupId(Long.parseLong(bid.getCid()));
       } else {
         noCid.inc();
-        logger.debug("Missing cid in a Bid created for multi-campaign Impression: {}", bid);
+        if (logger.isDebugEnabled()) {
+          logger.debug("Missing cid in a Bid created for multi-campaign Impression: {}",
+              TextFormat.shortDebugString(bid));
+        }
       }
     }
     if (bid.hasDealid()) {
@@ -238,8 +243,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         dcAd.setHeight(bid.getH());
       } else {
         missingSize.inc();
-        logger.debug("Missing size in a Bid created for {} impression: {}",
-            multisize ? "multisize" : "interstitial", bid);
+        if (logger.isDebugEnabled()) {
+          logger.debug("Missing size in a Bid created for {} impression: {}",
+              multisize ? "multisize" : "interstitial", TextFormat.shortDebugString(bid));
+        }
       }
     }
   }
@@ -651,7 +658,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcRequest.hasGeoCriteriaId()) {
       int geoCriteriaId = dcRequest.getGeoCriteriaId();
 
-      DoubleClickMetadata.GeoTarget geoTarget = metadata.getGeoTarget(geoCriteriaId);
+      GeoTarget geoTarget = metadata.getGeoTarget(geoCriteriaId);
 
       if (geoTarget == null) {
         invalidGeoId.inc();
@@ -692,13 +699,13 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return geo;
   }
 
-  protected void mapGeo(DoubleClickMetadata.GeoTarget geoTarget, Geo.Builder geo) {
-    DoubleClickMetadata.GeoTarget city = null;
-    DoubleClickMetadata.GeoTarget metro = null;
-    DoubleClickMetadata.GeoTarget region = null;
-    DoubleClickMetadata.GeoTarget country = null;
+  protected void mapGeo(GeoTarget geoTarget, Geo.Builder geo) {
+    GeoTarget city = null;
+    GeoTarget metro = null;
+    GeoTarget region = null;
+    GeoTarget country = null;
 
-    for (DoubleClickMetadata.GeoTarget currTarget = geoTarget; currTarget != null;
+    for (GeoTarget currTarget = geoTarget; currTarget != null;
         currTarget = currTarget.getParent()) {
       switch (currTarget.getTargetType()) {
         case CITY:
@@ -734,7 +741,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       geo.setRegion(region.getName());
     }
     if (country != null) {
-      DoubleClickMetadata.CountryCodes countryCodes =
+      CountryCodes countryCodes =
           metadata.getCountryCodes().get(country.getCountryCode());
       if (countryCodes != null) {
         geo.setCountry(countryCodes.getAlpha3());
@@ -756,7 +763,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     } else if (dcRequest.hasAnonymousId()) {
       site.setName(dcRequest.getAnonymousId());
     } else {
-      logger.debug("Site request is missing both url and anonymousId: {}", dcRequest);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Site request is missing both url and anonymousId: {}",
+            TextFormat.shortDebugString(dcRequest));
+      }
     }
 
     String channelId = findChannelId(dcRequest);
@@ -786,7 +796,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     } else if (dcRequest.hasAnonymousId()) {
       content.setId(dcRequest.getAnonymousId());
     } else {
-      logger.debug("App request is missing both url and anonymousId: {}", dcRequest);
+      if (logger.isDebugEnabled()) {
+        logger.debug("App request is missing both url and anonymousId: {}",
+            TextFormat.shortDebugString(dcRequest));
+      }
     }
     if (dcMobile.hasAppRating()) {
       content.setUserrating(String.valueOf(dcMobile.getAppRating()));

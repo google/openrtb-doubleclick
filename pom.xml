@@ -57,11 +57,11 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>0.8.0-beta</openrtbVersion>
+    <openrtbVersion>0.8.1-SNAPSHOT</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/0.8.0-beta</openrtbSource>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/master</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
-    <slf4jVersion>1.7.10</slf4jVersion>
+    <slf4jVersion>1.7.12</slf4jVersion>
 
     <!-- Plugin versions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -166,7 +166,7 @@
 
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.1</version>
+        <version>2.10.2</version>
         <configuration>
           <windowtitle>${project.name}</windowtitle>
           <notimestamp>true</notimestamp>
@@ -207,7 +207,7 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.2</version>
+        <version>3.3</version>
         <configuration>
           <source>1.7</source>
           <target>1.7</target>

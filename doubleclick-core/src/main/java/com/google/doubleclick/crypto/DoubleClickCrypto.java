@@ -326,8 +326,8 @@ public class DoubleClickCrypto {
         .append(": initVector={timestamp ")
             .append(DateFormat.getDateTimeInstance().format(timestamp))
             .append(", serverId ").append(serverId)
-        .append("}\ninput  =").append(BaseEncoding.base16().encode(inData))
-        .append("\noutput =").append(BaseEncoding.base16().encode(workBytes))
+        .append("}, input =").append(BaseEncoding.base16().encode(inData))
+        .append(", output =").append(BaseEncoding.base16().encode(workBytes))
         .toString();
   }
 
