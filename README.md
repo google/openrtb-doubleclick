@@ -27,6 +27,13 @@ line after checkout or after any mvn clean.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.8.0-beta4, 02-04-2015
+
+* Improved handling of geo_criteria_id in the DoubleclickMetadata API
+  and the OpenRTB mapper. You should see more Geo fields populated
+  for many requests, e.g. city for requests located at a postal code,
+  metro for requests from a city that belongs to a metro, etc.
+
 ## Version 0.8.0-beta3, 31-03-2015
 
 * Logging updates, mostly avoiding multiline logs (bad for syslog).
