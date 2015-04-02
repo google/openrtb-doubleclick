@@ -83,9 +83,8 @@
           <format>html</format>
           <instrumentation>
             <excludes>
-              <exclude>com/google/doubleclick/Doubleclick.class</exclude>
-              <exclude>com/google/doubleclick/Doubleclick$*.class</exclude>
-              <exclude>com/google/doubleclick/util/ProtoUtils.class</exclude>
+              <exclude>com/google/doubleclick/*.class</exclude>
+              <exclude>com/google/protos/adx/*.class</exclude>
             </excludes>
           </instrumentation>
         </configuration>

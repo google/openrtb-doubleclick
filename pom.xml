@@ -174,7 +174,7 @@
           <groups>
             <group>
               <title>DoubleClick Utilities</title>
-              <packages>com.google.protos.adx:com.google.doubleclick.crypto:com.google.doubleclick.util</packages>
+              <packages>com.google.protos.adx:com.google.doubleclick:com.google.doubleclick.crypto:com.google.doubleclick.util</packages>
             </group>
             <group>
               <title>DoubleClick OpenRTB support</title>

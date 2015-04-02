@@ -20,3 +20,4 @@
 9999999999999999999999999999999999999,"Some,Name","Id Too Large","1,2,3,4","","US","City"
 9012102,"33611","33611,Florida,United States","1015214,9040475,9057273,200539,21142,2840","","US","Postal Code"
 1015214,"Tampa","Tampa,Florida,United States","9057273,200539,21142,2840","","US","City"
+1115214,"RepeatedCanonName","Tampa,Florida,United States","9057273,200539,21142,2840","","US","City"

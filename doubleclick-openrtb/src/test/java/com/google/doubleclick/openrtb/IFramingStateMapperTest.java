@@ -32,6 +32,9 @@ public class IFramingStateMapperTest {
     assertSame(
         IFramingState.NO_IFRAME,
         IFramingStateMapper.toDoubleClick(false));
+    assertSame(
+        IFramingState.UNKNOWN_IFRAME_STATE,
+        IFramingStateMapper.toDoubleClick(null));
 
     for (boolean openrtb : asList(false, true)) {
       IFramingStateMapper.toDoubleClick(openrtb);

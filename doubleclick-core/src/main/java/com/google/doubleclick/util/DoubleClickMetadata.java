@@ -375,24 +375,20 @@ public class DoubleClickMetadata {
 
       for (Map.Entry<Integer, GeoTarget> entry : targetsById.entrySet()) {
         GeoTarget target = entry.getValue();
-        if (target.getCanonParent() == null) {
-          GeoTarget canonParent = targetsByCanon.get(target.findCanonParentName());
-          if (canonParent != null) {
-            target.setCanonParent(canonParent);
-          }
+        GeoTarget canonParent = targetsByCanon.get(target.findCanonParentName());
+        if (canonParent != null) {
+          target.setCanonParent(canonParent);
         }
       }
 
       for (Map.Entry<Integer, GeoTarget> entry : targetsById.entrySet()) {
         GeoTarget target = entry.getValue();
-        if (target.getIdParent() == null) {
-          List<Integer> parentIds = parentIdsById.get(target.getCriteriaId());
-          for (Integer parentId : parentIds) {
-            GeoTarget idParent = targetsById.get(parentId);
-            if (idParent != null) {
-              target.setIdParent(idParent);
-              break;
-            }
+        List<Integer> parentIds = parentIdsById.get(target.getCriteriaId());
+        for (Integer parentId : parentIds) {
+          GeoTarget idParent = targetsById.get(parentId);
+          if (idParent != null) {
+            target.setIdParent(idParent);
+            break;
           }
         }
       }
