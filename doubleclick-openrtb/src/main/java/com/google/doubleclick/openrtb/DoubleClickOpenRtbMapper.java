@@ -705,28 +705,32 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     GeoTarget region = null;
     GeoTarget country = null;
 
-    for (GeoTarget currTarget = geoTarget; currTarget != null;
-        currTarget = currTarget.getParent()) {
-      switch (currTarget.getTargetType()) {
-        case CITY:
-        case PREFECTURE:
-          city = currTarget;
-          break;
+    for (int chain = 0; chain < 2; ++chain) {
+      for (GeoTarget target = geoTarget; target != null;
+          // Looks up the canonical chain last, so its results overwrite those
+          // obtained by the parentId chain if there's conflict
+          target = (chain == 0) ? target.getIdParent() : target.getCanonParent()) {
+        switch (target.getType()) {
+          case CITY:
+          case PREFECTURE:
+            city = target;
+            break;
 
-        case COUNTRY:
-          country = currTarget;
-          break;
+          case COUNTRY:
+            country = target;
+            break;
 
-        case DMA_REGION:
-          metro = currTarget;
-          break;
+          case DMA_REGION:
+            metro = target;
+            break;
 
-        case STATE:
-        case REGION:
-          region = currTarget;
-          break;
+          case STATE:
+          case REGION:
+            region = target;
+            break;
 
-        default:
+          default:
+        }
       }
     }
 

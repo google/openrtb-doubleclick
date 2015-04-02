@@ -73,12 +73,13 @@ public class DoubleClickMetadataTest {
         DoubleClickMetadata.toString(metadata.getPublisherVerticals(), 1));
     assertEquals("9999: <invalid>",
         DoubleClickMetadata.toString(metadata.getSensitiveCategories(), 9999));
-    assertEquals("United States", metadata.getGeoTarget(1023191).getParent().getParent().getName());
+    assertEquals("United States",
+        metadata.getGeoTarget(1023191).getCanonParent().getCanonParent().getName());
     assertFalse(metadata.getTargetsByCriteriaId().isEmpty());
 
     GeoTarget geoTarget1 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "United States");
-    GeoTarget geoTarget2 =
-        new GeoTarget(2840, "United States", "United States", null, "US", GeoTarget.Type.COUNTRY);
+    GeoTarget geoTarget2 = new GeoTarget(
+        2840, GeoTarget.Type.COUNTRY, "United States", "United States", "US", null, null);
     GeoTarget geoTarget3 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "France");
     TestUtil.testCommonMethods(geoTarget1, geoTarget2, geoTarget3);
 
@@ -86,9 +87,11 @@ public class DoubleClickMetadataTest {
     assertEquals("United States", geoTarget1.getName());
     assertEquals("United States", geoTarget1.getCanonicalName());
     assertEquals("US", geoTarget1.getCountryCode());
-    assertEquals(GeoTarget.Type.COUNTRY, geoTarget1.getTargetType());
-    assertSame(geoTarget1, geoTarget1.getAncestor(GeoTarget.Type.COUNTRY));
-    assertNull(geoTarget1.getAncestor(GeoTarget.Type.CITY));
+    assertEquals(GeoTarget.Type.COUNTRY, geoTarget1.getType());
+    assertSame(geoTarget1, geoTarget1.getCanonAncestor(GeoTarget.Type.COUNTRY));
+    assertNull(geoTarget1.getCanonAncestor(GeoTarget.Type.CITY));
+    assertSame(geoTarget1, geoTarget1.getIdAncestor(GeoTarget.Type.COUNTRY));
+    assertNull(geoTarget1.getIdAncestor(GeoTarget.Type.CITY));
     TestUtil.testCommonEnum(GeoTarget.Type.values());
 
     CountryCodes country1 = metadata.getCountryCodes().get("US");
@@ -101,6 +104,11 @@ public class DoubleClickMetadataTest {
     assertEquals("US", country1.getAlpha2());
     assertEquals("USA", country1.getAlpha3());
 
+    // https://github.com/google/openrtb-doubleclick/issues/28
+    GeoTarget postalTarget = metadata.getGeoTarget(9012102);
+    assertNull(postalTarget.getCanonAncestor(GeoTarget.Type.CITY));
+    assertEquals("Tampa", postalTarget.getIdAncestor(GeoTarget.Type.CITY).getName());
+
     GeoTarget.CanonicalKey canKey1 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");
     GeoTarget.CanonicalKey canKey2 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");
     GeoTarget.CanonicalKey canKey3 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "B");
@@ -110,8 +118,8 @@ public class DoubleClickMetadataTest {
   @Test
   public void testResourceTransport() throws IOException {
     ResourceTransport transport = new ResourceTransport();
-    transport.setResourceName("/adx-openrtb/countries.txt");
-    assertEquals("/adx-openrtb/countries.txt", transport.getResourceName());
+    transport.setResourceName("/adx-rtb-dictionaries/countries.txt");
+    assertEquals("/adx-rtb-dictionaries/countries.txt", transport.getResourceName());
     try (InputStream is = transport.open(null)) {
     }
   }

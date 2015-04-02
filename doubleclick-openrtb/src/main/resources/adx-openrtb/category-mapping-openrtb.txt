@@ -9,8 +9,6 @@
 // category "Sleep Disorders" means all creatives with the (AdX) category
 // "Health Conditions & Concerns" will get blocked.
 //
-// Everything over "379" in this list is unmapped.
-//
 // Second column is not used but is useful for creators, users and maintainers.
 // Fourth column is used to verify that creators entered correct AdX ID and
 // name. Smoke tests shall catch if AdX ID is non-existent and if mapping from

@@ -57,9 +57,9 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>0.8.0-beta3</openrtbVersion>
+    <openrtbVersion>0.8.1-SNAPSHOT</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/0.8.0-beta3</openrtbSource>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/master</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
     <slf4jVersion>1.7.12</slf4jVersion>
 
@@ -174,7 +174,7 @@
           <groups>
             <group>
               <title>DoubleClick Utilities</title>
-              <packages>com.google.protos.adx:com.google.doubleclick.crypto:com.google.doubleclick.util</packages>
+              <packages>com.google.protos.adx:com.google.doubleclick:com.google.doubleclick.crypto:com.google.doubleclick.util</packages>
             </group>
             <group>
               <title>DoubleClick OpenRTB support</title>
