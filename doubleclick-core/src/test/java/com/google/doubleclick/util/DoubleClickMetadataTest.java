@@ -73,7 +73,8 @@ public class DoubleClickMetadataTest {
         DoubleClickMetadata.toString(metadata.getPublisherVerticals(), 1));
     assertEquals("9999: <invalid>",
         DoubleClickMetadata.toString(metadata.getSensitiveCategories(), 9999));
-    assertEquals("United States", metadata.getGeoTarget(1023191).getCanonParent().getCanonParent().getName());
+    assertEquals("United States",
+        metadata.getGeoTarget(1023191).getCanonParent().getCanonParent().getName());
     assertFalse(metadata.getTargetsByCriteriaId().isEmpty());
 
     GeoTarget geoTarget1 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "United States");
@@ -117,8 +118,8 @@ public class DoubleClickMetadataTest {
   @Test
   public void testResourceTransport() throws IOException {
     ResourceTransport transport = new ResourceTransport();
-    transport.setResourceName("/adx-openrtb/countries.txt");
-    assertEquals("/adx-openrtb/countries.txt", transport.getResourceName());
+    transport.setResourceName("/adx-rtb-dictionaries/countries.txt");
+    assertEquals("/adx-rtb-dictionaries/countries.txt", transport.getResourceName());
     try (InputStream is = transport.open(null)) {
     }
   }

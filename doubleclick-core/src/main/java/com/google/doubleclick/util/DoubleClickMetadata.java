@@ -109,7 +109,7 @@ public class DoubleClickMetadata {
       byKey.put(target.getKey(), target);
     }
     targetsByCanonicalKey = ImmutableMap.copyOf(byKey);
-    countryCodes = loadCountryCodes("/adx-openrtb/countries.txt");
+    countryCodes = loadCountryCodes(transport, ADX_DICT + "countries.txt");
   }
 
   /**
@@ -298,9 +298,8 @@ public class DoubleClickMetadata {
 
   private static ImmutableMap<Integer, String> load(
       Transport transport, String resourceName) {
-    Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
-
     try (InputStream isMetadata = transport.open(resourceName)) {
+      Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
       ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
       BufferedReader rd  = new BufferedReader(new InputStreamReader(isMetadata));
       String record;
@@ -325,40 +324,27 @@ public class DoubleClickMetadata {
 
   private static ImmutableMap<Integer, GeoTarget> loadGeoTargets(
       Transport transport, String resourceName) {
-    Pattern pattern = Pattern.compile("(\\d+),(.*)");
-    Map<Integer, GeoTarget> targetsById = new LinkedHashMap<>();
-    Map<Integer, List<Integer>> parentIdsById = new LinkedHashMap<>();
-    Map<String, GeoTarget> targetsByCanon = new LinkedHashMap<>();
-    Set<String> duplicateCanon = new LinkedHashSet<>();
+    final Map<Integer, GeoTarget> targetsById = new LinkedHashMap<>();
+    final Map<Integer, List<Integer>> parentIdsById = new LinkedHashMap<>();
+    final Map<String, GeoTarget> targetsByCanon = new LinkedHashMap<>();
+    final Set<String> duplicateCanon = new LinkedHashSet<>();
 
-    try (InputStream isMetadata = transport.open(resourceName)) {
-      BufferedReader rd  = new BufferedReader(new InputStreamReader(isMetadata));
-      String line;
-      CSVParser csvParser = CSVParser.csvParser();
-
-      while ((line = rd.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line);
-
-        if (matcher.matches()) {
+    try (InputStream is = transport.open(resourceName)) {
+      CSVParser.csvParser().parse(is, "(\\d+),(.*)", new Function<List<String>, Boolean>() {
+        @Override public Boolean apply(List<String> fields) {
           try {
-            List<String> fields = csvParser.parse(line);
             if (fields.size() == 7) {
-              Integer criteriaId = Integer.valueOf(fields.get(0));
-              String name = fields.get(1);
-              String canonicalName = fields.get(2);
-              List<Integer> idParent = Lists.transform(csvParser.parse(fields.get(3)),
-                  new Function<String, Integer>(){
+              GeoTarget target = new GeoTarget(
+                  Integer.valueOf(fields.get(0)), Type.valueOf(toEnumName(fields.get(6))),
+                  fields.get(2), fields.get(1), fields.get(5), null, null);
+              List<Integer> idParent = Lists.transform(
+                  CSVParser.csvParser().parse(fields.get(3)), new Function<String, Integer>(){
                 @Override public Integer apply(@Nullable String id) {
                   return Integer.valueOf(id);
                 }});
-              String countryCode = fields.get(5);
-              String targetType = fields.get(6);
-              GeoTarget target = new GeoTarget(
-                  criteriaId, Type.valueOf(toEnumName(targetType)), canonicalName,
-                  name, countryCode, null, null);
 
-              targetsById.put(criteriaId, target);
-              parentIdsById.put(criteriaId, idParent);
+              targetsById.put(target.getCriteriaId(), target);
+              parentIdsById.put(target.getCriteriaId(), idParent);
 
               if (targetsByCanon.containsKey(target.getCanonicalName())) {
                 duplicateCanon.add(target.getCanonicalName());
@@ -368,10 +354,11 @@ public class DoubleClickMetadata {
               }
             }
           } catch (ParseException | IllegalArgumentException e) {
-            logger.trace("Bad record [{}]: {}", line, e.toString());
+            logger.trace("Bad record [{}]: {}", fields, e.toString());
           }
+          return true;
         }
-      }
+      });
 
       for (Map.Entry<Integer, GeoTarget> entry : targetsById.entrySet()) {
         GeoTarget target = entry.getValue();
@@ -399,29 +386,25 @@ public class DoubleClickMetadata {
     }
   }
 
-  private ImmutableMap<Object, CountryCodes> loadCountryCodes(String resourceName) {
-    ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
+  private ImmutableMap<Object, CountryCodes> loadCountryCodes(
+      Transport transport, String resourceName) {
+    final ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
 
-    try (InputStream is = DoubleClickMetadata.class.getResourceAsStream(resourceName)) {
-      BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-      CSVParser csvParser = CSVParser.tsvParser();
-      Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
-      String record;
-
-      while ((record = rd.readLine()) != null) {
-        if (pattern.matcher(record).matches()) {
+    try (InputStream is = transport.open(resourceName)) {
+      CSVParser.tsvParser().parse(is, "(\\d+)\\s+(.*)", new Function<List<String>, Boolean>() {
+        @Override @Nullable public Boolean apply(@Nullable List<String> fields) {
           try {
-            List<String> fields = csvParser.parse(record);
             CountryCodes codes = new CountryCodes(
                 Integer.parseInt(fields.get(0)), fields.get(2), fields.get(3));
             map.put(codes.getNumeric(), codes);
             map.put(codes.getAlpha2(), codes);
             map.put(codes.getAlpha3(), codes);
-          } catch (ParseException | IllegalArgumentException e) {
-            logger.trace("Bad record: [{}]: {}", record, e.toString());
+          } catch (IllegalArgumentException e) {
+            logger.trace("Bad record: {}: {}", fields, e.toString());
           }
+          return true;
         }
-      }
+      });
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
@@ -466,7 +449,11 @@ public class DoubleClickMetadata {
     @Override
     public InputStream open(String url) throws IOException {
       String resourceName = this.resourceName == null ? new URL(url).getPath() : this.resourceName;
-      return ResourceTransport.class.getResourceAsStream(resourceName);
+      InputStream is = ResourceTransport.class.getResourceAsStream(resourceName);
+      if (is == null) {
+        throw new IOException("Cannot open local resource: " + resourceName);
+      }
+      return is;
     }
   }
 }

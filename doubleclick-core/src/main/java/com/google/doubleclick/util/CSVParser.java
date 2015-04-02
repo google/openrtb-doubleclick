@@ -16,11 +16,17 @@
 
 package com.google.doubleclick.util;
 
+import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -37,8 +43,11 @@ import javax.annotation.Nullable;
  * would ideally be implemented as part of the parser with a stream-oriented API.
  */
 class CSVParser {
-  private static final char EOT = (char) 0x03;
+  static final char EOT = (char) 0x03;
   static final char NUL = (char) 0x00;
+  private static final CSVParser TSV_PARSER = new CSVParser('\t', NUL, NUL, "", false);
+  private static final CSVParser CSV_PARSER = new CSVParser(',', '"', NUL, "", false);
+
   final char separator;
   final char quote;
   final char escape;
@@ -70,14 +79,33 @@ class CSVParser {
    * Returns a RFC 4180-compliant CSV parser.
    */
   public static CSVParser csvParser() {
-    return new CSVParser(',', '"', NUL, "", false);
+    return CSV_PARSER;
   }
 
   /**
    * Returns an IANA-standard TSV parser.
    */
   public static CSVParser tsvParser() {
-    return new CSVParser('\t', NUL, NUL, "", false);
+    return TSV_PARSER;
+  }
+
+  public boolean parse(InputStream is, String regex, Function<List<String>, Boolean> sink)
+      throws IOException {
+    BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+    Pattern pattern = Pattern.compile(regex);
+    String record;
+    while ((record = rd.readLine()) != null) {
+      if (pattern.matcher(record).matches()) {
+        try {
+          if (!sink.apply(parse(record))) {
+            return false;
+          }
+        } catch (ParseException e) {
+          //logger.trace("Bad record: [{}]: {}", record, e.toString());
+        }
+      }
+    }
+    return true;
   }
 
   /**
