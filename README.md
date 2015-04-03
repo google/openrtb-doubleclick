@@ -27,7 +27,7 @@ line after checkout or after any mvn clean.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 0.8.0-beta4, 02-04-2015
+## Version 0.8.0-beta5, 03-04-2015
 
 * Improved handling of geo_criteria_id in the DoubleclickMetadata API
   and the OpenRTB mapper. You should see more Geo fields populated
