@@ -118,9 +118,7 @@ public class DoubleClickMetadataTest {
   @Test
   public void testResourceTransport() throws IOException {
     ResourceTransport transport = new ResourceTransport();
-    transport.setResourceName("/adx-rtb-dictionaries/countries.txt");
-    assertEquals("/adx-rtb-dictionaries/countries.txt", transport.getResourceName());
-    try (InputStream is = transport.open(null)) {
+    try (InputStream is = transport.open("/adx-rtb-dictionaries/countries.txt")) {
     }
   }
 

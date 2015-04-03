@@ -109,7 +109,7 @@ public class DoubleClickMetadata {
       byKey.put(target.getKey(), target);
     }
     targetsByCanonicalKey = ImmutableMap.copyOf(byKey);
-    countryCodes = loadCountryCodes(transport, ADX_DICT + "countries.txt");
+    countryCodes = loadCountryCodes(ADX_DICT + "countries.txt");
   }
 
   /**
@@ -386,11 +386,10 @@ public class DoubleClickMetadata {
     }
   }
 
-  private ImmutableMap<Object, CountryCodes> loadCountryCodes(
-      Transport transport, String resourceName) {
+  private ImmutableMap<Object, CountryCodes> loadCountryCodes(String resourceName) {
     final ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
 
-    try (InputStream is = transport.open(resourceName)) {
+    try (InputStream is = new ResourceTransport().open(resourceName)) {
       CSVParser.tsvParser().parse(is, "(\\d+)\\s+(.*)", new Function<List<String>, Boolean>() {
         @Override @Nullable public Boolean apply(@Nullable List<String> fields) {
           try {
@@ -435,20 +434,8 @@ public class DoubleClickMetadata {
    * Implementation of {@link Transport} that loads a local resource.
    */
   public static class ResourceTransport implements Transport {
-    private String resourceName;
-
-    public String getResourceName() {
-      return resourceName;
-    }
-
-    public ResourceTransport setResourceName(String resourceName) {
-      this.resourceName = resourceName;
-      return this;
-    }
-
-    @Override
-    public InputStream open(String url) throws IOException {
-      String resourceName = this.resourceName == null ? new URL(url).getPath() : this.resourceName;
+    @Override public InputStream open(String url) throws IOException {
+      String resourceName = url.startsWith("/") ? url : new URL(url).getPath();
       InputStream is = ResourceTransport.class.getResourceAsStream(resourceName);
       if (is == null) {
         throw new IOException("Cannot open local resource: " + resourceName);
