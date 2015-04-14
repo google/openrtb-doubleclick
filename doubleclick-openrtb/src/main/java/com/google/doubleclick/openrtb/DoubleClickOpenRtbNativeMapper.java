@@ -81,10 +81,10 @@ public class DoubleClickOpenRtbNativeMapper {
     } else {
       throw new MapperException("Not configured for OpenRTB/JSON native ads");
     }
-    return buildNativeAd(matchingImp.getNative().getRequest(), natResp);
+    return buildRespAd(matchingImp.getNative().getRequest(), natResp);
   }
 
-  private NetworkBid.BidResponse.Ad.NativeAd.Builder buildNativeAd(
+  protected NetworkBid.BidResponse.Ad.NativeAd.Builder buildRespAd(
       NativeRequest natReq, NativeResponse natResp) {
     NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd =
         NetworkBid.BidResponse.Ad.NativeAd.newBuilder()
@@ -104,8 +104,11 @@ public class DoubleClickOpenRtbNativeMapper {
       }
       if (matchingReqAsset == null) {
         invalid.inc();
-        throw new MapperException(
-            "Asset.id doesn't match any request native asset: %s", asset.getId());
+        if (logger.isDebugEnabled()) {
+          logger.debug(
+              "Asset.id doesn't match any request native asset: {}", asset.getId());
+        }
+        continue;
       }
 
       if (asset.hasLink()) {
@@ -113,80 +116,102 @@ public class DoubleClickOpenRtbNativeMapper {
       }
 
       if (asset.hasTitle()) {
-        if (!matchingReqAsset.hasTitle()) {
-          invalid.inc();
-          throw new MapperException(
-              "Asset.id doesn't match request asset, should be Title: %s", asset.getId());
-        }
-        dcNatAd.setHeadline(asset.getTitle().getText());
+        buildRespTitle(dcNatAd, asset, matchingReqAsset);
       }
 
       if (asset.hasImg()) {
-        if (!matchingReqAsset.hasImg()) {
-          invalid.inc();
-          throw new MapperException(
-              "Asset.id doesn't match request asset, should be Image: %s", asset.getId());
-        }
-        NativeResponse.Asset.Image img = asset.getImg();
-        NetworkBid.BidResponse.Ad.NativeAd.Image.Builder dcImg =
-            NetworkBid.BidResponse.Ad.NativeAd.Image.newBuilder()
-                .setUrl(img.getUrl())
-                .setWidth(img.getW())
-                .setHeight(img.getH());
-        switch (matchingReqAsset.getImg().getType()) {
-          case MAIN:
-            dcNatAd.setImage(dcImg);
-            break;
-          case ICON:
-            dcNatAd.setAppIcon(dcImg);
-            break;
-          case LOGO:
-            dcNatAd.setLogo(dcImg);
-            break;
-          default:
-            invalid.inc();
-            throw new MapperException(
-                "Asset %s has unsupported Image type: %s",
-                asset.getId(), matchingReqAsset.getImg().getType());
-        }
+        buildRespImg(dcNatAd, asset, matchingReqAsset);
       }
 
       if (asset.hasData()) {
-        if (!matchingReqAsset.hasData()) {
-          invalid.inc();
-          throw new MapperException(
-              "Asset.id doesn't match request asset, should be Data: %s", asset.getId());
-        }
-        NativeResponse.Asset.Data data = asset.getData();
-        switch (matchingReqAsset.getData().getType()) {
-          case CTATEXT:
-            dcNatAd.setCallToAction(data.getValue());
-            break;
-          case DESC:
-            dcNatAd.setBody(data.getValue());
-            break;
-          case SPONSORED:
-            dcNatAd.setAdvertiser(data.getValue());
-            break;
-          case PRICE:
-            dcNatAd.setPrice(data.getValue());
-            break;
-          case ADDRESS:
-            dcNatAd.setStore(data.getValue());
-            break;
-          case RATING:
-            dcNatAd.setStarRating(Double.parseDouble(data.getValue()));
-            break;
-          default:
-            invalid.inc();
-            throw new MapperException(
-                "Asset %s has unsupported Image type: %s",
-                asset.getId(), matchingReqAsset.getImg().getType());
-        }
+        buildRespData(dcNatAd, asset, matchingReqAsset);
       }
     }
 
     return dcNatAd;
+  }
+
+  protected void buildRespTitle(NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd,
+      NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset) {
+    if (!matchingReqAsset.hasTitle()) {
+      failRespAsset(asset);
+    } else {
+      dcNatAd.setHeadline(asset.getTitle().getText());
+    }
+  }
+
+  protected void buildRespImg(NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd,
+      NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset) {
+    if (!matchingReqAsset.hasImg()) {
+      failRespAsset(asset);
+      return;
+    }
+    NativeResponse.Asset.Image img = asset.getImg();
+    NetworkBid.BidResponse.Ad.NativeAd.Image.Builder dcImg =
+        NetworkBid.BidResponse.Ad.NativeAd.Image.newBuilder()
+            .setUrl(img.getUrl())
+            .setWidth(img.getW())
+            .setHeight(img.getH());
+    switch (matchingReqAsset.getImg().getType()) {
+      case MAIN:
+        dcNatAd.setImage(dcImg);
+        break;
+      case ICON:
+        dcNatAd.setAppIcon(dcImg);
+        break;
+      case LOGO:
+        dcNatAd.setLogo(dcImg);
+        break;
+      default:
+        invalid.inc();
+        if (logger.isDebugEnabled()) {
+          logger.debug("Asset {} has unsupported Image type: {}",
+              asset.getId(), matchingReqAsset.getImg().getType());
+        }
+    }
+  }
+
+  protected void buildRespData(NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd,
+      NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset) {
+    if (!matchingReqAsset.hasData()) {
+      failRespAsset(asset);
+      return;
+    }
+    NativeResponse.Asset.Data data = asset.getData();
+    switch (matchingReqAsset.getData().getType()) {
+      case CTATEXT:
+        dcNatAd.setCallToAction(data.getValue());
+        break;
+      case DESC:
+        dcNatAd.setBody(data.getValue());
+        break;
+      case SPONSORED:
+        dcNatAd.setAdvertiser(data.getValue());
+        break;
+      case PRICE:
+        dcNatAd.setPrice(data.getValue());
+        break;
+      case ADDRESS:
+        dcNatAd.setStore(data.getValue());
+        break;
+      case RATING:
+        dcNatAd.setStarRating(Double.parseDouble(data.getValue()));
+        break;
+      default:
+        invalid.inc();
+        if (logger.isDebugEnabled()) {
+          logger.debug("Asset {} has unsupported Image type: {}",
+              asset.getId(), matchingReqAsset.getImg().getType());
+        }
+    }
+  }
+
+  protected void failRespAsset(NativeResponse.Asset asset) {
+    invalid.inc();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+          "Asset.id doesn't match request asset: %s", asset.getId());
+    }
   }
 
   public Impression.Native.Builder buildNativeRequest(NetworkBid.BidRequest.AdSlot dcSlot) {
@@ -195,159 +220,193 @@ public class DoubleClickOpenRtbNativeMapper {
     int id = 0;
 
     for (NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ : dcSlot.getNativeAdTemplateList()) {
-      long reqBits = dcNativ.getRequiredFields();
-      long bits = dcNativ.getRecommendedFields() | reqBits;
+      long bits = dcNativ.getRecommendedFields() | dcNativ.getRequiredFields();
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE);
-        NativeRequest.Asset.Title.Builder title = NativeRequest.Asset.Title.newBuilder();
-        if (dcNativ.hasHeadlineMaxSafeLength()) {
-          title.setLen(dcNativ.getHeadlineMaxSafeLength());
-          nativReq.addAssets(extMapNative(dcNativ, asset.setTitle(title)));
-        } else {
-          incomplete.inc();
-          if (logger.isDebugEnabled()) {
-            logger.debug("Headline ignored, missing value: {}",
-                TextFormat.shortDebugString(dcNativ));
-          }
-        }
+        addAsset(++id, nativReq, buildReqAssetTitle(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE);
-        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
-            .setType(NativeRequest.Asset.Data.DataAssetType.DESC);
-        if (dcNativ.hasBodyMaxSafeLength()) {
-          data.setLen(dcNativ.getBodyMaxSafeLength());
-          nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
-        } else {
-          incomplete.inc();
-          if (logger.isDebugEnabled()) {
-            logger.debug("Body ignored, missing value: {}",
-                TextFormat.shortDebugString(dcNativ));
-          }
-        }
+        addAsset(++id, nativReq, buildReqAssetBody(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE);
-        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
-            .setType(NativeRequest.Asset.Data.DataAssetType.CTATEXT);
-        if (dcNativ.hasCallToActionMaxSafeLength()) {
-          data.setLen(dcNativ.getCallToActionMaxSafeLength());
-          nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
-        } else {
-          incomplete.inc();
-          if (logger.isDebugEnabled()) {
-            logger.debug("Call to action ignored, missing value: {}",
-                TextFormat.shortDebugString(dcNativ));
-          }
-        }
+        addAsset(++id, nativReq, buildReqAssetCTA(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE);
-        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
-            .setType(NativeRequest.Asset.Data.DataAssetType.SPONSORED);
-        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+        addAsset(++id, nativReq, buildReqAssetAdvertiser(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE);
-        NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
-            .setType(NativeRequest.Asset.Image.ImageAssetType.MAIN);
-        if (dcNativ.hasImageWidth()) {
-          image.setWmin(dcNativ.getImageWidth());
-        }
-        if (dcNativ.hasImageHeight()) {
-          image.setHmin(dcNativ.getImageHeight());
-        }
-        nativReq.addAssets(extMapNative(dcNativ, asset.setImg(image)));
+        addAsset(++id, nativReq, buildReqAssetImage(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE);
-        NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
-            .setType(NativeRequest.Asset.Image.ImageAssetType.LOGO);
-        if (dcNativ.hasLogoWidth()) {
-          image.setWmin(dcNativ.getLogoWidth());
-        }
-        if (dcNativ.hasLogoHeight()) {
-          image.setHmin(dcNativ.getLogoHeight());
-        }
-        nativReq.addAssets(extMapNative(dcNativ, asset.setImg(image)));
+        addAsset(++id, nativReq, buildReqAssetLogo(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE);
-        NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
-            .setType(NativeRequest.Asset.Image.ImageAssetType.ICON);
-        if (dcNativ.hasAppIconWidth()) {
-          image.setWmin(dcNativ.getAppIconWidth());
-        }
-        if (dcNativ.hasAppIconHeight()) {
-          image.setHmin(dcNativ.getAppIconHeight());
-        }
-        nativReq.addAssets(extMapNative(dcNativ, asset.setImg(image)));
+        addAsset(++id, nativReq, buildReqAssetIcon(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE);
-        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
-            .setType(NativeRequest.Asset.Data.DataAssetType.RATING);
-        nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
+        addAsset(++id, nativReq, buildReqAssetStarRating(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE);
-        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
-            .setType(NativeRequest.Asset.Data.DataAssetType.PRICE);
-        if (dcNativ.hasPriceMaxSafeLength()) {
-          data.setLen(dcNativ.getPriceMaxSafeLength());
-          nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
-        } else {
-          incomplete.inc();
-          if (logger.isDebugEnabled()) {
-            logger.debug("Price ignored, missing value: {}",
-                TextFormat.shortDebugString(dcNativ));
-          }
-        }
+        addAsset(++id, nativReq, buildReqAssetPrice(dcNativ));
       }
-
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0) {
-        NativeRequest.Asset.Builder asset = newAsset(++id, reqBits,
-            NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE);
-        NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
-            .setType(NativeRequest.Asset.Data.DataAssetType.ADDRESS);
-        if (dcNativ.hasStoreMaxSafeLength()) {
-          data.setLen(dcNativ.getStoreMaxSafeLength());
-          nativReq.addAssets(extMapNative(dcNativ, asset.setData(data)));
-        } else {
-          incomplete.inc();
-          if (logger.isDebugEnabled()) {
-            logger.debug("Store ignored, missing value: {}",
-                TextFormat.shortDebugString(dcNativ));
-          }
-        }
+        addAsset(++id, nativReq, buildReqAssetStore(dcNativ));
       }
     }
 
     return impNativ.setRequest(nativReq);
   }
 
-  private static NativeRequest.Asset.Builder newAsset(int id, long reqBits, int bit) {
+  protected static void addAsset(
+      int id, NativeRequest.Builder dcNativ, NativeRequest.Asset.Builder asset) {
+    if (asset != null) {
+      dcNativ.addAssets(asset.setId(id));
+    }
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetStore(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    if (dcNativ.hasStoreMaxSafeLength()) {
+      NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+          NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE);
+      return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
+          .setType(NativeRequest.Asset.Data.DataAssetType.ADDRESS)
+          .setLen(dcNativ.getStoreMaxSafeLength())));
+    } else {
+      return failReqAsset(dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE);
+    }
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetPrice(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    if (dcNativ.hasPriceMaxSafeLength()) {
+      NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+          NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE);
+      return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
+          .setType(NativeRequest.Asset.Data.DataAssetType.PRICE)
+          .setLen(dcNativ.getPriceMaxSafeLength())));
+    } else {
+      return failReqAsset(dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE);
+    }
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetStarRating(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+        NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING);
+    return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
+        .setType(NativeRequest.Asset.Data.DataAssetType.RATING)));
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetAdvertiser(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+        NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER);
+    return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
+        .setType(NativeRequest.Asset.Data.DataAssetType.SPONSORED)));
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetCTA(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    if (dcNativ.hasCallToActionMaxSafeLength()) {
+      NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+          NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION);
+      return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
+          .setType(NativeRequest.Asset.Data.DataAssetType.CTATEXT)
+          .setLen(dcNativ.getCallToActionMaxSafeLength())));
+    } else {
+      return failReqAsset(
+          dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION);
+    }
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetBody(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    if (dcNativ.hasBodyMaxSafeLength()) {
+      NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+          NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY);
+      NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
+          .setType(NativeRequest.Asset.Data.DataAssetType.DESC)
+          .setLen(dcNativ.getBodyMaxSafeLength());
+      return extMapNative(dcNativ, asset.setData(data));
+    } else {
+      return failReqAsset(dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY);
+    }
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetIcon(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+        NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON);
+    NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
+        .setType(NativeRequest.Asset.Image.ImageAssetType.ICON);
+    if (dcNativ.hasAppIconWidth()) {
+      image.setWmin(dcNativ.getAppIconWidth());
+    }
+    if (dcNativ.hasAppIconHeight()) {
+      image.setHmin(dcNativ.getAppIconHeight());
+    }
+    return extMapNative(dcNativ, asset.setImg(image));
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetLogo(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+        NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO);
+    NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
+        .setType(NativeRequest.Asset.Image.ImageAssetType.LOGO);
+    if (dcNativ.hasLogoWidth()) {
+      image.setWmin(dcNativ.getLogoWidth());
+    }
+    if (dcNativ.hasLogoHeight()) {
+      image.setHmin(dcNativ.getLogoHeight());
+    }
+    return extMapNative(dcNativ, asset.setImg(image));
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetImage(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+        NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE);
+    NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
+        .setType(NativeRequest.Asset.Image.ImageAssetType.MAIN);
+    if (dcNativ.hasImageWidth()) {
+      image.setWmin(dcNativ.getImageWidth());
+    }
+    if (dcNativ.hasImageHeight()) {
+      image.setHmin(dcNativ.getImageHeight());
+    }
+    return extMapNative(dcNativ, asset.setImg(image));
+  }
+
+  protected NativeRequest.Asset.Builder buildReqAssetTitle(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    if (dcNativ.hasHeadlineMaxSafeLength()) {
+      NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+          NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE);
+      NativeRequest.Asset.Title.Builder title = NativeRequest.Asset.Title.newBuilder();
+      title.setLen(dcNativ.getHeadlineMaxSafeLength());
+      return extMapNative(dcNativ, asset.setTitle(title));
+    } else {
+      return failReqAsset(dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE);
+    }
+  }
+
+  protected NativeRequest.Asset.Builder failReqAsset(
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields field) {
+    incomplete.inc();
+    if (logger.isDebugEnabled()) {
+      logger.debug(field.name() + " ignored, missing value: {}",
+          TextFormat.shortDebugString(dcNativ));
+    }
+    return null;
+  }
+
+  protected static NativeRequest.Asset.Builder newAsset(
+      long reqBits, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields bit) {
     return NativeRequest.Asset.newBuilder()
-        .setId(id)
-        .setRequired((reqBits & bit) != 0);
+        .setRequired((reqBits & bit.getNumber()) != 0);
   }
 
   protected NativeRequest.Asset.Builder extMapNative(
