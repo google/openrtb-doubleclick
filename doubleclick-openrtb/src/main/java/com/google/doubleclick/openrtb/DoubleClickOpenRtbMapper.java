@@ -43,7 +43,6 @@ import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP.Deal;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.Linearity;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.Protocol;
 import com.google.openrtb.OpenRtb.BidRequest.Publisher;
 import com.google.openrtb.OpenRtb.BidRequest.Regulations;
@@ -482,12 +481,16 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   protected Video.Builder buildVideo(
       NetworkBid.BidRequest.AdSlot dcSlot, NetworkBid.BidRequest.Video dcVideo) {
     Video.Builder video = Video.newBuilder()
-        .setLinearity(Linearity.LINEAR)
         .addProtocols(Protocol.VAST_2_0)
         .addProtocols(Protocol.VAST_3_0)
-        .setMinduration(dcVideo.getMinAdDuration())
-        .setMaxduration(dcVideo.getMaxAdDuration())
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
+
+    if (dcVideo.hasMinAdDuration()) {
+      video.setMinduration(dcVideo.getMinAdDuration());
+    }
+    if (dcVideo.hasMaxAdDuration()) {
+      video.setMaxduration(dcVideo.getMaxAdDuration());
+    }
 
     if (dcVideo.getAllowedVideoFormatsCount() != 0) {
       video.addAllMimes(VideoMimeMapper.toOpenRtb(dcVideo.getAllowedVideoFormatsList(), null));
