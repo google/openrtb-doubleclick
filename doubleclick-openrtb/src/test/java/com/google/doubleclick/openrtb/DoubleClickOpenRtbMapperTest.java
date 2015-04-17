@@ -66,6 +66,7 @@ public class DoubleClickOpenRtbMapperTest {
     NetworkBid.BidResponse.Builder dcResponse = mapper.toNativeBidResponse(
         TestUtil.newBidRequest("1", 1, 1, 1.0).build(),
         BidResponse.newBuilder()
+            .setId("1")
             .setBidid("bidid")
             .addSeatbid(SeatBid.newBuilder()
                 .addBid(TestData.newBid(false)))

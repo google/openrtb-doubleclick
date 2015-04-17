@@ -83,7 +83,7 @@ class TestUtil {
       }
     }
 
-    return BidResponse.newBuilder().addSeatbid(seat).build();
+    return BidResponse.newBuilder().setId("1").addSeatbid(seat).build();
   }
 
   public static DoubleClickMetadata getMetadata() {

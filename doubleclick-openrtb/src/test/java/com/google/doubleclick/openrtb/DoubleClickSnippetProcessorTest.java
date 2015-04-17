@@ -64,6 +64,7 @@ public class DoubleClickSnippetProcessorTest {
 
   private static BidResponse createBidResponse(String snippet) {
     return BidResponse.newBuilder()
+        .setId("1")
         .addSeatbid(SeatBid.newBuilder()
             .setSeat("seat1")
             .addBid(Bid.newBuilder()
