@@ -18,6 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import com.google.common.collect.ImmutableList;
 import com.google.openrtb.OpenRtb.BidRequest.Impression;
+import com.google.openrtb.OpenRtb.BidRequest.Impression.ApiFramework;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtbNative.NativeRequest;
 import com.google.openrtb.OpenRtbNative.NativeResponse;
@@ -215,8 +216,16 @@ public class DoubleClickOpenRtbNativeMapper {
   }
 
   public Impression.Native.Builder buildNativeRequest(NetworkBid.BidRequest.AdSlot dcSlot) {
-    Impression.Native.Builder impNativ = Impression.Native.newBuilder().setVer("1.0");
+    Impression.Native.Builder impNativ = Impression.Native.newBuilder()
+        .setVer("1.0")
+        .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
     NativeRequest.Builder nativReq = NativeRequest.newBuilder().setVer("1.0");
+
+    if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
+      impNativ.addApi(ApiFramework.MRAID_1);
+    }
+    impNativ.addApi(ApiFramework.MRAID_2);
+
     int id = 0;
 
     for (NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ : dcSlot.getNativeAdTemplateList()) {

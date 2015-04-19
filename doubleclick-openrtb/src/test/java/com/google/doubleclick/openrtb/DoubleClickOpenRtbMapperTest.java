@@ -63,7 +63,7 @@ public class DoubleClickOpenRtbMapperTest {
 
   @Test
   public void testResponse() {
-    NetworkBid.BidResponse.Builder dcResponse = mapper.toNativeBidResponse(
+    NetworkBid.BidResponse.Builder dcResponse = mapper.toExchangeBidResponse(
         TestUtil.newBidRequest("1", 1, 1, 1.0).build(),
         BidResponse.newBuilder()
             .setId("1")
@@ -87,7 +87,7 @@ public class DoubleClickOpenRtbMapperTest {
         .setId(TestUtil.REQUEST_ID)
         .addAdslot(AdSlot.newBuilder().setId(5))
         .addAdslot(AdSlot.newBuilder().setId(10)));
-    mapper.toNativeBidResponse(request, TestUtil.newBidResponse(TestData.newBid(false)));
+    mapper.toExchangeBidResponse(request, TestUtil.newBidResponse(TestData.newBid(false)));
   }
 
   @Test(expected = MapperException.class)
@@ -265,7 +265,7 @@ public class DoubleClickOpenRtbMapperTest {
         if (size == TestData.NO_SLOT) {
           assertEquals(0, request.getImpCount());
           BidResponse response = TestUtil.newBidResponse();
-          NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
+          NetworkBid.BidResponse dcResponse = mapper.toExchangeBidResponse(request, response).build();
           assertEquals(0, dcResponse.getAdCount());
         } else {
           Impression imp = request.getImp(0);
@@ -301,7 +301,7 @@ public class DoubleClickOpenRtbMapperTest {
             }
           }
           BidResponse response = TestUtil.newBidResponse(bid);
-          NetworkBid.BidResponse dcResponse = mapper.toNativeBidResponse(request, response).build();
+          NetworkBid.BidResponse dcResponse = mapper.toExchangeBidResponse(request, response).build();
           if (linkExt) {
             Ad ad = dcResponse.getAd(0);
             assertEquals(testDesc,
@@ -342,10 +342,10 @@ public class DoubleClickOpenRtbMapperTest {
   @Test
   public void testReqResp_NullMapper() {
     NullDoubleClickOpenRtbMapper mapper = NullDoubleClickOpenRtbMapper.INSTANCE;
-    assertNull(mapper.toNativeBidResponse(
+    assertNull(mapper.toExchangeBidResponse(
         OpenRtb.BidRequest.getDefaultInstance(), OpenRtb.BidResponse.getDefaultInstance()));
     assertNull(mapper.toOpenRtbBidRequest(TestData.newRequest()));
-    assertNull(mapper.toNativeBidRequest(OpenRtb.BidRequest.getDefaultInstance()));
+    assertNull(mapper.toExchangeBidRequest(OpenRtb.BidRequest.getDefaultInstance()));
     assertNull(mapper.toOpenRtbBidResponse(
         TestData.newRequest(), NetworkBid.BidResponse.getDefaultInstance()));
   }
@@ -371,7 +371,7 @@ public class DoubleClickOpenRtbMapperTest {
     extMapper.toOpenRtbPMP(
         NetworkBid.BidRequest.AdSlot.MatchingAdData.getDefaultInstance(),
         OpenRtb.BidRequest.Impression.PMP.newBuilder());
-    extMapper.toNativeAd(
+    extMapper.toDoubleClickAd(
         OpenRtb.BidRequest.getDefaultInstance(),
         OpenRtb.BidResponse.getDefaultInstance(),
         OpenRtb.BidResponse.SeatBid.Bid.getDefaultInstance(),

@@ -132,7 +132,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   @Override
-  public NetworkBid.BidResponse.Builder toNativeBidResponse(
+  public NetworkBid.BidResponse.Builder toExchangeBidResponse(
     OpenRtb.BidRequest request, OpenRtb.BidResponse response) {
     checkNotNull(request);
     NetworkBid.BidResponse.Builder dcResponse = NetworkBid.BidResponse.newBuilder();
@@ -226,7 +226,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toNativeAd(request, response, bid, dcAd);
+      extMapper.toDoubleClickAd(request, response, bid, dcAd);
     }
 
     return dcAd;
@@ -436,6 +436,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
       banner.addApi(ApiFramework.MRAID_1);
     }
+    banner.addApi(ApiFramework.MRAID_2);
 
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
 
@@ -499,12 +500,19 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcSlot.hasSlotVisibility()) {
       video.setPos(AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility()));
     }
+
     if (dcVideo.hasVideoadStartDelay()) {
       video.setStartdelay(VideoStartDelayMapper.toDoubleClick(dcVideo.getVideoadStartDelay()));
+    }
+
+    if (!dcSlot.getExcludedAttributeList().contains(30 /* InstreamVastVideoType: Vpaid Flash */)) {
+      video.addApi(ApiFramework.VPAID_1_0);
+      video.addApi(ApiFramework.VPAID_2_0);
     }
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
       video.addApi(ApiFramework.MRAID_1);
     }
+    video.addApi(ApiFramework.MRAID_2);
 
     if (dcSlot.getWidthCount() == 1) {
       video.setW(dcSlot.getWidth(0));
@@ -914,7 +922,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
    * Not implemented yet!
    */
   @Override
-  public NetworkBid.BidRequest.Builder toNativeBidRequest(OpenRtb.BidRequest request) {
+  public NetworkBid.BidRequest.Builder toExchangeBidRequest(OpenRtb.BidRequest request) {
     throw new UnsupportedOperationException();
   }
 
