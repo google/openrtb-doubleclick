@@ -66,9 +66,9 @@ public class CreativeAttributeMapper {
     return openrtbToDc.get(openrtb);
   }
 
-  public static Set<CreativeAttribute> toOpenRtb(
-      Collection<Integer> dcList, Set<CreativeAttribute> openrtbSet) {
-    Set<CreativeAttribute> ret = openrtbSet == null
+  public static EnumSet<CreativeAttribute> toOpenRtb(
+      Collection<Integer> dcList, EnumSet<CreativeAttribute> openrtbSet) {
+    EnumSet<CreativeAttribute> ret = openrtbSet == null
         ? EnumSet.noneOf(CreativeAttribute.class)
         : openrtbSet;
     for (int dc : dcList) {

@@ -94,9 +94,9 @@ public class AdCategoryMapper {
     return openrtbToName;
   }
 
-  public static Set<ContentCategory> toOpenRtb(
-      Collection<Integer> dcList, @Nullable Set<ContentCategory> openrtbSet) {
-    Set<ContentCategory> ret = openrtbSet == null
+  public static EnumSet<ContentCategory> toOpenRtb(
+      Collection<Integer> dcList, @Nullable EnumSet<ContentCategory> openrtbSet) {
+    EnumSet<ContentCategory> ret = openrtbSet == null
         ? EnumSet.noneOf(ContentCategory.class)
         : openrtbSet;
     for (int dc : dcList) {
@@ -106,7 +106,7 @@ public class AdCategoryMapper {
   }
 
   public static Set<Integer> toDoubleClick(
-      Collection<ContentCategory> openrtbList, ImmutableSet<Integer> dcSet) {
+      Collection<ContentCategory> openrtbList, Set<Integer> dcSet) {
     Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (ContentCategory openrtb : openrtbList) {
       ret.addAll(toDoubleClick(openrtb));

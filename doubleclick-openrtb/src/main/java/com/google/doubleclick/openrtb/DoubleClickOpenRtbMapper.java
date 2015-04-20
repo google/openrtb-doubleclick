@@ -69,7 +69,6 @@ import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -522,7 +521,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.getCompanionSlotCount() != 0) {
-      Set<CompanionType> companionTypes = EnumSet.noneOf(CompanionType.class);
+      EnumSet<CompanionType> companionTypes = EnumSet.noneOf(CompanionType.class);
 
       for (NetworkBid.BidRequest.Video.CompanionSlot dcCompSlot
           : dcVideo.getCompanionSlotList()) {
@@ -906,7 +905,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected void addBcat(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
-    Set<ContentCategory> cats = EnumSet.noneOf(ContentCategory.class);
+    EnumSet<ContentCategory> cats = EnumSet.noneOf(ContentCategory.class);
 
     for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
       AdCategoryMapper.toOpenRtb(dcSlot.getExcludedProductCategoryList(), cats);

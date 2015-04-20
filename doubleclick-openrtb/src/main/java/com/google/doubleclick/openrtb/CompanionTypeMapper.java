@@ -21,7 +21,6 @@ import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeF
 
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.Set;
 
 /**
  * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link CompanionType}.
@@ -49,18 +48,18 @@ public class CompanionTypeMapper {
     }
   }
 
-  public static Set<CompanionType> toOpenRtb(
-      Collection<CreativeFormat> dcList, Set<CompanionType> openrtbSet) {
-    Set<CompanionType> ret = openrtbSet == null ? EnumSet.noneOf(CompanionType.class) : openrtbSet;
+  public static EnumSet<CompanionType> toOpenRtb(
+      Collection<CreativeFormat> dcList, EnumSet<CompanionType> openrtbSet) {
+    EnumSet<CompanionType> ret = openrtbSet == null ? EnumSet.noneOf(CompanionType.class) : openrtbSet;
     for (CreativeFormat dc : dcList) {
       ret.add(toOpenRtb(dc));
     }
     return ret;
   }
 
-  public static Set<CreativeFormat> toDoubleClick(
-      Collection<CompanionType> openrtbList, Set<CreativeFormat> dcSet) {
-    Set<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : null;
+  public static EnumSet<CreativeFormat> toDoubleClick(
+      Collection<CompanionType> openrtbList, EnumSet<CreativeFormat> dcSet) {
+    EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : null;
     for (CompanionType openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {

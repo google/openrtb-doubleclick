@@ -61,9 +61,9 @@ public class VideoMimeMapper {
     return openrtbToDc.get(openrtb);
   }
 
-  public static Set<VideoFormat> toDoubleClick(
-      Collection<String> openrtbList, Set<VideoFormat> dcSet) {
-    Set<VideoFormat> ret = dcSet == null ? EnumSet.noneOf(VideoFormat.class) : dcSet;
+  public static EnumSet<VideoFormat> toDoubleClick(
+      Collection<String> openrtbList, EnumSet<VideoFormat> dcSet) {
+    EnumSet<VideoFormat> ret = dcSet == null ? EnumSet.noneOf(VideoFormat.class) : dcSet;
     for (String openrtb : openrtbList) {
       VideoFormat dc = toDoubleClick(openrtb);
       if (dc != null) {

@@ -59,8 +59,7 @@ final class ProtoUtils {
 
   private static <M extends MessageLiteOrBuilder> List<M> filterFrom(
       Iterable<M> objs, Predicate<M> filter, int firstDiscarded) {
-    int initialCapacity = (objs instanceof Collection)
-        ? ((Collection<?>) objs).size() - 1 : 10;
+    int initialCapacity = (objs instanceof Collection<?>) ? ((Collection<?>) objs).size() - 1 : 10;
     List<M> filtered = (firstDiscarded == 0) ? null : new ArrayList<M>(initialCapacity);
 
     Iterator<M> iter = objs.iterator();

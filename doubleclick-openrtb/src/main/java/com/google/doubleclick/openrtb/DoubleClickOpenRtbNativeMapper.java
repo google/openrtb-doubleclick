@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -57,7 +56,7 @@ public class DoubleClickOpenRtbNativeMapper {
   public DoubleClickOpenRtbNativeMapper(
       MetricRegistry metricRegistry,
       @Nullable OpenRtbJsonFactory jsonFactory,
-      List<ExtMapper> extMappers) {
+      Iterable<ExtMapper> extMappers) {
     this.jsonReader = jsonFactory == null ? null : jsonFactory.newNativeReader();
     this.extMappers = ImmutableList.copyOf(extMappers);
     Class<? extends DoubleClickOpenRtbNativeMapper> cls = getClass();

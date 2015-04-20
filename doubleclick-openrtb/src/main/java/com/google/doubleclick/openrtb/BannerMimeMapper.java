@@ -66,9 +66,9 @@ public class BannerMimeMapper {
     return openrtbToDc.get(openrtb);
   }
 
-  public static Set<CreativeFormat> toDoubleClick(
-      Collection<String> openrtbList, Set<CreativeFormat> dcSet) {
-    Set<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : dcSet;
+  public static EnumSet<CreativeFormat> toDoubleClick(
+      Collection<String> openrtbList, EnumSet<CreativeFormat> dcSet) {
+    EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : dcSet;
     for (String openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {
