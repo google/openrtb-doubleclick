@@ -16,13 +16,13 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -49,7 +49,7 @@ public class BannerMimeMapper {
           .putAll(CreativeFormat.HTML_CREATIVE, "text/html", "text/css", "application/javascript")
           .build());
 
-  public static ImmutableCollection<String> toOpenRtb(CreativeFormat dc) {
+  public static ImmutableSet<String> toOpenRtb(CreativeFormat dc) {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
 
@@ -68,7 +68,7 @@ public class BannerMimeMapper {
 
   public static Set<CreativeFormat> toDoubleClick(
       Collection<String> openrtbList, Set<CreativeFormat> dcSet) {
-    Set<CreativeFormat> ret = dcSet == null ? new LinkedHashSet<CreativeFormat>() : dcSet;
+    Set<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : dcSet;
     for (String openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {

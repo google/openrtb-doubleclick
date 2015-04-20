@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.SignatureException;
 import java.util.Calendar;
-import java.util.LinkedHashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -522,7 +522,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.getCompanionSlotCount() != 0) {
-      Set<CompanionType> companionTypes = new LinkedHashSet<>();
+      Set<CompanionType> companionTypes = EnumSet.noneOf(CompanionType.class);
 
       for (NetworkBid.BidRequest.Video.CompanionSlot dcCompSlot
           : dcVideo.getCompanionSlotList()) {
@@ -906,7 +906,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected void addBcat(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
-    Set<ContentCategory> cats = new LinkedHashSet<>();
+    Set<ContentCategory> cats = EnumSet.noneOf(ContentCategory.class);
 
     for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
       AdCategoryMapper.toOpenRtb(dcSlot.getExcludedProductCategoryList(), cats);

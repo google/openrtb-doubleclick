@@ -19,13 +19,15 @@ package com.google.doubleclick.openrtb;
 import com.google.common.collect.ImmutableSet;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner.ExpandableDirection;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Maps between AdX's {@code excluded_attribute} and OpenRTB's {@link ExpandableDirection}.
  */
 public class ExpandableDirectionMapper {
-  public static ImmutableSet<ExpandableDirection> toOpenRtb(List<Integer> dcList) {
+  public static Set<ExpandableDirection> toOpenRtb(List<Integer> dcList) {
     boolean left = true, right = true, up = true, down = true;
     for (int dc : dcList) {
       switch (dc) {
@@ -44,7 +46,7 @@ public class ExpandableDirectionMapper {
         default:
       }
     }
-    ImmutableSet.Builder<ExpandableDirection> openrtbSet = ImmutableSet.builder();
+    EnumSet<ExpandableDirection> openrtbSet = EnumSet.noneOf(ExpandableDirection.class);
     if (left) {
       openrtbSet.add(ExpandableDirection.LEFT);
     }
@@ -57,7 +59,7 @@ public class ExpandableDirectionMapper {
     if (down) {
       openrtbSet.add(ExpandableDirection.DOWN);
     }
-    return openrtbSet.build();
+    return openrtbSet;
   }
 
   public static ImmutableSet<Integer> toDoubleClick(List<ExpandableDirection> openrtbList) {

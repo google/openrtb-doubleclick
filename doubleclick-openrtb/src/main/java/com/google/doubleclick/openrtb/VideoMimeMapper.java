@@ -16,13 +16,13 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -45,7 +45,7 @@ public class VideoMimeMapper {
           .putAll(VideoFormat.YT_HOSTED, "video/x-flv", "video/mp4", "video/webm")
           .build());
 
-  public static ImmutableCollection<String> toOpenRtb(VideoFormat dc) {
+  public static ImmutableSet<String> toOpenRtb(VideoFormat dc) {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
 
@@ -63,7 +63,7 @@ public class VideoMimeMapper {
 
   public static Set<VideoFormat> toDoubleClick(
       Collection<String> openrtbList, Set<VideoFormat> dcSet) {
-    Set<VideoFormat> ret = dcSet == null ? new LinkedHashSet<VideoFormat>() : dcSet;
+    Set<VideoFormat> ret = dcSet == null ? EnumSet.noneOf(VideoFormat.class) : dcSet;
     for (String openrtb : openrtbList) {
       VideoFormat dc = toDoubleClick(openrtb);
       if (dc != null) {

@@ -16,12 +16,13 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.openrtb.OpenRtb.CreativeAttribute;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -29,8 +30,8 @@ import java.util.Set;
  * Maps between AdX creative attributes and OpenRTB's {@link CreativeAttribute}.
  */
 public class CreativeAttributeMapper {
-  private static ImmutableMultimap<CreativeAttribute, Integer> openrtbToDc =
-      ImmutableMultimap.<CreativeAttribute, Integer>builder()
+  private static ImmutableSetMultimap<CreativeAttribute, Integer> openrtbToDc =
+      ImmutableSetMultimap.<CreativeAttribute, Integer>builder()
           // Empty mappings listed only for documentation
           .putAll(CreativeAttribute.AD_CAN_BE_SKIPPED, 44)
           .putAll(CreativeAttribute.ANNOYING)
@@ -49,7 +50,7 @@ public class CreativeAttributeMapper {
           .putAll(CreativeAttribute.VIDEO_IN_BANNER_USER_INITIATED, 2, 22)
           .putAll(CreativeAttribute.WINDOWS_DIALOG_OR_ALERT_STYLE)
       .build();
-  private static ImmutableSet<CreativeAttribute>[] dcToOpenrtb = MapperUtil.multimapIntToSets(
+  private static ImmutableSet<CreativeAttribute>[] dcToOpenrtb = MapperUtil.multimapIntToEnumSets(
       ImmutableMultimap.<Integer, CreativeAttribute>builder()
           .putAll(44, CreativeAttribute.AD_CAN_BE_SKIPPED)
           .putAll(28, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
@@ -57,18 +58,18 @@ public class CreativeAttributeMapper {
           .putAll(32, CreativeAttribute.USER_INTERACTIVE)
           .build());
 
-  public static ImmutableCollection<CreativeAttribute> toOpenRtb(int dc) {
+  public static ImmutableSet<CreativeAttribute> toOpenRtb(int dc) {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
 
-  public static ImmutableCollection<Integer> toDoubleClick(CreativeAttribute openrtb) {
+  public static ImmutableSet<Integer> toDoubleClick(CreativeAttribute openrtb) {
     return openrtbToDc.get(openrtb);
   }
 
   public static Set<CreativeAttribute> toOpenRtb(
       Collection<Integer> dcList, Set<CreativeAttribute> openrtbSet) {
     Set<CreativeAttribute> ret = openrtbSet == null
-        ? new LinkedHashSet<CreativeAttribute>()
+        ? EnumSet.noneOf(CreativeAttribute.class)
         : openrtbSet;
     for (int dc : dcList) {
       ret.addAll(toOpenRtb(dc));
