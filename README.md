@@ -27,6 +27,13 @@ line after checkout or after any mvn clean.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.8.0, 21-04-2015
+
+* DoubleClick protocol v.60, adds `allowed_restricted_category_for_deals`.
+* DoubleClickOpenRtbNativeMapper more lenient.
+* Improved mapping of api fields (ApiFramework).
+* Maps Native.battr, Native.api.
+
 ## Version 0.8.0-beta5, 03-04-2015
 
 * Improved handling of geo_criteria_id in the DoubleclickMetadata API
