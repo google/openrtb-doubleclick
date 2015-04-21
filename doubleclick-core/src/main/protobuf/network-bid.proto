@@ -2,10 +2,10 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.59: + beta: CL 78263652
+// Synchronized with v.60: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
-// Copyright 2014 Google Inc. All Rights Reserved.
+// Copyright 2015 Google Inc. All Rights Reserved.
 
 // This is the message that Google uses to request bids. A single BidRequest
 // includes all applicable ad slots from a single impression.
@@ -307,10 +307,10 @@ message BidRequest {
     optional bool is_interstitial_request = 10 [default = false];
 
     // This field contains the IDs of categories to which the current mobile app
-    // belongs. This field will be empty if is_app is false. The mapping
-    // between mobile apps and categories is defined by the Google Play Store
-    // for Android apps, or the Apple iTunes Store for iOS apps. To look up
-    // category name from category ID, please refer to
+    // belongs. This field will be empty if is_app is false. The mapping between
+    // mobile apps and categories is defined by the Google Play Store for
+    // Android apps, or the Apple iTunes Store for iOS apps. To look up category
+    // name from category ID, please refer to
     // https://developers.google.com/adwords/api/docs/appendix/mobileappcategories
     repeated int32 app_category_ids = 11;
 
@@ -329,14 +329,14 @@ message BidRequest {
 
     // Apple's identifier for advertising (IDFA) as described at
     // https://support.google.com/adxbuyer/answer/3221407 or Android's
-    // advertising identifier. When the encrypted_advertising_id is an IDFA,
-    // the plaintext after decrypting the ciphertext is the IDFA returned by
-    // iOS's [ASIdentifierManager advertisingIdentifier]. For
-    // encrypted_hashed_idfa, the plaintext is the MD5 hash of the IDFA. Only
-    // one of the two fields will be available, depending on the version of the
-    // SDK making the request. Later SDKs provide unhashed values.
-    // Not set if there is one or more user_data_treatment value in the
-    // BidRequest, see constrained_usage_encrypted_advertising_id and
+    // advertising identifier. When the encrypted_advertising_id is an IDFA, the
+    // plaintext after decrypting the ciphertext is the IDFA returned by iOS's
+    // [ASIdentifierManager advertisingIdentifier]. For encrypted_hashed_idfa,
+    // the plaintext is the MD5 hash of the IDFA. Only one of the two fields
+    // will be available, depending on the version of the SDK making the
+    // request. Later SDKs provide unhashed values.  Not set if there is one or
+    // more user_data_treatment value in the BidRequest, see
+    // constrained_usage_encrypted_advertising_id and
     // constrained_usage_encrypted_hashed_idfa instead.
     optional bytes encrypted_advertising_id = 20;
     optional bytes encrypted_hashed_idfa = 21;
@@ -376,8 +376,7 @@ message BidRequest {
 
     // The time in milliseconds from the start of the video when the ad will be
     // displayed. 0 means pre-roll and -1 means post-roll. The value is valid
-    // only if this param is set. When not set, the display position is
-    // unknown.
+    // only if this param is set. When not set, the display position is unknown.
     optional int32 videoad_start_delay = 1;
 
     // The maximum duration in milliseconds of the ad that you should return.
@@ -388,10 +387,10 @@ message BidRequest {
     // If this is not set or has value <= 0, there is no minimum duration.
     optional int32 min_ad_duration = 8;
 
-    // The maximum number of ads in an Adx video pod. A non-zero value
-    // indicates that the current ad slot is a video pod that can show multiple
-    // video ads. Actual number of video ads shown can be less than or equal to
-    // this value but cannot exceed it.
+    // The maximum number of ads in an Adx video pod. A non-zero value indicates
+    // that the current ad slot is a video pod that can show multiple video
+    // ads. Actual number of video ads shown can be less than or equal to this
+    // value but cannot exceed it.
     optional int32 max_ads_in_pod = 12;
 
     // The type of inventory from which request is sent.
@@ -414,8 +413,8 @@ message BidRequest {
 
     // The maximum duration in milliseconds for the ad you should return, if
     // this ad is skippable (this generally differs from the maximum duration
-    // allowed for non-skippable ads). If this is not set or has value <= 0,
-    // any duration is allowed.
+    // allowed for non-skippable ads). If this is not set or has value <= 0, any
+    // duration is allowed.
     optional int32 skippable_max_ad_duration = 5;
 
     // The video technologies that are allowed for this request. The response
@@ -463,22 +462,22 @@ message BidRequest {
       optional int32 duration_seconds = 2;
 
       // A list of keywords describing the video, extracted from the content
-      // management system of the video publisher. There will be no more than
-      // 10 keywords in this list.
+      // management system of the video publisher. There will be no more than 10
+      // keywords in this list.
       repeated string keywords = 3;
     }
     optional ContentAttributes content_attributes = 9;
   }
   optional Video video = 29;
 
-  // The publisher settings list id that applies to this page. See the
-  // Targeting section of the RTB documentation for details.
+  // The publisher settings list id that applies to this page. See the Targeting
+  // section of the RTB documentation for details.
   optional fixed64 publisher_settings_list_id = 42;
 
   // -----------------------------------------------------------
   // Information about the adslots on the page.
   //
-  // Next tag to use: 22, but 51,52 are taken.
+  // Next tag to use: 23, but 51,52 are taken.
   message AdSlot {
 
     // An arbitrarily assigned slot id that is unique on a given page and
@@ -511,31 +510,43 @@ message BidRequest {
     // The allowed vendor types. See the vendors.txt file in the technical
     // documentation for a list of ids. When the seller_network is GDN, the
     // vendor ids listed in gdn-vendors.txt in the supporting technical
-    // documentation are also allowed. This field does not apply
-    // to deals with block overrides
-    // (see https://support.google.com/adxbuyer/answer/6114194).
+    // documentation are also allowed. This field does not apply to deals with
+    // block overrides (see https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 allowed_vendor_type = 6 [packed=true];
 
     // The disallowed sensitive ad categories. See the
     // ad-sensitive-categories.txt file in the technical documentation for a
     // list of ids. You should enforce these exclusions if you have the ability
-    // to classify ads into the listed categories. This field does not
-    // apply to deals with block overrides
-    // (see https://support.google.com/adxbuyer/answer/6114194).
+    // to classify ads into the listed categories. This field does not apply to
+    // deals with block overrides (see
+    // https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 excluded_sensitive_category = 7 [packed=true];
 
-    // The allowed restricted ad categories. See the
-    // ad-restricted-categories.txt file in the technical documentation for a
-    // list of ids. If you are bidding with ads in any of the listed categories
-    // you MUST declare them in the bid response.
+    // The allowed restricted ad categories for private and open auctions. See
+    // the ad-restricted-categories.txt file in the technical documentation for
+    // a list of ids. These only apply for private and open auction bids. See
+    // the allowed_restricted_category_for_deals field for direct deals. If you
+    // bid with an ad in a restricted category, you MUST ALWAYS declare the
+    // category in the bid response regardless of the values in this field.
     repeated int32 allowed_restricted_category = 16 [packed=true];
 
+    // The allowed restricted ad categories for direct deals. See the
+    // ad-restricted-categories.txt file in the technical documentation for a
+    // list of ids. These only apply for direct deals. See the
+    // allowed_restricted_category field for private and open auctions. In some
+    // cases, restricted categories are only allowed on direct deals so this
+    // field lists all categories in allowed_restricted_category, and
+    // additionally, restricted categories that are only allowed for direct
+    // deals. If you bid with an ad in a restricted category, you MUST ALWAYS
+    // declare the category in the bid response regardless of the values in this
+    // field.
+    repeated int32 allowed_restricted_category_for_deals = 22 [packed=true];
+
     // The disallowed ad product categories. See the ad-product-categories.txt
-    // file in the technical documentation for a list of ids. You should
-    // enforce these exclusions if you have the ability to classify ads into the
-    // listed categories. This field does not apply to deals with
-    // block overrides
-    // (see https://support.google.com/adxbuyer/answer/6114194).
+    // file in the technical documentation for a list of ids. You should enforce
+    // these exclusions if you have the ability to classify ads into the listed
+    // categories. This field does not apply to deals with block overrides (see
+    // https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 excluded_product_category = 13 [packed=true];
 
     // Information about the pre-targeting campaigns and adgroups that matched.
@@ -557,9 +568,9 @@ message BidRequest {
         repeated int64 included_advertisers = 1;
         repeated int64 excluded_advertisers = 2;
 
-        // Only one of the included_agencies and excluded_agencies fields
-        // can be set in a rule. See agencies.txt file in the technical
-        // documentation for a list of ids.
+        // Only one of the included_agencies and excluded_agencies fields can be
+        // set in a rule. See agencies.txt file in the technical documentation
+        // for a list of ids.
         repeated int64 included_agencies = 3;
         repeated int64 excluded_agencies = 4;
 
@@ -588,8 +599,8 @@ message BidRequest {
         // value of fixed_cpm_micros, and if you win, you will always be charged
         // fixed_cpm_micros. The value is in micros of your account currency.
         // For example, if the fixed cpm is 1290000 (1.29 in your account
-        // currency), then you need to bid at least this amount. If you win,
-        // you will be charged a CPM of 1.29 in your account currency.
+        // currency), then you need to bid at least this amount. If you win, you
+        // will be charged a CPM of 1.29 in your account currency.
         optional int64 fixed_cpm_micros = 2;
       }
       repeated DirectDeal direct_deal = 6;
@@ -613,11 +624,11 @@ message BidRequest {
     }
     optional SlotVisibility slot_visibility = 12 [default = NO_DETECTION];
 
-    // Historical viewability percentage for the ad slot. This is an estimate
-    // of the likelihood that this slot will be viewable by the end user, based
-    // on how often it has been viewable in the past. Expressed as a percentage
-    // in the range of [0, 100] and rounded down to the next multiple of 10.
-    // The default value -1 indicates that historical viewability data is not
+    // Historical viewability percentage for the ad slot. This is an estimate of
+    // the likelihood that this slot will be viewable by the end user, based on
+    // how often it has been viewable in the past. Expressed as a percentage in
+    // the range of [0, 100] and rounded down to the next multiple of 10.  The
+    // default value -1 indicates that historical viewability data is not
     // available.
     optional int32 viewability = 21 [default = -1];
 
@@ -692,9 +703,9 @@ message BidRequest {
     }
     repeated NativeAdTemplate native_ad_template = 51;
 
-    // Whether the ad request comes directly from the publisher, or whether
-    // it is a "passback" impression that has already been offered to and
-    // rejected by another ad network or ad exchange.
+    // Whether the ad request comes directly from the publisher, or whether it
+    // is a "passback" impression that has already been offered to and rejected
+    // by another ad network or ad exchange.
     enum MediationStatus {
       UNKNOWN = 0;
       DIRECT_REQUEST = 1;
@@ -718,8 +729,8 @@ message BidRequest {
     optional bytes request_id = 1;
 
     // The index of the creative within the BidResponse if there was more than
-    // one. The index starts at zero for the first creative. This is usually
-    // the index of the BidResponse.Ad, but may be the
+    // one. The index starts at zero for the first creative. This is usually the
+    // index of the BidResponse.Ad, but may be the
     // BidResponse.Ad.TemplateParameter if you use a template ad.
     optional int32 creative_index = 2;
 
@@ -732,8 +743,8 @@ message BidRequest {
     // if your ad did not win. This is only set if your bid participated in the
     // auction. It is not set if the bid was filtered prior to the auction. It
     // is also witheld if the publisher or winning bidder has opted out of price
-    // feedback, or if your account has opted out of sharing winning prices
-    // with other bidders.
+    // feedback, or if your account has opted out of sharing winning prices with
+    // other bidders.
     optional int64 cpm_micros = 4;
   }
   repeated BidResponseFeedback bid_response_feedback = 44;
@@ -807,8 +818,8 @@ message BidResponse {
     // conforms to the VAST 2.0 standard. Please use
     // BidResponse.Ad.AdSlot.adgroup_id to indicate which adgroup to attribute
     // this ad to. Only one of the following should be set: html_snippet,
-    // video_url, snippet_template. Only set this field if the BidRequest is
-    // for an in-video ad (BidRequest.video is present).
+    // video_url, snippet_template. Only set this field if the BidRequest is for
+    // an in-video ad (BidRequest.video is present).
     optional string video_url = 9;
 
     // An HTML snippet in the form of a template and multiple parameter values.
@@ -827,15 +838,15 @@ message BidResponse {
       // ad.
       optional string blank_ad_parameter_value = 8;
 
-      // A buyer-specific creative id. See the description in the parent
-      // message for more details. The field in the parent message should not
-      // be set when using a template.
+      // A buyer-specific creative id. See the description in the parent message
+      // for more details. The field in the parent message should not be set
+      // when using a template.
       optional string buyer_creative_id = 2;
 
-      // The destination URL for the creative. See the description in the
-      // parent message for more details. The field in the parent message
-      // should not be set when using a template. Only a single URL is allowed,
-      // unlike the field in the parent message.
+      // The destination URL for the creative. See the description in the parent
+      // message for more details. The field in the parent message should not be
+      // set when using a template. Only a single URL is allowed, unlike the
+      // field in the parent message.
       optional string click_through_url = 3;
 
       // The bounding box within the slot where the creative corresponding to
@@ -855,10 +866,9 @@ message BidResponse {
       // required. They should only be used in cases where non-backup ads may
       // need replacement for reasons that can change in the few milliseconds
       // between the time you submit the bid and the time the ad is shown to
-      // user. For example, budget or frequency capping constraints may fit
-      // this requirement. All parameters representing backup ads should come
-      // after the non-backup parameters in the repeated template_parameter
-      // field.
+      // user. For example, budget or frequency capping constraints may fit this
+      // requirement. All parameters representing backup ads should come after
+      // the non-backup parameters in the repeated template_parameter field.
       optional int32 backup_index = 9;
     };
     repeated TemplateParameter template_parameter = 13;
@@ -910,9 +920,9 @@ message BidResponse {
       // response.
       repeated string impression_tracking_url = 9;
 
-      // The URL to use for click tracking. The SDK pings click tracking url
-      // on a background thread. When resolving the url, HTTP 30x redirects
-      // are followed. The SDK ignores the contents of the response.
+      // The URL to use for click tracking. The SDK pings click tracking url on
+      // a background thread. When resolving the url, HTTP 30x redirects are
+      // followed. The SDK ignores the contents of the response.
       optional string click_tracking_url = 11;
 
       // The price of the promoted app including the currency info.
@@ -956,7 +966,8 @@ message BidResponse {
     // snippet. See ad-restricted-categories.txt in the technical documentation
     // for a list of ids. We will check to ensure these categories were listed
     // in the allowed_restricted_category list in the BidRequest. If you are
-    // bidding with ads in restricted categories you MUST declare them here.
+    // bidding with ads in restricted categories you MUST ALWAYS declare them
+    // here.
     repeated int32 restricted_category = 17;
 
     // All names of the ad's advertisers.
@@ -986,15 +997,15 @@ message BidResponse {
       required int64 max_cpm_micros = 2;
 
       // The minimum CPM you want to be charged if you win the auction for this
-      // ad slot. This may represent a second price if you choose max_cpm as
-      // the highest of several bids, or some form of reserve price if you wish
-      // to override the reserve price set by the publisher. The bid must be
-      // less than or equal to max_cpm_micros or it will be ignored. This field
-      // is optional and does not need to be set.
+      // ad slot. This may represent a second price if you choose max_cpm as the
+      // highest of several bids, or some form of reserve price if you wish to
+      // override the reserve price set by the publisher. The bid must be less
+      // than or equal to max_cpm_micros or it will be ignored. This field is
+      // optional and does not need to be set.
       optional int64 min_cpm_micros = 3;
 
-      // Id of the adgroup to attribute this impression to. The value must be
-      // in the set of adgroups for this slot that were sent in the
+      // Id of the adgroup to attribute this impression to. The value must be in
+      // the set of adgroups for this slot that were sent in the
       // BidRequest.AdSlot.matching_ad_data.adgroup_id. This must always be set
       // if the BidRequest has more than one BidRequest.AdSlot.matching_ad_data.
       optional int64 adgroup_id = 4;
@@ -1019,9 +1030,9 @@ message BidResponse {
 
   // If is_test was set in the BidRequest, then you may return debug information
   // as plain text in this field. Please do not set this field under normal
-  // conditions, or set it to values longer than 100 characters. You should
-  // only use this field when asked to do so as part of troubleshooting
-  // particular problems.
+  // conditions, or set it to values longer than 100 characters. You should only
+  // use this field when asked to do so as part of troubleshooting particular
+  // problems.
   optional string debug_string = 5;
 
   // Please set this to the processing time in milliseconds from when you
