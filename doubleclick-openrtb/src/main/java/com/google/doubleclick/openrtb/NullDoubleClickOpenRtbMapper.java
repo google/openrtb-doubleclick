@@ -35,7 +35,7 @@ public class NullDoubleClickOpenRtbMapper
   private NullDoubleClickOpenRtbMapper() {
   }
 
-  @Override public NetworkBid.BidResponse.Builder toNativeBidResponse(
+  @Override public NetworkBid.BidResponse.Builder toExchangeBidResponse(
       OpenRtb.BidRequest request, OpenRtb.BidResponse response) {
     return null;
   }
@@ -45,7 +45,7 @@ public class NullDoubleClickOpenRtbMapper
     return null;
   }
 
-  @Override public NetworkBid.BidRequest.Builder toNativeBidRequest(OpenRtb.BidRequest request) {
+  @Override public NetworkBid.BidRequest.Builder toExchangeBidRequest(OpenRtb.BidRequest request) {
     return null;
   }
 

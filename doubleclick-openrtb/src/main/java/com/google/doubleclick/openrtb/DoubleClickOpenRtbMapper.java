@@ -67,9 +67,8 @@ import org.slf4j.LoggerFactory;
 
 import java.security.SignatureException;
 import java.util.Calendar;
-import java.util.LinkedHashSet;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -132,7 +131,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   @Override
-  public NetworkBid.BidResponse.Builder toNativeBidResponse(
+  public NetworkBid.BidResponse.Builder toExchangeBidResponse(
     OpenRtb.BidRequest request, OpenRtb.BidResponse response) {
     checkNotNull(request);
     NetworkBid.BidResponse.Builder dcResponse = NetworkBid.BidResponse.newBuilder();
@@ -226,7 +225,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toNativeAd(request, response, bid, dcAd);
+      extMapper.toDoubleClickAd(request, response, bid, dcAd);
     }
 
     return dcAd;
@@ -436,6 +435,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
       banner.addApi(ApiFramework.MRAID_1);
     }
+    banner.addApi(ApiFramework.MRAID_2);
 
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
 
@@ -499,12 +499,19 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcSlot.hasSlotVisibility()) {
       video.setPos(AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility()));
     }
+
     if (dcVideo.hasVideoadStartDelay()) {
       video.setStartdelay(VideoStartDelayMapper.toDoubleClick(dcVideo.getVideoadStartDelay()));
+    }
+
+    if (!dcSlot.getExcludedAttributeList().contains(30 /* InstreamVastVideoType: Vpaid Flash */)) {
+      video.addApi(ApiFramework.VPAID_1_0);
+      video.addApi(ApiFramework.VPAID_2_0);
     }
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
       video.addApi(ApiFramework.MRAID_1);
     }
+    video.addApi(ApiFramework.MRAID_2);
 
     if (dcSlot.getWidthCount() == 1) {
       video.setW(dcSlot.getWidth(0));
@@ -514,7 +521,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.getCompanionSlotCount() != 0) {
-      Set<CompanionType> companionTypes = new LinkedHashSet<>();
+      EnumSet<CompanionType> companionTypes = EnumSet.noneOf(CompanionType.class);
 
       for (NetworkBid.BidRequest.Video.CompanionSlot dcCompSlot
           : dcVideo.getCompanionSlotList()) {
@@ -898,7 +905,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected void addBcat(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
-    Set<ContentCategory> cats = new LinkedHashSet<>();
+    EnumSet<ContentCategory> cats = EnumSet.noneOf(ContentCategory.class);
 
     for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
       AdCategoryMapper.toOpenRtb(dcSlot.getExcludedProductCategoryList(), cats);
@@ -914,7 +921,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
    * Not implemented yet!
    */
   @Override
-  public NetworkBid.BidRequest.Builder toNativeBidRequest(OpenRtb.BidRequest request) {
+  public NetworkBid.BidRequest.Builder toExchangeBidRequest(OpenRtb.BidRequest request) {
     throw new UnsupportedOperationException();
   }
 

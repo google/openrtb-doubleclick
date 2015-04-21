@@ -18,9 +18,9 @@ package com.google.doubleclick.openrtb;
 
 import static java.lang.Math.min;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.io.BaseEncoding;
 import com.google.common.net.InetAddresses;
 import com.google.protobuf.ByteString;
@@ -47,7 +47,18 @@ public class MapperUtil {
     return setArray;
   }
 
-  public static <T> ImmutableCollection<T> get(ImmutableSet<T>[] sets, int i) {
+  @SuppressWarnings("unchecked")
+  public static <E extends Enum<E>> ImmutableSet<E>[] multimapIntToEnumSets(
+      ImmutableMultimap<Integer, E> mmap) {
+    int iMax = Collections.max(mmap.keySet());
+    ImmutableSet<E>[] setArray = new ImmutableSet[iMax + 1];
+    for (Integer key : mmap.keySet()) {
+      setArray[key] = Sets.immutableEnumSet(mmap.get(key));
+    }
+    return setArray;
+  }
+
+  public static <T> ImmutableSet<T> get(ImmutableSet<T>[] sets, int i) {
     return i >= 0 && i < sets.length && sets[i] != null
         ? sets[i]
         : ImmutableSet.<T>of();
@@ -64,7 +75,7 @@ public class MapperUtil {
     return setArray;
   }
 
-  public static <E extends Enum<E>, T> ImmutableCollection<T> get(ImmutableSet<T>[] sets, E e) {
+  public static <E extends Enum<E>, T> ImmutableSet<T> get(ImmutableSet<T>[] sets, E e) {
     return e != null && e.ordinal() < sets.length && sets[e.ordinal()] != null
         ? sets[e.ordinal()]
         : ImmutableSet.<T>of();

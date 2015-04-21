@@ -16,51 +16,42 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner.ExpandableDirection;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Maps between AdX's {@code excluded_attribute} and OpenRTB's {@link ExpandableDirection}.
  */
 public class ExpandableDirectionMapper {
-  public static ImmutableSet<ExpandableDirection> toOpenRtb(List<Integer> dcList) {
-    boolean left = true, right = true, up = true, down = true;
+
+  public static EnumSet<ExpandableDirection> toOpenRtb(Collection<Integer> dcList) {
+    EnumSet<ExpandableDirection> openrtbSet = EnumSet.allOf(ExpandableDirection.class);
+    openrtbSet.remove(ExpandableDirection.FULLSCREEN);
     for (int dc : dcList) {
       switch (dc) {
         case 13 /* ExpandingDirection: ExpandingUp */:
-          up = false;
+          openrtbSet.remove(ExpandableDirection.UP);
           break;
         case 14 /* ExpandingDirection: ExpandingDown */:
-          down = false;
+          openrtbSet.remove(ExpandableDirection.DOWN);
           break;
         case 15 /* ExpandingDirection: ExpandingLeft */:
-          left = false;
+          openrtbSet.remove(ExpandableDirection.LEFT);
           break;
         case 16 /* ExpandingDirection: ExpandingRight */:
-          right = false;
+          openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
         default:
       }
     }
-    ImmutableSet.Builder<ExpandableDirection> openrtbSet = ImmutableSet.builder();
-    if (left) {
-      openrtbSet.add(ExpandableDirection.LEFT);
-    }
-    if (right) {
-      openrtbSet.add(ExpandableDirection.RIGHT);
-    }
-    if (up) {
-      openrtbSet.add(ExpandableDirection.UP);
-    }
-    if (down) {
-      openrtbSet.add(ExpandableDirection.DOWN);
-    }
-    return openrtbSet.build();
+    return openrtbSet;
   }
 
-  public static ImmutableSet<Integer> toDoubleClick(List<ExpandableDirection> openrtbList) {
+  public static Set<Integer> toDoubleClick(Collection<ExpandableDirection> openrtbList) {
     boolean left = false, right = false, up = false, down = false;
     for (ExpandableDirection openrtb : openrtbList) {
       switch (openrtb) {
@@ -79,7 +70,7 @@ public class ExpandableDirectionMapper {
         default:
       }
     }
-    ImmutableSet.Builder<Integer> dcSet = ImmutableSet.builder();
+    LinkedHashSet<Integer> dcSet = new LinkedHashSet<>();
     if (!left) {
       dcSet.add(15 /* ExpandingDirection: ExpandingLeft */);
     }
@@ -92,6 +83,6 @@ public class ExpandableDirectionMapper {
     if (!down) {
       dcSet.add(14 /* ExpandingDirection: ExpandingDown */);
     }
-    return dcSet.build();
+    return dcSet;
   }
 }
