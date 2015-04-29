@@ -22,7 +22,9 @@ import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
 import javax.annotation.Nullable;
 
 /**
- * Maps between AdX's {@link Gender} and OpenRTB's {@code gender}.
+ * Maps between AdX's
+ * {@link com.google.protos.adx.NetworkBid.BidRequest.UserDemographic.Gender}
+ * and OpenRTB's {@link com.google.openrtb.OpenRtb.BidRequest.User.Gender}.
  */
 public class GenderMapper {
   public static @Nullable User.Gender toOpenRtb(@Nullable UserDemographic.Gender dc) {
