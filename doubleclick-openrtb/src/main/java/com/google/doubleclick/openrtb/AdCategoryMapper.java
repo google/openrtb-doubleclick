@@ -16,7 +16,6 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.io.CharStreams;
@@ -29,10 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,12 +44,10 @@ public class AdCategoryMapper {
   private static final Logger logger = LoggerFactory.getLogger(AdCategoryMapper.class);
   private static ImmutableSet<ContentCategory>[] dcToOpenrtb;
   private static ImmutableSetMultimap<ContentCategory, Integer> openrtbToDc;
-  private static ImmutableBiMap<ContentCategory, String> openrtbToName;
 
   static {
     Pattern pattern = Pattern.compile("(\\d+)\\|.*\\|(\\d+)\\|.*");
     ImmutableSetMultimap.Builder<ContentCategory, Integer> data = ImmutableSetMultimap.builder();
-    Map<ContentCategory, String> names = new EnumMap<>(ContentCategory.class);
 
     try (InputStream isMetadata = AdCategoryMapper.class.getResourceAsStream(
         "/adx-openrtb/category-mapping-openrtb.txt")) {
@@ -67,15 +62,11 @@ public class AdCategoryMapper {
             logger.warn("Ignoring unknown ContentCategory code: {}", line);
           } else {
             data.put(openrtbCat, dcCode);
-            if (!names.containsKey(openrtbCat)) {
-              names.put(openrtbCat, openrtbCat.name().replace("_", "-"));
-            }
           }
         }
       }
 
       openrtbToDc = data.build();
-      openrtbToName = ImmutableBiMap.copyOf(names);
       dcToOpenrtb = MapperUtil.multimapIntToSets(openrtbToDc.inverse());
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
@@ -88,10 +79,6 @@ public class AdCategoryMapper {
 
   public static ImmutableSet<Integer> toDoubleClick(ContentCategory openrtb) {
     return openrtbToDc.get(openrtb);
-  }
-
-  public static ImmutableBiMap<ContentCategory, String> getNameMap() {
-    return openrtbToName;
   }
 
   public static EnumSet<ContentCategory> toOpenRtb(

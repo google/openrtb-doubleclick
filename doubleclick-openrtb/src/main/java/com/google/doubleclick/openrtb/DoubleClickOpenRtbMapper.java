@@ -220,8 +220,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (bid.hasCat()) {
-      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(
-          asList(ContentCategory.valueOf(bid.getCat())), null));
+      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(asList(bid.getCat()), null));
     }
 
     for (ExtMapper extMapper : extMappers) {
@@ -320,7 +319,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       NetworkBid.BidRequest.UserDemographic dcUser = dcRequest.getUserDemographic();
 
       if (dcUser.hasGender()) {
-        user.setGender(GenderMapper.toOpenRtb(dcUser.getGender()));
+        User.Gender gender = GenderMapper.toOpenRtb(dcUser.getGender());
+        if (gender != null) {
+          user.setGender(gender);
+        }
       }
       if (dcUser.hasAgeLow() || dcUser.hasAgeHigh()) {
         // OpenRTB only supports a single age, not a range. We have to be pessimistic;
@@ -912,9 +914,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       AdCategoryMapper.toOpenRtb(dcSlot.getExcludedSensitiveCategoryList(), cats);
     }
 
-    for (ContentCategory cat : cats) {
-      request.addBcat(AdCategoryMapper.getNameMap().get(cat));
-    }
+    request.addAllBcat(cats);
   }
 
   /**

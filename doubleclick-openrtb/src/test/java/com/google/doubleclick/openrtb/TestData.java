@@ -66,7 +66,7 @@ public class TestData {
           .setW(200)
           .setH(220)
           .setNurl("http://impression.com")
-          .setCat(ContentCategory.IAB1.name());
+          .setCat(ContentCategory.IAB1);
     }
     return bid;
   }

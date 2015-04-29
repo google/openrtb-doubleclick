@@ -16,23 +16,23 @@
 
 package com.google.doubleclick.openrtb;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
-import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic.Gender;
+import com.google.openrtb.OpenRtb.BidRequest.User;
+import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
 
 import org.junit.Test;
 
 public class GenderMapperTest {
   @Test
   public void testMapper() {
-    assertEquals("M", GenderMapper.toOpenRtb(Gender.MALE));
-    assertEquals(Gender.MALE, GenderMapper.toDoubleClick("M"));
+    assertEquals(User.Gender.MALE, GenderMapper.toOpenRtb(UserDemographic.Gender.MALE));
+    assertEquals(UserDemographic.Gender.MALE, GenderMapper.toDoubleClick(User.Gender.MALE));
 
-    for (String openrtb : asList("M", "F", "O")) {
+    for (User.Gender openrtb : User.Gender.values()) {
       GenderMapper.toDoubleClick(openrtb);
     }
-    for (Gender dc : Gender.values()) {
+    for (UserDemographic.Gender dc : UserDemographic.Gender.values()) {
       GenderMapper.toOpenRtb(dc);
     }
   }
