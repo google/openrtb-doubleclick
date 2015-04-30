@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Google Inc. All Rights Reserved.
+ * Copyright 2015 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,28 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-import com.google.openrtb.OpenRtb.BidRequest.User;
-import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
+import com.google.openrtb.OpenRtb.BidRequest.AuctionType;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal.DealType;
 
 import org.junit.Test;
 
-public class GenderMapperTest {
+public class DealTypeMapperTest {
   @Test
   public void testMapper() {
-    assertEquals(User.Gender.MALE, GenderMapper.toOpenRtb(UserDemographic.Gender.MALE));
-    assertEquals(UserDemographic.Gender.MALE, GenderMapper.toDoubleClick(User.Gender.MALE));
+    assertSame(
+        AuctionType.SECOND_PRICE,
+        DealTypeMapper.toOpenRtb(DealType.PRIVATE_AUCTION));
+    assertSame(
+        DealType.PREFERRED_DEAL,
+        DealTypeMapper.toDoubleClick(AuctionType.FIXED_PRICE));
 
-    for (User.Gender openrtb : User.Gender.values()) {
-      GenderMapper.toDoubleClick(openrtb);
+    for (AuctionType openrtb : AuctionType.values()) {
+      DealTypeMapper.toDoubleClick(openrtb);
     }
-    for (UserDemographic.Gender dc : UserDemographic.Gender.values()) {
-      GenderMapper.toOpenRtb(dc);
+    for (DealType dc : DealType.values()) {
+      DealTypeMapper.toOpenRtb(dc);
     }
   }
 }

@@ -16,33 +16,38 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic.Gender;
+import com.google.openrtb.OpenRtb.BidRequest.User;
+import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
+
+import javax.annotation.Nullable;
 
 /**
- * Maps between AdX's {@link Gender} and OpenRTB's {@code gender}.
+ * Maps between AdX's
+ * {@link com.google.protos.adx.NetworkBid.BidRequest.UserDemographic.Gender}
+ * and OpenRTB's {@link com.google.openrtb.OpenRtb.BidRequest.User.Gender}.
  */
 public class GenderMapper {
-  public static String toOpenRtb(Gender dc) {
+  public static @Nullable User.Gender toOpenRtb(@Nullable UserDemographic.Gender dc) {
     switch (dc) {
       case MALE:
-        return "M";
+        return User.Gender.MALE;
       case FEMALE:
-        return "F";
+        return User.Gender.FEMALE;
       case UNKNOWN:
       default:
-        return "O";
+        return null;
     }
   }
 
-  public static Gender toDoubleClick(String gender) {
+  public static @Nullable UserDemographic.Gender toDoubleClick(@Nullable User.Gender gender) {
     switch (gender) {
-      case "M":
-        return Gender.MALE;
-      case "F":
-        return Gender.FEMALE;
-      case "O":
+      case MALE:
+        return UserDemographic.Gender.MALE;
+      case FEMALE:
+        return UserDemographic.Gender.FEMALE;
+      case OTHER:
       default:
-        return Gender.UNKNOWN;
+        return null;
     }
   }
 }

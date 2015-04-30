@@ -31,6 +31,7 @@ import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.doubleclick.util.GeoTarget;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest.App;
+import com.google.openrtb.OpenRtb.BidRequest.AuctionType;
 import com.google.openrtb.OpenRtb.BidRequest.Content;
 import com.google.openrtb.OpenRtb.BidRequest.Data;
 import com.google.openrtb.OpenRtb.BidRequest.Data.Segment;
@@ -220,8 +221,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (bid.hasCat()) {
-      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(
-          asList(ContentCategory.valueOf(bid.getCat())), null));
+      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(asList(bid.getCat()), null));
     }
 
     for (ExtMapper extMapper : extMappers) {
@@ -252,7 +252,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   @Override
   public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
-        .setId(BaseEncoding.base64Url().omitPadding().encode(dcRequest.getId().toByteArray()));
+        .setId(BaseEncoding.base64Url().omitPadding().encode(dcRequest.getId().toByteArray()))
+        .setAt(AuctionType.SECOND_PRICE);
 
     if (dcRequest.getIsPing()) {
       return request;
@@ -320,7 +321,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       NetworkBid.BidRequest.UserDemographic dcUser = dcRequest.getUserDemographic();
 
       if (dcUser.hasGender()) {
-        user.setGender(GenderMapper.toOpenRtb(dcUser.getGender()));
+        User.Gender gender = GenderMapper.toOpenRtb(dcUser.getGender());
+        if (gender != null) {
+          user.setGender(gender);
+        }
       }
       if (dcUser.hasAgeLow() || dcUser.hasAgeHigh()) {
         // OpenRTB only supports a single age, not a range. We have to be pessimistic;
@@ -466,6 +470,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
             .setId(String.valueOf(dcDeal.getDirectDealId()));
         if (dcDeal.hasFixedCpmMicros()) {
           deal.setBidfloor(dcDeal.getFixedCpmMicros() / ((double) MICROS_PER_CURRENCY_UNIT));
+        }
+        if (dcDeal.hasDealType()) {
+          deal.setAt(DealTypeMapper.toOpenRtb(dcDeal.getDealType()));
         }
         pmp.addDeals(deal);
       }
@@ -912,9 +919,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       AdCategoryMapper.toOpenRtb(dcSlot.getExcludedSensitiveCategoryList(), cats);
     }
 
-    for (ContentCategory cat : cats) {
-      request.addBcat(AdCategoryMapper.getNameMap().get(cat));
-    }
+    request.addAllBcat(cats);
   }
 
   /**
