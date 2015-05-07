@@ -903,6 +903,18 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       content.setContentrating(rating);
     }
 
+    if (dcRequest.getVideo().hasContentAttributes()) {
+      NetworkBid.BidRequest.Video.ContentAttributes dcContent =
+          dcRequest.getVideo().getContentAttributes();
+      if (dcContent.hasTitle()) {
+        content.setTitle(dcContent.getTitle());
+      }
+      if (dcContent.hasDurationSeconds()) {
+        content.setLen(dcContent.getDurationSeconds());
+      }
+      content.addAllKeywords(dcContent.getKeywordsList());
+    }
+
     return content;
   }
 
