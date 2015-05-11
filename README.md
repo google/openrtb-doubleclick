@@ -29,7 +29,7 @@ RELEASE NOTES
 
 ## Version 0.8.1, 29-04-2015
 
-* DoubleClick protocol v.60, adds `inventory_type` and `deal_type`.
+* DoubleClick protocol v.61, adds `inventory_type` and `deal_type`.
 * Maps BidRequest.at, Deal.at.
 
 ## Version 0.8.0, 21-04-2015
