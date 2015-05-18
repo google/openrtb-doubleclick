@@ -30,7 +30,6 @@ import com.google.doubleclick.DcExt;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
-import com.google.openrtb.OpenRtb.BidRequest.AuctionType;
 import com.google.openrtb.OpenRtb.BidRequest.Impression;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Native;
@@ -325,7 +324,6 @@ public class DoubleClickOpenRtbMapperTest {
         OpenRtb.BidRequest.newBuilder()
             .setId(BaseEncoding.base64Url().omitPadding().encode(
                 dcRequest.getId().toByteArray()))
-            .setAt(AuctionType.SECOND_PRICE)
             .build(),
         request);
   }

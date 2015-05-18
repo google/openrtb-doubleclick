@@ -33,6 +33,7 @@ import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest.App;
 import com.google.openrtb.OpenRtb.BidRequest.AuctionType;
 import com.google.openrtb.OpenRtb.BidRequest.Content;
+import com.google.openrtb.OpenRtb.BidRequest.Content.Builder;
 import com.google.openrtb.OpenRtb.BidRequest.Data;
 import com.google.openrtb.OpenRtb.BidRequest.Data.Segment;
 import com.google.openrtb.OpenRtb.BidRequest.Device;
@@ -252,12 +253,13 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   @Override
   public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
-        .setId(BaseEncoding.base64Url().omitPadding().encode(dcRequest.getId().toByteArray()))
-        .setAt(AuctionType.SECOND_PRICE);
+        .setId(BaseEncoding.base64Url().omitPadding().encode(dcRequest.getId().toByteArray()));
 
     if (dcRequest.getIsPing()) {
       return request;
     }
+
+    request.setAt(AuctionType.SECOND_PRICE);
 
     boolean coppa = false;
     for (NetworkBid.BidRequest.UserDataTreatment dcUDT : dcRequest.getUserDataTreatmentList()) {
@@ -280,7 +282,17 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     addBcat(dcRequest, request);
-    buildImps(dcRequest, request);
+
+    for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
+      Impression.Builder imp = buildImp(dcRequest, dcSlot);
+      if (imp != null) {
+        request.addImp(imp);
+      }
+    }
+    if (request.getImpCount() == 0) {
+      noImp.inc();
+      logger.debug("Request has no impressions");
+    }
 
     User.Builder user = buildUser(dcRequest, coppa);
     if (user != null) {
@@ -299,7 +311,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return request;
   }
 
-  protected User.Builder buildUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
+  protected @Nullable User.Builder buildUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
     if ((!coppa && !dcRequest.hasGoogleUserId())
         || (coppa && !dcRequest.hasConstrainedUsageGoogleUserId())) {
       return null;
@@ -363,66 +375,51 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return user;
   }
 
-  protected void buildImps(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
-    for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
-      Impression.Builder imp = request.addImpBuilder()
-          .setId(String.valueOf(dcSlot.getId()));
+  protected Impression.Builder buildImp(
+      NetworkBid.BidRequest dcRequest, NetworkBid.BidRequest.AdSlot dcSlot) {
+    Impression.Builder imp = Impression.newBuilder()
+        .setId(String.valueOf(dcSlot.getId()));
 
-      Long bidFloor = null;
+    Long bidFloor = null;
 
-      for (NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData :
-          dcSlot.getMatchingAdDataList()) {
-
-        if (dcAdData.hasMinimumCpmMicros()) {
-          bidFloor = (bidFloor == null)
-              ? dcAdData.getMinimumCpmMicros()
-              : min(bidFloor, dcAdData.getMinimumCpmMicros());
-        }
-
-        for (NetworkBid.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule dcPricingRule :
-            dcAdData.getPricingRuleList()) {
-          if (dcPricingRule.hasMinimumCpmMicros()) {
-            bidFloor = (bidFloor == null)
-                ? dcPricingRule.getMinimumCpmMicros()
-                : min(bidFloor, dcPricingRule.getMinimumCpmMicros());
-          }
-        }
-
-        PMP.Builder pmp = buildPmp(dcAdData);
-        if (pmp != null) {
-          imp.setPmp(pmp);
-        }
+    for (NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData : dcSlot.getMatchingAdDataList()) {
+      if (dcAdData.hasMinimumCpmMicros()) {
+        bidFloor = (bidFloor == null)
+            ? dcAdData.getMinimumCpmMicros()
+            : min(bidFloor, dcAdData.getMinimumCpmMicros());
       }
 
-      if (bidFloor != null) {
-        imp.setBidfloor(((double) bidFloor) / MICROS_PER_CURRENCY_UNIT);
-      }
-
-      if (dcRequest.getMobile().hasIsInterstitialRequest()) {
-        imp.setInstl(dcRequest.getMobile().getIsInterstitialRequest());
-      }
-
-      if (dcSlot.hasAdBlockKey()) {
-        imp.setTagid(String.valueOf(dcSlot.getAdBlockKey()));
-      }
-
-      if (dcSlot.getNativeAdTemplateCount() != 0) {
-        imp.setNative(nativeMapper.buildNativeRequest(dcSlot));
-      } else if (dcRequest.hasVideo()) {
-        imp.setVideo(buildVideo(dcSlot, dcRequest.getVideo()));
-      } else {
-        imp.setBanner(buildBanner(dcSlot));
-      }
-
-      for (ExtMapper extMapper : extMappers) {
-        extMapper.toOpenRtbImpression(dcSlot, imp);
+      PMP.Builder pmp = buildPmp(dcAdData);
+      if (pmp != null) {
+        imp.setPmp(pmp);
       }
     }
 
-    if (request.getImpCount() == 0) {
-      noImp.inc();
-      logger.debug("Request has no impressions");
+    if (bidFloor != null) {
+      imp.setBidfloor(((double) bidFloor) / MICROS_PER_CURRENCY_UNIT);
     }
+
+    if (dcRequest.getMobile().hasIsInterstitialRequest()) {
+      imp.setInstl(dcRequest.getMobile().getIsInterstitialRequest());
+    }
+
+    if (dcSlot.hasAdBlockKey()) {
+      imp.setTagid(String.valueOf(dcSlot.getAdBlockKey()));
+    }
+
+    if (dcSlot.getNativeAdTemplateCount() != 0) {
+      imp.setNative(nativeMapper.buildNativeRequest(dcSlot));
+    } else if (dcRequest.hasVideo()) {
+      imp.setVideo(buildVideo(dcSlot, dcRequest.getVideo()));
+    } else {
+      imp.setBanner(buildBanner(dcSlot));
+    }
+
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbImpression(dcSlot, imp);
+    }
+
+    return imp;
   }
 
   protected Banner.Builder buildBanner(NetworkBid.BidRequest.AdSlot dcSlot) {
@@ -457,7 +454,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return banner;
   }
 
-  protected PMP.Builder buildPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
+  protected @Nullable PMP.Builder buildPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
     if (dcAdData.getDirectDealCount() == 0) {
       return null;
     }
@@ -657,7 +654,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return device;
   }
 
-  protected Geo.Builder buildGeo(NetworkBid.BidRequest dcRequest) {
+  protected @Nullable Geo.Builder buildGeo(NetworkBid.BidRequest dcRequest) {
     if (!dcRequest.hasGeoCriteriaId() && !dcRequest.hasEncryptedHyperlocalSet()
         && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()) {
       return null;
@@ -772,11 +769,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
   protected Site.Builder buildSite(NetworkBid.BidRequest dcRequest) {
     Site.Builder site = Site.newBuilder();
-    site.setContent(buildContent(dcRequest));
-    NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
 
-    if (dcMobile.hasIsMobileWebOptimized()) {
-      site.setMobile(dcMobile.getIsMobileWebOptimized());
+    Builder content = buildContent(dcRequest);
+    if (content != null) {
+      site.setContent(content);
+    }
+
+    if (dcRequest.getMobile().hasIsMobileWebOptimized()) {
+      site.setMobile(dcRequest.getMobile().getIsMobileWebOptimized());
     }
 
     if (dcRequest.hasUrl()) {
@@ -811,21 +811,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
     App.Builder app = App.newBuilder();
 
-    Content.Builder content = buildContent(dcRequest);
-    if (dcRequest.hasUrl()) {
-      content.setUrl(dcRequest.getUrl());
-    } else if (dcRequest.hasAnonymousId()) {
-      content.setId(dcRequest.getAnonymousId());
-    } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("App request is missing both url and anonymousId: {}",
-            TextFormat.shortDebugString(dcRequest));
-      }
+    Content.Builder content = buildAppContent(dcRequest);
+    if (content != null) {
+      app.setContent(content);
     }
-    if (dcMobile.hasAppRating()) {
-      content.setUserrating(String.valueOf(dcMobile.getAppRating()));
-    }
-    app.setContent(content);
 
     if (dcMobile.hasAppId()) {
       app.setBundle(dcMobile.getAppId());
@@ -851,7 +840,36 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return app;
   }
 
-  protected Publisher.Builder buildPublisher(NetworkBid.BidRequest dcRequest) {
+  protected @Nullable Content.Builder buildAppContent(NetworkBid.BidRequest dcRequest) {
+    Content.Builder content = buildContent(dcRequest);
+    if (content == null) {
+      if (!dcRequest.hasUrl() && !dcRequest.hasAnonymousId()
+          && !dcRequest.getMobile().hasAppRating()) {
+        return null;
+      } else {
+        content = Content.newBuilder();
+      }
+    }
+
+    if (dcRequest.hasUrl()) {
+      content.setUrl(dcRequest.getUrl());
+    } else if (dcRequest.hasAnonymousId()) {
+      content.setId(dcRequest.getAnonymousId());
+    } else {
+      if (logger.isDebugEnabled()) {
+        logger.debug("App request is missing both url and anonymousId: {}",
+            TextFormat.shortDebugString(dcRequest));
+      }
+    }
+
+    if (dcRequest.getMobile().hasAppRating()) {
+      content.setUserrating(String.valueOf(dcRequest.getMobile().getAppRating()));
+    }
+
+    return content;
+  }
+
+  protected @Nullable Publisher.Builder buildPublisher(NetworkBid.BidRequest dcRequest) {
     if (!dcRequest.hasSellerNetworkId()) {
       return null;
     }
@@ -867,7 +885,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return publisher;
   }
 
-  protected String findChannelId(NetworkBid.BidRequest dcRequest) {
+  protected @Nullable String findChannelId(NetworkBid.BidRequest dcRequest) {
     for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
       for (String dcChannel : dcSlot.getTargetableChannelList()) {
         if (dcChannel.startsWith(YOUTUBE_AFV_USER_ID)) {
@@ -881,7 +899,13 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return null;
   }
 
-  protected Content.Builder buildContent(NetworkBid.BidRequest dcRequest) {
+  protected @Nullable Content.Builder buildContent(NetworkBid.BidRequest dcRequest) {
+    if (dcRequest.getDetectedLanguageCount() == 0
+        && dcRequest.getDetectedContentLabelCount() == 0
+        && !dcRequest.getVideo().hasContentAttributes()) {
+      return null;
+    }
+
     Content.Builder content = Content.newBuilder();
     int nLangs = dcRequest.getDetectedLanguageCount();
 
