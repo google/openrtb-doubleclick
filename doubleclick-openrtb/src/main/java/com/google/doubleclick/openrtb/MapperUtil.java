@@ -83,7 +83,7 @@ public class MapperUtil {
 
   public static String toIpv4String(ByteString bytes) {
     StringBuilder sb = new StringBuilder(15);
-    int size = min(3, bytes.size());
+    int size = min(4, bytes.size());
 
     for (int i = 0; i < size; ++i) {
       if (i != 0) {
@@ -102,7 +102,7 @@ public class MapperUtil {
   public static String toIpv6String(ByteString bytes) {
     try {
       byte[] ipv6 = new byte[16];
-      bytes.copyTo(ipv6, 0, 0, min(12, bytes.size()));
+      bytes.copyTo(ipv6, 0, 0, min(ipv6.length, bytes.size()));
       return InetAddresses.toAddrString(InetAddress.getByAddress(ipv6));
     } catch (UnknownHostException e) {
       throw new IllegalArgumentException("ip=" + BaseEncoding.base16().encode(bytes.toByteArray()));

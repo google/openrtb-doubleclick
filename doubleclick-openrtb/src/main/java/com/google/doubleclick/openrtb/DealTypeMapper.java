@@ -29,7 +29,7 @@ public class DealTypeMapper {
         return AuctionType.FIXED_PRICE;
       case PRIVATE_AUCTION:
         return AuctionType.SECOND_PRICE;
-      case UNKNOWN:
+      case UNKNOWN_DEAL_TYPE:
       default:
         return null;
     }

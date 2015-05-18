@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.61: + beta: CL 78263652
+// Synchronized with v.63: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2015 Google Inc. All Rights Reserved.
@@ -474,17 +474,17 @@ message BidRequest {
   // section of the RTB documentation for details.
   optional fixed64 publisher_settings_list_id = 42;
 
-  // Inventory type of the page where the ad will be shown. For an AdX
+  // Publisher type of the inventory where the ad will be shown. For an AdX
   // publisher, its inventory can be either owned and operated (O&O),
   // represented by the publisher, or of unknown status. AdSense and AdMob
   // inventory is represented by Google.
-  enum InventoryType {
-    UNKNOWN_INVENTORY_TYPE = 0;
+  enum PublisherType {
+    UNKNOWN_PUBLISHER_TYPE = 0;
     ADX_PUBLISHER_OWNED_AND_OPERATED = 1;
     ADX_PUBLISHER_REPRESENTED = 2;
     GOOGLE_REPRESENTED = 3;
   };
-  optional InventoryType inventory_type = 51 [default = UNKNOWN_INVENTORY_TYPE];
+  optional PublisherType publisher_type = 51 [default = UNKNOWN_PUBLISHER_TYPE];
 
   // -----------------------------------------------------------
   // Information about the adslots on the page.
@@ -617,11 +617,11 @@ message BidRequest {
 
         // The type of the deal.
         enum DealType {
-          UNKNOWN = 0;
+          UNKNOWN_DEAL_TYPE = 0;
           PREFERRED_DEAL = 1;
           PRIVATE_AUCTION = 2;
         }
-        optional DealType deal_type = 3 [default = UNKNOWN];
+        optional DealType deal_type = 3 [default = UNKNOWN_DEAL_TYPE];
       }
       repeated DirectDeal direct_deal = 6;
 
