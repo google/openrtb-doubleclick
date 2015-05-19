@@ -27,34 +27,40 @@ line after checkout or after any mvn clean.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.8.2, 19-05-2015
+- Maps `Video.content.title/len/keywords`.
+- DoubleClick protocol v.63, only fixes two enum value names.
+- Mapping of `Impression.bidfloor` now ignores DC `BuyerPricingRule`,
+  which could rarely result in zero prices.
+
 ## Version 0.8.1, 29-04-2015
 
 * DoubleClick protocol v.61, adds `inventory_type` and `deal_type`.
-* Maps BidRequest.at, Deal.at.
+* Maps `BidRequest.at`, `Deal.at`.
 
 ## Version 0.8.0, 21-04-2015
 
 * DoubleClick protocol v.60, adds `allowed_restricted_category_for_deals`.
-* DoubleClickOpenRtbNativeMapper more lenient.
-* Improved mapping of api fields (ApiFramework).
-* Maps Native.battr, Native.api.
+* `DoubleClickOpenRtbNativeMapper` more lenient.
+* Improved mapping of `api` fields (`ApiFramework`).
+* Maps `Native.battr`, `Native.api`.
 
 ## Version 0.8.0-beta5, 03-04-2015
 
-* Improved handling of geo_criteria_id in the DoubleclickMetadata API
-  and the OpenRTB mapper. You should see more Geo fields populated
-  for many requests, e.g. city for requests located at a postal code,
-  metro for requests from a city that belongs to a metro, etc.
+* Improved handling of `geo_criteria_id` in the `DoubleclickMetadata` API
+  and the OpenRTB mapper. You should see more `Geo` fields populated
+  for many requests, e.g. `city` for requests located at a postal code,
+  `metro` for requests from a city that belongs to a metro, etc.
 
 ## Version 0.8.0-beta3, 31-03-2015
 
 * Logging updates, mostly avoiding multiline logs (bad for syslog).
-* Refactor some DoubleClickMetadata helper types.
+* Refactor some `DoubleClickMetadata` helper types.
 
 ## Version 0.8.0-beta2, 13-03-2015
 
-* BidRequest.id & User.customdata using base64Url, not base16.
-* Fix bcat mapping; optimize some enum mappings.
+* `BidRequest.id` & `User.customdata` using base64Url, not base16.
+* Fix `bcat` mapping; optimize some enum mappings.
 * More metadata: Agencies, Site lists, Creative status.
 * Removed error-prone from build, new version had some issues too.
 
