@@ -27,7 +27,7 @@ line after checkout or after any mvn clean.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 0.8.2, 19-05-2015
+## Version 0.8.3, 22-05-2015
 - Maps `Video.content.title/len/keywords`.
 - DoubleClick protocol v.63, only fixes two enum value names.
 - Mapping of `Impression.bidfloor` now ignores DC `BuyerPricingRule`,
