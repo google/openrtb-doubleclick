@@ -16,8 +16,8 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
+import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 
 /**
  * Maps between AdX's {@link MobileDeviceType} and OpenRTB's {@link DeviceType}.
@@ -26,7 +26,9 @@ public class DeviceTypeMapper {
   public static DeviceType toOpenRtb(MobileDeviceType dc) {
     switch (dc) {
       case HIGHEND_PHONE:
+        return DeviceType.PHONE;
       case TABLET:
+        return DeviceType.TABLET;
       case UNKNOWN:
       default:
         return DeviceType.MOBILE;
@@ -35,10 +37,14 @@ public class DeviceTypeMapper {
 
   public static MobileDeviceType toDoubleClick(DeviceType openrtb) {
     switch (openrtb) {
+      case TABLET:
+        return MobileDeviceType.TABLET;
       case CONNECTED_TV:
       case MOBILE:
+      case PHONE:
         return MobileDeviceType.HIGHEND_PHONE;
-      case PC:
+      case PERSONAL_COMPUTER:
+      case SET_TOP_BOX:
       default:
         return MobileDeviceType.UNKNOWN;
     }

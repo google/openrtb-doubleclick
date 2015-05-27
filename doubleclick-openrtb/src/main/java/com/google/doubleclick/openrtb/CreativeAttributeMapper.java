@@ -41,7 +41,7 @@ public class CreativeAttributeMapper {
           .putAll(CreativeAttribute.EXPANDABLE_CLICK_INITIATED)
           .putAll(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED, 28)
           .putAll(CreativeAttribute.HAS_AUDIO_ON_OFF_BUTTON)
-          .putAll(CreativeAttribute.POP_UP)
+          .putAll(CreativeAttribute.POP)
           .putAll(CreativeAttribute.PROVOCATIVE_OR_SUGGESTIVE)
           .putAll(CreativeAttribute.SURVEYS)
           .putAll(CreativeAttribute.TEXT_ONLY, 1)

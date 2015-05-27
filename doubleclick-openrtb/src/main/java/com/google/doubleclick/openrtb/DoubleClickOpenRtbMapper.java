@@ -39,13 +39,13 @@ import com.google.openrtb.OpenRtb.BidRequest.Data.Segment;
 import com.google.openrtb.OpenRtb.BidRequest.Device;
 import com.google.openrtb.OpenRtb.BidRequest.Geo;
 import com.google.openrtb.OpenRtb.BidRequest.Impression;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.ApiFramework;
+import com.google.openrtb.OpenRtb.BidRequest.Impression.APIFramework;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP.Deal;
 import com.google.openrtb.OpenRtb.BidRequest.Impression.Video;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.Protocol;
+import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VASTCompanionType;
+import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VideoBidResponseProtocol;
 import com.google.openrtb.OpenRtb.BidRequest.Publisher;
 import com.google.openrtb.OpenRtb.BidRequest.Regulations;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
@@ -434,9 +434,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
-      banner.addApi(ApiFramework.MRAID_1);
+      banner.addApi(APIFramework.MRAID_1);
     }
-    banner.addApi(ApiFramework.MRAID_2);
+    banner.addApi(APIFramework.MRAID_2);
 
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
 
@@ -485,8 +485,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   protected Video.Builder buildVideo(
       NetworkBid.BidRequest.AdSlot dcSlot, NetworkBid.BidRequest.Video dcVideo) {
     Video.Builder video = Video.newBuilder()
-        .addProtocols(Protocol.VAST_2_0)
-        .addProtocols(Protocol.VAST_3_0)
+        .addProtocols(VideoBidResponseProtocol.VAST_2_0)
+        .addProtocols(VideoBidResponseProtocol.VAST_3_0)
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
 
     if (dcVideo.hasMinAdDuration()) {
@@ -509,13 +509,13 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (!dcSlot.getExcludedAttributeList().contains(30 /* InstreamVastVideoType: Vpaid Flash */)) {
-      video.addApi(ApiFramework.VPAID_1_0);
-      video.addApi(ApiFramework.VPAID_2_0);
+      video.addApi(APIFramework.VPAID_1);
+      video.addApi(APIFramework.VPAID_2);
     }
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
-      video.addApi(ApiFramework.MRAID_1);
+      video.addApi(APIFramework.MRAID_1);
     }
-    video.addApi(ApiFramework.MRAID_2);
+    video.addApi(APIFramework.MRAID_2);
 
     if (dcSlot.getWidthCount() == 1) {
       video.setW(dcSlot.getWidth(0));
@@ -525,7 +525,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.getCompanionSlotCount() != 0) {
-      EnumSet<CompanionType> companionTypes = EnumSet.noneOf(CompanionType.class);
+      EnumSet<VASTCompanionType> companionTypes = EnumSet.noneOf(VASTCompanionType.class);
 
       for (NetworkBid.BidRequest.Video.CompanionSlot dcCompSlot
           : dcVideo.getCompanionSlotList()) {

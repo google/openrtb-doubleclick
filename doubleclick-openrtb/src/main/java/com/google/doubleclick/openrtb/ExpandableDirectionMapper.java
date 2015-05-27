@@ -30,7 +30,7 @@ public class ExpandableDirectionMapper {
 
   public static EnumSet<ExpandableDirection> toOpenRtb(Collection<Integer> dcList) {
     EnumSet<ExpandableDirection> openrtbSet = EnumSet.allOf(ExpandableDirection.class);
-    openrtbSet.remove(ExpandableDirection.FULLSCREEN);
+    openrtbSet.remove(ExpandableDirection.EXPANDABLE_FULLSCREEN);
     for (int dc : dcList) {
       switch (dc) {
         case 13 /* ExpandingDirection: ExpandingUp */:

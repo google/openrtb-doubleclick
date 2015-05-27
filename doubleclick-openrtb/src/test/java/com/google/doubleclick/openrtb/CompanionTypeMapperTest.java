@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
+import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VASTCompanionType;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import org.junit.Test;
@@ -29,13 +29,13 @@ public class CompanionTypeMapperTest {
   @Test
   public void testMapper() {
     assertEquals(
-        ImmutableSet.of(CompanionType.HTML),
+        ImmutableSet.of(VASTCompanionType.HTML),
         CompanionTypeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.HTML_CREATIVE), null));
     assertEquals(
         ImmutableSet.of(CreativeFormat.HTML_CREATIVE),
-        CompanionTypeMapper.toDoubleClick(ImmutableList.of(CompanionType.HTML), null));
+        CompanionTypeMapper.toDoubleClick(ImmutableList.of(VASTCompanionType.HTML), null));
 
-    for (CompanionType openrtb : CompanionType.values()) {
+    for (VASTCompanionType openrtb : VASTCompanionType.values()) {
       CompanionTypeMapper.toDoubleClick(openrtb);
     }
     for (CreativeFormat dc : CreativeFormat.values()) {
