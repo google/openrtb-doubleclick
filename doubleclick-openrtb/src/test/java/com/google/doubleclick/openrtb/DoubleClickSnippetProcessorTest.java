@@ -21,7 +21,7 @@ import static org.junit.Assert.assertSame;
 
 import com.google.doubleclick.util.DoubleClickMacros;
 import com.google.openrtb.OpenRtb.BidRequest;
-import com.google.openrtb.OpenRtb.BidRequest.Impression;
+import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
@@ -55,7 +55,7 @@ public class DoubleClickSnippetProcessorTest {
   private String process(DoubleClickSnippetProcessor processor, String snippet) {
     BidRequest request = BidRequest.newBuilder()
         .setId("1")
-        .addImp(Impression.newBuilder()
+        .addImp(Imp.newBuilder()
             .setId("1")).build();
     BidResponse response = createBidResponse(snippet);
     return processor.process(

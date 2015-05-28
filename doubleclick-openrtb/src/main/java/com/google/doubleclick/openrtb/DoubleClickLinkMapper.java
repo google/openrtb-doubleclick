@@ -37,8 +37,8 @@ public class DoubleClickLinkMapper extends ExtMapper {
     request.setExtension(DcExt.bidRequest, dcRequest);
   }
 
-  @Override public void toOpenRtbImpression(
-      NetworkBid.BidRequest.AdSlot dcSlot, OpenRtb.BidRequest.Impression.Builder imp) {
+  @Override public void toOpenRtbImp(
+      NetworkBid.BidRequest.AdSlot dcSlot, OpenRtb.BidRequest.Imp.Builder imp) {
     imp.setExtension(DcExt.adSlot, dcSlot);
   }
 
@@ -48,7 +48,7 @@ public class DoubleClickLinkMapper extends ExtMapper {
   }
 
   @Override public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
-      OpenRtb.BidRequest.Impression.Video.Builder video) {
+      OpenRtb.BidRequest.Imp.Video.Builder video) {
     video.setExtension(DcExt.video, dcVideo);
   }
 
@@ -59,8 +59,8 @@ public class DoubleClickLinkMapper extends ExtMapper {
     }
   }
 
-  @Override public void toOpenRtbPMP(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
-      OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
+  @Override public void toOpenRtbPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
+      OpenRtb.BidRequest.Imp.Pmp.Builder pmp) {
     pmp.setExtension(DcExt.adData, dcAdData);
   }
 

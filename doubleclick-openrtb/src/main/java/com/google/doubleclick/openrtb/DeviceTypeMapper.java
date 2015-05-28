@@ -19,6 +19,8 @@ package com.google.doubleclick.openrtb;
 import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
 import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 
+import javax.annotation.Nullable;
+
 /**
  * Maps between AdX's {@link MobileDeviceType} and OpenRTB's {@link DeviceType}.
  */
@@ -29,13 +31,12 @@ public class DeviceTypeMapper {
         return DeviceType.PHONE;
       case TABLET:
         return DeviceType.TABLET;
-      case UNKNOWN:
       default:
         return DeviceType.MOBILE;
     }
   }
 
-  public static MobileDeviceType toDoubleClick(DeviceType openrtb) {
+  public static @Nullable MobileDeviceType toDoubleClick(DeviceType openrtb) {
     switch (openrtb) {
       case TABLET:
         return MobileDeviceType.TABLET;
@@ -43,10 +44,8 @@ public class DeviceTypeMapper {
       case MOBILE:
       case PHONE:
         return MobileDeviceType.HIGHEND_PHONE;
-      case PERSONAL_COMPUTER:
-      case SET_TOP_BOX:
       default:
-        return MobileDeviceType.UNKNOWN;
+        return null;
     }
   }
 }

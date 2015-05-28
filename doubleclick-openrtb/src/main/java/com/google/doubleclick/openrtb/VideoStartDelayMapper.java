@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VideoStartDelay;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoStartDelay;
 
 /**
  * Maps between AdX's {@code videoad_start_delay} and OpenRTB's {@code startdelay}.

@@ -19,23 +19,24 @@ package com.google.doubleclick.openrtb;
 import com.google.openrtb.OpenRtb.BidRequest.AuctionType;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal.DealType;
 
+import javax.annotation.Nullable;
+
 /**
  * Maps between AdX's {@link DealType} and OpenRTB's {@link AuctionType}.
  */
 public class DealTypeMapper {
-  public static AuctionType toOpenRtb(DealType dc) {
+  public static @Nullable AuctionType toOpenRtb(DealType dc) {
     switch (dc) {
       case PREFERRED_DEAL:
         return AuctionType.FIXED_PRICE;
       case PRIVATE_AUCTION:
         return AuctionType.SECOND_PRICE;
-      case UNKNOWN_DEAL_TYPE:
       default:
         return null;
     }
   }
 
-  public static DealType toDoubleClick(AuctionType openrtb) {
+  public static @Nullable DealType toDoubleClick(AuctionType openrtb) {
     switch (openrtb) {
       case FIRST_PRICE:
       case SECOND_PRICE:

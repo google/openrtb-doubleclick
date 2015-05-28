@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VASTCompanionType;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VASTCompanionType;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import java.util.Collection;

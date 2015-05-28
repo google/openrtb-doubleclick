@@ -33,7 +33,6 @@ public class GenderMapper {
         return User.Gender.MALE;
       case FEMALE:
         return User.Gender.FEMALE;
-      case UNKNOWN:
       default:
         return null;
     }

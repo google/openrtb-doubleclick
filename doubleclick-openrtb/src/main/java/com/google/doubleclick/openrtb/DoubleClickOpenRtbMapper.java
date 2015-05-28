@@ -19,7 +19,6 @@ package com.google.doubleclick.openrtb;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.util.Arrays.asList;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -37,17 +36,19 @@ import com.google.openrtb.OpenRtb.BidRequest.Content.Builder;
 import com.google.openrtb.OpenRtb.BidRequest.Data;
 import com.google.openrtb.OpenRtb.BidRequest.Data.Segment;
 import com.google.openrtb.OpenRtb.BidRequest.Device;
+import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
 import com.google.openrtb.OpenRtb.BidRequest.Geo;
-import com.google.openrtb.OpenRtb.BidRequest.Impression;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.APIFramework;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.PMP.Deal;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VASTCompanionType;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VideoBidResponseProtocol;
+import com.google.openrtb.OpenRtb.BidRequest.Imp;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.APIFramework;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.AdPosition;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp.Deal;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Video;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VASTCompanionType;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoBidResponseProtocol;
 import com.google.openrtb.OpenRtb.BidRequest.Publisher;
-import com.google.openrtb.OpenRtb.BidRequest.Regulations;
+import com.google.openrtb.OpenRtb.BidRequest.Regs;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidRequest.User;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
@@ -168,7 +169,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     dcAd.setBuyerCreativeId(bid.getCrid());
 
-    Impression matchingImp = OpenRtbUtils.impWithId(request, bid.getImpid());
+    Imp matchingImp = OpenRtbUtils.impWithId(request, bid.getImpid());
     if (matchingImp == null) {
       invalidImp.inc();
       throw new MapperException(
@@ -222,7 +223,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (bid.hasCat()) {
-      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(asList(bid.getCat()), null));
+      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(bid.getCat()));
     }
 
     for (ExtMapper extMapper : extMappers) {
@@ -232,8 +233,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return dcAd;
   }
 
-  protected void setAdSize(
-      Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd, Impression matchingImp) {
+  protected void setAdSize(Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd, Imp matchingImp) {
     boolean multisize = matchingImp.getExtension(DcExt.adSlot).getWidthCount() > 1;
 
     if (multisize || matchingImp.getInstl()) {
@@ -270,7 +270,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
     if (coppa) {
       coppaTreatment.inc();
-      request.setRegs(Regulations.newBuilder().setCoppa(true));
+      request.setRegs(Regs.newBuilder().setCoppa(true));
     }
 
     request.setDevice(buildDevice(dcRequest, coppa));
@@ -284,7 +284,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     addBcat(dcRequest, request);
 
     for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
-      Impression.Builder imp = buildImp(dcRequest, dcSlot);
+      Imp.Builder imp = buildImp(dcRequest, dcSlot);
       if (imp != null) {
         request.addImp(imp);
       }
@@ -375,9 +375,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return user;
   }
 
-  protected Impression.Builder buildImp(
+  protected Imp.Builder buildImp(
       NetworkBid.BidRequest dcRequest, NetworkBid.BidRequest.AdSlot dcSlot) {
-    Impression.Builder imp = Impression.newBuilder()
+    Imp.Builder imp = Imp.newBuilder()
         .setId(String.valueOf(dcSlot.getId()));
 
     Long bidFloor = null;
@@ -389,7 +389,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
             : min(bidFloor, dcAdData.getMinimumCpmMicros());
       }
 
-      PMP.Builder pmp = buildPmp(dcAdData);
+      Pmp.Builder pmp = buildPmp(dcAdData);
       if (pmp != null) {
         imp.setPmp(pmp);
       }
@@ -416,7 +416,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtbImpression(dcSlot, imp);
+      extMapper.toOpenRtbImp(dcSlot, imp);
     }
 
     return imp;
@@ -430,7 +430,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     setSize(banner, dcSlot.getWidthList(), dcSlot.getHeightList());
 
     if (dcSlot.hasSlotVisibility()) {
-      banner.setPos(AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility()));
+      AdPosition pos = AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility());
+      if (pos != null) {
+        banner.setPos(pos);
+      }
     }
 
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
@@ -454,12 +457,12 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return banner;
   }
 
-  protected @Nullable PMP.Builder buildPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
+  protected @Nullable Pmp.Builder buildPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
     if (dcAdData.getDirectDealCount() == 0) {
       return null;
     }
 
-    PMP.Builder pmp = PMP.newBuilder();
+    Pmp.Builder pmp = Pmp.newBuilder();
     for (NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal dcDeal
         : dcAdData.getDirectDealList()) {
       if (dcDeal.hasDirectDealId()) {
@@ -469,14 +472,17 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
           deal.setBidfloor(dcDeal.getFixedCpmMicros() / ((double) MICROS_PER_CURRENCY_UNIT));
         }
         if (dcDeal.hasDealType()) {
-          deal.setAt(DealTypeMapper.toOpenRtb(dcDeal.getDealType()));
+          AuctionType type = DealTypeMapper.toOpenRtb(dcDeal.getDealType());
+          if (type != null) {
+            deal.setAt(type);
+          }
         }
         pmp.addDeals(deal);
       }
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtbPMP(dcAdData, pmp);
+      extMapper.toOpenRtbPmp(dcAdData, pmp);
     }
 
     return pmp;
@@ -501,7 +507,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcSlot.hasSlotVisibility()) {
-      video.setPos(AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility()));
+      AdPosition pos = AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility());
+      if (pos != null) {
+        video.setPos(pos);
+      }
     }
 
     if (dcVideo.hasVideoadStartDelay()) {
@@ -634,7 +643,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
             dcVer.hasOsVersionMicro() ? dcVer.getOsVersionMicro() : null));
       }
       if (dcMobile.hasMobileDeviceType()) {
-        device.setDevicetype(DeviceTypeMapper.toOpenRtb(dcMobile.getMobileDeviceType()));
+        DeviceType type = DeviceTypeMapper.toOpenRtb(dcMobile.getMobileDeviceType());
+        if (type != null) {
+          device.setDevicetype(type);
+        }
       }
       if (dcMobile.hasScreenWidth()) {
         device.setW(dcMobile.getScreenWidth());

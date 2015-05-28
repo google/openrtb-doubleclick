@@ -48,17 +48,17 @@ extend com.google.openrtb.BidRequest.Geo {
   optional com.google.protos.adx.BidRequest.HyperlocalSet hyperLocal = 102;
 }
 
-extend com.google.openrtb.BidRequest.Impression {
+extend com.google.openrtb.BidRequest.Imp {
   /** Reference to the corresponding node in the DoubleClick request. */
   optional com.google.protos.adx.BidRequest.AdSlot adSlot = 101;
 }
 
-extend com.google.openrtb.BidRequest.Impression.Video {
+extend com.google.openrtb.BidRequest.Imp.Video {
   /** Reference to the corresponding node in the DoubleClick request. */
   optional com.google.protos.adx.BidRequest.Video video = 101;
 }
 
-extend com.google.openrtb.BidRequest.Impression.PMP {
+extend com.google.openrtb.BidRequest.Imp.Pmp {
   /** Reference to the corresponding node in the DoubleClick request. */
   optional com.google.protos.adx.BidRequest.AdSlot.MatchingAdData adData = 101;
 }

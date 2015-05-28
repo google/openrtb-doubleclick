@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner.ExpandableDirection;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner.ExpandableDirection;
 
 import java.util.Collection;
 import java.util.EnumSet;
