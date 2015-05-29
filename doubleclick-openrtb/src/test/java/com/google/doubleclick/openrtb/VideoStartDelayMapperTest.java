@@ -18,7 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.VideoStartDelay;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoStartDelay;
 
 import org.junit.Test;
 

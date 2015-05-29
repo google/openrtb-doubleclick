@@ -28,22 +28,19 @@ public class IFramingStateMapper {
     switch (dc) {
       case NO_IFRAME:
         return false;
-      case SAME_DOMAIN_IFRAME:
       case CROSS_DOMAIN_IFRAME:
+      case SAME_DOMAIN_IFRAME:
         return true;
       case UNKNOWN_IFRAME_STATE:
-      default:
         return null;
     }
+    return null;
   }
 
   public static @Nullable IFramingState toDoubleClick(@Nullable Boolean openrtb) {
-    if (openrtb == null) {
-      return IFramingState.UNKNOWN_IFRAME_STATE;
-    }
-    if (openrtb == false) {
+    if (openrtb == Boolean.FALSE) {
       return IFramingState.NO_IFRAME;
-    } else if (openrtb == true) {
+    } else if (openrtb == Boolean.TRUE) {
       return IFramingState.CROSS_DOMAIN_IFRAME;
     } else {
       return null;

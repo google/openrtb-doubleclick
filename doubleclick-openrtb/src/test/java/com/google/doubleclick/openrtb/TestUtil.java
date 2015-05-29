@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb.BidRequest;
-import com.google.openrtb.OpenRtb.BidRequest.Impression;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner;
+import com.google.openrtb.OpenRtb.BidRequest.Imp;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
@@ -60,7 +60,7 @@ class TestUtil {
 
     for (int i = 0; i < adGroupMincpm.length; i += 3) {
       String adid = String.valueOf(adGroupMincpm[i + 0]);
-      request.addImp(Impression.newBuilder()
+      request.addImp(Imp.newBuilder()
           .setId(adid)
           .setBidfloor(((Number) adGroupMincpm[i + 2]).floatValue())
           .setBanner(Banner.newBuilder()

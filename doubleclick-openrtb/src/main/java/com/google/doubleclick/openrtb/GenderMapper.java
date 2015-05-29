@@ -29,25 +29,25 @@ import javax.annotation.Nullable;
 public class GenderMapper {
   public static @Nullable User.Gender toOpenRtb(@Nullable UserDemographic.Gender dc) {
     switch (dc) {
-      case MALE:
-        return User.Gender.MALE;
       case FEMALE:
         return User.Gender.FEMALE;
+      case MALE:
+        return User.Gender.MALE;
       case UNKNOWN:
-      default:
         return null;
     }
+    return null;
   }
 
   public static @Nullable UserDemographic.Gender toDoubleClick(@Nullable User.Gender gender) {
     switch (gender) {
-      case MALE:
-        return UserDemographic.Gender.MALE;
       case FEMALE:
         return UserDemographic.Gender.FEMALE;
+      case MALE:
+        return UserDemographic.Gender.MALE;
       case OTHER:
-      default:
-        return null;
+        return null;  // Maping is UNKNOWN => AdX's default
     }
+    return null;
   }
 }

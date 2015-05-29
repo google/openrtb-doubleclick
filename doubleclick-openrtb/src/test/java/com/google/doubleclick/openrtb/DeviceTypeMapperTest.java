@@ -18,8 +18,8 @@ package com.google.doubleclick.openrtb;
 
 import static org.junit.Assert.assertSame;
 
-import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
+import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 
 import org.junit.Test;
 
@@ -27,11 +27,11 @@ public class DeviceTypeMapperTest {
   @Test
   public void testMapper() {
     assertSame(
-        DeviceType.MOBILE,
+        DeviceType.PHONE,
         DeviceTypeMapper.toOpenRtb(MobileDeviceType.HIGHEND_PHONE));
     assertSame(
         MobileDeviceType.HIGHEND_PHONE,
-        DeviceTypeMapper.toDoubleClick(DeviceType.MOBILE));
+        DeviceTypeMapper.toDoubleClick(DeviceType.PHONE));
 
     for (DeviceType openrtb : DeviceType.values()) {
       DeviceTypeMapper.toDoubleClick(openrtb);

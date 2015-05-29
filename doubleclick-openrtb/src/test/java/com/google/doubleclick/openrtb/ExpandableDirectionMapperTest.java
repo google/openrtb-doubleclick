@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner.ExpandableDirection;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner.ExpandableDirection;
 
 import org.junit.Test;
 

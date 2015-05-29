@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Banner.ExpandableDirection;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner.ExpandableDirection;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -30,7 +30,7 @@ public class ExpandableDirectionMapper {
 
   public static EnumSet<ExpandableDirection> toOpenRtb(Collection<Integer> dcList) {
     EnumSet<ExpandableDirection> openrtbSet = EnumSet.allOf(ExpandableDirection.class);
-    openrtbSet.remove(ExpandableDirection.FULLSCREEN);
+    openrtbSet.remove(ExpandableDirection.EXPANDABLE_FULLSCREEN);
     for (int dc : dcList) {
       switch (dc) {
         case 13 /* ExpandingDirection: ExpandingUp */:
@@ -45,7 +45,6 @@ public class ExpandableDirectionMapper {
         case 16 /* ExpandingDirection: ExpandingRight */:
           openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
-        default:
       }
     }
     return openrtbSet;
@@ -67,7 +66,9 @@ public class ExpandableDirectionMapper {
         case DOWN:
           down = true;
           break;
-        default:
+        case EXPANDABLE_FULLSCREEN:
+          left = right = up = down = true;
+          break;
       }
     }
     LinkedHashSet<Integer> dcSet = new LinkedHashSet<>();

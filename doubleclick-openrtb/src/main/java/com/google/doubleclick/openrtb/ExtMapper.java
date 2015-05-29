@@ -47,16 +47,16 @@ public abstract class ExtMapper {
       OpenRtb.BidRequest.Device.Builder device) {
   }
 
-  public void toOpenRtbImpression(NetworkBid.BidRequest.AdSlot dcSlot,
-      OpenRtb.BidRequest.Impression.Builder imp) {
+  public void toOpenRtbImp(NetworkBid.BidRequest.AdSlot dcSlot,
+      OpenRtb.BidRequest.Imp.Builder imp) {
   }
 
   public void toOpenRtbBanner(NetworkBid.BidRequest.AdSlot dcSlot,
-      OpenRtb.BidRequest.Impression.Banner.Builder banner) {
+      OpenRtb.BidRequest.Imp.Banner.Builder banner) {
   }
 
-  public void toOpenRtbPMP(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
-      OpenRtb.BidRequest.Impression.PMP.Builder pmp) {
+  public void toOpenRtbPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
+      OpenRtb.BidRequest.Imp.Pmp.Builder pmp) {
   }
 
   public void toOpenRtbNative(
@@ -65,7 +65,7 @@ public abstract class ExtMapper {
   }
 
   public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
-      OpenRtb.BidRequest.Impression.Video.Builder video) {
+      OpenRtb.BidRequest.Imp.Video.Builder video) {
   }
 
   public void toOpenRtbGeo(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo,

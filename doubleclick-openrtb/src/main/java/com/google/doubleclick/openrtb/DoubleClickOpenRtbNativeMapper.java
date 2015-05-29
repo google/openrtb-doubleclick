@@ -17,8 +17,8 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.common.collect.ImmutableList;
-import com.google.openrtb.OpenRtb.BidRequest.Impression;
-import com.google.openrtb.OpenRtb.BidRequest.Impression.ApiFramework;
+import com.google.openrtb.OpenRtb.BidRequest.Imp;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.APIFramework;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtbNative.NativeRequest;
 import com.google.openrtb.OpenRtbNative.NativeResponse;
@@ -64,8 +64,7 @@ public class DoubleClickOpenRtbNativeMapper {
     metricRegistry.register(MetricRegistry.name(cls, "incomplete"), incomplete);
   }
 
-  public NetworkBid.BidResponse.Ad.NativeAd.Builder buildNativeResponse(
-      Bid bid, Impression matchingImp) {
+  public NetworkBid.BidResponse.Ad.NativeAd.Builder buildNativeResponse(Bid bid, Imp matchingImp) {
     if (bid.hasAdmNative() == bid.hasAdm()) {
       throw new MapperException("Must provide only one of adm/admNative");
     }
@@ -214,16 +213,16 @@ public class DoubleClickOpenRtbNativeMapper {
     }
   }
 
-  public Impression.Native.Builder buildNativeRequest(NetworkBid.BidRequest.AdSlot dcSlot) {
-    Impression.Native.Builder impNativ = Impression.Native.newBuilder()
+  public Imp.Native.Builder buildNativeRequest(NetworkBid.BidRequest.AdSlot dcSlot) {
+    Imp.Native.Builder impNativ = Imp.Native.newBuilder()
         .setVer("1.0")
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
     NativeRequest.Builder nativReq = NativeRequest.newBuilder().setVer("1.0");
 
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
-      impNativ.addApi(ApiFramework.MRAID_1);
+      impNativ.addApi(APIFramework.MRAID_1);
     }
-    impNativ.addApi(ApiFramework.MRAID_2);
+    impNativ.addApi(APIFramework.MRAID_2);
 
     int id = 0;
 
@@ -400,7 +399,7 @@ public class DoubleClickOpenRtbNativeMapper {
     }
   }
 
-  protected NativeRequest.Asset.Builder failReqAsset(
+  protected @Nullable NativeRequest.Asset.Builder failReqAsset(
       NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
       NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields field) {
     incomplete.inc();

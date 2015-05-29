@@ -16,41 +16,45 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Impression.Video.CompanionType;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VASTCompanionType;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import java.util.Collection;
 import java.util.EnumSet;
 
+import javax.annotation.Nullable;
+
 /**
- * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link CompanionType}.
+ * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link VASTCompanionType}.
  */
 public class CompanionTypeMapper {
-  public static CompanionType toOpenRtb(CreativeFormat dc) {
+  public static @Nullable VASTCompanionType toOpenRtb(CreativeFormat dc) {
     switch (dc) {
       case IMAGE_CREATIVE:
-        return CompanionType.STATIC;
+        return VASTCompanionType.STATIC;
       case FLASH_CREATIVE:
       case HTML_CREATIVE:
-        default:
-        return CompanionType.HTML;
+        return VASTCompanionType.HTML;
     }
+    return null;
   }
 
-  public static CreativeFormat toDoubleClick(CompanionType openrtb) {
+  public static @Nullable CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
     switch (openrtb) {
       case STATIC:
         return CreativeFormat.IMAGE_CREATIVE;
+      case COMPANION_IFRAME:
       case HTML:
-      case IFRAME:
-        default:
         return CreativeFormat.HTML_CREATIVE;
     }
+    return null;
   }
 
-  public static EnumSet<CompanionType> toOpenRtb(
-      Collection<CreativeFormat> dcList, EnumSet<CompanionType> openrtbSet) {
-    EnumSet<CompanionType> ret = openrtbSet == null ? EnumSet.noneOf(CompanionType.class) : openrtbSet;
+  public static EnumSet<VASTCompanionType> toOpenRtb(
+      Collection<CreativeFormat> dcList, EnumSet<VASTCompanionType> openrtbSet) {
+    EnumSet<VASTCompanionType> ret = openrtbSet == null
+        ? EnumSet.noneOf(VASTCompanionType.class)
+            : openrtbSet;
     for (CreativeFormat dc : dcList) {
       ret.add(toOpenRtb(dc));
     }
@@ -58,9 +62,9 @@ public class CompanionTypeMapper {
   }
 
   public static EnumSet<CreativeFormat> toDoubleClick(
-      Collection<CompanionType> openrtbList, EnumSet<CreativeFormat> dcSet) {
+      Collection<VASTCompanionType> openrtbList, EnumSet<CreativeFormat> dcSet) {
     EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : null;
-    for (CompanionType openrtb : openrtbList) {
+    for (VASTCompanionType openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {
         ret.add(dc);

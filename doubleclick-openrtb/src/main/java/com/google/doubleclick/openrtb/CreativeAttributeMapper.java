@@ -41,7 +41,7 @@ public class CreativeAttributeMapper {
           .putAll(CreativeAttribute.EXPANDABLE_CLICK_INITIATED)
           .putAll(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED, 28)
           .putAll(CreativeAttribute.HAS_AUDIO_ON_OFF_BUTTON)
-          .putAll(CreativeAttribute.POP_UP)
+          .putAll(CreativeAttribute.POP)
           .putAll(CreativeAttribute.PROVOCATIVE_OR_SUGGESTIVE)
           .putAll(CreativeAttribute.SURVEYS)
           .putAll(CreativeAttribute.TEXT_ONLY, 1)
@@ -52,10 +52,10 @@ public class CreativeAttributeMapper {
       .build();
   private static ImmutableSet<CreativeAttribute>[] dcToOpenrtb = MapperUtil.multimapIntToEnumSets(
       ImmutableMultimap.<Integer, CreativeAttribute>builder()
-          .putAll(44, CreativeAttribute.AD_CAN_BE_SKIPPED)
-          .putAll(28, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
           .putAll(1, CreativeAttribute.TEXT_ONLY)
+          .putAll(28, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
           .putAll(32, CreativeAttribute.USER_INTERACTIVE)
+          .putAll(44, CreativeAttribute.AD_CAN_BE_SKIPPED)
           .build());
 
   public static ImmutableSet<CreativeAttribute> toOpenRtb(int dc) {
