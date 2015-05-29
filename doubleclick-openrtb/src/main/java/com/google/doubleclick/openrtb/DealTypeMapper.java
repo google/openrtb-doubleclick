@@ -30,7 +30,7 @@ public class DealTypeMapper {
       case PREFERRED_DEAL:
         return AuctionType.FIXED_PRICE;
       case PRIVATE_AUCTION:
-        return AuctionType.SECOND_PRICE;
+        // Mapping is SECOND_PRICE => OpenRTB's default
       default:
         return null;
     }

@@ -19,35 +19,39 @@ package com.google.doubleclick.openrtb;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.AdPosition;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 
+import javax.annotation.Nullable;
+
 /**
  * Maps between AdX's {@link SlotVisibility} and OpenRTB's {@link AdPosition}.
  */
 public class AdPositionMapper {
-  public static AdPosition toOpenRtb(SlotVisibility dc) {
+  public static @Nullable AdPosition toOpenRtb(SlotVisibility dc) {
     switch (dc) {
       case ABOVE_THE_FOLD:
         return AdPosition.ABOVE_THE_FOLD;
       case BELOW_THE_FOLD:
         return AdPosition.BELOW_THE_FOLD;
       case NO_DETECTION:
+        // Mapping is UNKNOWN => OpenRTB's default
       default:
-        return AdPosition.UNKNOWN;
+        return null;
     }
   }
 
-  public static SlotVisibility toDoubleClick(AdPosition openrtb) {
+  public static @Nullable SlotVisibility toDoubleClick(AdPosition openrtb) {
     switch (openrtb) {
       case ABOVE_THE_FOLD:
-      case HEADER:                 // Mobile only
-      case FOOTER:                 // Mobile only
-      case SIDEBAR:                // Mobile only
       case AD_POSITION_FULLSCREEN: // Mobile only
+      case FOOTER:                 // Mobile only
+      case HEADER:                 // Mobile only
+      case SIDEBAR:                // Mobile only
         return SlotVisibility.ABOVE_THE_FOLD;
       case BELOW_THE_FOLD:
         return SlotVisibility.BELOW_THE_FOLD;
       case UNKNOWN:
       default:
-        return SlotVisibility.NO_DETECTION;
+        // Mapping is NO_DETECTION => AdX's default
+        return null;
     }
   }
 }

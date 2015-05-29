@@ -34,19 +34,19 @@ import javax.annotation.Nullable;
 public class BannerMimeMapper {
   private static ImmutableMap<String, CreativeFormat> openrtbToDc =
       ImmutableMap.<String, CreativeFormat>builder()
-          .put("video/x-flv", CreativeFormat.FLASH_CREATIVE)
+          .put("application/javascript", CreativeFormat.HTML_CREATIVE)
           .put("image/gif", CreativeFormat.IMAGE_CREATIVE)
           .put("image/jpeg", CreativeFormat.IMAGE_CREATIVE)
           .put("image/png", CreativeFormat.IMAGE_CREATIVE)
-          .put("text/html", CreativeFormat.HTML_CREATIVE)
           .put("text/css", CreativeFormat.HTML_CREATIVE)
-          .put("application/javascript", CreativeFormat.HTML_CREATIVE)
+          .put("text/html", CreativeFormat.HTML_CREATIVE)
+          .put("video/x-flv", CreativeFormat.FLASH_CREATIVE)
           .build();
   private static ImmutableSet<String>[] dcToOpenrtb = MapperUtil.multimapEnumToSets(
       ImmutableMultimap.<CreativeFormat, String>builder()
           .putAll(CreativeFormat.FLASH_CREATIVE, "video/x-flv")
-          .putAll(CreativeFormat.IMAGE_CREATIVE, "image/gif", "image/jpeg", "image/png")
           .putAll(CreativeFormat.HTML_CREATIVE, "text/html", "text/css", "application/javascript")
+          .putAll(CreativeFormat.IMAGE_CREATIVE, "image/gif", "image/jpeg", "image/png")
           .build());
 
   public static ImmutableSet<String> toOpenRtb(CreativeFormat dc) {

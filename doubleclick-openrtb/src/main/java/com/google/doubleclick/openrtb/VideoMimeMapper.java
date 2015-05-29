@@ -34,9 +34,9 @@ import javax.annotation.Nullable;
 public class VideoMimeMapper {
   private static ImmutableMap<String, VideoFormat> openrtbToDc =
       ImmutableMap.<String, VideoFormat>builder()
-          .put("video/x-flv", VideoFormat.VIDEO_FLASH)
           .put("video/mp4", VideoFormat.VIDEO_HTML5)
           .put("video/webm", VideoFormat.VIDEO_HTML5)
+          .put("video/x-flv", VideoFormat.VIDEO_FLASH)
           .build();
   private static ImmutableSet<String>[] dcToOpenrtb = MapperUtil.multimapEnumToSets(
       ImmutableMultimap.<VideoFormat, String>builder()

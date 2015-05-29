@@ -27,8 +27,8 @@ public class DealTypeMapperTest {
   @Test
   public void testMapper() {
     assertSame(
-        AuctionType.SECOND_PRICE,
-        DealTypeMapper.toOpenRtb(DealType.PRIVATE_AUCTION));
+        AuctionType.FIXED_PRICE,
+        DealTypeMapper.toOpenRtb(DealType.PREFERRED_DEAL));
     assertSame(
         DealType.PREFERRED_DEAL,
         DealTypeMapper.toDoubleClick(AuctionType.FIXED_PRICE));

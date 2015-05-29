@@ -28,9 +28,10 @@ public class IFramingStateMapper {
     switch (dc) {
       case NO_IFRAME:
         return false;
-      case SAME_DOMAIN_IFRAME:
       case CROSS_DOMAIN_IFRAME:
+      case SAME_DOMAIN_IFRAME:
         return true;
+      case UNKNOWN_IFRAME_STATE:
       default:
         return null;
     }
