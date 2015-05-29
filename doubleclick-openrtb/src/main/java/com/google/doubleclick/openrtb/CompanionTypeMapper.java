@@ -25,7 +25,7 @@ import java.util.EnumSet;
 import javax.annotation.Nullable;
 
 /**
- * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link CompanionType}.
+ * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link VASTCompanionType}.
  */
 public class CompanionTypeMapper {
   public static @Nullable VASTCompanionType toOpenRtb(CreativeFormat dc) {

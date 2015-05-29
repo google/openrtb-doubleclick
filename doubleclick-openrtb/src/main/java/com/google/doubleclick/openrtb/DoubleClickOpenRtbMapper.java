@@ -195,7 +195,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       dcAd.setNativeAd(nativeMapper.buildNativeResponse(bid, matchingImp));
     } else {
       noVideoOrBanner.inc();
-      throw new MapperException("Impression has neither of Video or Banner");
+      throw new MapperException("Imp has neither of Video or Banner");
     }
 
     NetworkBid.BidResponse.Ad.AdSlot.Builder dcSlot = dcAd.addAdslotBuilder()
@@ -207,7 +207,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       } else {
         noCid.inc();
         if (logger.isDebugEnabled()) {
-          logger.debug("Missing cid in a Bid created for multi-campaign Impression: {}",
+          logger.debug("Missing cid in a Bid created for multi-campaign Imp: {}",
               TextFormat.shortDebugString(bid));
         }
       }
