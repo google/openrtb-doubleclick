@@ -45,7 +45,6 @@ public class ExpandableDirectionMapper {
         case 16 /* ExpandingDirection: ExpandingRight */:
           openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
-        default:
       }
     }
     return openrtbSet;
@@ -67,7 +66,9 @@ public class ExpandableDirectionMapper {
         case DOWN:
           down = true;
           break;
-        default:
+        case EXPANDABLE_FULLSCREEN:
+          left = right = up = down = true;
+          break;
       }
     }
     LinkedHashSet<Integer> dcSet = new LinkedHashSet<>();

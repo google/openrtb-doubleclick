@@ -39,12 +39,15 @@ public class DeviceTypeMapper {
 
   public static @Nullable MobileDeviceType toDoubleClick(DeviceType openrtb) {
     switch (openrtb) {
-      case TABLET:
-        return MobileDeviceType.TABLET;
       case CONNECTED_TV:
       case MOBILE:
       case PHONE:
         return MobileDeviceType.HIGHEND_PHONE;
+      case TABLET:
+        return MobileDeviceType.TABLET;
+      case PERSONAL_COMPUTER:
+      case SET_TOP_BOX:
+        // Mapping is UNKNOWN => AdX's default
       default:
         return null;
     }

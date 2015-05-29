@@ -30,10 +30,11 @@ public class DealTypeMapper {
       case PREFERRED_DEAL:
         return AuctionType.FIXED_PRICE;
       case PRIVATE_AUCTION:
-        // Mapping is SECOND_PRICE => OpenRTB's default
-      default:
+        return null;  // Mapping is SECOND_PRICE => OpenRTB's default
+      case UNKNOWN_DEAL_TYPE:
         return null;
     }
+    return null;
   }
 
   public static @Nullable DealType toDoubleClick(AuctionType openrtb) {
@@ -43,8 +44,7 @@ public class DealTypeMapper {
         return DealType.PRIVATE_AUCTION;
       case FIXED_PRICE:
         return DealType.PREFERRED_DEAL;
-      default:
-        return null;
     }
+    return null;
   }
 }

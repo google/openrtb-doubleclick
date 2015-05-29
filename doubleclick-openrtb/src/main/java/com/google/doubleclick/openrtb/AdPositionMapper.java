@@ -32,10 +32,9 @@ public class AdPositionMapper {
       case BELOW_THE_FOLD:
         return AdPosition.BELOW_THE_FOLD;
       case NO_DETECTION:
-        // Mapping is UNKNOWN => OpenRTB's default
-      default:
-        return null;
+        return null;  // Mapping is UNKNOWN => OpenRTB's default
     }
+    return null;
   }
 
   public static @Nullable SlotVisibility toDoubleClick(AdPosition openrtb) {
@@ -47,11 +46,11 @@ public class AdPositionMapper {
       case SIDEBAR:                // Mobile only
         return SlotVisibility.ABOVE_THE_FOLD;
       case BELOW_THE_FOLD:
+      case DEPRECATED_LIKELY_BELOW_THE_FOLD:
         return SlotVisibility.BELOW_THE_FOLD;
       case UNKNOWN:
-      default:
-        // Mapping is NO_DETECTION => AdX's default
-        return null;
+        return null;  // Mapping is NO_DETECTION => AdX's default
     }
+    return null;
   }
 }

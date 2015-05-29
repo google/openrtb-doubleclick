@@ -32,9 +32,9 @@ public class IFramingStateMapper {
       case SAME_DOMAIN_IFRAME:
         return true;
       case UNKNOWN_IFRAME_STATE:
-      default:
         return null;
     }
+    return null;
   }
 
   public static @Nullable IFramingState toDoubleClick(@Nullable Boolean openrtb) {

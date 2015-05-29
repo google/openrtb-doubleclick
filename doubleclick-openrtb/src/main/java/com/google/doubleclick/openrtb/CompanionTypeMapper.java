@@ -22,30 +22,32 @@ import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeF
 import java.util.Collection;
 import java.util.EnumSet;
 
+import javax.annotation.Nullable;
+
 /**
  * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link CompanionType}.
  */
 public class CompanionTypeMapper {
-  public static VASTCompanionType toOpenRtb(CreativeFormat dc) {
+  public static @Nullable VASTCompanionType toOpenRtb(CreativeFormat dc) {
     switch (dc) {
       case IMAGE_CREATIVE:
         return VASTCompanionType.STATIC;
       case FLASH_CREATIVE:
       case HTML_CREATIVE:
-        default:
         return VASTCompanionType.HTML;
     }
+    return null;
   }
 
-  public static CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
+  public static @Nullable CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
     switch (openrtb) {
       case STATIC:
         return CreativeFormat.IMAGE_CREATIVE;
-      case HTML:
       case COMPANION_IFRAME:
-        default:
+      case HTML:
         return CreativeFormat.HTML_CREATIVE;
     }
+    return null;
   }
 
   public static EnumSet<VASTCompanionType> toOpenRtb(

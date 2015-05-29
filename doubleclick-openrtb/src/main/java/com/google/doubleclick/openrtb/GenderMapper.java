@@ -34,9 +34,9 @@ public class GenderMapper {
       case MALE:
         return User.Gender.MALE;
       case UNKNOWN:
-      default:
         return null;
     }
+    return null;
   }
 
   public static @Nullable UserDemographic.Gender toDoubleClick(@Nullable User.Gender gender) {
@@ -46,8 +46,8 @@ public class GenderMapper {
       case MALE:
         return UserDemographic.Gender.MALE;
       case OTHER:
-      default:
-        return null;
+        return null;  // Maping is UNKNOWN => AdX's default
     }
+    return null;
   }
 }
