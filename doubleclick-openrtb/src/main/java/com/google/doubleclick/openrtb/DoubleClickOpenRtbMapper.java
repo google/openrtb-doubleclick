@@ -222,8 +222,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       dcAd.setImpressionTrackingUrl(bid.getNurl());
     }
 
-    if (bid.hasCat()) {
-      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(bid.getCat()));
+    if (bid.getCatCount() != 0) {
+      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(bid.getCatList(), null));
     }
 
     for (ExtMapper extMapper : extMappers) {
