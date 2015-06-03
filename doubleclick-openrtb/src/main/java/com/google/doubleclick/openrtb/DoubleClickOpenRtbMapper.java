@@ -145,7 +145,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     for (SeatBid seatBid : response.getSeatbidList()) {
       for (Bid bid : seatBid.getBidList()) {
-        dcResponse.addAd(buildResponseAd(request, response, bid));
+        dcResponse.addAd(buildResponseAd(request, bid));
       }
     }
 
@@ -153,7 +153,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected NetworkBid.BidResponse.Ad.Builder buildResponseAd(
-      OpenRtb.BidRequest request, OpenRtb.BidResponse response, Bid bid) {
+      OpenRtb.BidRequest request, Bid bid) {
     NetworkBid.BidResponse.Ad.Builder dcAd;
 
     if (bid.hasExtension(DcExt.ad)) {
@@ -227,7 +227,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toDoubleClickAd(request, response, bid, dcAd);
+      extMapper.toDoubleClickAd(request, bid, dcAd);
     }
 
     return dcAd;

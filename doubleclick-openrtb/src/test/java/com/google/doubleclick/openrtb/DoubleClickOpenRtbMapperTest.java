@@ -100,8 +100,7 @@ public class DoubleClickOpenRtbMapperTest {
     Bid bid = TestData.newBid(false)
         .setAdm("snippet")
         .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(
-        request, TestUtil.newBidResponse(bid), bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
     assertNotNull(ad);
   }
 
@@ -113,8 +112,7 @@ public class DoubleClickOpenRtbMapperTest {
         .setAdm("snippet")
         .build();
 
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(
-        request, TestUtil.newBidResponse(bid), bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
     assertNotNull(ad);
   }
 
@@ -126,8 +124,7 @@ public class DoubleClickOpenRtbMapperTest {
         .setCrid("creativeId")
         .setAdm("<img src=\"foo\">")
         .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(
-        request, TestUtil.newBidResponse(bid), bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
     assertNotNull(ad);
     assertEquals("<img src=\"foo\">", ad.getHtmlSnippet());
     assertEquals("creativeId", ad.getBuyerCreativeId());
@@ -142,8 +139,7 @@ public class DoubleClickOpenRtbMapperTest {
         .setAdm("http://my-video")
         .setCrid("creativeId")
         .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(
-        request, TestUtil.newBidResponse(bid), bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
     assertNotNull(ad);
     assertEquals("http://my-video", ad.getVideoUrl());
     assertEquals("creativeId", ad.getBuyerCreativeId());
@@ -160,8 +156,7 @@ public class DoubleClickOpenRtbMapperTest {
         .build();
     assertEquals(3, request.getImp(0).getExtension(DcExt.adSlot).getWidthCount());
     assertFalse(request.getImp(0).getVideo().hasW());
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(
-        request, TestUtil.newBidResponse(bid), bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
     assertFalse(ad.hasWidth());
   }
 
@@ -177,8 +172,7 @@ public class DoubleClickOpenRtbMapperTest {
                 .addTemplateParameter(NetworkBid.BidResponse.Ad.TemplateParameter.newBuilder())
                 .build())
         .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(
-        request, TestUtil.newBidResponse(bid), bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
     assertNotNull(ad);
     assertFalse(ad.hasHtmlSnippet());
     assertEquals("<img src=\"foo-templatized\">", ad.getSnippetTemplate());
@@ -192,10 +186,7 @@ public class DoubleClickOpenRtbMapperTest {
     Bid bid = TestData.newBid(false)
         .clearCrid()
         .build();
-    mapper.buildResponseAd(
-        TestUtil.newBidRequest(TestData.newRequest()),
-        TestUtil.newBidResponse(bid),
-        bid);
+    mapper.buildResponseAd(TestUtil.newBidRequest(TestData.newRequest()), bid);
   }
 
   @Test
@@ -213,9 +204,9 @@ public class DoubleClickOpenRtbMapperTest {
     Bid bid2 = TestData.newBid(true).build();
     BidResponse response = TestUtil.newBidResponse(bid1, bid1);
     OpenRtb.BidRequest request = OpenRtb.BidRequest.newBuilder().setId("1").addImp(imp).build();
-    NetworkBid.BidResponse.Ad.Builder ad1 = mapper.buildResponseAd(request, response, bid1);
+    NetworkBid.BidResponse.Ad.Builder ad1 = mapper.buildResponseAd(request, bid1);
     assertTrue(!ad1.hasWidth() && !ad1.hasHeight());
-    NetworkBid.BidResponse.Ad.Builder ad2 = mapper.buildResponseAd(request, response, bid2);
+    NetworkBid.BidResponse.Ad.Builder ad2 = mapper.buildResponseAd(request, bid2);
     assertEquals(bid2.getW(), ad2.getWidth());
     assertEquals(bid2.getH(), ad2.getHeight());
   }
@@ -374,7 +365,6 @@ public class DoubleClickOpenRtbMapperTest {
         OpenRtb.BidRequest.Imp.Pmp.newBuilder());
     extMapper.toDoubleClickAd(
         OpenRtb.BidRequest.getDefaultInstance(),
-        OpenRtb.BidResponse.getDefaultInstance(),
         OpenRtb.BidResponse.SeatBid.Bid.getDefaultInstance(),
         NetworkBid.BidResponse.Ad.newBuilder());
   }
