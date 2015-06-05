@@ -27,7 +27,7 @@ import org.junit.Test;
 public class ExpandableDirectionMapperTest {
   @Test
   public void testMapper() {
-    ImmutableList<Integer> dcAll = ImmutableList.of(13, 14, 15, 16);
+    ImmutableList<Integer> dcAll = ImmutableList.of(13, 14, 15, 16, 17, 18, 19, 20, 25, 26, 27);
     ImmutableList<ExpandableDirection> openrtbAll = ImmutableList.of(
         ExpandableDirection.LEFT, ExpandableDirection.RIGHT,
         ExpandableDirection.UP, ExpandableDirection.DOWN);
