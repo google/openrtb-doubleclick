@@ -28,6 +28,9 @@ import java.util.Set;
  */
 public class ExpandableDirectionMapper {
 
+  /**
+   * Note: Mapping is inverse, from excluded to included.
+   */
   public static EnumSet<ExpandableDirection> toOpenRtb(Collection<Integer> dcList) {
     EnumSet<ExpandableDirection> openrtbSet = EnumSet.allOf(ExpandableDirection.class);
     openrtbSet.remove(ExpandableDirection.EXPANDABLE_FULLSCREEN);
@@ -45,11 +48,44 @@ public class ExpandableDirectionMapper {
         case 16 /* ExpandingDirection: ExpandingRight */:
           openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
+        case 17 /* ExpandingDirection: ExpandingUpLeft */:
+          openrtbSet.remove(ExpandableDirection.UP);
+          openrtbSet.remove(ExpandableDirection.LEFT);
+          break;
+        case 18 /* ExpandingDirection: ExpandingUpRight */:
+          openrtbSet.remove(ExpandableDirection.UP);
+          openrtbSet.remove(ExpandableDirection.RIGHT);
+          break;
+        case 19 /* ExpandingDirection: ExpandingDownLeft */:
+          openrtbSet.remove(ExpandableDirection.DOWN);
+          openrtbSet.remove(ExpandableDirection.LEFT);
+          break;
+        case 20 /* ExpandingDirection: ExpandingDownRight */:
+          openrtbSet.remove(ExpandableDirection.DOWN);
+          openrtbSet.remove(ExpandableDirection.RIGHT);
+          break;
+        case 25 /* ExpandingDirection: ExpandingUpOrDown */:
+          openrtbSet.remove(ExpandableDirection.UP);
+          openrtbSet.remove(ExpandableDirection.DOWN);
+          break;
+        case 26 /* ExpandingDirection: ExpandingLeftOrRight */:
+          openrtbSet.remove(ExpandableDirection.LEFT);
+          openrtbSet.remove(ExpandableDirection.RIGHT);
+          break;
+        case 27 /* ExpandingDirection: ExpandingAnyDiagonal */:
+          openrtbSet.remove(ExpandableDirection.UP);
+          openrtbSet.remove(ExpandableDirection.DOWN);
+          openrtbSet.remove(ExpandableDirection.LEFT);
+          openrtbSet.remove(ExpandableDirection.RIGHT);
+          break;
       }
     }
     return openrtbSet;
   }
 
+  /**
+   * Note: Mapping is inverse, from included to excluded.
+   */
   public static Set<Integer> toDoubleClick(Collection<ExpandableDirection> openrtbList) {
     boolean left = false, right = false, up = false, down = false;
     for (ExpandableDirection openrtb : openrtbList) {
@@ -67,7 +103,6 @@ public class ExpandableDirectionMapper {
           down = true;
           break;
         case EXPANDABLE_FULLSCREEN:
-          left = right = up = down = true;
           break;
       }
     }
@@ -83,6 +118,27 @@ public class ExpandableDirectionMapper {
     }
     if (!down) {
       dcSet.add(14 /* ExpandingDirection: ExpandingDown */);
+    }
+    if (!up || !left) {
+      dcSet.add(17 /* ExpandingDirection: ExpandingUpLeft */);
+    }
+    if (!up || !right) {
+      dcSet.add(18 /* ExpandingDirection: ExpandingUpRight */);
+    }
+    if (!down || !left) {
+      dcSet.add(19 /* ExpandingDirection: ExpandingDownLeft */);
+    }
+    if (!down || !right) {
+      dcSet.add(20 /* ExpandingDirection: ExpandingDownRight */);
+    }
+    if (!up || !down) {
+      dcSet.add(25 /* ExpandingDirection: ExpandingUpOrDown */);
+    }
+    if (!left || !right) {
+      dcSet.add(26 /* ExpandingDirection: ExpandingLeftOrRight */);
+    }
+    if (!up || !down || !left || !right) {
+      dcSet.add(27 /* ExpandingDirection: ExpandingAnyDiagonal */);
     }
     return dcSet;
   }

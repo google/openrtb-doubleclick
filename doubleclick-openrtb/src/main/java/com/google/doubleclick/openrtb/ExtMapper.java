@@ -72,7 +72,7 @@ public abstract class ExtMapper {
       NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
   }
 
-  public void toDoubleClickAd(OpenRtb.BidRequest request, OpenRtb.BidResponse response,
+  public void toDoubleClickAd(OpenRtb.BidRequest request,
       OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
   }
 }

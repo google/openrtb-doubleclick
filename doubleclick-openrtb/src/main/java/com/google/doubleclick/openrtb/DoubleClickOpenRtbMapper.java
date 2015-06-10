@@ -145,7 +145,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     for (SeatBid seatBid : response.getSeatbidList()) {
       for (Bid bid : seatBid.getBidList()) {
-        dcResponse.addAd(buildResponseAd(request, response, bid));
+        dcResponse.addAd(buildResponseAd(request, bid));
       }
     }
 
@@ -153,7 +153,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected NetworkBid.BidResponse.Ad.Builder buildResponseAd(
-      OpenRtb.BidRequest request, OpenRtb.BidResponse response, Bid bid) {
+      OpenRtb.BidRequest request, Bid bid) {
     NetworkBid.BidResponse.Ad.Builder dcAd;
 
     if (bid.hasExtension(DcExt.ad)) {
@@ -222,12 +222,12 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       dcAd.setImpressionTrackingUrl(bid.getNurl());
     }
 
-    if (bid.hasCat()) {
-      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(bid.getCat()));
+    if (bid.getCatCount() != 0) {
+      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(bid.getCatList(), null));
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toDoubleClickAd(request, response, bid, dcAd);
+      extMapper.toDoubleClickAd(request, bid, dcAd);
     }
 
     return dcAd;
@@ -726,55 +726,39 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected void mapGeo(GeoTarget geoTarget, Geo.Builder geo) {
-    GeoTarget city = null;
-    GeoTarget metro = null;
-    GeoTarget region = null;
-    GeoTarget country = null;
-
+    String countryAlpha2 = null;
     for (int chain = 0; chain < 2; ++chain) {
       for (GeoTarget target = geoTarget; target != null;
           // Looks up the canonical chain last, so its results overwrite those
           // obtained by the parentId chain if there's conflict
           target = (chain == 0) ? target.getIdParent() : target.getCanonParent()) {
+        if (target.getCountryCode() != null) {
+          countryAlpha2 = target.getCountryCode();
+        }
         switch (target.getType()) {
           case CITY:
           case PREFECTURE:
-            city = target;
-            break;
-
-          case COUNTRY:
-            country = target;
+            geo.setCity(target.getName());
+            geo.setCountry(target.getCountryCode());
             break;
 
           case DMA_REGION:
-            metro = target;
+            geo.setMetro(target.getName());
             break;
 
           case STATE:
           case REGION:
-            region = target;
+            geo.setRegion(target.getName());
             break;
 
           default:
         }
       }
-    }
-
-    if (city != null) {
-      geo.setCity(city.getName());
-      geo.setCountry(city.getCountryCode());
-    }
-    if (metro != null) {
-      geo.setMetro(metro.getName());
-    }
-    if (region != null) {
-      geo.setRegion(region.getName());
-    }
-    if (country != null) {
-      CountryCodes countryCodes =
-          metadata.getCountryCodes().get(country.getCountryCode());
-      if (countryCodes != null) {
-        geo.setCountry(countryCodes.getAlpha3());
+      if (countryAlpha2 != null) {
+        CountryCodes countryCodes = metadata.getCountryCodes().get(countryAlpha2);
+        if (countryCodes != null) {
+          geo.setCountry(countryCodes.getAlpha3());
+        }
       }
     }
   }
