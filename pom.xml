@@ -57,9 +57,9 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>0.8.5-SNAPSHOT</openrtbVersion>
+    <openrtbVersion>0.8.5</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/master</openrtbSource>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/0.8.5</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
     <slf4jVersion>1.7.12</slf4jVersion>
 
