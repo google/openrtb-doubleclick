@@ -27,6 +27,11 @@ line after checkout or after any mvn clean.
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.8.5, 11-06-2015
+* Fix mapping for `Bid.cat`, now includes all categories.
+* Improved mapping for `ExpandableDirection`.
+* Cleanup `ExtMapper.toDoubleClickAd()`, has one less parameter.
+
 ## Version 0.8.4, 29-05-2015
 * Improved mapping of `Device.devicetype`.
 * Changes for the new names of some OpenRTB messages and enums.
