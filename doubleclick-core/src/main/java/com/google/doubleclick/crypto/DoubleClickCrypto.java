@@ -17,6 +17,7 @@
 package com.google.doubleclick.crypto;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.min;
 
 import com.google.common.base.MoreObjects;
@@ -463,7 +464,7 @@ public class DoubleClickCrypto {
      * @return the price value in micros (1/1.000.000th of the currency unit)
      */
     public long decodePriceMicros(String priceCipher) throws SignatureException {
-      return decryptPriceMicros(decode(priceCipher));
+      return decryptPriceMicros(decode(checkNotNull(priceCipher)));
     }
 
     /**
