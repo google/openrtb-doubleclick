@@ -24,55 +24,71 @@ import com.google.protos.adx.NetworkBid;
  * Extension mapper for {@link DoubleClickOpenRtbMapper}. The core mapper only handles the
  * properties that can be mapped to standard OpenRTB fields; you must provide one or
  * more extension mappers to perform other mappings (usually from/to OpenRTB extensions).
+ * All methods return {@code true} if they add some extension field, {@code false} if not.
  */
 public abstract class ExtMapper {
   protected ExtMapper() {
   }
 
-  public void toOpenRtbBidRequest(
+  public boolean toOpenRtbBidRequest(
       NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Builder request) {
+    return false;
   }
 
-  public void toOpenRtbUser(
+  public boolean toOpenRtbUser(
       NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.User.Builder user) {
+    return false;
   }
 
-  public void toOpenRtbSite(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Site.Builder site) {
+  public boolean toOpenRtbSite(
+      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Site.Builder site) {
+    return false;
   }
 
-  public void toOpenRtbApp(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.App.Builder app) {
+  public boolean toOpenRtbApp(
+      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.App.Builder app) {
+    return false;
   }
 
-  public void toOpenRtbDevice(NetworkBid.BidRequest dcRequest,
+  public boolean toOpenRtbDevice(NetworkBid.BidRequest dcRequest,
       OpenRtb.BidRequest.Device.Builder device) {
+    return false;
   }
 
-  public void toOpenRtbImp(NetworkBid.BidRequest.AdSlot dcSlot,
+  public boolean toOpenRtbImp(NetworkBid.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Imp.Builder imp) {
+    return false;
   }
 
-  public void toOpenRtbBanner(NetworkBid.BidRequest.AdSlot dcSlot,
+  public boolean toOpenRtbBanner(NetworkBid.BidRequest.AdSlot dcSlot,
       OpenRtb.BidRequest.Imp.Banner.Builder banner) {
+    return false;
   }
 
-  public void toOpenRtbPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
+  public boolean toOpenRtbPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Imp.Pmp.Builder pmp) {
+    return false;
   }
 
-  public void toOpenRtbNative(
+  public boolean toOpenRtbNative(
       NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
       OpenRtbNative.NativeRequest.Asset.Builder asset) {
+    return false;
   }
 
-  public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
+  public boolean toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
       OpenRtb.BidRequest.Imp.Video.Builder video) {
+    return false;
   }
 
-  public void toOpenRtbGeo(NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo,
+  public boolean toOpenRtbGeo(
+      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo,
       NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
+    return false;
   }
 
-  public void toDoubleClickAd(OpenRtb.BidRequest request,
+  public boolean toDoubleClickAd(OpenRtb.BidRequest request,
       OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
+    return false;
   }
 }
