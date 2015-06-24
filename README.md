@@ -8,8 +8,8 @@ module, doubleclick-openrtb, provides client-side mapping between
 DoubleClick's model/protocol and OpenRTB, and validation support.
 
 See our [wiki](https://github.com/google/openrtb-doubleclick/wiki)
-to get started!
-Use the Github issue tracker for bugs, RFEs or any support.
+to get started! Use the Github issue tracker for bugs, RFEs or any
+support. Check the [changelog](CHANGELOG.md) for detailed release notes.
 
 
 BUILDING NOTES
