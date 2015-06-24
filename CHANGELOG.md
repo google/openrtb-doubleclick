@@ -1,18 +1,26 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.8.6, 24-06-2015
+
+* Small mapper reviews. Breaking changes to `ExtMapper`.
+* Fixes for a couple potential NPEs.
+
 ## Version 0.8.5, 11-06-2015
+
 * Fix mapping for `Bid.cat`, now includes all categories.
 * Improved mapping for `ExpandableDirection`.
 * Cleanup `ExtMapper.toDoubleClickAd()`, has one less parameter.
 
 ## Version 0.8.4, 29-05-2015
+
 * Improved mapping of `Device.devicetype`.
 * Changes for the new names of some OpenRTB messages and enums.
 * Several small mapping reviews, in particular to avoid setting a value
   that would be redundant because it's the default in the target model.
 
 ## Version 0.8.3, 22-05-2015
+
 * Maps `Video.content.title/len/keywords`.
 * DoubleClick protocol v.63, only fixes two enum value names.
 * Mapping of `Impression.bidfloor` now ignores DC `BuyerPricingRule`,
