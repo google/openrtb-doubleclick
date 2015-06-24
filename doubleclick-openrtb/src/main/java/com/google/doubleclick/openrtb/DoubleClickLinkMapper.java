@@ -32,42 +32,53 @@ public class DoubleClickLinkMapper extends ExtMapper {
   private DoubleClickLinkMapper() {
   }
 
-  @Override public void toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest,
+  @Override public boolean toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest,
       OpenRtb.BidRequest.Builder request) {
     request.setExtension(DcExt.bidRequest, dcRequest);
+    return true;
   }
 
-  @Override public void toOpenRtbImp(
+  @Override public boolean toOpenRtbImp(
       NetworkBid.BidRequest.AdSlot dcSlot, OpenRtb.BidRequest.Imp.Builder imp) {
     imp.setExtension(DcExt.adSlot, dcSlot);
+    return true;
   }
 
-  @Override public void toOpenRtbNative(
+  @Override public boolean toOpenRtbNative(
       NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ, OpenRtbNative.NativeRequest.Asset.Builder asset) {
     asset.setExtension(DcExt.nativ, dcNativ);
+    return true;
   }
 
-  @Override public void toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
+  @Override public boolean toOpenRtbVideo(NetworkBid.BidRequest.Video dcVideo,
       OpenRtb.BidRequest.Imp.Video.Builder video) {
     video.setExtension(DcExt.video, dcVideo);
+    return true;
   }
 
-  @Override public void toOpenRtbDevice(NetworkBid.BidRequest dcRequest,
+  @Override public boolean toOpenRtbDevice(NetworkBid.BidRequest dcRequest,
       OpenRtb.BidRequest.Device.Builder device) {
     if (dcRequest.hasMobile()) {
       device.setExtension(DcExt.mobile, dcRequest.getMobile());
+      return true;
+    } else {
+      return false;
     }
   }
 
-  @Override public void toOpenRtbPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
+  @Override public boolean toOpenRtbPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData,
       OpenRtb.BidRequest.Imp.Pmp.Builder pmp) {
     pmp.setExtension(DcExt.adData, dcAdData);
+    return true;
   }
 
-  @Override public void toOpenRtbGeo(NetworkBid.BidRequest dcRequest,
+  @Override public boolean toOpenRtbGeo(NetworkBid.BidRequest dcRequest,
       OpenRtb.BidRequest.Geo.Builder geo, NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
     if (hyperlocalSet != null) {
       geo.setExtension(DcExt.hyperLocal, hyperlocalSet);
+      return true;
+    } else {
+      return false;
     }
   }
 }

@@ -150,14 +150,7 @@ public class DoubleClickOpenRtbMapperTest {
   public void testResponse_videoAd_missingSize() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(
         TestData.newRequest(3, false, false).setVideo(TestData.newVideo(0)));
-    Bid bid = TestData.newBid(false)
-        .setAdm("http://my-video")
-        .setCrid("creativeId")
-        .build();
-    assertEquals(3, request.getImp(0).getExtension(DcExt.adSlot).getWidthCount());
-    assertFalse(request.getImp(0).getVideo().hasW());
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
-    assertFalse(ad.hasWidth());
+    assertEquals(0, request.getImpCount());
   }
 
   @Test
@@ -253,7 +246,7 @@ public class DoubleClickOpenRtbMapperTest {
             coppa ? "" : "7CLmnMiwSsq7bNTaiPsztg",
             request.getUser().getCustomdata());
 
-        if (size == TestData.NO_SLOT) {
+        if (size == TestData.NO_SLOT || (size > 1 && impVideo)) {
           assertEquals(0, request.getImpCount());
           BidResponse response = TestUtil.newBidResponse();
           NetworkBid.BidResponse dcResponse = mapper.toExchangeBidResponse(request, response).build();

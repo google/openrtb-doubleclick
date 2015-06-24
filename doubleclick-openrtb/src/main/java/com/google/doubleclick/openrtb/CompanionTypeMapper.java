@@ -54,7 +54,7 @@ public class CompanionTypeMapper {
       Collection<CreativeFormat> dcList, EnumSet<VASTCompanionType> openrtbSet) {
     EnumSet<VASTCompanionType> ret = openrtbSet == null
         ? EnumSet.noneOf(VASTCompanionType.class)
-            : openrtbSet;
+        : openrtbSet;
     for (CreativeFormat dc : dcList) {
       ret.add(toOpenRtb(dc));
     }
@@ -63,7 +63,7 @@ public class CompanionTypeMapper {
 
   public static EnumSet<CreativeFormat> toDoubleClick(
       Collection<VASTCompanionType> openrtbList, EnumSet<CreativeFormat> dcSet) {
-    EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : null;
+    EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : dcSet;
     for (VASTCompanionType openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {
