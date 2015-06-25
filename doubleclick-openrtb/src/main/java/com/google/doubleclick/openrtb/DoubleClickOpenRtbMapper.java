@@ -72,7 +72,9 @@ import org.slf4j.LoggerFactory;
 import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -110,6 +112,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   private final Counter invalidGeoId = new Counter();
   private final Counter invalidHyperlocal = new Counter();
   private final Counter noCid = new Counter();
+  private final Counter invalidContentCategory = new Counter();
 
   @Inject
   public DoubleClickOpenRtbMapper(
@@ -132,6 +135,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     metricRegistry.register(MetricRegistry.name(cls, "invalid-geoid"), invalidGeoId);
     metricRegistry.register(MetricRegistry.name(cls, "invalid-hyperlocal"), invalidHyperlocal);
     metricRegistry.register(MetricRegistry.name(cls, "no-cid"), noCid);
+    metricRegistry.register(MetricRegistry.name(cls, "invalid-cat"), invalidContentCategory);
   }
 
   @Override
@@ -178,7 +182,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         AdCategoryMapper.toOpenRtb(dcSlot.getExcludedSensitiveCategoryList(), cats);
       }
     }
-    request.addAllBcat(cats);
+    for (ContentCategory cat : cats) {
+      request.addBcat(cat.name());
+    }
+
     if (request.getImpCount() == 0) {
       noImp.inc();
       logger.debug("Request has no impressions");
@@ -944,9 +951,16 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       dcAd.setImpressionTrackingUrl(bid.getNurl());
     }
 
-    if (bid.getCatCount() != 0) {
-      dcAd.addAllCategory(AdCategoryMapper.toDoubleClick(bid.getCatList(), null));
+    Set<Integer> cats = new LinkedHashSet<>();
+    for (String catName : bid.getCatList()) {
+      try {
+        ContentCategory cat = ContentCategory.valueOf(catName);
+        cats.addAll(AdCategoryMapper.toDoubleClick(cat));
+      } catch (IllegalArgumentException e) {
+        invalidContentCategory.inc();
+      }
     }
+    dcAd.addAllCategory(cats);
 
     for (ExtMapper extMapper : extMappers) {
       extMapper.toDoubleClickAd(request, bid, dcAd);

@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.ContentCategory;
-import com.google.openrtb.OpenRtbNative.NativeResponse;
+import com.google.openrtb.OpenRtb.NativeResponse;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
@@ -66,7 +66,7 @@ public class TestData {
           .setW(200)
           .setH(220)
           .setNurl("http://impression.com")
-          .addCat(ContentCategory.IAB1);
+          .addCat(ContentCategory.IAB1.name());
     }
     return bid;
   }

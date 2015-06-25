@@ -19,7 +19,6 @@ package com.google.doubleclick;
 option java_outer_classname = "DcExt";
 
 import "openrtb.proto";
-import "openrtb-native.proto";
 import "network-bid.proto";
 
 //

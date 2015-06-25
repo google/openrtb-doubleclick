@@ -17,7 +17,6 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtbNative;
 import com.google.protos.adx.NetworkBid;
 
 /**
@@ -72,7 +71,7 @@ public abstract class ExtMapper {
 
   public boolean toOpenRtbNative(
       NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
-      OpenRtbNative.NativeRequest.Asset.Builder asset) {
+      OpenRtb.NativeRequest.Asset.Builder asset) {
     return false;
   }
 

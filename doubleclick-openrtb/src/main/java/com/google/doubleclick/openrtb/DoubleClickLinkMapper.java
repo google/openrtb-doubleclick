@@ -18,7 +18,6 @@ package com.google.doubleclick.openrtb;
 
 import com.google.doubleclick.DcExt;
 import com.google.openrtb.OpenRtb;
-import com.google.openrtb.OpenRtbNative;
 import com.google.protos.adx.NetworkBid;
 
 /**
@@ -45,7 +44,8 @@ public class DoubleClickLinkMapper extends ExtMapper {
   }
 
   @Override public boolean toOpenRtbNative(
-      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ, OpenRtbNative.NativeRequest.Asset.Builder asset) {
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
+      OpenRtb.NativeRequest.Asset.Builder asset) {
     asset.setExtension(DcExt.nativ, dcNativ);
     return true;
   }
