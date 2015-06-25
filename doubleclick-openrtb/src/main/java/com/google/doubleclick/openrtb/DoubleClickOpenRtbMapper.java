@@ -94,7 +94,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   private static final String YOUTUBE_AFV_USER_ID = "afv_user_id_";
   private static final Pattern SEMITRANSPARENT_CHANNEL =
       Pattern.compile("pack-(brand|semi|anon)-([^\\-]+)::(.+)");
-  private static final Joiner versionJoiner = Joiner.on(".").skipNulls();
+  private static final Joiner csvJoiner = Joiner.on(",").skipNulls();
   private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
 
   private final DoubleClickMetadata metadata;
@@ -524,7 +524,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       if (dcContent.hasDurationSeconds()) {
         content.setLen(dcContent.getDurationSeconds());
       }
-      content.addAllKeywords(dcContent.getKeywordsList());
+      content.setKeywords(csvJoiner.join(dcContent.getKeywordsList()));
     }
 
     return content;
