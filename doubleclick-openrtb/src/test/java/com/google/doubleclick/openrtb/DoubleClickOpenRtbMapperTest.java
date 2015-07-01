@@ -37,7 +37,7 @@ import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
-import com.google.openrtb.OpenRtbNative.NativeResponse;
+import com.google.openrtb.OpenRtb.NativeResponse;
 import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
