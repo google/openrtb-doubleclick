@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.0, 01-07-2015
+* Mapper changes for OpenRTB model changes.
+
 ## Version 0.8.6, 24-06-2015
 
 * Small mapper reviews. Breaking changes to `ExtMapper`.
