@@ -183,7 +183,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
     }
     for (ContentCategory cat : cats) {
-      request.addBcat(cat.name());
+      request.addBcat(OpenRtbUtils.categoryToJsonName(cat.name()));
     }
 
     if (request.getImpCount() == 0) {
@@ -809,7 +809,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       if (dcUser.hasGender()) {
         User.Gender gender = GenderMapper.toOpenRtb(dcUser.getGender());
         if (gender != null) {
-          user.setGender(gender);
+          user.setGender(OpenRtbUtils.genderToJsonName(gender));
         }
       }
       if (dcUser.hasAgeLow() || dcUser.hasAgeHigh()) {
@@ -954,7 +954,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     Set<Integer> cats = new LinkedHashSet<>();
     for (String catName : bid.getCatList()) {
       try {
-        ContentCategory cat = ContentCategory.valueOf(catName);
+        ContentCategory cat = OpenRtbUtils.categoryFromName(catName);
         cats.addAll(AdCategoryMapper.toDoubleClick(cat));
       } catch (IllegalArgumentException e) {
         invalidContentCategory.inc();
