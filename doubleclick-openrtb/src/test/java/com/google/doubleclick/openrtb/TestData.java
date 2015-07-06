@@ -21,7 +21,6 @@ import static java.lang.Math.min;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
-import com.google.openrtb.OpenRtb.ContentCategory;
 import com.google.openrtb.OpenRtb.NativeResponse;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;

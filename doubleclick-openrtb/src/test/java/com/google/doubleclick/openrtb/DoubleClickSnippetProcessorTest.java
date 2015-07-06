@@ -57,12 +57,13 @@ public class DoubleClickSnippetProcessorTest {
         .setId("1")
         .addImp(Imp.newBuilder()
             .setId("1")).build();
-    BidResponse response = createBidResponse(snippet);
-    return processor.process(
-        new SnippetProcessorContext(request, response, response.getSeatbid(0).getBid(0)), snippet);
+    BidResponse.Builder response = createBidResponse(snippet);
+    SnippetProcessorContext ctx = new SnippetProcessorContext(request, response);
+    ctx.setBid(response.getSeatbidBuilder(0).getBidBuilder(0));
+    return processor.process(ctx, snippet);
   }
 
-  private static BidResponse createBidResponse(String snippet) {
+  private static BidResponse.Builder createBidResponse(String snippet) {
     return BidResponse.newBuilder()
         .setId("1")
         .addSeatbid(SeatBid.newBuilder()
@@ -71,7 +72,6 @@ public class DoubleClickSnippetProcessorTest {
                 .setId("1")
                 .setImpid("1")
                 .setPrice(1000)
-                .setAdm(snippet)))
-        .build();
+                .setAdm(snippet)));
   }
 }
