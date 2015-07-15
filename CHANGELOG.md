@@ -1,6 +1,11 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.1, 15-07-2015
+* Support for the `SnippetProcessor` improvements in _openrtb-core_.
+* DoubleClick protocol v.64, changes `publisher_settings_list_id` from
+  `optional` to `repeated`.
+
 ## Version 0.9.0, 01-07-2015
 * Mapper changes for OpenRTB model changes.
 
