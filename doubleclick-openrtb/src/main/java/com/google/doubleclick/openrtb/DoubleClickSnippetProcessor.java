@@ -36,7 +36,7 @@ public class DoubleClickSnippetProcessor extends OpenRtbSnippetProcessor {
     }};
 
   @Override protected void processMacroAt(
-      SnippetProcessorContext ctx, StringBuilder sb, SnippetMacroType<?> macroDef) {
+      SnippetProcessorContext ctx, StringBuilder sb, SnippetMacroType macroDef) {
     if (macroDef instanceof OpenRtbMacros) {
       switch ((OpenRtbMacros) macroDef) {
         case AUCTION_PRICE: {
