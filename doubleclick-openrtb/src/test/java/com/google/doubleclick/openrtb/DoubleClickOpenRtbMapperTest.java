@@ -195,7 +195,6 @@ public class DoubleClickOpenRtbMapperTest {
             .addAllHeight(asList(300, 400)).build());
     Bid bid1 = TestData.newBid(false).build();
     Bid bid2 = TestData.newBid(true).build();
-    BidResponse response = TestUtil.newBidResponse(bid1, bid1);
     OpenRtb.BidRequest request = OpenRtb.BidRequest.newBuilder().setId("1").addImp(imp).build();
     NetworkBid.BidResponse.Ad.Builder ad1 = mapper.buildResponseAd(request, bid1);
     assertTrue(!ad1.hasWidth() && !ad1.hasHeight());

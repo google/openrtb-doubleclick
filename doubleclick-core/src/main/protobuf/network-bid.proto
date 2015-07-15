@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.63: + beta: CL 78263652
+// Synchronized with v.64: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2015 Google Inc. All Rights Reserved.
@@ -470,8 +470,10 @@ message BidRequest {
   }
   optional Video video = 29;
 
-  // The publisher settings list id that applies to this page. See the Targeting
-  // section of the RTB documentation for details.
+  // The publisher settings list id that applies to this page.
+  // See the RTB Publisher Settings guide at
+  // https://developers.google.com/ad-exchange/rtb/pub-settings-guide
+  // for details.
   optional fixed64 publisher_settings_list_id = 42;
 
   // Publisher type of the inventory where the ad will be shown. For an AdX
@@ -632,9 +634,11 @@ message BidRequest {
     }
     repeated MatchingAdData matching_ad_data = 9;
 
-    // The publisher settings list ids that apply to this slot. See the
-    // Targeting section of the RTB documentation for details.
-    optional fixed64 publisher_settings_list_id = 15;
+    // The publisher settings list ids that apply to this slot.
+    // See the RTB Publisher Settings guide at
+    // https://developers.google.com/ad-exchange/rtb/pub-settings-guide
+    // for details.
+    repeated fixed64 publisher_settings_list_id = 15;
 
     // Visibility information for the slot.
     enum SlotVisibility  {

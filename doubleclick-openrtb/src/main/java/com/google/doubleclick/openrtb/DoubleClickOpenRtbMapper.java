@@ -138,8 +138,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     metricRegistry.register(MetricRegistry.name(cls, "invalid-cat"), invalidContentCategory);
   }
 
-  @Override
-  public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
+  @Override public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
         .setId(BaseEncoding.base64Url().omitPadding().encode(dcRequest.getId().toByteArray()));
 
@@ -863,8 +862,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return null;
   }
 
-  @Override
-  public NetworkBid.BidResponse.Builder toExchangeBidResponse(
+  @Override public NetworkBid.BidResponse.Builder toExchangeBidResponse(
     OpenRtb.BidRequest request, OpenRtb.BidResponse response) {
     checkNotNull(request);
     NetworkBid.BidResponse.Builder dcResponse = NetworkBid.BidResponse.newBuilder();
@@ -994,16 +992,15 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   /**
    * Not implemented yet!
    */
-  @Override
-  public NetworkBid.BidRequest.Builder toExchangeBidRequest(OpenRtb.BidRequest request) {
+  @Override public NetworkBid.BidRequest.Builder toExchangeBidRequest(
+      OpenRtb.BidRequest request) {
     throw new UnsupportedOperationException();
   }
 
   /**
    * Not implemented yet!
    */
-  @Override
-  public OpenRtb.BidResponse.Builder toOpenRtbBidResponse(
+  @Override public OpenRtb.BidResponse.Builder toOpenRtbBidResponse(
       NetworkBid.BidRequest request, NetworkBid.BidResponse response) {
     throw new UnsupportedOperationException();
   }

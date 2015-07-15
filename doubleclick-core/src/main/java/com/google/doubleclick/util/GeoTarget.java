@@ -169,19 +169,16 @@ public class GeoTarget {
     return null;
   }
 
-  @Override
-  public int hashCode() {
+  @Override public int hashCode() {
     return criteriaId;
   }
 
-  @Override
-  public boolean equals(Object obj) {
+  @Override public boolean equals(Object obj) {
     return obj == this
         || (obj instanceof GeoTarget && criteriaId == ((GeoTarget) obj).criteriaId);
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues()
         .add("criteriaId", criteriaId)
         .add("name", name)
@@ -238,13 +235,11 @@ public class GeoTarget {
       this.canonicalName = canonicalName;
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
       return type.hashCode() ^ canonicalName.hashCode();
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
       if (obj == this) {
         return true;
       } else if (!(obj instanceof GeoTarget.CanonicalKey)) {
@@ -256,8 +251,7 @@ public class GeoTarget {
           && canonicalName.equals(other.canonicalName);
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
       return type.name() + ' ' + canonicalName;
     }
   }

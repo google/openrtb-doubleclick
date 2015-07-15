@@ -332,8 +332,7 @@ public class DoubleClickCrypto {
         .toString();
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues()
         .add("keys", keys)
         .toString();
@@ -367,13 +366,11 @@ public class DoubleClickCrypto {
       return integrityKey;
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
       return encryptionKey.hashCode() ^ integrityKey.hashCode();
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
       if (obj == this) {
         return true;
       } else if (!(obj instanceof Keys)) {

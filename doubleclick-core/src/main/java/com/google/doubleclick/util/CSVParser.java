@@ -208,8 +208,7 @@ class CSVParser {
     sb.setLength(0);
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues()
         .add("separator", separator == NUL ? null : "0x" + Integer.toHexString(separator))
         .add("quote", quote == NUL ? null : "0x" + Integer.toHexString(quote))
