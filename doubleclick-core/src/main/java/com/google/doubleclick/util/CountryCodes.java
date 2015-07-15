@@ -53,13 +53,11 @@ public class CountryCodes {
     return alpha3;
   }
 
-  @Override
-  public int hashCode() {
+  @Override public int hashCode() {
     return numeric;
   }
 
-  @Override
-  public boolean equals(Object obj) {
+  @Override public boolean equals(Object obj) {
     if (obj == this) {
       return true;
     } else if (!(obj instanceof CountryCodes)) {
@@ -72,8 +70,7 @@ public class CountryCodes {
         && alpha3.equals(other.alpha3);
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues()
         .add("numeric", numeric)
         .add("alpha2", alpha2)

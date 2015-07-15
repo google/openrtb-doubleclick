@@ -275,8 +275,7 @@ public class DoubleClickMetadata {
     return countryCodes;
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues()
         .add("agencies#", agencies.size())
         .add("buyDecCreativeAttributes#", buyDecCreativeAttributes.size())
