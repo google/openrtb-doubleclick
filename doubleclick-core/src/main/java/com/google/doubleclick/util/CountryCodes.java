@@ -35,21 +35,21 @@ public class CountryCodes {
   /**
    * The numeric code. Example: United States = 840.
    */
-  public final int getNumeric() {
+  public final int numeric() {
     return numeric;
   }
 
   /**
    * The alpha-2 code. Example: United States = "US".
    */
-  public final String getAlpha2() {
+  public final String alpha2() {
     return alpha2;
   }
 
   /**
    * The alpha-3 code. Example: United States = "USA".
    */
-  public final String getAlpha3() {
+  public final String alpha3() {
     return alpha3;
   }
 
