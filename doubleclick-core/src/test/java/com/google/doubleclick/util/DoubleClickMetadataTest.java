@@ -74,8 +74,10 @@ public class DoubleClickMetadataTest {
     assertEquals("9999: <invalid>",
         DoubleClickMetadata.toString(metadata.getSensitiveCategories(), 9999));
     assertEquals("United States",
-        metadata.getGeoTarget(1023191).getCanonParent().getCanonParent().getName());
+        metadata.getGeoTarget(1023191).canonParent().canonParent().name());
     assertFalse(metadata.getTargetsByCriteriaId().isEmpty());
+    assertEquals((Integer) 624, metadata.getDMARegionsByCriteriaId().get(
+        new CityDMARegionKey(1016100, "Sioux City, IA")));
 
     GeoTarget geoTarget1 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "United States");
     GeoTarget geoTarget2 = new GeoTarget(
@@ -83,11 +85,11 @@ public class DoubleClickMetadataTest {
     GeoTarget geoTarget3 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "France");
     TestUtil.testCommonMethods(geoTarget1, geoTarget2, geoTarget3);
 
-    assertEquals(2840, geoTarget1.getCriteriaId());
-    assertEquals("United States", geoTarget1.getName());
-    assertEquals("United States", geoTarget1.getCanonicalName());
-    assertEquals("US", geoTarget1.getCountryCode());
-    assertEquals(GeoTarget.Type.COUNTRY, geoTarget1.getType());
+    assertEquals(2840, geoTarget1.criteriaId());
+    assertEquals("United States", geoTarget1.name());
+    assertEquals("United States", geoTarget1.canonicalName());
+    assertEquals("US", geoTarget1.countryCode());
+    assertEquals(GeoTarget.Type.COUNTRY, geoTarget1.type());
     assertSame(geoTarget1, geoTarget1.getCanonAncestor(GeoTarget.Type.COUNTRY));
     assertNull(geoTarget1.getCanonAncestor(GeoTarget.Type.CITY));
     assertSame(geoTarget1, geoTarget1.getIdAncestor(GeoTarget.Type.COUNTRY));
@@ -100,14 +102,14 @@ public class DoubleClickMetadataTest {
     TestUtil.testCommonMethods(country1, country2, country3);
     assertSame(country1, metadata.getCountryCodes().get("USA"));
     assertSame(country1, metadata.getCountryCodes().get(840));
-    assertEquals(840, country1.getNumeric());
-    assertEquals("US", country1.getAlpha2());
-    assertEquals("USA", country1.getAlpha3());
+    assertEquals(840, country1.numeric());
+    assertEquals("US", country1.alpha2());
+    assertEquals("USA", country1.alpha3());
 
     // https://github.com/google/openrtb-doubleclick/issues/28
     GeoTarget postalTarget = metadata.getGeoTarget(9012102);
     assertNull(postalTarget.getCanonAncestor(GeoTarget.Type.CITY));
-    assertEquals("Tampa", postalTarget.getIdAncestor(GeoTarget.Type.CITY).getName());
+    assertEquals("Tampa", postalTarget.getIdAncestor(GeoTarget.Type.CITY).name());
 
     GeoTarget.CanonicalKey canKey1 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");
     GeoTarget.CanonicalKey canKey2 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");

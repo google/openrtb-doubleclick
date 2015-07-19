@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
+import com.google.doubleclick.util.CityDMARegionKey;
 import com.google.doubleclick.util.CountryCodes;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.doubleclick.util.GeoTarget;
@@ -352,37 +353,50 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
   protected void mapGeo(GeoTarget geoTarget, Geo.Builder geo) {
     String countryAlpha2 = null;
+    int cityCriteriaId = -1;
+    String dmaRegionName = null;
+
     for (int chain = 0; chain < 2; ++chain) {
       for (GeoTarget target = geoTarget; target != null;
           // Looks up the canonical chain last, so its results overwrite those
           // obtained by the parentId chain if there's conflict
-          target = (chain == 0) ? target.getIdParent() : target.getCanonParent()) {
-        if (target.getCountryCode() != null) {
-          countryAlpha2 = target.getCountryCode();
+          target = (chain == 0) ? target.idParent() : target.canonParent()) {
+        if (target.countryCode() != null) {
+          countryAlpha2 = target.countryCode();
         }
-        switch (target.getType()) {
+        switch (target.type()) {
           case CITY:
           case PREFECTURE:
-            geo.setCity(target.getName());
-            geo.setCountry(target.getCountryCode());
+            geo.setCity(target.name());
+            geo.setCountry(target.countryCode());
+            cityCriteriaId = target.criteriaId();
             break;
 
           case DMA_REGION:
-            geo.setMetro(target.getName());
+            dmaRegionName = target.name();
             break;
 
           case STATE:
           case REGION:
-            geo.setRegion(target.getName());
+            geo.setRegion(target.name());
             break;
 
           default:
         }
       }
+
       if (countryAlpha2 != null) {
         CountryCodes countryCodes = metadata.getCountryCodes().get(countryAlpha2);
         if (countryCodes != null) {
-          geo.setCountry(countryCodes.getAlpha3());
+          geo.setCountry(countryCodes.alpha3());
+        }
+      }
+
+      if (cityCriteriaId != -1 && dmaRegionName != null) {
+        Integer dma = metadata.getDMARegionsByCriteriaId().get(
+            new CityDMARegionKey(cityCriteriaId, dmaRegionName));
+        if (dma != null) {
+          geo.setMetro(String.valueOf(dma));
         }
       }
     }

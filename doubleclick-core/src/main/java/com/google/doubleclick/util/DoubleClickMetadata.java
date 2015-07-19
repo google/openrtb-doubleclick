@@ -79,6 +79,7 @@ public class DoubleClickMetadata {
   private final ImmutableMap<Integer, String> contentLabels;
   private final ImmutableMap<Integer, String> publisherVerticals;
   private final ImmutableMap<Integer, GeoTarget> targetsByCriteriaId;
+  private final ImmutableMap<CityDMARegionKey, Integer> dmaRegionsByCriteriaId;
   private final ImmutableMap<GeoTarget.CanonicalKey, GeoTarget> targetsByCanonicalKey;
   private final ImmutableMap<Object, CountryCodes> countryCodes;
 
@@ -106,9 +107,12 @@ public class DoubleClickMetadata {
     targetsByCriteriaId = loadGeoTargets(transport, ADX_DICT + "geo-table.csv");
     HashMap<GeoTarget.CanonicalKey, GeoTarget> byKey = new HashMap<>();
     for (GeoTarget target : targetsByCriteriaId.values()) {
-      byKey.put(target.getKey(), target);
+      byKey.put(target.key(), target);
     }
     targetsByCanonicalKey = ImmutableMap.copyOf(byKey);
+    dmaRegionsByCriteriaId = loadCitiesDMARegions(transport, transport instanceof ResourceTransport
+        ? ADX_DICT + "cities-dma-regions.csv"
+        : "http://goo.gl/9ENFV7");
     countryCodes = loadCountryCodes(ADX_DICT + "countries.txt");
   }
 
@@ -246,14 +250,10 @@ public class DoubleClickMetadata {
   }
 
   /**
-   * Formats a code to the corresponding description from its domain.
+   * Dictionary file used to map cities to DMA Region codes.
    */
-  public static String toString(Map<Integer, String> metadata, int code) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(code).append(": ");
-    String description = metadata.get(code);
-    sb.append(description == null ? "<invalid>" : description);
-    return sb.toString();
+  public ImmutableMap<CityDMARegionKey, Integer> getDMARegionsByCriteriaId() {
+    return dmaRegionsByCriteriaId;
   }
 
   public ImmutableMap<Integer, GeoTarget> getTargetsByCriteriaId() {
@@ -273,6 +273,17 @@ public class DoubleClickMetadata {
    */
   public ImmutableMap<Object, CountryCodes> getCountryCodes() {
     return countryCodes;
+  }
+
+  /**
+   * Formats a code to the corresponding description from its domain.
+   */
+  public static String toString(Map<Integer, String> metadata, int code) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(code).append(": ");
+    String description = metadata.get(code);
+    sb.append(description == null ? "<invalid>" : description);
+    return sb.toString();
   }
 
   @Override public String toString() {
@@ -321,6 +332,24 @@ public class DoubleClickMetadata {
     }
   }
 
+  private static ImmutableMap<CityDMARegionKey, Integer> loadCitiesDMARegions(
+      Transport transport, String resourceName) {
+    final Map<CityDMARegionKey, Integer> map = new LinkedHashMap<>();
+    try (InputStream is = transport.open(resourceName)) {
+      CSVParser.csvParser().parse(is, ".*,(\\d+),.*,.*,(\\d+)",
+          new Function<List<String>, Boolean>() {
+        @Override public Boolean apply(List<String> fields) {
+          map.put(
+              new CityDMARegionKey(Integer.valueOf(fields.get(1)), fields.get(3)),
+              Integer.valueOf(fields.get(4)));
+          return true;
+        }});
+    } catch (IOException e) {
+      throw new ExceptionInInitializerError(e);
+    }
+    return ImmutableMap.copyOf(map);
+  }
+
   private static ImmutableMap<Integer, GeoTarget> loadGeoTargets(
       Transport transport, String resourceName) {
     final Map<Integer, GeoTarget> targetsById = new LinkedHashMap<>();
@@ -342,14 +371,14 @@ public class DoubleClickMetadata {
                   return Integer.valueOf(id);
                 }});
 
-              targetsById.put(target.getCriteriaId(), target);
-              parentIdsById.put(target.getCriteriaId(), idParent);
+              targetsById.put(target.criteriaId(), target);
+              parentIdsById.put(target.criteriaId(), idParent);
 
-              if (targetsByCanon.containsKey(target.getCanonicalName())) {
-                duplicateCanon.add(target.getCanonicalName());
-                targetsByCanon.remove(target.getCanonicalName());
+              if (targetsByCanon.containsKey(target.canonicalName())) {
+                duplicateCanon.add(target.canonicalName());
+                targetsByCanon.remove(target.canonicalName());
               } else {
-                targetsByCanon.put(target.getCanonicalName(), target);
+                targetsByCanon.put(target.canonicalName(), target);
               }
             }
           } catch (ParseException | IllegalArgumentException e) {
@@ -369,7 +398,7 @@ public class DoubleClickMetadata {
 
       for (Map.Entry<Integer, GeoTarget> entry : targetsById.entrySet()) {
         GeoTarget target = entry.getValue();
-        List<Integer> parentIds = parentIdsById.get(target.getCriteriaId());
+        List<Integer> parentIds = parentIdsById.get(target.criteriaId());
         for (Integer parentId : parentIds) {
           GeoTarget idParent = targetsById.get(parentId);
           if (idParent != null) {
@@ -394,9 +423,9 @@ public class DoubleClickMetadata {
           try {
             CountryCodes codes = new CountryCodes(
                 Integer.parseInt(fields.get(0)), fields.get(2), fields.get(3));
-            map.put(codes.getNumeric(), codes);
-            map.put(codes.getAlpha2(), codes);
-            map.put(codes.getAlpha3(), codes);
+            map.put(codes.numeric(), codes);
+            map.put(codes.alpha2(), codes);
+            map.put(codes.alpha3(), codes);
           } catch (IllegalArgumentException e) {
             logger.trace("Bad record: {}: {}", fields, e.toString());
           }

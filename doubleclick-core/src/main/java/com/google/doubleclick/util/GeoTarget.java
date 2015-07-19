@@ -58,7 +58,7 @@ public class GeoTarget {
    * <p>
    * Example: 1023191.
    */
-  public final int getCriteriaId() {
+  public final int criteriaId() {
     return criteriaId;
   }
 
@@ -67,7 +67,7 @@ public class GeoTarget {
    * <p>
    * Example: "New York".
    */
-  public final String getName() {
+  public final String name() {
     return name;
   }
 
@@ -79,11 +79,11 @@ public class GeoTarget {
    * <p>
    * Example: "New York,New York,United States".
    */
-  public final String getCanonicalName() {
+  public final String canonicalName() {
     return key.canonicalName;
   }
 
-  final CanonicalKey getKey() {
+  final CanonicalKey key() {
     return key;
   }
 
@@ -94,7 +94,7 @@ public class GeoTarget {
    * <p>
    * Example: (New York city target) returns (New York state)
    */
-  public final @Nullable GeoTarget getCanonParent() {
+  public final @Nullable GeoTarget canonParent() {
     return canonParent;
   }
 
@@ -112,7 +112,7 @@ public class GeoTarget {
    * Example: (33611 postal code) returns (Tampa city); which is the only way to get
    * that city, since the parent by canonical name is (Florida state), skipping the city.
    */
-  public final @Nullable GeoTarget getIdParent() {
+  public final @Nullable GeoTarget idParent() {
     return idParent;
   }
 
@@ -127,7 +127,7 @@ public class GeoTarget {
    * Example: "US". Notice that OpenRTB uses alpha-3 codes (like "USA"), so you may have
    * to convert that via {@link DoubleClickMetadata#getCountryCodes()}.
    */
-  public final String getCountryCode() {
+  public final String countryCode() {
     return countryCode;
   }
 
@@ -136,7 +136,7 @@ public class GeoTarget {
    * <p>
    * Example: (New York city target) returns {@link Type#CITY}
    */
-  public final GeoTarget.Type getType() {
+  public final GeoTarget.Type type() {
     return key.type;
   }
 
@@ -146,8 +146,8 @@ public class GeoTarget {
    * Example: (New York city target, {@link Type#COUNTRY}) returns (US country target)
    */
   public @Nullable GeoTarget getCanonAncestor(GeoTarget.Type type) {
-    for (GeoTarget target = this; target != null; target = target.getCanonParent()) {
-      if (target.getType() == type) {
+    for (GeoTarget target = this; target != null; target = target.canonParent()) {
+      if (target.key.type == type) {
         return target;
       }
     }
@@ -160,8 +160,8 @@ public class GeoTarget {
    * You should prefer {@link #getCanonAncestor(Type)}, using this method as last resort.
    */
   public @Nullable GeoTarget getIdAncestor(GeoTarget.Type type) {
-    for (GeoTarget target = this; target != null; target = target.getIdParent()) {
-      if (target.getType() == type) {
+    for (GeoTarget target = this; target != null; target = target.idParent) {
+      if (target.key.type == type) {
         return target;
       }
     }
@@ -183,9 +183,9 @@ public class GeoTarget {
         .add("criteriaId", criteriaId)
         .add("name", name)
         .add("canonicalName", key.canonicalName)
-        .add("canonParent", canonParent == null ? null : canonParent.getCriteriaId())
+        .add("canonParent", canonParent == null ? null : canonParent.criteriaId)
         .add("idParent",
-            idParent == null || idParent == canonParent ? null : idParent.getCriteriaId())
+            idParent == null || idParent == canonParent ? null : idParent.criteriaId)
         .add("countryCode", countryCode)
         .add("targetType", key.type)
         .toString();
