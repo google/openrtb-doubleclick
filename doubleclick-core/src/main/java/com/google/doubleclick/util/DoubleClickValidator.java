@@ -184,7 +184,7 @@ public class DoubleClickValidator {
         if (logger.isDebugEnabled()) {
           logger.debug("{} rejected, ad.attribute needs value: {}",
               logId(adslot), DoubleClickMetadata.toString(
-                  metadata.getBuyerDeclarableCreativeAttributes(), CREATIVE_NON_FLASH));
+                  metadata.buyerDeclarableCreativeAttributes(), CREATIVE_NON_FLASH));
         }
         valid = false;
       }
@@ -196,7 +196,7 @@ public class DoubleClickValidator {
         if (logger.isDebugEnabled()) {
           logger.debug("{} rejected, ad.attribute needs value: {}",
               logId(adslot), DoubleClickMetadata.toString(
-                  metadata.getBuyerDeclarableCreativeAttributes(), CREATIVE_SSL));
+                  metadata.buyerDeclarableCreativeAttributes(), CREATIVE_SSL));
         }
         valid = false;
       }
@@ -204,8 +204,8 @@ public class DoubleClickValidator {
 
     List<Integer> bad;
     ImmutableMap<Integer, String> metaVendors = request.getSellerNetworkId() == GDN
-        ? metadata.getGdnVendors()
-        : metadata.getVendors();
+        ? metadata.gdnVendors()
+        : metadata.vendors();
 
     if (!(bad = checkAttributes(
         reqSlot.getAllowedVendorTypeList(), ad.getVendorTypeList(),
@@ -220,7 +220,7 @@ public class DoubleClickValidator {
 
     if (!(bad = checkAttributes(
         reqSlot.getAllowedRestrictedCategoryList(), ad.getRestrictedCategoryList(),
-        metadata.getRestrictedCategories(), true)).isEmpty()) {
+        metadata.restrictedCategories(), true)).isEmpty()) {
       if (logger.isDebugEnabled()) {
         logger.debug("{} rejected, unknown or not-allowed ad.restricted_category values: {}",
             logId(adslot), bad);
@@ -231,7 +231,7 @@ public class DoubleClickValidator {
 
     if (!(bad = checkAttributes(
         reqSlot.getExcludedProductCategoryList(), ad.getCategoryList(),
-        metadata.getAllCategories(), false)).isEmpty()) {
+        metadata.allCategories(), false)).isEmpty()) {
       if (logger.isDebugEnabled()) {
         logger.debug("{} rejected, unknown or excluded product ad.category values: {}",
             logId(adslot), bad);
@@ -242,7 +242,7 @@ public class DoubleClickValidator {
 
     if (!(bad = checkAttributes(
         reqSlot.getExcludedSensitiveCategoryList(), ad.getCategoryList(),
-        metadata.getAllCategories(), false)).isEmpty()) {
+        metadata.allCategories(), false)).isEmpty()) {
       if (logger.isDebugEnabled()) {
         logger.debug("{} rejected, unknown or excluded sensitive ad.category values: {}",
             logId(adslot), bad);
@@ -253,7 +253,7 @@ public class DoubleClickValidator {
 
     if (!(bad = checkAttributes(
         reqSlot.getExcludedAttributeList(), ad.getAttributeList(),
-        metadata.getBuyerDeclarableCreativeAttributes(), false)).isEmpty()) {
+        metadata.buyerDeclarableCreativeAttributes(), false)).isEmpty()) {
       if (logger.isDebugEnabled()) {
         logger.debug("{} rejected, unknown or excluded ad.attribute values: {}",
             logId(adslot), bad);

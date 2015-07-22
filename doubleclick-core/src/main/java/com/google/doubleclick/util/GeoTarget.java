@@ -107,7 +107,7 @@ public class GeoTarget {
    * The immediate parent of this target. Computed from the Parent Criteria IDs column,
    * which is not the preferred option but sometimes contains more detailed information
    * than the canonical names.
-   * You should prefer {@link #getCanonParent()}, using this method as last resort.
+   * You should prefer {@link #canonParent()}, using this method as last resort.
    * <p>
    * Example: (33611 postal code) returns (Tampa city); which is the only way to get
    * that city, since the parent by canonical name is (Florida state), skipping the city.
@@ -125,7 +125,7 @@ public class GeoTarget {
    * The ISO-3166-1 alpha-2 country code that is associated with the target.
    * <p>
    * Example: "US". Notice that OpenRTB uses alpha-3 codes (like "USA"), so you may have
-   * to convert that via {@link DoubleClickMetadata#getCountryCodes()}.
+   * to convert that via {@link DoubleClickMetadata#countryCodes()}.
    */
   public final String countryCode() {
     return countryCode;
