@@ -353,15 +353,16 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected void mapGeo(GeoTarget geoTarget, Geo.Builder geo) {
-    String countryAlpha2 = null;
-    int cityCriteriaId = -1;
-    String dmaRegionName = null;
-
     for (int chain = 0; chain < 2; ++chain) {
+      String countryAlpha2 = null;
+      int cityCriteriaId = -1;
+      String dmaRegionName = null;
+
       for (GeoTarget target = geoTarget; target != null;
           // Looks up the canonical chain last, so its results overwrite those
           // obtained by the parentId chain if there's conflict
           target = (chain == 0) ? target.idParent() : target.canonParent()) {
+
         if (target.countryCode() != null) {
           countryAlpha2 = target.countryCode();
         }

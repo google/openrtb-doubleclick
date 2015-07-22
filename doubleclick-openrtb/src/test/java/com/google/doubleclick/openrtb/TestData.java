@@ -17,6 +17,7 @@
 package com.google.doubleclick.openrtb;
 
 import static java.lang.Math.min;
+import static java.util.Arrays.asList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
@@ -43,6 +44,7 @@ import com.google.protos.adx.NetworkBid.BidRequest.Vertical;
 import com.google.protos.adx.NetworkBid.BidRequest.Video;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
+import com.google.protos.adx.NetworkBid.BidRequest.Video.ContentAttributes;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
 
 import java.util.List;
@@ -145,7 +147,7 @@ public class TestData {
       req
           .setIp(ByteString.copyFrom(new byte[] { (byte) 192, (byte) 168, (byte) 1 } ))
           .setUserAgent("Chrome")
-          .setGeoCriteriaId(9058770)
+          .setGeoCriteriaId(1023191)
           .setTimezoneOffset(3600)
           .setAnonymousId("mysite.com")
           .setSellerNetworkId(1);
@@ -257,7 +259,7 @@ public class TestData {
           .setDevicePixelRatioMillis(1500)
           .setCarrierId(10)
           .setPlatform("android")
-          .setIsMobileWebOptimized(false);
+          .setIsMobileWebOptimized(size % 4 == 0);
 
       if (size % 4 == 0) {
         if (coppa) {
@@ -288,6 +290,13 @@ public class TestData {
       if (size >= 2) {
         video.setVideoadStartDelay(5);
         compSlot.addCreativeFormat(CreativeFormat.IMAGE_CREATIVE);
+        ContentAttributes.Builder vcont = ContentAttributes.newBuilder();
+        if (size >= 3) {
+          vcont.setTitle("Gone with the Wind");
+          vcont.setDurationSeconds(14280);
+          vcont.addAllKeywords(asList("civil war", "carrots"));
+        }
+        video.setContentAttributes(vcont);
       }
       video.addCompanionSlot(compSlot);
     }

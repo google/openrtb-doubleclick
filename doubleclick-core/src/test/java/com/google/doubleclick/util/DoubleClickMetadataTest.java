@@ -76,18 +76,9 @@ public class DoubleClickMetadataTest {
     assertEquals("United States",
         metadata.geoTargetFor(1023191).canonParent().canonParent().name());
     assertFalse(metadata.geoTargets().isEmpty());
-
     assertEquals(
         new CityDMARegionValue(624, "West Bend", "Iowa"),
         metadata.dmaRegions().get(new CityDMARegionKey(1016100, "Sioux City, IA")));
-    TestUtil.testCommonMethods(
-        new CityDMARegionKey(1, "a"),
-        new CityDMARegionKey(1, "a"),
-        new CityDMARegionKey(1, "b"));
-    TestUtil.testCommonMethods(
-        new CityDMARegionValue(1, "a", "b"),
-        new CityDMARegionValue(1, "a", "b"),
-        new CityDMARegionValue(1, "a", "c"));
 
     GeoTarget geoTarget1 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "United States");
     GeoTarget geoTarget2 = new GeoTarget(
@@ -134,11 +125,43 @@ public class DoubleClickMetadataTest {
     }
   }
 
+  @Test(expected = IOException.class)
+  public void testResourceTransport_notFound() throws IOException {
+    ResourceTransport transport = new ResourceTransport();
+    try (InputStream is = transport.open("/adx-rtb-dictionaries/doesnt.exist")) {
+    }
+  }
+
   @Test
   public void testJavaNetTransport() throws IOException {
     Transport transport = new URLConnectionTransport();
     try (InputStream is = transport.open(
         "https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt")) {
     }
+  }
+
+  @Test(expected = IOException.class)
+  public void testJavaNetTransport_notFound() throws IOException {
+    Transport transport = new URLConnectionTransport();
+    try (InputStream is = transport.open(
+        "https://storage.googleapis.com/adx-rtb-dictionaries/doesnt.exist")) {
+    }
+  }
+
+  @Test
+  public void testCityDMARegion() {
+    CityDMARegionKey key1 = new CityDMARegionKey(1, "a");
+    CityDMARegionKey key2 = new CityDMARegionKey(1, "a");
+    CityDMARegionKey key3 = new CityDMARegionKey(1, "b");
+    TestUtil.testCommonMethods(key1, key2, key3);
+    assertEquals(1, key1.criteriaId());
+    assertEquals("a", key1.regionName());
+    CityDMARegionValue value1 = new CityDMARegionValue(1, "a", "b");
+    CityDMARegionValue value2 = new CityDMARegionValue(1, "a", "b");
+    CityDMARegionValue value3 = new CityDMARegionValue(1, "a", "c");
+    assertEquals(1, value1.regionCode());
+    assertEquals("a", value1.city());
+    assertEquals("b", value1.state());
+    TestUtil.testCommonMethods(value1, value2, value3);
   }
 }
