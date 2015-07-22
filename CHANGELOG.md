@@ -1,6 +1,14 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.2, 22-07-2015
+* Fixed mapping of `Geo.metro`, now gets the Google DMA Region code
+  (as required by the spec) instead of the region name.
+* Improvements to `DoubleClickMetadata` and related helper classes:
+  - Added `dmaRegions()`, loads the Cities - DMA Regions table.
+  - (Breaking) Renamed several getters that aren't JavaBean accessors.
+  - Saving memory with interning of common strings across all metadata.
+
 ## Version 0.9.1, 15-07-2015
 * Support for the `SnippetProcessor` improvements in _openrtb-core_.
 * DoubleClick protocol v.64, changes `publisher_settings_list_id` from
