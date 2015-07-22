@@ -19,6 +19,8 @@ package com.google.doubleclick.util;
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import com.google.common.collect.Lists;
 import com.google.doubleclick.util.GeoTarget.Type;
 
@@ -78,42 +80,46 @@ public class DoubleClickMetadata {
   private final ImmutableMap<Integer, String> siteLists;
   private final ImmutableMap<Integer, String> contentLabels;
   private final ImmutableMap<Integer, String> publisherVerticals;
-  private final ImmutableMap<Integer, GeoTarget> targetsByCriteriaId;
-  private final ImmutableMap<CityDMARegionKey, Integer> dmaRegionsByCriteriaId;
-  private final ImmutableMap<GeoTarget.CanonicalKey, GeoTarget> targetsByCanonicalKey;
+  private final ImmutableMap<Integer, GeoTarget> geoTargetsByCriteriaId;
+  private final ImmutableMap<CityDMARegionKey, CityDMARegionValue> dmaRegions;
+  private final ImmutableMap<GeoTarget.CanonicalKey, GeoTarget> geoTargetsByCanonicalKey;
   private final ImmutableMap<Object, CountryCodes> countryCodes;
 
   @Inject
   public DoubleClickMetadata(Transport transport) {
-    vendors = load(transport, ADX_DICT + "vendors.txt");
-    gdnVendors = load(transport, ADX_DICT + "gdn-vendors.txt");
+    Interner<String> interner = Interners.<String>newStrongInterner();
+    vendors = load(interner, transport, ADX_DICT + "vendors.txt");
+    gdnVendors = load(interner, transport, ADX_DICT + "gdn-vendors.txt");
     HashMap<Integer, String> cats = new HashMap<>();
-    cats.putAll(adSensitiveCategories = load(transport, ADX_DICT + "ad-sensitive-categories.txt"));
-    cats.putAll(adProductCategories = load(transport, ADX_DICT + "ad-product-categories.txt"));
-    cats.putAll(adRestrictedCategories = load(transport, ADX_DICT + "ad-restricted-categories.txt"));
+    cats.putAll(adSensitiveCategories = load(
+        interner, transport, ADX_DICT + "ad-sensitive-categories.txt"));
+    cats.putAll(adProductCategories = load(
+        interner, transport, ADX_DICT + "ad-product-categories.txt"));
+    cats.putAll(adRestrictedCategories = load(
+        interner, transport, ADX_DICT + "ad-restricted-categories.txt"));
     allAdCategories = ImmutableMap.copyOf(cats);
-    agencies = load(transport, ADX_DICT + "agencies.txt");
+    agencies = load(interner, transport, ADX_DICT + "agencies.txt");
     HashMap<Integer, String> attrs = new HashMap<>();
     attrs.putAll(pubExcCreativeAttributes =
-        load(transport, ADX_DICT + "publisher-excludable-creative-attributes.txt"));
+        load(interner, transport, ADX_DICT + "publisher-excludable-creative-attributes.txt"));
     attrs.putAll(buyDecCreativeAttributes =
-        load(transport, ADX_DICT + "buyer-declarable-creative-attributes.txt"));
+        load(interner, transport, ADX_DICT + "buyer-declarable-creative-attributes.txt"));
     allCreativeAttributes = ImmutableMap.copyOf(attrs);
-    creativeStatusCodes = load(transport, ADX_DICT + "creative-status-codes.txt");
-    sellerNetworks = load(transport, ADX_DICT + "seller-network-ids.txt");
-    siteLists = load(transport, ADX_DICT + "site-lists.txt");
-    contentLabels = load(transport, ADX_DICT + "content-labels.txt");
-    publisherVerticals = load(transport, ADX_DICT + "publisher-verticals.txt");
-    targetsByCriteriaId = loadGeoTargets(transport, ADX_DICT + "geo-table.csv");
+    creativeStatusCodes = load(interner, transport, ADX_DICT + "creative-status-codes.txt");
+    sellerNetworks = load(interner, transport, ADX_DICT + "seller-network-ids.txt");
+    siteLists = load(interner, transport, ADX_DICT + "site-lists.txt");
+    contentLabels = load(interner, transport, ADX_DICT + "content-labels.txt");
+    publisherVerticals = load(interner, transport, ADX_DICT + "publisher-verticals.txt");
+    geoTargetsByCriteriaId = loadGeoTargets(interner, transport, ADX_DICT + "geo-table.csv");
     HashMap<GeoTarget.CanonicalKey, GeoTarget> byKey = new HashMap<>();
-    for (GeoTarget target : targetsByCriteriaId.values()) {
+    for (GeoTarget target : geoTargetsByCriteriaId.values()) {
       byKey.put(target.key(), target);
     }
-    targetsByCanonicalKey = ImmutableMap.copyOf(byKey);
-    dmaRegionsByCriteriaId = loadCitiesDMARegions(transport, transport instanceof ResourceTransport
+    geoTargetsByCanonicalKey = ImmutableMap.copyOf(byKey);
+    dmaRegions = loadCitiesDMARegions(interner, transport, transport instanceof ResourceTransport
         ? ADX_DICT + "cities-dma-regions.csv"
         : "http://goo.gl/9ENFV7");
-    countryCodes = loadCountryCodes(ADX_DICT + "countries.txt");
+    countryCodes = loadCountryCodes(interner, ADX_DICT + "countries.txt");
   }
 
   /**
@@ -122,7 +128,7 @@ public class DoubleClickMetadata {
    * For example, they might specify restrictions on whether cookie usage is allowed,
    * or whether media and/or text ads are allowed.
    */
-  public ImmutableMap<Integer, String> getPublisherExcludableCreativeAttributes() {
+  public ImmutableMap<Integer, String> publisherExcludableCreativeAttributes() {
     return pubExcCreativeAttributes;
   }
 
@@ -130,15 +136,15 @@ public class DoubleClickMetadata {
    * Dictionary used for the attribute field in BidResponse. This field describes buyer declarable
    * attributes on creatives which must must not appear in excluded_attribute in BidRequest.
    */
-  public ImmutableMap<Integer, String> getBuyerDeclarableCreativeAttributes() {
+  public ImmutableMap<Integer, String> buyerDeclarableCreativeAttributes() {
     return buyDecCreativeAttributes;
   }
 
   /**
-   * @return Union of {@link #getPublisherExcludableCreativeAttributes()},
-   * {@link #getBuyerDeclarableCreativeAttributes()}
+   * @return Union of {@link #publisherExcludableCreativeAttributes()},
+   * {@link #buyerDeclarableCreativeAttributes()}
    */
-  public ImmutableMap<Integer, String> getAllCreativeAttributes() {
+  public ImmutableMap<Integer, String> allCreativeAttributes() {
     return allCreativeAttributes;
   }
 
@@ -147,7 +153,7 @@ public class DoubleClickMetadata {
    * This field lists the different reasons that a creative returned
    * in a BidResponse may be rejected.
    */
-  public ImmutableMap<Integer, String> getCreativeStatusCodes() {
+  public ImmutableMap<Integer, String> creativeStatusCodes() {
     return creativeStatusCodes;
   }
 
@@ -157,7 +163,7 @@ public class DoubleClickMetadata {
    * that are not allowed by publisher.
    * For example, the publisher does not want to host ads related to Politics.
    */
-  public ImmutableMap<Integer, String> getSensitiveCategories() {
+  public ImmutableMap<Integer, String> sensitiveCategories() {
     return adSensitiveCategories;
   }
 
@@ -166,7 +172,7 @@ public class DoubleClickMetadata {
    * This field describes categories of products and services that are not allowed by the publisher.
    * For example, the publisher does not want to host ads related to Online Banking.
    */
-  public ImmutableMap<Integer, String> getProductCategories() {
+  public ImmutableMap<Integer, String> productCategories() {
     return adProductCategories;
   }
 
@@ -176,15 +182,15 @@ public class DoubleClickMetadata {
    * that may be allowed by the publisher, and must be declared to use.
    * For example, ads containing Alcohol related content.
    */
-  public ImmutableMap<Integer, String> getRestrictedCategories() {
+  public ImmutableMap<Integer, String> restrictedCategories() {
     return adRestrictedCategories;
   }
 
   /**
-   * @return Union of {@link #getProductCategories()}, {@link #getSensitiveCategories()},
-   * {@link #getRestrictedCategories()}
+   * @return Union of {@link #productCategories()}, {@link #sensitiveCategories()},
+   * {@link #restrictedCategories()}
    */
-  public ImmutableMap<Integer, String> getAllCategories() {
+  public ImmutableMap<Integer, String> allCategories() {
     return allAdCategories;
   }
 
@@ -192,7 +198,7 @@ public class DoubleClickMetadata {
    * Dictionary file used in the agency_id field of BidResponse.
    * This field is used to declare the agency that is associated with the ad being returned.
    */
-  public ImmutableMap<Integer, String> getAgencies() {
+  public ImmutableMap<Integer, String> agencies() {
     return agencies;
   }
 
@@ -201,16 +207,16 @@ public class DoubleClickMetadata {
    * Rich Media vendors such as Eyeblaster and Pointroll are allowed for the creative being
    * served as specified by the publisher.
    */
-  public ImmutableMap<Integer, String> getVendors() {
+  public ImmutableMap<Integer, String> vendors() {
     return vendors;
   }
 
   /**
    * Dictionary which lists all the allowed_vendor_type entries for any request
    * from a GDN publisher. These vendor types are all allowed on GDN but must be declared if used.
-   * This is a subset of the entries in {@link #getVendors()}.
+   * This is a subset of the entries in {@link #vendors()}.
    */
-  public ImmutableMap<Integer, String> getGdnVendors() {
+  public ImmutableMap<Integer, String> gdnVendors() {
     return gdnVendors;
   }
 
@@ -218,7 +224,7 @@ public class DoubleClickMetadata {
    * Dictionary file used in the seller_network_id field of BidRequest. This field specifies
    * the seller network to which the publisher belongs.
    */
-  public ImmutableMap<Integer, String> getSellerNetworks() {
+  public ImmutableMap<Integer, String> sellerNetworks() {
     return sellerNetworks;
   }
 
@@ -228,14 +234,14 @@ public class DoubleClickMetadata {
    * (a list of 1000 most visited sites on the web), and Brand Select
    * (a list of quality publishers generated based on Google internal ranking).
    */
-  public ImmutableMap<Integer, String> getSiteLists() {
+  public ImmutableMap<Integer, String> siteLists() {
     return siteLists;
   }
 
   /**
    * Dictionary file used in the detected_content_labels field of BidRequest.
    */
-  public ImmutableMap<Integer, String> getContentLabels() {
+  public ImmutableMap<Integer, String> contentLabels() {
     return contentLabels;
   }
 
@@ -245,33 +251,36 @@ public class DoubleClickMetadata {
    * the ad will be shown. Google generates this field by crawling the page and
    * determining which verticals are used.
    */
-  public ImmutableMap<Integer, String> getPublisherVerticals() {
+  public ImmutableMap<Integer, String> publisherVerticals() {
     return publisherVerticals;
   }
 
   /**
    * Dictionary file used to map cities to DMA Region codes.
    */
-  public ImmutableMap<CityDMARegionKey, Integer> getDMARegionsByCriteriaId() {
-    return dmaRegionsByCriteriaId;
+  public ImmutableMap<CityDMARegionKey, CityDMARegionValue> dmaRegions() {
+    return dmaRegions;
   }
 
-  public ImmutableMap<Integer, GeoTarget> getTargetsByCriteriaId() {
-    return targetsByCriteriaId;
+  /**
+   * {@link GeoTarget}s indexed by criteria ID.
+   */
+  public ImmutableMap<Integer, GeoTarget> geoTargets() {
+    return geoTargetsByCriteriaId;
   }
 
-  public GeoTarget getGeoTarget(int criteriaId) {
-    return targetsByCriteriaId.get(criteriaId);
+  public GeoTarget geoTargetFor(int criteriaId) {
+    return geoTargetsByCriteriaId.get(criteriaId);
   }
 
-  public GeoTarget getGeoTarget(Type type, String canonicalName) {
-    return targetsByCanonicalKey.get(new GeoTarget.CanonicalKey(type, canonicalName));
+  public GeoTarget geoTargetFor(Type type, String canonicalName) {
+    return geoTargetsByCanonicalKey.get(new GeoTarget.CanonicalKey(type, canonicalName));
   }
 
   /**
    * Maps ISO 3166-1 codes.
    */
-  public ImmutableMap<Object, CountryCodes> getCountryCodes() {
+  public ImmutableMap<Object, CountryCodes> countryCodes() {
     return countryCodes;
   }
 
@@ -301,13 +310,14 @@ public class DoubleClickMetadata {
         .add("sellerNetworks#", sellerNetworks.size())
         .add("sensitiveCategories#", adSensitiveCategories.size())
         .add("siteLists#", siteLists.size())
-        .add("targetsByCriteriaId#", targetsByCriteriaId.size())
+        .add("geoTargets#", geoTargetsByCriteriaId.size())
+        .add("dmaRegions#", dmaRegions.size())
         .add("vendors#", vendors.size())
         .toString();
   }
 
   private static ImmutableMap<Integer, String> load(
-      Transport transport, String resourceName) {
+      Interner<String> interner, Transport transport, String resourceName) {
     try (InputStream isMetadata = transport.open(resourceName)) {
       Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
       ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
@@ -319,7 +329,7 @@ public class DoubleClickMetadata {
 
         if (matcher.matches()) {
           try {
-            builder.put(Integer.parseInt(matcher.group(1)), matcher.group(2));
+            builder.put(Integer.parseInt(matcher.group(1)), interner.intern(matcher.group(2)));
           } catch (NumberFormatException e) {
             logger.trace("Bad record, ignoring: {} - [{}]", e.toString(), record);
           }
@@ -332,16 +342,21 @@ public class DoubleClickMetadata {
     }
   }
 
-  private static ImmutableMap<CityDMARegionKey, Integer> loadCitiesDMARegions(
-      Transport transport, String resourceName) {
-    final Map<CityDMARegionKey, Integer> map = new LinkedHashMap<>();
+  private static ImmutableMap<CityDMARegionKey, CityDMARegionValue> loadCitiesDMARegions(
+      final Interner<String> interner, Transport transport, String resourceName) {
+    final Map<CityDMARegionKey, CityDMARegionValue> map = new LinkedHashMap<>();
     try (InputStream is = transport.open(resourceName)) {
       CSVParser.csvParser().parse(is, ".*,(\\d+),.*,.*,(\\d+)",
           new Function<List<String>, Boolean>() {
         @Override public Boolean apply(List<String> fields) {
           map.put(
-              new CityDMARegionKey(Integer.valueOf(fields.get(1)), fields.get(3)),
-              Integer.valueOf(fields.get(4)));
+              new CityDMARegionKey(
+                  Integer.parseInt(fields.get(1)),
+                  interner.intern(fields.get(3))),
+              new CityDMARegionValue(
+                  Integer.parseInt(fields.get(4)),
+                  interner.intern(fields.get(0)),
+                  interner.intern(fields.get(2))));
           return true;
         }});
     } catch (IOException e) {
@@ -351,7 +366,7 @@ public class DoubleClickMetadata {
   }
 
   private static ImmutableMap<Integer, GeoTarget> loadGeoTargets(
-      Transport transport, String resourceName) {
+      final Interner<String> interner, Transport transport, String resourceName) {
     final Map<Integer, GeoTarget> targetsById = new LinkedHashMap<>();
     final Map<Integer, List<Integer>> parentIdsById = new LinkedHashMap<>();
     final Map<String, GeoTarget> targetsByCanon = new LinkedHashMap<>();
@@ -363,8 +378,13 @@ public class DoubleClickMetadata {
           try {
             if (fields.size() == 7) {
               GeoTarget target = new GeoTarget(
-                  Integer.valueOf(fields.get(0)), Type.valueOf(toEnumName(fields.get(6))),
-                  fields.get(2), fields.get(1), fields.get(5), null, null);
+                  Integer.valueOf(fields.get(0)),
+                  Type.valueOf(toEnumName(fields.get(6))),
+                  interner.intern(fields.get(2)),
+                  interner.intern(fields.get(1)),
+                  interner.intern(fields.get(5)),
+                  null,
+                  null);
               List<Integer> idParent = Lists.transform(
                   CSVParser.csvParser().parse(fields.get(3)), new Function<String, Integer>(){
                 @Override public Integer apply(@Nullable String id) {
@@ -414,7 +434,8 @@ public class DoubleClickMetadata {
     }
   }
 
-  private ImmutableMap<Object, CountryCodes> loadCountryCodes(String resourceName) {
+  private ImmutableMap<Object, CountryCodes> loadCountryCodes(
+      final Interner<String> interner, String resourceName) {
     final ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
 
     try (InputStream is = new ResourceTransport().open(resourceName)) {
@@ -422,7 +443,9 @@ public class DoubleClickMetadata {
         @Override @Nullable public Boolean apply(@Nullable List<String> fields) {
           try {
             CountryCodes codes = new CountryCodes(
-                Integer.parseInt(fields.get(0)), fields.get(2), fields.get(3));
+                Integer.parseInt(fields.get(0)),
+                interner.intern(fields.get(2)),
+                interner.intern(fields.get(3)));
             map.put(codes.numeric(), codes);
             map.put(codes.alpha2(), codes);
             map.put(codes.alpha3(), codes);

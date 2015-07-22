@@ -44,45 +44,46 @@ public class DoubleClickMetadataTest {
 
     assertNotNull(metadata.toString());
     assertEquals("1: CreativeAttribute1",
-        DoubleClickMetadata.toString(metadata.getPublisherExcludableCreativeAttributes(), 1));
+        DoubleClickMetadata.toString(metadata.publisherExcludableCreativeAttributes(), 1));
     assertEquals("1: CreativeAttribute1",
-        DoubleClickMetadata.toString(metadata.getBuyerDeclarableCreativeAttributes(), 1));
+        DoubleClickMetadata.toString(metadata.buyerDeclarableCreativeAttributes(), 1));
     assertEquals("1: CreativeAttribute1",
-        DoubleClickMetadata.toString(metadata.getAllCreativeAttributes(), 1));
+        DoubleClickMetadata.toString(metadata.allCreativeAttributes(), 1));
     assertEquals("1: Creative won the auction",
-        DoubleClickMetadata.toString(metadata.getCreativeStatusCodes(), 1));
+        DoubleClickMetadata.toString(metadata.creativeStatusCodes(), 1));
     assertEquals("1: SensitiveCategory1",
-        DoubleClickMetadata.toString(metadata.getSensitiveCategories(), 1));
+        DoubleClickMetadata.toString(metadata.sensitiveCategories(), 1));
     assertEquals("1: RestrictedCategory1",
-        DoubleClickMetadata.toString(metadata.getRestrictedCategories(), 1));
+        DoubleClickMetadata.toString(metadata.restrictedCategories(), 1));
     assertEquals("1: ProductCategory1",
-        DoubleClickMetadata.toString(metadata.getProductCategories(), 1));
+        DoubleClickMetadata.toString(metadata.productCategories(), 1));
     assertEquals("1: NONE",
-        DoubleClickMetadata.toString(metadata.getAgencies(), 1));
+        DoubleClickMetadata.toString(metadata.agencies(), 1));
     assertEquals("1: Vendor1",
-        DoubleClickMetadata.toString(metadata.getVendors(), 1));
+        DoubleClickMetadata.toString(metadata.vendors(), 1));
     assertEquals("1: GDNVendor1",
-        DoubleClickMetadata.toString(metadata.getGdnVendors(), 1));
+        DoubleClickMetadata.toString(metadata.gdnVendors(), 1));
     assertEquals("1: GDN",
-        DoubleClickMetadata.toString(metadata.getSellerNetworks(), 1));
+        DoubleClickMetadata.toString(metadata.sellerNetworks(), 1));
     assertEquals("31: Brand Select",
-        DoubleClickMetadata.toString(metadata.getSiteLists(), 31));
+        DoubleClickMetadata.toString(metadata.siteLists(), 31));
     assertEquals("1: ContentLabel1",
-        DoubleClickMetadata.toString(metadata.getContentLabels(), 1));
+        DoubleClickMetadata.toString(metadata.contentLabels(), 1));
     assertEquals("1: /Vertical1",
-        DoubleClickMetadata.toString(metadata.getPublisherVerticals(), 1));
+        DoubleClickMetadata.toString(metadata.publisherVerticals(), 1));
     assertEquals("9999: <invalid>",
-        DoubleClickMetadata.toString(metadata.getSensitiveCategories(), 9999));
+        DoubleClickMetadata.toString(metadata.sensitiveCategories(), 9999));
     assertEquals("United States",
-        metadata.getGeoTarget(1023191).canonParent().canonParent().name());
-    assertFalse(metadata.getTargetsByCriteriaId().isEmpty());
-    assertEquals((Integer) 624, metadata.getDMARegionsByCriteriaId().get(
-        new CityDMARegionKey(1016100, "Sioux City, IA")));
+        metadata.geoTargetFor(1023191).canonParent().canonParent().name());
+    assertFalse(metadata.geoTargets().isEmpty());
+    assertEquals(
+        new CityDMARegionValue(624, "West Bend", "Iowa"),
+        metadata.dmaRegions().get(new CityDMARegionKey(1016100, "Sioux City, IA")));
 
-    GeoTarget geoTarget1 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "United States");
+    GeoTarget geoTarget1 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "United States");
     GeoTarget geoTarget2 = new GeoTarget(
         2840, GeoTarget.Type.COUNTRY, "United States", "United States", "US", null, null);
-    GeoTarget geoTarget3 = metadata.getGeoTarget(GeoTarget.Type.COUNTRY, "France");
+    GeoTarget geoTarget3 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "France");
     TestUtil.testCommonMethods(geoTarget1, geoTarget2, geoTarget3);
 
     assertEquals(2840, geoTarget1.criteriaId());
@@ -96,18 +97,18 @@ public class DoubleClickMetadataTest {
     assertNull(geoTarget1.getIdAncestor(GeoTarget.Type.CITY));
     TestUtil.testCommonEnum(GeoTarget.Type.values());
 
-    CountryCodes country1 = metadata.getCountryCodes().get("US");
+    CountryCodes country1 = metadata.countryCodes().get("US");
     CountryCodes country2 = new CountryCodes(840, "US", "USA");
     CountryCodes country3 = new CountryCodes(840, "US", "USB");
     TestUtil.testCommonMethods(country1, country2, country3);
-    assertSame(country1, metadata.getCountryCodes().get("USA"));
-    assertSame(country1, metadata.getCountryCodes().get(840));
+    assertSame(country1, metadata.countryCodes().get("USA"));
+    assertSame(country1, metadata.countryCodes().get(840));
     assertEquals(840, country1.numeric());
     assertEquals("US", country1.alpha2());
     assertEquals("USA", country1.alpha3());
 
     // https://github.com/google/openrtb-doubleclick/issues/28
-    GeoTarget postalTarget = metadata.getGeoTarget(9012102);
+    GeoTarget postalTarget = metadata.geoTargetFor(9012102);
     assertNull(postalTarget.getCanonAncestor(GeoTarget.Type.CITY));
     assertEquals("Tampa", postalTarget.getIdAncestor(GeoTarget.Type.CITY).name());
 
@@ -124,11 +125,43 @@ public class DoubleClickMetadataTest {
     }
   }
 
+  @Test(expected = IOException.class)
+  public void testResourceTransport_notFound() throws IOException {
+    ResourceTransport transport = new ResourceTransport();
+    try (InputStream is = transport.open("/adx-rtb-dictionaries/doesnt.exist")) {
+    }
+  }
+
   @Test
   public void testJavaNetTransport() throws IOException {
     Transport transport = new URLConnectionTransport();
     try (InputStream is = transport.open(
         "https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt")) {
     }
+  }
+
+  @Test(expected = IOException.class)
+  public void testJavaNetTransport_notFound() throws IOException {
+    Transport transport = new URLConnectionTransport();
+    try (InputStream is = transport.open(
+        "https://storage.googleapis.com/adx-rtb-dictionaries/doesnt.exist")) {
+    }
+  }
+
+  @Test
+  public void testCityDMARegion() {
+    CityDMARegionKey key1 = new CityDMARegionKey(1, "a");
+    CityDMARegionKey key2 = new CityDMARegionKey(1, "a");
+    CityDMARegionKey key3 = new CityDMARegionKey(1, "b");
+    TestUtil.testCommonMethods(key1, key2, key3);
+    assertEquals(1, key1.criteriaId());
+    assertEquals("a", key1.regionName());
+    CityDMARegionValue value1 = new CityDMARegionValue(1, "a", "b");
+    CityDMARegionValue value2 = new CityDMARegionValue(1, "a", "b");
+    CityDMARegionValue value3 = new CityDMARegionValue(1, "a", "c");
+    assertEquals(1, value1.regionCode());
+    assertEquals("a", value1.city());
+    assertEquals("b", value1.state());
+    TestUtil.testCommonMethods(value1, value2, value3);
   }
 }

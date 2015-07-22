@@ -26,6 +26,7 @@ import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.doubleclick.util.CityDMARegionKey;
+import com.google.doubleclick.util.CityDMARegionValue;
 import com.google.doubleclick.util.CountryCodes;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.doubleclick.util.GeoTarget;
@@ -309,7 +310,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcRequest.hasGeoCriteriaId()) {
       int geoCriteriaId = dcRequest.getGeoCriteriaId();
 
-      GeoTarget geoTarget = metadata.getGeoTarget(geoCriteriaId);
+      GeoTarget geoTarget = metadata.geoTargetFor(geoCriteriaId);
 
       if (geoTarget == null) {
         invalidGeoId.inc();
@@ -352,15 +353,16 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected void mapGeo(GeoTarget geoTarget, Geo.Builder geo) {
-    String countryAlpha2 = null;
-    int cityCriteriaId = -1;
-    String dmaRegionName = null;
-
     for (int chain = 0; chain < 2; ++chain) {
+      String countryAlpha2 = null;
+      int cityCriteriaId = -1;
+      String dmaRegionName = null;
+
       for (GeoTarget target = geoTarget; target != null;
           // Looks up the canonical chain last, so its results overwrite those
           // obtained by the parentId chain if there's conflict
           target = (chain == 0) ? target.idParent() : target.canonParent()) {
+
         if (target.countryCode() != null) {
           countryAlpha2 = target.countryCode();
         }
@@ -386,17 +388,17 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
 
       if (countryAlpha2 != null) {
-        CountryCodes countryCodes = metadata.getCountryCodes().get(countryAlpha2);
+        CountryCodes countryCodes = metadata.countryCodes().get(countryAlpha2);
         if (countryCodes != null) {
           geo.setCountry(countryCodes.alpha3());
         }
       }
 
       if (cityCriteriaId != -1 && dmaRegionName != null) {
-        Integer dma = metadata.getDMARegionsByCriteriaId().get(
+        CityDMARegionValue dma = metadata.dmaRegions().get(
             new CityDMARegionKey(cityCriteriaId, dmaRegionName));
         if (dma != null) {
-          geo.setMetro(String.valueOf(dma));
+          geo.setMetro(String.valueOf(dma.regionCode()));
         }
       }
     }
@@ -558,7 +560,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     Publisher.Builder publisher = Publisher.newBuilder()
         .setId(String.valueOf(dcRequest.getSellerNetworkId()));
 
-    String sellerNetwork = metadata.getSellerNetworks().get(dcRequest.getSellerNetworkId());
+    String sellerNetwork = metadata.sellerNetworks().get(dcRequest.getSellerNetworkId());
     if (sellerNetwork != null) {
       publisher.setName(sellerNetwork);
     }
@@ -846,7 +848,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         Segment.Builder segment = Segment.newBuilder()
             .setId(String.valueOf(dcVertical.getId()))
             .setValue(String.valueOf(dcVertical.getWeight()));
-        String name = metadata.getPublisherVerticals().get(dcVertical.getId());
+        String name = metadata.publisherVerticals().get(dcVertical.getId());
         if (name != null) {
           segment.setName(name);
         }

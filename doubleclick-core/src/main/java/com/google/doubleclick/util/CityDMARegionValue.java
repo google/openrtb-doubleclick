@@ -19,45 +19,51 @@ package com.google.doubleclick.util;
 import com.google.common.base.MoreObjects;
 
 /**
- * Key for the DMA Region mapping.  This composite key is necessary
- * because cities can belong to multiple DMA Regions.
+ * Value for the DMA Region mapping.
  */
-public class CityDMARegionKey {
-  private final int criteriaId;
-  private final String regionName;
+public class CityDMARegionValue {
+  private final int regionCode;
+  private final String city;
+  private final String state;
 
-  public CityDMARegionKey(int criteriaId, String regionName) {
-    this.criteriaId = criteriaId;
-    this.regionName = regionName;
+  public CityDMARegionValue(int regionCode, String city, String state) {
+    this.regionCode = regionCode;
+    this.city = city;
+    this.state = state;
   }
 
-  public final int criteriaId() {
-    return criteriaId;
+  public final int regionCode() {
+    return regionCode;
   }
 
-  public final String regionName() {
-    return regionName;
+  public final String city() {
+    return city;
+  }
+
+  public final String state() {
+    return state;
   }
 
   @Override public int hashCode() {
-    return criteriaId ^ regionName.hashCode();
+    return regionCode ^ state.hashCode();
   }
 
   @Override public boolean equals(Object obj) {
     if (obj == this) {
       return true;
-    } else if (!(obj instanceof CityDMARegionKey)) {
+    } else if (!(obj instanceof CityDMARegionValue)) {
       return false;
     }
 
-    CityDMARegionKey other = (CityDMARegionKey) obj;
-    return criteriaId == other.criteriaId && regionName.equals(other.regionName);
+    CityDMARegionValue other = (CityDMARegionValue) obj;
+    return regionCode == other.regionCode && city.equals(other.city) && state.equals(other.state);
   }
 
   @Override public String toString() {
     return MoreObjects.toStringHelper(this).omitNullValues()
-        .add("criteriaId", criteriaId)
-        .add("regionName", regionName)
+        .add("regionCode", regionCode)
+        .add("city", city)
+        .add("state", state)
         .toString();
   }
 }
