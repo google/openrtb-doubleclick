@@ -71,6 +71,8 @@ import com.codahale.metrics.MetricRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.EnumSet;
@@ -975,6 +977,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
     }
     dcAd.addAllCategory(cats);
+
+    for (String adomain : bid.getAdomainList()) {
+      try {
+        URL url = new URL("http", adomain, "");
+        dcAd.addClickThroughUrl(url.toExternalForm());
+      } catch (MalformedURLException e) {
+      }
+    }
 
     for (ExtMapper extMapper : extMappers) {
       extMapper.toDoubleClickAd(request, bid, dcAd);
