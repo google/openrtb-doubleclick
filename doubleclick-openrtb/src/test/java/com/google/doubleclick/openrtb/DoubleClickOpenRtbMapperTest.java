@@ -245,8 +245,7 @@ public class DoubleClickOpenRtbMapperTest {
             coppa ? "" : "7CLmnMiwSsq7bNTaiPsztg",
             request.getUser().getCustomdata());
 
-        if (size == TestData.NO_SLOT || (size > 1 && impVideo)) {
-          assertEquals(0, request.getImpCount());
+        if (request.getImpCount() == 0) {
           BidResponse response = TestUtil.newBidResponse();
           NetworkBid.BidResponse dcResponse = mapper.toExchangeBidResponse(request, response).build();
           assertEquals(0, dcResponse.getAdCount());

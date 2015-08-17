@@ -1,6 +1,16 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.3, 18-08-2015
+
+* Improved `Video` mapping, supports interstitial video impressions.
+* Maps `Bid.adomain` to `click_through_url`. Notice the OpenRTB
+  specification only allows populating `adomain` with domain names
+  (like “myads.com”), not full URLs. The mapper supports both:
+  domains, which may result in less precise classification by AdX;
+  and full URLs, which are ideal for AdX but not spec-compliant
+  so avoid doing that in portable code used with other exchanges.
+
 ## Version 0.9.2, 22-07-2015
 * Fixed mapping of `Geo.metro`, now gets the Google DMA Region code
   (as required by the spec) instead of the region name.

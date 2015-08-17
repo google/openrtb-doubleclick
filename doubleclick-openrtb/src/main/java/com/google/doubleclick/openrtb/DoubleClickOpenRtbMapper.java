@@ -199,7 +199,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       request.setUser(user);
     }
 
-    if (dcRequest.hasIsTest()) {
+    if (dcRequest.getIsTest()) {
       request.setTest(dcRequest.getIsTest());
     }
     request.setTmax(100);
@@ -594,8 +594,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       imp.setBidfloor(((double) bidFloor) / MICROS_PER_CURRENCY_UNIT);
     }
 
-    if (dcRequest.getMobile().hasIsInterstitialRequest()) {
-      imp.setInstl(dcRequest.getMobile().getIsInterstitialRequest());
+    boolean interstitial = dcRequest.getMobile().getIsInterstitialRequest();
+    if (interstitial) {
+      imp.setInstl(interstitial);
     }
 
     if (dcSlot.hasAdBlockKey()) {
@@ -608,7 +609,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         imp.setNative(nativ);
       }
     } else if (dcRequest.hasVideo()) {
-      Video.Builder video = buildVideo(dcSlot, dcRequest.getVideo());
+      Video.Builder video = buildVideo(dcSlot, dcRequest.getVideo(), interstitial);
       if (video != null) {
         imp.setVideo(video);
       }
@@ -695,7 +696,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   protected Video.Builder buildVideo(
-      NetworkBid.BidRequest.AdSlot dcSlot, NetworkBid.BidRequest.Video dcVideo) {
+      NetworkBid.BidRequest.AdSlot dcSlot, NetworkBid.BidRequest.Video dcVideo,
+      boolean interstitial) {
     Video.Builder video = Video.newBuilder()
         .addProtocols(VideoBidResponseProtocol.VAST_2_0)
         .addProtocols(VideoBidResponseProtocol.VAST_3_0)
@@ -735,9 +737,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcSlot.getWidthCount() == 1) {
       video.setW(dcSlot.getWidth(0));
       video.setH(dcSlot.getHeight(0));
-    } else if (dcSlot.getWidthCount() != 0) {
-      logger.debug("Invalid Video, cannot be multisize");
-      return null;
+    } else if (dcSlot.getWidthCount() > 1) {
+      if (interstitial) {
+        video.setW(dcSlot.getWidth(0));
+        video.setH(dcSlot.getHeight(0));
+      } else {
+        logger.debug("Invalid Video, non-interstitial with multiple sizes");
+        return null;
+      }
     }
 
     if (dcVideo.getCompanionSlotCount() != 0) {
@@ -979,10 +986,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     dcAd.addAllCategory(cats);
 
     for (String adomain : bid.getAdomainList()) {
-      try {
-        URL url = new URL("http", adomain, "");
-        dcAd.addClickThroughUrl(url.toExternalForm());
-      } catch (MalformedURLException e) {
+      if (adomain.contains("://")) {
+        dcAd.addClickThroughUrl(adomain);
+      } else {
+        try {
+          URL url = new URL("http", adomain, "");
+          dcAd.addClickThroughUrl(url.toExternalForm());
+        } catch (MalformedURLException e) {
+        }
       }
     }
 
