@@ -67,6 +67,7 @@ public class TestData {
           .setW(200)
           .setH(220)
           .setNurl("http://impression.com")
+          .addAllAdomain(asList("myads1.com", "https://myads2.com"))
           .addCat("IAB1");
     }
     return bid;
