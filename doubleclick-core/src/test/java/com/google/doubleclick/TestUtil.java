@@ -136,7 +136,7 @@ public class TestUtil {
         Constructor<E> constr1 = klass.getConstructor();
         E e = constr1.newInstance();
         testCommonException(e);
-      } catch (NoSuchMethodException e) {}
+      } catch (NoSuchMethodException e) { }
 
       try {
         Constructor<E> constr2 = klass.getConstructor(String.class);
@@ -144,7 +144,7 @@ public class TestUtil {
         E e = constr2.newInstance(msg);
         testCommonException(e);
         assertEquals(msg, e.getMessage());
-      } catch (NoSuchMethodException e) {}
+      } catch (NoSuchMethodException e) { }
 
       try {
         Constructor<E> constr3 = klass.getConstructor(Throwable.class);
@@ -152,7 +152,7 @@ public class TestUtil {
         E e = constr3.newInstance(cause);
         testCommonException(e);
         assertEquals(cause, e.getCause());
-      } catch (NoSuchMethodException e) {}
+      } catch (NoSuchMethodException e) { }
 
       try {
         Constructor<E> constr4 = klass.getConstructor(String.class, Throwable.class);
@@ -161,7 +161,7 @@ public class TestUtil {
         testCommonException(e);
         assertEquals(msg, e.getMessage());
         assertEquals(cause, e.getCause());
-      } catch (NoSuchMethodException e) {}
+      } catch (NoSuchMethodException e) { }
     } catch (ReflectiveOperationException e) {
       fail(e.getMessage());
     }

@@ -54,7 +54,7 @@ public class BannerMimeMapper {
   }
 
   public static Set<String> toOpenRtb(
-      Collection<CreativeFormat> dcList, Set<String> openrtbSet) {
+      Collection<CreativeFormat> dcList, @Nullable Set<String> openrtbSet) {
     Set<String> ret = openrtbSet == null ? new LinkedHashSet<String>() : openrtbSet;
     for (CreativeFormat dc : dcList) {
       ret.addAll(toOpenRtb(dc));
@@ -62,12 +62,12 @@ public class BannerMimeMapper {
     return ret;
   }
 
-  public static @Nullable CreativeFormat toDoubleClick(String openrtb) {
+  @Nullable public static CreativeFormat toDoubleClick(String openrtb) {
     return openrtbToDc.get(openrtb);
   }
 
   public static EnumSet<CreativeFormat> toDoubleClick(
-      Collection<String> openrtbList, EnumSet<CreativeFormat> dcSet) {
+      Collection<String> openrtbList, @Nullable EnumSet<CreativeFormat> dcSet) {
     EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : dcSet;
     for (String openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);

@@ -82,7 +82,7 @@ public class DoubleClickMetadataTest {
 
     GeoTarget geoTarget1 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "United States");
     GeoTarget geoTarget2 = new GeoTarget(
-        2840, GeoTarget.Type.COUNTRY, "United States", "United States", "US", null, null);
+        2840, GeoTarget.Type.COUNTRY, "United States", "United States", "US");
     GeoTarget geoTarget3 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "France");
     TestUtil.testCommonMethods(geoTarget1, geoTarget2, geoTarget3);
 

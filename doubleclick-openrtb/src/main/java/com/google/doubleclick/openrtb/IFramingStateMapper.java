@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * Maps between AdX's IFramingState and OpenRTB's topframe.
  */
 public class IFramingStateMapper {
-  public static @Nullable Boolean toOpenRtb(IFramingState dc) {
+  @Nullable public static Boolean toOpenRtb(IFramingState dc) {
     switch (dc) {
       case NO_IFRAME:
         return false;
@@ -37,7 +37,7 @@ public class IFramingStateMapper {
     return null;
   }
 
-  public static @Nullable IFramingState toDoubleClick(@Nullable Boolean openrtb) {
+  @Nullable public static IFramingState toDoubleClick(@Nullable Boolean openrtb) {
     if (openrtb == Boolean.FALSE) {
       return IFramingState.NO_IFRAME;
     } else if (openrtb == Boolean.TRUE) {

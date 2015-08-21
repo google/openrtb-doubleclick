@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * Maps between AdX's {@link DealType} and OpenRTB's {@link AuctionType}.
  */
 public class DealTypeMapper {
-  public static @Nullable AuctionType toOpenRtb(DealType dc) {
+  @Nullable public static AuctionType toOpenRtb(DealType dc) {
     switch (dc) {
       case PREFERRED_DEAL:
         return AuctionType.FIXED_PRICE;
@@ -37,7 +37,7 @@ public class DealTypeMapper {
     return null;
   }
 
-  public static @Nullable DealType toDoubleClick(AuctionType openrtb) {
+  @Nullable public static DealType toDoubleClick(AuctionType openrtb) {
     switch (openrtb) {
       case FIRST_PRICE:
       case SECOND_PRICE:

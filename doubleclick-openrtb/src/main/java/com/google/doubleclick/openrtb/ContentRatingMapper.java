@@ -43,15 +43,15 @@ public class ContentRatingMapper {
           .put(43, "DV-UNRATED")
           .build();
 
-  public static @Nullable String toOpenRtb(int dc) {
+  @Nullable public static String toOpenRtb(int dc) {
     return dcToOpenrtb.get(dc);
   }
 
-  public static @Nullable Integer toDoubleClick(String openrtb) {
+  @Nullable public static Integer toDoubleClick(String openrtb) {
     return openrtbToDc.get(openrtb);
   }
 
-  public static @Nullable String toOpenRtb(List<Integer> dcList) {
+  @Nullable public static String toOpenRtb(List<Integer> dcList) {
     int dcMax = -1;
     for (int dc : dcList) {
       if (dc > dcMax) {

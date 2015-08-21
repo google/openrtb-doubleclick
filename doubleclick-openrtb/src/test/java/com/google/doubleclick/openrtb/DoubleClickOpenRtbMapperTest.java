@@ -247,7 +247,8 @@ public class DoubleClickOpenRtbMapperTest {
 
         if (request.getImpCount() == 0) {
           BidResponse response = TestUtil.newBidResponse();
-          NetworkBid.BidResponse dcResponse = mapper.toExchangeBidResponse(request, response).build();
+          NetworkBid.BidResponse dcResponse =
+              mapper.toExchangeBidResponse(request, response).build();
           assertEquals(0, dcResponse.getAdCount());
         } else {
           Imp imp = request.getImp(0);
@@ -283,7 +284,8 @@ public class DoubleClickOpenRtbMapperTest {
             }
           }
           BidResponse response = TestUtil.newBidResponse(bid);
-          NetworkBid.BidResponse dcResponse = mapper.toExchangeBidResponse(request, response).build();
+          NetworkBid.BidResponse dcResponse =
+              mapper.toExchangeBidResponse(request, response).build();
           if (linkExt) {
             Ad ad = dcResponse.getAd(0);
             assertEquals(testDesc,

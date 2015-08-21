@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link VASTCompanionType}.
  */
 public class CompanionTypeMapper {
-  public static @Nullable VASTCompanionType toOpenRtb(CreativeFormat dc) {
+  @Nullable public static VASTCompanionType toOpenRtb(CreativeFormat dc) {
     switch (dc) {
       case IMAGE_CREATIVE:
         return VASTCompanionType.STATIC;
@@ -39,7 +39,7 @@ public class CompanionTypeMapper {
     return null;
   }
 
-  public static @Nullable CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
+  @Nullable public static CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
     switch (openrtb) {
       case STATIC:
         return CreativeFormat.IMAGE_CREATIVE;
@@ -51,7 +51,7 @@ public class CompanionTypeMapper {
   }
 
   public static EnumSet<VASTCompanionType> toOpenRtb(
-      Collection<CreativeFormat> dcList, EnumSet<VASTCompanionType> openrtbSet) {
+      Collection<CreativeFormat> dcList, @Nullable EnumSet<VASTCompanionType> openrtbSet) {
     EnumSet<VASTCompanionType> ret = openrtbSet == null
         ? EnumSet.noneOf(VASTCompanionType.class)
         : openrtbSet;
@@ -62,7 +62,7 @@ public class CompanionTypeMapper {
   }
 
   public static EnumSet<CreativeFormat> toDoubleClick(
-      Collection<VASTCompanionType> openrtbList, EnumSet<CreativeFormat> dcSet) {
+      Collection<VASTCompanionType> openrtbList, @Nullable EnumSet<CreativeFormat> dcSet) {
     EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : dcSet;
     for (VASTCompanionType openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);

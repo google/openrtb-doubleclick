@@ -93,7 +93,7 @@ public class AdCategoryMapper {
   }
 
   public static Set<Integer> toDoubleClick(
-      Collection<ContentCategory> openrtbList, Set<Integer> dcSet) {
+      Collection<ContentCategory> openrtbList, @Nullable Set<Integer> dcSet) {
     Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (ContentCategory openrtb : openrtbList) {
       ret.addAll(toDoubleClick(openrtb));

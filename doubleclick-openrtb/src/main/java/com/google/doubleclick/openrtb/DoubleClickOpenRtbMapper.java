@@ -295,7 +295,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return device;
   }
 
-  protected @Nullable Geo.Builder buildGeo(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Geo.Builder buildGeo(NetworkBid.BidRequest dcRequest) {
     if (!dcRequest.hasGeoCriteriaId() && !dcRequest.hasEncryptedHyperlocalSet()
         && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()) {
       return null;
@@ -406,7 +406,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
   }
 
-  protected @Nullable App.Builder buildApp(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected App.Builder buildApp(NetworkBid.BidRequest dcRequest) {
     NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
     App.Builder app = App.newBuilder();
     boolean mapped = false;
@@ -445,7 +445,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return mapped ? app : null;
   }
 
-  protected @Nullable Content.Builder buildAppContent(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Content.Builder buildAppContent(NetworkBid.BidRequest dcRequest) {
     Content.Builder content = buildContent(dcRequest);
     if (content == null) {
       if (!dcRequest.hasUrl() && !dcRequest.hasAnonymousId()
@@ -469,7 +469,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return content;
   }
 
-  protected @Nullable Site.Builder buildSite(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Site.Builder buildSite(NetworkBid.BidRequest dcRequest) {
     Site.Builder site = Site.newBuilder();
     boolean mapped = false;
 
@@ -511,7 +511,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return mapped ? site : null;
   }
 
-  protected @Nullable Content.Builder buildContent(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Content.Builder buildContent(NetworkBid.BidRequest dcRequest) {
     if (dcRequest.getDetectedLanguageCount() == 0
         && dcRequest.getDetectedContentLabelCount() == 0
         && !dcRequest.getVideo().hasContentAttributes()) {
@@ -554,7 +554,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return content;
   }
 
-  protected @Nullable Publisher.Builder buildPublisher(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Publisher.Builder buildPublisher(NetworkBid.BidRequest dcRequest) {
     if (!dcRequest.hasSellerNetworkId()) {
       return null;
     }
@@ -570,7 +570,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return publisher;
   }
 
-  protected @Nullable Imp.Builder buildImp(
+  @Nullable protected Imp.Builder buildImp(
       NetworkBid.BidRequest dcRequest, NetworkBid.BidRequest.AdSlot dcSlot) {
     Imp.Builder imp = Imp.newBuilder()
         .setId(String.valueOf(dcSlot.getId()));
@@ -627,7 +627,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return imp.hasVideo() || imp.hasBanner() || imp.hasNative() ? imp : null;
   }
 
-  protected @Nullable Pmp.Builder buildPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
+  @Nullable protected Pmp.Builder buildPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
     if (dcAdData.getDirectDealCount() == 0) {
       return null;
     }
@@ -648,7 +648,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return pmp;
   }
 
-  protected @Nullable Deal.Builder buildDeal(
+  @Nullable protected Deal.Builder buildDeal(
       NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal dcDeal) {
     if (!dcDeal.hasDirectDealId()) {
       return null;
@@ -809,7 +809,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return banner;
   }
 
-  protected @Nullable User.Builder buildUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
+  @Nullable protected User.Builder buildUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
     if ((!coppa && !dcRequest.hasGoogleUserId())
         || (coppa && !dcRequest.hasConstrainedUsageGoogleUserId())) {
       return null;
@@ -873,7 +873,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return user;
   }
 
-  protected @Nullable String findChannelId(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected String findChannelId(NetworkBid.BidRequest dcRequest) {
     for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
       for (String dcChannel : dcSlot.getTargetableChannelList()) {
         if (dcChannel.startsWith(YOUTUBE_AFV_USER_ID)) {

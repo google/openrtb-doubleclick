@@ -78,7 +78,7 @@ public class DoubleClickCrypto {
   public static final int OVERHEAD_SIZE = INITV_SIZE + SIGNATURE_SIZE;
 
   private static final int COUNTER_PAGESIZE = 20;
-  private static final int COUNTER_SECTIONS = 3*256 + 1;
+  private static final int COUNTER_SECTIONS = 3 * 256 + 1;
 
   private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
 
@@ -98,7 +98,7 @@ public class DoubleClickCrypto {
    * Decodes data, from string to binary form.
    * The default implementation performs websafe-base64 decoding (RFC 3548).
    */
-  protected @Nullable byte[] decode(@Nullable String data) {
+  @Nullable protected byte[] decode(@Nullable String data) {
     return data == null ? null : BaseEncoding.base64Url().decode(data);
   }
 
@@ -106,7 +106,7 @@ public class DoubleClickCrypto {
    * Encodes data, from binary form to string.
    * The default implementation performs websafe-base64 encoding (RFC 3548).
    */
-  protected @Nullable String encode(@Nullable byte[] data) {
+  @Nullable protected String encode(@Nullable byte[] data) {
     return data == null ? null : BaseEncoding.base64Url().encode(data);
   }
 

@@ -265,7 +265,7 @@ public class DoubleClickValidator {
     return valid;
   }
 
-  protected static @Nullable DirectDeal findDeal(BidRequest.AdSlot reqSlot, long dealId) {
+  @Nullable protected static DirectDeal findDeal(BidRequest.AdSlot reqSlot, long dealId) {
     for (MatchingAdData reqMad : reqSlot.getMatchingAdDataList()) {
       for (DirectDeal reqDeal : reqMad.getDirectDealList()) {
         if (reqDeal.hasDirectDealId() && reqDeal.getDirectDealId() == dealId) {
