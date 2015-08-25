@@ -26,6 +26,8 @@ import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 /**
  * Maps between AdX creative attributes and OpenRTB's {@link CreativeAttribute}.
  */
@@ -67,7 +69,7 @@ public class CreativeAttributeMapper {
   }
 
   public static EnumSet<CreativeAttribute> toOpenRtb(
-      Collection<Integer> dcList, EnumSet<CreativeAttribute> openrtbSet) {
+      Collection<Integer> dcList, @Nullable EnumSet<CreativeAttribute> openrtbSet) {
     EnumSet<CreativeAttribute> ret = openrtbSet == null
         ? EnumSet.noneOf(CreativeAttribute.class)
         : openrtbSet;
@@ -78,7 +80,7 @@ public class CreativeAttributeMapper {
   }
 
   public static Set<Integer> toDoubleClick(
-      Collection<CreativeAttribute> openrtbList, Set<Integer> dcSet) {
+      Collection<CreativeAttribute> openrtbList, @Nullable Set<Integer> dcSet) {
     Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (CreativeAttribute openrtb : openrtbList) {
       ret.addAll(toDoubleClick(openrtb));

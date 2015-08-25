@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  * and OpenRTB's {@link com.google.openrtb.OpenRtb.BidRequest.User.Gender}.
  */
 public class GenderMapper {
-  public static @Nullable User.Gender toOpenRtb(@Nullable UserDemographic.Gender dc) {
+  @Nullable public static User.Gender toOpenRtb(UserDemographic.Gender dc) {
     switch (dc) {
       case FEMALE:
         return User.Gender.FEMALE;
@@ -39,8 +39,8 @@ public class GenderMapper {
     return null;
   }
 
-  public static @Nullable UserDemographic.Gender toDoubleClick(@Nullable User.Gender gender) {
-    switch (gender) {
+  @Nullable public static UserDemographic.Gender toDoubleClick(User.Gender openrtb) {
+    switch (openrtb) {
       case FEMALE:
         return UserDemographic.Gender.FEMALE;
       case MALE:

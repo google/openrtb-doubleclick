@@ -49,7 +49,8 @@ public class VideoMimeMapper {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
 
-  public static Set<String> toOpenRtb(Collection<VideoFormat> dcList, Set<String> openrtbSet) {
+  public static Set<String> toOpenRtb(
+      Collection<VideoFormat> dcList, @Nullable Set<String> openrtbSet) {
     Set<String> ret = openrtbSet == null ? new LinkedHashSet<String>() : openrtbSet;
     for (VideoFormat dc : dcList) {
       ret.addAll(toOpenRtb(dc));
@@ -57,12 +58,12 @@ public class VideoMimeMapper {
     return ret;
   }
 
-  public static @Nullable VideoFormat toDoubleClick(String openrtb) {
+  @Nullable public static VideoFormat toDoubleClick(String openrtb) {
     return openrtbToDc.get(openrtb);
   }
 
   public static EnumSet<VideoFormat> toDoubleClick(
-      Collection<String> openrtbList, EnumSet<VideoFormat> dcSet) {
+      Collection<String> openrtbList, @Nullable EnumSet<VideoFormat> dcSet) {
     EnumSet<VideoFormat> ret = dcSet == null ? EnumSet.noneOf(VideoFormat.class) : dcSet;
     for (String openrtb : openrtbList) {
       VideoFormat dc = toDoubleClick(openrtb);

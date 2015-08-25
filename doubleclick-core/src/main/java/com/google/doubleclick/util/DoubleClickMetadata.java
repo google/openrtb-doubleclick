@@ -382,9 +382,7 @@ public class DoubleClickMetadata {
                   Type.valueOf(toEnumName(fields.get(6))),
                   interner.intern(fields.get(2)),
                   interner.intern(fields.get(1)),
-                  interner.intern(fields.get(5)),
-                  null,
-                  null);
+                  interner.intern(fields.get(5)));
               List<Integer> idParent = Lists.transform(
                   CSVParser.csvParser().parse(fields.get(3)), new Function<String, Integer>(){
                 @Override public Integer apply(@Nullable String id) {

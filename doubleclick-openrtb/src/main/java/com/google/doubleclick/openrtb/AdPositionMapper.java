@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * Maps between AdX's {@link SlotVisibility} and OpenRTB's {@link AdPosition}.
  */
 public class AdPositionMapper {
-  public static @Nullable AdPosition toOpenRtb(SlotVisibility dc) {
+  @Nullable public static AdPosition toOpenRtb(SlotVisibility dc) {
     switch (dc) {
       case ABOVE_THE_FOLD:
         return AdPosition.ABOVE_THE_FOLD;
@@ -37,7 +37,7 @@ public class AdPositionMapper {
     return null;
   }
 
-  public static @Nullable SlotVisibility toDoubleClick(AdPosition openrtb) {
+  @Nullable public static SlotVisibility toDoubleClick(AdPosition openrtb) {
     switch (openrtb) {
       case ABOVE_THE_FOLD:
       case AD_POSITION_FULLSCREEN: // Mobile only

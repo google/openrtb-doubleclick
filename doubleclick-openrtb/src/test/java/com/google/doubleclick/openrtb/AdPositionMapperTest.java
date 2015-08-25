@@ -18,8 +18,8 @@ package com.google.doubleclick.openrtb;
 
 import static org.junit.Assert.assertSame;
 
-import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.AdPosition;
+import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 
 import org.junit.Test;
 

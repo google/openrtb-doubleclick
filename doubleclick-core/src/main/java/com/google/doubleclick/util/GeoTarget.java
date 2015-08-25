@@ -36,15 +36,13 @@ public class GeoTarget {
   private GeoTarget idParent;
 
   public GeoTarget(
-      int criteriaId, GeoTarget.Type type, String canonicalName, String name, String countryCode,
-      GeoTarget canonParent, GeoTarget idParent) {
-    this(criteriaId, new CanonicalKey(type, canonicalName),
-        name, countryCode, canonParent, idParent);
+      int criteriaId, GeoTarget.Type type, String canonicalName, String name, String countryCode) {
+    this(criteriaId, new CanonicalKey(type, canonicalName), name, countryCode, null, null);
   }
 
-  GeoTarget(
-      int criteriaId, CanonicalKey key, String name, String countryCode, GeoTarget canonParent,
-      GeoTarget idParent) {
+  public GeoTarget(
+      int criteriaId, CanonicalKey key, String name, String countryCode,
+      @Nullable GeoTarget canonParent, @Nullable GeoTarget idParent) {
     this.criteriaId = criteriaId;
     this.key = key;
     this.name = name;
@@ -94,7 +92,7 @@ public class GeoTarget {
    * <p>
    * Example: (New York city target) returns (New York state)
    */
-  public final @Nullable GeoTarget canonParent() {
+  @Nullable public final GeoTarget canonParent() {
     return canonParent;
   }
 
@@ -112,7 +110,7 @@ public class GeoTarget {
    * Example: (33611 postal code) returns (Tampa city); which is the only way to get
    * that city, since the parent by canonical name is (Florida state), skipping the city.
    */
-  public final @Nullable GeoTarget idParent() {
+  @Nullable public final GeoTarget idParent() {
     return idParent;
   }
 
@@ -145,7 +143,7 @@ public class GeoTarget {
    * <p>
    * Example: (New York city target, {@link Type#COUNTRY}) returns (US country target)
    */
-  public @Nullable GeoTarget getCanonAncestor(GeoTarget.Type type) {
+  @Nullable public GeoTarget getCanonAncestor(GeoTarget.Type type) {
     for (GeoTarget target = this; target != null; target = target.canonParent()) {
       if (target.key.type == type) {
         return target;
@@ -159,7 +157,7 @@ public class GeoTarget {
    * Finds an ancestor of a specific type, if possible, using the parent-ID chain.
    * You should prefer {@link #getCanonAncestor(Type)}, using this method as last resort.
    */
-  public @Nullable GeoTarget getIdAncestor(GeoTarget.Type type) {
+  @Nullable public GeoTarget getIdAncestor(GeoTarget.Type type) {
     for (GeoTarget target = this; target != null; target = target.idParent) {
       if (target.key.type == type) {
         return target;

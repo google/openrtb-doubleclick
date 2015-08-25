@@ -399,7 +399,7 @@ public class DoubleClickOpenRtbNativeMapper {
     }
   }
 
-  protected @Nullable NativeRequest.Asset.Builder failReqAsset(
+  @Nullable protected NativeRequest.Asset.Builder failReqAsset(
       NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ,
       NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields field) {
     incomplete.inc();

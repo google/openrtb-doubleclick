@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * Maps between AdX's {@link MobileDeviceType} and OpenRTB's {@link DeviceType}.
  */
 public class DeviceTypeMapper {
-  public static @Nullable DeviceType toOpenRtb(MobileDeviceType dc) {
+  @Nullable public static DeviceType toOpenRtb(MobileDeviceType dc) {
     switch (dc) {
       case HIGHEND_PHONE:
         return DeviceType.PHONE;
@@ -37,7 +37,7 @@ public class DeviceTypeMapper {
     }
   }
 
-  public static @Nullable MobileDeviceType toDoubleClick(DeviceType openrtb) {
+  @Nullable public static MobileDeviceType toDoubleClick(DeviceType openrtb) {
     switch (openrtb) {
       case CONNECTED_TV:
       case MOBILE:
