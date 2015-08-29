@@ -19,11 +19,14 @@
 // IAB Category enum ID|IAB Category Name|Adx Category ID|Adx Category Name
 1|Arts & Entertainment|10013|/Arts & Entertainment
 1|Arts & Entertainment|10105|Entertainment Industry
+1|Arts & Entertainment|13530|Arts & Entertainment Awards
 2|Books & Literature|10112|Books & Literature
 3|Celebrity Fan/Gossip|10584|/News, Media & Publications/Celebrities & Entertainment News
 4|Fine Art|13388|/Arts & Entertainment/Visual Art & Design
 5|Humor|10106|/Arts & Entertainment/Humor & Jokes
+5|Humor|13760|Cartoons
 6|Movies|13417|/Arts & Entertainment/Movies & Films
+7|Music|8|Ringtones & Downloadables
 7|Music|13379|Ringtones & Ringtone Makers
 8|Television|12143|Televisions
 8|Television|13536|Film & TV Industry
@@ -59,11 +62,21 @@
 31|Vintage Cars|10185|Cars & Trucks
 32|Wagon|10001|Vehicles
 33|Business|10004|Business & Industrial
+33|Business|10093|Banking
 33|Business|10096|Business Banking & Finance
 33|Business|10300|Office
 33|Business|10098|Business News & Media
 33|Business|10296|Business Management Software
+33|Business|10302|Industrial Electronics
+33|Business|10307|Commercial & Industrial Printing
+33|Business|10364|Cards & Greetings
+33|Business|11099|Office & Facilities Management
+33|Business|11339|Office Appliances
+33|Business|11813|Private Banking
+33|Business|11814|Online Banking
 33|Business|12209|Business & Productivity Software
+33|Business|13432|Translation
+33|Business|13464|Industrial Goods & Manufacturing
 34|Advertising|11088|Advertising & Marketing
 35|Agriculture|13460|Agriculture
 35|Agriculture|11188|Crops
@@ -79,9 +92,11 @@
 38|Construction|11141|Commercial & General Contracting
 38|Construction|11287|Hardware Tools & Accessories
 38|Construction|12590|Power Tools
+38|Construction|13797|Building Materials & Supplies
 39|Forestry|11083|Forestry
 39|Forestry|12366|Logging & Milling
 40|Government|12014|Lotteries *Mopub IAB categorization.
+40|Government|13291|Government Mortgages
 41|Green Solutions|10295|/Business & Industrial/Energy Industry
 41|Green Solutions|10028|/Family & Community/Community Service & Social Organizations
 41|Green Solutions|13731|/Business & Industrial/Building Construction & Maintenance/Eco-Friendly Building & Construction
@@ -119,6 +134,8 @@
 57|Career Advice|10747|Career Counseling & Coaching
 58|Education|10141|Education & Training
 58|Education|11029|Primary & Secondary Schooling (K-12)
+58|Education|10756|Reference Materials & Resources
+58|Education|10759|Vocational Training & Trade Schools
 58|Education|10767|Teaching & Classroom Resources
 59|7-12 Education|11029|Primary & Secondary Schooling (K-12)
 59|7-12 Education|10767|Teaching & Classroom Resources
@@ -151,6 +168,7 @@
 73|Studying Business|12059|Graduate Programs/MBA Programs
 74|Family & Parenting|10236|Parenting & Family
 74|Family & Parenting|10002|Family & Community
+74|Family & Parenting|10030|Baby, Parenting & Family
 75|Adoption|11032|Parenting & Family/Adoption
 76|Babies & Toddlers|10235|Baby, Parenting & Family/Baby
 76|Babies & Toddlers|11019|Children's Clothing/Baby & Toddler Clothing
@@ -173,7 +191,10 @@
 83|Eldercare|11804|Assisted Living Services
 83|Eldercare|10517|Geriatric & Aging Care Services
 83|Eldercare|11805|In-Home Aging Care Services
+84|Health & Fitness|19|Cosmetic Procedures & Body Modification
+84|Health & Fitness|23|Drugs & Supplements
 84|Health & Fitness|10011|Health
+84|Health & Fitness|10089|Pharmacy
 84|Health & Fitness|10091|Health Care Services
 84|Health & Fitness|10123|Fitness
 84|Health & Fitness|10460|Vision
@@ -183,6 +204,8 @@
 84|Health & Fitness|10473|Skin Conditions & Skin Health
 84|Health & Fitness|10491|Diets & Diet Programs
 84|Health & Fitness|10508|Plastic & Cosmetic Surgery
+84|Health & Fitness|10509|Laboratory Testing & Medical Diagnostic Services
+84|Health & Fitness|11783|Cosmetic Surgery & Medical Spa Services
 85|Exercise|10011|Health
 85|Exercise|10123|Fitness
 85|Exercise|10666|Fitness Classes & Instruction
@@ -285,6 +308,7 @@
 126|Substance Abuse|10224|Alcohol & Substance Abuse
 127|Thyroid Disease|13745|Thyroid Conditions
 127|Thyroid Disease|10486|Headache & Pain Management
+128|Weight Loss|18|Weight Loss
 128|Weight Loss|10457|Weight Loss
 128|Weight Loss|11669|Weight Loss/Weight Loss Products
 128|Weight Loss|11754|Weight Loss Diets & Diet Programs
@@ -293,9 +317,13 @@
 129|Women's Health|10512|Women's Health Care Services
 129|Women's Health|10462|Sexual & Reproductive Health
 129|Women's Health|10085|Health Conditions & Concerns
+130|Food & Drink|10010|Food & Groceries
 130|Food & Drink|10679|/Hobbies & Leisure/Cooking/Recipes
 130|Food & Drink|10082|/Food & Groceries/Food
+130|Food & Drink|10301|Food Service Industry
+130|Food & Drink|10410|Kitchen & Dining
 130|Food & Drink|10437|/Food & Groceries/Food/Meat & Poultry
+130|Food & Drink|10683|Pet Food & Supplies
 131|American Cuisine|10889|Cuisines
 131|American Cuisine|10169|/Dining & Nightlife/Restaurants
 131|American Cuisine|10890|/Dining & Nightlife/Restaurants/Dine-In Restaurants
@@ -321,6 +349,7 @@
 139|Dining Out|10020|Dining & Nightlife
 139|Dining Out|10169|/Dining & Nightlife/Restaurants
 139|Dining Out|10890|/Dining & Nightlife/Restaurants/Dine-In Restaurants
+139|Dining Out|11870|Dining & Nightlife Reviews, Guides & Listings
 140|Food Allergies|11653|Food Allergies
 140|Food Allergies|10085|Health Conditions & Concerns
 141|French Cuisine|13790|French Cuisines
@@ -341,6 +370,9 @@
 148|Wine|10674|/Hobbies & Leisure/Wine & Beer Collecting & Brewing/Wine Collecting
 148|Wine|13008|/Hobbies & Leisure/Wine & Beer Collecting & Brewing/Wine Collecting/Wine Clubs
 149|Hobbies & Interests|10015|Hobbies & Leisure
+149|Hobbies & Interests|10137|Gambling
+149|Hobbies & Interests|10671|Toys
+149|Hobbies & Interests|13425|Fun & Trivia
 150|Art/Technology|13388|/Arts & Entertainment/Visual Art & Design
 150|Art/Technology|13595|/Arts & Entertainment/Visual Art & Design/Painting
 151|Arts & Crafts|10131|/Hobbies & Leisure/Arts & Crafts
@@ -349,6 +381,7 @@
 153|Birdwatching|10134|/Hobbies & Leisure/Birding
 154|Board Games/Puzzles|11948|Board Games
 154|Board Games/Puzzles|10672|/Hobbies & Leisure/Toys & Games/Games
+154|Board Games/Puzzles|11950|Video Games, Consoles & Accessories
 155|Candle & Soap Making|11533|Candles & Incense
 155|Candle & Soap Making|10131|Arts & Craft
 156|Card Games|32|Gambling *Mopub IAB categorization
@@ -404,11 +437,16 @@
 181|Home & Garden|11542|Gardening/Garden Ornaments & Statuary
 181|Home & Garden|10009|/Home & Garden
 181|Home & Garden|10406|/Home & Garden/Yard, Garden & Patio
+181|Home & Garden|10413|Home Furniture
 182|Appliances|10412|Home Appliances
+182|Appliances|11284|HVAC
 182|Appliances|11567|Home Appliances/Major Kitchen Appliances
 182|Appliances|12805|Refrigerators & Freezers
 182|Appliances|10418|Home Heating & Cooling
+183|Entertaining|28|Free Gifts, Quizzes, & Surveys
 183|Entertaining|10006|Occasions & Gifts
+183|Entertaining|10365|Gifts
+183|Entertaining|13493|Occasions
 184|Environmental Safety|11067|Occupational Health & Safety
 184|Environmental Safety|11383|Hazardous Material Control
 185|Gardening|13658|Gardening
@@ -455,8 +493,32 @@
 202|Beginning Investing|13459|/Finance/Investing/Securities/Stocks
 203|Credit/Debt & Loans|27|ConsumerLoans
 203|Credit/Debt & Loans|11839|Credit & Lending/Debt Management & Consolidation
+203|Credit/Debt & Loans|10094|Money Transfer & Wire Services
 203|Credit/Debt & Loans|10097|Credit & Lending
+203|Credit/Debt & Loans|11816|Debit & Check Cards
+203|Credit/Debt & Loans|11818|Fixed Deposit Accounts & Certificates
+203|Credit/Debt & Loans|11819|Brokerages & Day Trading
+203|Credit/Debt & Loans|11820|Investor Relations & Venture Capital
+203|Credit/Debt & Loans|11825|Spread Betting
 203|Credit/Debt & Loans|11837|Credit & Lending/Credit Counseling
+203|Credit/Debt & Loans|11840|Unsecured Credit & Lending
+203|Credit/Debt & Loans|11841|Loans
+203|Credit/Debt & Loans|11842|Credit Cards
+203|Credit/Debt & Loans|12950|401(K)s
+203|Credit/Debt & Loans|12956|Commercial Lending
+203|Credit/Debt & Loans|12957|Auto Financing
+203|Credit/Debt & Loans|12961|Personal Lending & Borrowing
+203|Credit/Debt & Loans|13284|Auto Leasing
+203|Credit/Debt & Loans|12960|Home Loans & Mortgages
+203|Credit/Debt & Loans|13283|Commercial Mortgages
+203|Credit/Debt & Loans|13286|Title Loans
+203|Credit/Debt & Loans|13289|Interest Only Mortgages
+203|Credit/Debt & Loans|13292|Buy-To-Let Mortgages
+203|Credit/Debt & Loans|13293|Fixed Rate Mortgages
+203|Credit/Debt & Loans|13296|Home Equity Loans & Lines of Credit
+203|Credit/Debt & Loans|13299|Home Refinancing Loans
+203|Credit/Debt & Loans|13300|Payday & Emergency Loans
+203|Credit/Debt & Loans|13301|Personal Loans & Lines of Credit
 204|Financial News|10098|/Finance/Business News & Media
 204|Financial News|10095|/Finance/Investing
 205|Financial Planning|10092|Financial Planning & Management
@@ -464,6 +526,7 @@
 206|Hedge Fund|11835|/Finance/Investing/Hedge Funds
 206|Hedge Fund|10095|/Finance/Investing
 207|Insurance|10102|Insurance
+207|Insurance|10550|Vehicle Insurance
 207|Insurance|11854|Insurance/Vehicle Insurance/Car Insurance
 207|Insurance|11849|Insurance/Property Insurance/Homeowners Insurance
 208|Investing|10095|Investing
@@ -506,7 +569,9 @@
 223|Science|13569|Astronomy
 223|Science|10273|Design & Engineering
 223|Science|10294|Scientific Equipment & Services
+224|Astrology|30|Black Magic, Astrology, & Esoteric
 224|Astrology|13469|Faith & Belief/Astrology & Horoscopes
+224|Astrology|13470|Psychics & Fortune Telling
 225|Biology|10088|/Health/Biotech & Pharmaceutical
 225|Biology|10141|/Jobs & Education/Education & Training
 226|Chemistry|13491|/Business & Industrial/Chemical Industry
@@ -530,6 +595,10 @@
 240|Reptiles|11976|/Hobbies & Leisure/Pets & Animals/Pets By Breed/Reptiles & Amphibians
 241|Veterinary Medicine|11979|/Hobbies & Leisure/Pets & Animals/Veterinary
 242|Sports|10014|/Sports & Fitness
+242|Sports|10021|Apparel
+242|Sports|10116|Sports Fan Gear & Apparel
+242|Sports|10121|Sporting Goods
+242|Sports|11883|Sports Event Tickets & Ticketing Services
 243|Auto Racing|13624|/Sports & Fitness/Sports/Motor Sports
 244|Baseball|13610|/Sports & Fitness/Sports/Baseball
 245|Bicycling|10014|/Sports & Fitness
@@ -552,6 +621,7 @@
 255|Freshwater Fishing|11907|/Sports & Fitness/Boating & Water Recreation/Fishing/Fishing Tackle
 256|Game & Fish|13612|/Sports & Fitness/Sports/Hunting & Shooting
 256|Game & Fish|10628|/Sports & Fitness/Boating & Water Recreation/Fishing
+257|Golf|10653|Golf Equipment
 257|Golf|13627|/Sports & Fitness/Sports/Golf
 258|Horse Racing|12015|/Hobbies & Leisure/Gambling/Horse & Dog Racing
 259|Horses|11975|/Hobbies & Leisure/Pets & Animals/Pets By Breed/Horses
@@ -578,9 +648,11 @@
 271|Rugby|13613|/Sports & Fitness/Sports/Rugby
 272|Running/Jogging|13616|/Sports & Fitness/Sports/Running & Walking
 272|Running/Jogging|10621|/Sports & Fitness/Sports & Fitness Apparel/Running Apparel
+273|Sailing|10027|Boats & Watercraft
 273|Sailing|10117|/Sports & Fitness/Boating & Water Recreation
 273|Sailing|10213|/Vehicles/Boats & Watercraft/Sailboats
 273|Sailing|10210|/Vehicles/Boats & Watercraft/Yachts
+273|Sailing|13657|Boat & Yacht Sales & Brokers
 274|Saltwater Fishing|10628|/Sports & Fitness/Boating & Water Recreation/Fishing
 274|Saltwater Fishing|11907|/Sports & Fitness/Boating & Water Recreation/Fishing/Fishing Tackle
 275|Scuba Diving|10629|/Sports & Fitness/Boating & Water Recreation/Scuba & Diving
@@ -606,21 +678,34 @@
 287|Style & Fashion|13636|Beauty & Personal Care/Fashion & Style
 287|Style & Fashion|13637|Beauty & Personal Care/Fashion & Style/Fashion Designers & Collections
 288|Beauty|10005|Beauty & Personal Care
+288|Beauty|10048|Tanning & Sun Care
 288|Beauty|10054|Beauty & Personal Care/Make-Up & Cosmetics
 288|Beauty|10055|Beauty & Personal Care/Hair Care
 288|Beauty|10047|Beauty & Personal Care/Skin Care
 288|Beauty|10061|Beauty & Personal Care/Skin Care/Face Care
 288|Beauty|10050|Beauty & Personal Care/Anti-Aging
+288|Beauty|10057|Perfumes & Fragrances
+288|Beauty|10058|Shaving & Grooming
+288|Beauty|10060|Hygiene & Toiletries
+288|Beauty|10454|Warts
+288|Beauty|11710|Acne
 289|Body Art|13422|Beauty & Personal Care/Body Art
 290|Fashion|11875|/News, Media & Publications/Apparel Media & Publications/Fashion & Style Publications
 291|Jewelry|10171|/Apparel/Jewelry
 291|Jewelry|12236|/Apparel/Jewelry/Precious Metal Jewelry/Silver Jewelry
 291|Jewelry|10893|/Apparel/Jewelry/Precious & Semi-Precious Gems & Gemstone Jewelry
 292|Clothing|10176|Clothing
+292|Clothing|10177|Footwear
+292|Clothing|10913|Underwear
+292|Clothing|12240|Shirts, Tops & Blouses
+292|Clothing|13116|Jerseys & Knit Shirts
 292|Clothing|13778|Clothing/Men's Clothing
 292|Clothing|13779|Clothing/Women's Clothing
 292|Clothing|13780|Clothing/Children's Clothing
 293|Accessories|10178|Apparel Accessories
+293|Accessories|10872|Consumer Electronic Accessories
+293|Accessories|11950|Video Games, Consoles & Accessories
+294|Technology & Computing|10880|GPS
 294|Technology & Computing|10882|Computers/Technology News & Publications
 294|Technology & Computing|10883|Computer Hardware
 294|Technology & Computing|10885|Software
@@ -633,8 +718,11 @@
 298|C/C++|13113|Programming & Developer Software/C & C++ Software
 299|Cameras & Camcorders|10692|Video Cameras & Camcorders
 299|Cameras & Camcorders|10691|Digital Cameras
+300|Cell Phones|10878|Telephony
+300|Cell Phones|11511|Mobile Phone Plans
 300|Cell Phones|12161|Mobile Phones & Accessories/Mobile Phones
 300|Cell Phones|13381|Mobile Phones & Accessories
+300|Cell Phones|13419|Phone Plans
 301|Computer Certification|10758|Education & Training/Training & Certification
 301|Computer Certification|12198|Vocational Training & Trade Schools/Computer Education
 302|Computer Networking|13095|Network Management Software
@@ -673,7 +761,9 @@
 311|Home Video/DVD|10561|TV & Video/DVD & Blu-Ray Retailers
 312|Internet Technology|11491|/Internet & Telecom/Internet/Internet Service Plans
 312|Internet Technology|11504|Web Hosting
+312|Internet Technology|12204|Internet Software & Web Goodies
 312|Internet Technology|13418|Internet
+312|Internet Technology|13768|Domain Names & Domain Name Registration
 313|Java|13111|Programming & Developer Software/Java Software
 313|Java|12211|Programming & Developer Software
 314|JavaScript|11493|/Internet & Telecom/Internet/Web Design & Development
@@ -685,13 +775,17 @@
 319|Network Security|13088|/Internet & Telecom/Internet/Network Security
 319|Network Security|13092|Internet Software & Web Goodies/Network Security Software
 319|Network Security|10299|/Business & Industrial/Security Equipment & Services
+320|Palmtops/PDAs|10876|Wireless Devices
 320|Palmtops/PDAs|12159|/Computers & Consumer Electronics/Consumer Electronics/Wireless Devices/PDAs
 320|Palmtops/PDAs|12220|/Computers & Consumer Electronics/Computers/Computer Accessories/PDA Accessories
 320|Palmtops/PDAs|12161|/Internet & Telecom/Telephony/Mobile Phones & Accessories/Mobile Phones
+321|PC Support|10019|Computers & Consumer Electronics
 321|PC Support|10883|/Computers & Consumer Electronics/Computers/Computer Hardware
 321|PC Support|12187|/Computers & Consumer Electronics/Computers/Computer Hardware/Laptop Computers
 321|PC Support|12193|/Computers & Consumer Electronics/Computers/Computer Hardware/Desktop Computers
+321|PC Support|10167|Consumer Electronics
 321|PC Support|10168|/Computers & Consumer Electronics/Computers
+322|Portable|10877|Portable Media Devices
 322|Portable|13381|/Internet & Telecom/Telephony/Mobile Phones & Accessories
 322|Portable|12187|/Computers & Consumer Electronics/Computers/Computer Hardware/Laptop Computers
 323|Entertainment|10013|/Arts & Entertainment
@@ -705,17 +799,25 @@
 328|Web Design/HTML|13404|Internet Software & Web Goodies/Web Templates
 328|Web Design/HTML|12702|Graphics & Multimedia Software/Web Design Software
 329|Web Search|11498|/Internet & Telecom/Internet/Search Engines
+329|Web Search|13725|Web Portals
 330|Windows|13104|Operating Systems & OS Emulators/Operating Systems
 330|Windows|13109|/Computers & Consumer Electronics/Computers/Software/Windows & .NET Software
 331|Travel|10017|/Travel & Tourism
+331|Travel|10146|Transportation & Excursions
+331|Travel|10147|Last Minute Travel
+331|Travel|10150|Specialty Travel
 331|Travel|10151|/Travel & Tourism/Travel Booking Services
 331|Travel|10154|/Travel & Tourism/Vacation Packages
+331|Travel|10578|Travel Media & Publications
+331|Travel|10770|Vacation Rentals
+331|Travel|10776|Luggage
 332|Adventure Travel|10793|/Travel & Tourism/Specialty Travel/Adventure Travel
 332|Adventure Travel|10151|/Travel & Tourism/Travel Booking Services
 332|Adventure Travel|10793|/Travel & Tourism/Specialty Travel/Adventure Travel
 332|Adventure Travel|10148|/Travel & Tourism/Tour Operators
 333|Africa|0|Ignored
 333|Africa|0|Ignored
+334|Air Travel|10144|Air Travel
 334|Air Travel|10778|/Travel & Tourism/Air Travel/Airline Tickets, Fares & Flights
 334|Air Travel|10151|/Travel & Tourism/Travel Booking Services
 335|Australia & New Zealand|0|Ignored
@@ -728,6 +830,7 @@
 340|Camping|12070|Camping, Caravan & RV Accommodations/Campsites & Campgrounds
 340|Camping|10113|/Hobbies & Leisure/Camping & Outdoor Recreation
 340|Camping|10771|/Travel & Tourism/Accommodations/Camping, Caravan & RV Accommodations
+341|Canada|0|Ignored
 342|Caribbean|13582|/Travel & Tourism/Tourist Attractions & Destinations/Beaches & Islands
 343|Cruises|10153|/Travel & Tourism/Cruises & Cruise Services
 343|Cruises|10802|/Travel & Tourism/Cruises & Cruise Services/Activity & Theme-Based Cruises
@@ -736,6 +839,9 @@
 346|France|0|Ignored
 347|Greece|0|Ignored
 348|Honeymoons/Getaways|12093|/Travel & Tourism/Specialty Travel/Couples Travel & Honeymoons
+349|Hotels|10142|Accommodations
+349|Hotels|10769|Hotels, Motels & Resorts
+349|Hotels|12066|Resorts
 349|Hotels|12067|/Travel & Tourism/Accommodations/Hotels, Motels & Resorts/Hotels
 350|Italy|0|Ignored
 351|Japan|0|Ignored
@@ -749,7 +855,11 @@
 356|Theme Parks|13496|/Travel & Tourism/Tourist Attractions & Destinations/Theme Parks
 356|Theme Parks|10145|/Travel & Tourism/Tourist Attractions & Destinations
 357|Traveling with Kids|10017|/Travel & Tourism
+358|United Kingdom|0|Ignored
 359|Real Estate|10003|Real Estate
+359|Real Estate|10039|Property Development
+359|Real Estate|10531|Real Estate Investments
+359|Real Estate|10306|Plant & Facility
 360|Apartments|13687|/Rental Listings/Apartment Rentals
 360|Apartments|10032|/Rental Listings
 361|Architects|11130|/Business & Industrial/Design & Engineering/Architecture
@@ -785,6 +895,8 @@
 // Category 379 to 392 are ignored. Since we do not allow these categories on
 // our platform in any case, we ignore them in the incoming bid requests.
 379|Uncategorized|0|Ignored
+379|Uncategorized|13566|Offbeat
+379|Uncategorized|13567|Edgy & Bizarre
 380|Non-Standard Content|0|Ignored
 381|Unmoderated UGC|0|Ignored
 382|Extreme Graphic/Explicit Violence|0|Ignored
@@ -794,6 +906,9 @@
 386|Under Construction|0|Ignored
 387|Incentivized|0|Ignored
 388|Illegal Content|0|Ignored
+388|Illegal Content|10|Get Rich Quick
+388|Illegal Content|29|Misleading Claims
+388|Illegal Content|13423|Guns & Firearms
 389|Illegal Content|0|Ignored
 390|Warez|0|Ignored
 391|Spyware/Malware|0|Ignored

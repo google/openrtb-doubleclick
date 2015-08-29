@@ -18,20 +18,88 @@ package com.google.doubleclick.openrtb;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb.ContentCategory;
 
 import org.junit.Test;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 public class AdCategoryMapperTest {
+  private static final boolean SLOW = Boolean.getBoolean("slowTests");
+
   @Test
   public void testMapper() {
     assertEquals(
-        ImmutableSet.of(10106),
+        ImmutableSet.of(10106, 13760),
         AdCategoryMapper.toDoubleClick(ImmutableList.of(ContentCategory.IAB1_4), null));
     assertEquals(
         ImmutableSet.of(ContentCategory.IAB1_4),
         AdCategoryMapper.toOpenRtb(ImmutableList.of(10106), null));
+  }
+
+  @Test
+  public void testFullMapping() {
+    if (!SLOW) {
+      return;
+    }
+
+    DoubleClickMetadata metadata =
+        new DoubleClickMetadata(new DoubleClickMetadata.URLConnectionTransport());
+
+    SortedMap<Integer, String> categories = new TreeMap<>();
+    categories.putAll(metadata.productCategories());
+    categories.putAll(metadata.restrictedCategories());
+    categories.putAll(metadata.sensitiveCategories());
+
+    System.err.println("Unmapped AdX categories:");
+    for (Map.Entry<Integer, String> dc : categories.entrySet()) {
+      Set<ContentCategory> openrtb = AdCategoryMapper.toOpenRtb(dc.getKey());
+      if (openrtb.isEmpty()) {
+        reportUnmappedAdX(dc);
+      }
+    }
+
+    System.err.println("Unmapped OpenRTB categories:");
+    for (ContentCategory openrtb : ContentCategory.values()) {
+      Set<Integer> dc = AdCategoryMapper.toDoubleClick(openrtb);
+      if (dc.isEmpty()) {
+        System.err.println("** " + openrtb);
+      }
+    }
+  }
+
+  private static void reportUnmappedAdX(
+      Entry<Integer, String> dc) {
+    Splitter splitter = Splitter.on('/').omitEmptyStrings().trimResults();
+    String dcStr = dc.getKey() + "|" + dc.getValue();
+    System.err.println("** " + dcStr);
+
+    for (Map.Entry<ContentCategory, String> od : AdCategoryMapper.openrtbDesc().entrySet()) {
+      boolean similar =
+          od.getValue().contains(dc.getValue())
+          || dc.getValue().contains(od.getValue());
+      if (!similar) {
+        for (int dcOther : AdCategoryMapper.toDoubleClick(od.getKey())) {
+          for (String dcDesc : splitter.split(AdCategoryMapper.dcDesc().get(dcOther))) {
+            if (dcDesc != null
+                && (dcDesc.contains(dc.getValue()) || dc.getValue().contains(dcDesc))) {
+              similar = true;
+              break;
+            }
+          }
+        }
+      }
+      if (similar) {
+        System.err.println(od.getKey().getNumber() + "|" + od.getValue() + "|" + dcStr);
+      }
+    }
   }
 }

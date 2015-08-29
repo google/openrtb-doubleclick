@@ -16,6 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.io.CharStreams;
@@ -29,7 +32,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,10 +49,14 @@ public class AdCategoryMapper {
   private static final Logger logger = LoggerFactory.getLogger(AdCategoryMapper.class);
   private static ImmutableSet<ContentCategory>[] dcToOpenrtb;
   private static ImmutableSetMultimap<ContentCategory, Integer> openrtbToDc;
+  private static ImmutableList<String> dcDesc;
+  private static ImmutableMap<ContentCategory, String> openrtbDesc;
 
   static {
-    Pattern pattern = Pattern.compile("(\\d+)\\|.*\\|(\\d+)\\|.*");
+    Pattern pattern = Pattern.compile("(\\d+)\\|(.*)\\|(\\d+)\\|(.*)");
     ImmutableSetMultimap.Builder<ContentCategory, Integer> data = ImmutableSetMultimap.builder();
+    Map<ContentCategory, String> openrtbDesc = new LinkedHashMap<>();
+    Map<Integer, String> dcDesc = new LinkedHashMap<>();
 
     try (InputStream isMetadata = AdCategoryMapper.class.getResourceAsStream(
         "/adx-openrtb/category-mapping-openrtb.txt")) {
@@ -56,18 +65,26 @@ public class AdCategoryMapper {
 
         if (matcher.matches()) {
           int openrtbCode = Integer.parseInt(matcher.group(1));
-          int dcCode = Integer.parseInt(matcher.group(2));
+          int dcCode = Integer.parseInt(matcher.group(3));
           ContentCategory openrtbCat = ContentCategory.valueOf(openrtbCode);
           if (openrtbCat == null) {
             logger.warn("Ignoring unknown ContentCategory code: {}", line);
           } else {
             data.put(openrtbCat, dcCode);
+            dcDesc.put(dcCode, matcher.group(4));
+            openrtbDesc.put(openrtbCat, matcher.group(2));
           }
         }
       }
 
       openrtbToDc = data.build();
+      AdCategoryMapper.openrtbDesc = ImmutableMap.copyOf(openrtbDesc);
       dcToOpenrtb = MapperUtil.multimapIntToSets(openrtbToDc.inverse());
+      ImmutableList.Builder<String> dcDescBuilder = ImmutableList.builder();
+      for (int i = 0; i < dcToOpenrtb.length; ++i) {
+        dcDescBuilder.add(Strings.nullToEmpty(dcDesc.get(i)));
+      }
+      AdCategoryMapper.dcDesc = dcDescBuilder.build();
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
@@ -78,7 +95,8 @@ public class AdCategoryMapper {
   }
 
   public static ImmutableSet<Integer> toDoubleClick(ContentCategory openrtb) {
-    return openrtbToDc.get(openrtb);
+    ImmutableSet<Integer> dc = openrtbToDc.get(openrtb);
+    return dc.contains(0) && dc.size() > 1 ? ImmutableSet.<Integer>of(0) : dc;
   }
 
   public static EnumSet<ContentCategory> toOpenRtb(
@@ -99,5 +117,13 @@ public class AdCategoryMapper {
       ret.addAll(toDoubleClick(openrtb));
     }
     return ret;
+  }
+
+  static ImmutableMap<ContentCategory, String> openrtbDesc() {
+    return openrtbDesc;
+  }
+
+  static ImmutableList<String> dcDesc() {
+    return dcDesc;
   }
 }
