@@ -70,6 +70,7 @@ message BidRequest {
   optional uint32 cookie_version = 20;
 
   // The time in seconds since the google_user_id was created.
+  // This number may be quantized.
   optional int32 cookie_age_seconds = 31;
 
   // Match data stored for this google_user_id through the cookie matching
@@ -162,8 +163,9 @@ message BidRequest {
   }
   optional UserDemographic user_demographic = 50;
 
-  // Audience-targeting list to which the user has been added. See the Buyer UI
-  // Help topics on remarketing, where it is called a remarketing list.
+  // This field is not populated by default. We recommend that bidders instead
+  // store and look up list ids using either google_user_id or hosted_match_data
+  // as keys.
   //
   message UserList {
     // The user list id.
@@ -490,8 +492,6 @@ message BidRequest {
 
   // -----------------------------------------------------------
   // Information about the adslots on the page.
-  //
-  // Next tag to use: 23, but 51,52 are taken.
   message AdSlot {
 
     // An arbitrarily assigned slot id that is unique on a given page and
@@ -539,21 +539,23 @@ message BidRequest {
     // The allowed restricted ad categories for private and open auctions. See
     // the ad-restricted-categories.txt file in the technical documentation for
     // a list of ids. These only apply for private and open auction bids. See
-    // the allowed_restricted_category_for_deals field for direct deals. If you
-    // bid with an ad in a restricted category, you MUST ALWAYS declare the
-    // category in the bid response regardless of the values in this field.
+    // the allowed_restricted_category_for_deals field for preferred deals or
+    // programmatic guarantees. If you bid with an ad in a restricted category,
+    // you MUST ALWAYS declare the category in the bid response regardless of
+    // the values in this field.
     repeated int32 allowed_restricted_category = 16 [packed=true];
 
-    // The allowed restricted ad categories for direct deals. See the
-    // ad-restricted-categories.txt file in the technical documentation for a
-    // list of ids. These only apply for direct deals. See the
-    // allowed_restricted_category field for private and open auctions. In some
-    // cases, restricted categories are only allowed on direct deals so this
-    // field lists all categories in allowed_restricted_category, and
-    // additionally, restricted categories that are only allowed for direct
-    // deals. If you bid with an ad in a restricted category, you MUST ALWAYS
-    // declare the category in the bid response regardless of the values in this
-    // field.
+    // The allowed restricted ad categories for preferred deals or programmatic
+    // guarantees. See the ad-restricted-categories.txt file in the technical
+    // documentation for a list of ids. These only apply for preferred deals or
+    // programmatic guarantees. See the allowed_restricted_category field for
+    // private and open auctions. In some cases, restricted categories are only
+    // allowed on preferred deals or programmatic guarantees, so this field
+    // lists all categories in allowed_restricted_category, and additionally,
+    // restricted categories that are only allowed for preferred deals or
+    // programmatic guarantees. If you bid with an ad in a restricted category,
+    // you MUST ALWAYS declare the category in the bid response regardless of
+    // the values in this field.
     repeated int32 allowed_restricted_category_for_deals = 22 [packed=true];
 
     // The disallowed ad product categories. See the ad-product-categories.txt
@@ -563,11 +565,13 @@ message BidRequest {
     // https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 excluded_product_category = 13 [packed=true];
 
-    // Information about the pre-targeting campaigns and adgroups that matched.
+    // Information about the pre-targeting configs that matched.
     //
     message MatchingAdData {
-      // The adgroup id of the matching ad.
-      optional int64 adgroup_id = 2;
+      // The adgroup ids corresponding to the pretargeting configs that matched.
+      repeated int64 adgroup_id = 2 [
+          packed = false
+      ];
 
       // The minimum CPM value that you can bid to not be filtered before the
       // auction. This may be a global minimum, or it may be a minimum set by
@@ -602,7 +606,7 @@ message BidRequest {
       // lowest.
       repeated BuyerPricingRule pricing_rule = 7;
 
-      // Information about any direct deals that matched for this inventory.
+      // Information about any deals that matched for this inventory.
       //
       message DirectDeal {
         // An id identifying the deal.
@@ -624,6 +628,12 @@ message BidRequest {
           PRIVATE_AUCTION = 2;
         }
         optional DealType deal_type = 3 [default = UNKNOWN_DEAL_TYPE];
+
+        // Whether the publisher has exempted this deal from configured blocks.
+        // This setting does not override AdX policies or Ad Review Center
+        // decisions.
+        optional bool publisher_blocks_overridden = 4 [default = false];
+
       }
       repeated DirectDeal direct_deal = 6;
 
@@ -678,7 +688,7 @@ message BidRequest {
     // A native ad consists of pieces that are rendered by the publisher. A
     // publisher may support multiple distinct native ad templates. If any
     // native templates exist, you must set the native_ad field in the response,
-    // and must not set html_snippet, video_url or snippet_template.
+    // and must not set html_snippet or video_url.
     //
     message NativeAdTemplate {
       // Defines the bits used in required_fields and recommended_fields. There
@@ -737,6 +747,41 @@ message BidRequest {
     };
     optional MediationStatus mediation_status = 52 [default = UNKNOWN];
 
+    // Auto refresh settings.
+    message AutoRefresh {
+      message AutoRefreshSettings {
+        enum AutoRefreshType {
+          UNKNOWN_AUTO_REFRESH_TYPE = 0;
+          USER_ACTION = 1;  // Refresh triggered by user-initiated action such
+                            // as scrolling.
+          EVENT = 2;  // Event-driven content change. For example, ads refresh
+                      // when the football game score changes on the page.
+          TIME = 3;   // Time-based refresh. Ads refresh on a predefined time
+                      // interval even without user activity.
+        }
+        // The type of the declared auto refresh.
+        optional AutoRefreshType refresh_type = 1
+          [default = UNKNOWN_AUTO_REFRESH_TYPE];
+
+        // The minimum refresh interval. This applies to all refresh types.
+        optional int32 min_refresh_interval_seconds = 2;
+      }
+
+      // The auto-refresh settings that the publisher has on this
+      // inventory. This is repeated because publishers may
+      // do multiple types of auto refresh on one piece of inventory.
+      repeated AutoRefreshSettings refresh_settings = 1;
+    }
+    optional AutoRefresh auto_refresh = 23;
+
+    // Whether this request originated from a sticky ad slot that scrolls along
+    // with the content on the page.
+    enum Stickiness {
+      UNKNOWN_STICKINESS = 0;
+      IS_STICKY = 1;
+    }
+    optional Stickiness stickiness = 24 [default = UNKNOWN_STICKINESS];
+
     // These are deprecated. Please ignore.
     repeated int32 DEPRECATED_allowed_attribute = 5;
     repeated bytes DEPRECATED_publisher_settings_list_id = 11;
@@ -754,8 +799,7 @@ message BidRequest {
 
     // The index of the creative within the BidResponse if there was more than
     // one. The index starts at zero for the first creative. This is usually the
-    // index of the BidResponse.Ad, but may be the
-    // BidResponse.Ad.TemplateParameter if you use a template ad.
+    // index of the BidResponse.Ad.
     optional int32 creative_index = 2;
 
     // The status code for the ad. See creative-status-codes.txt in the
@@ -835,71 +879,20 @@ message BidResponse {
     // The HTML snippet that will be placed on the web page to display the ad.
     // Please use BidResponse.Ad.AdSlot.adgroup_id to indicate which adgroup
     // this snippet is attributed to. Only one of the following should be set:
-    // html_snippet, video_url, snippet_template.
+    // html_snippet, video_url.
     optional string html_snippet = 1;
 
     // The URL to fetch a video ad. The URL should return an XML response that
     // conforms to the VAST 2.0 standard. Please use
     // BidResponse.Ad.AdSlot.adgroup_id to indicate which adgroup to attribute
     // this ad to. Only one of the following should be set: html_snippet,
-    // video_url, snippet_template. Only set this field if the BidRequest is for
+    // video_url. Only set this field if the BidRequest is for
     // an in-video ad (BidRequest.video is present).
     optional string video_url = 9;
 
-    // An HTML snippet in the form of a template and multiple parameter values.
-    // See
-    // https://developers.google.com/ad-exchange/rtb/response-guide/multiple-ads-guide
-    // for details of how to use snippet_template and all the fields in
-    // TemplateParameter. Only one of the following should be set:
-    // html_snippet, video_url, snippet_template.
-    optional string snippet_template = 12;
-    message TemplateParameter {
-      // The value of the parameter to substitute into the template.
-      optional string parameter_value = 1;
-
-      // An alternate value of the parameter that when substituted into the
-      // template will render a blank ad in the same bounding box as the real
-      // ad.
-      optional string blank_ad_parameter_value = 8;
-
-      // A buyer-specific creative id. See the description in the parent message
-      // for more details. The field in the parent message should not be set
-      // when using a template.
-      optional string buyer_creative_id = 2;
-
-      // The destination URL for the creative. See the description in the parent
-      // message for more details. The field in the parent message should not be
-      // set when using a template. Only a single URL is allowed, unlike the
-      // field in the parent message.
-      optional string click_through_url = 3;
-
-      // The bounding box within the slot where the creative corresponding to
-      // this parameter is rendered. All the values are in pixels and (0,0)
-      // coordinate is the bottom left corner. For example, if the slot size is
-      // 320x250 and the first creative occupies the top half of the slot, then
-      // the bounding box values should be "left: 0 right: 320 top: 250 bottom
-      // 125".
-      optional int32 left = 4;
-      optional int32 right = 5;
-      optional int32 top = 6;
-      optional int32 bottom = 7;
-
-      // Set this value if the parameter represents a backup ad for a parameter
-      // at another index. For example, if this parameter represents a backup
-      // for the parameter at index 2, then backup_index=2. Backup ads are not
-      // required. They should only be used in cases where non-backup ads may
-      // need replacement for reasons that can change in the few milliseconds
-      // between the time you submit the bid and the time the ad is shown to
-      // user. For example, budget or frequency capping constraints may fit this
-      // requirement. All parameters representing backup ads should come after
-      // the non-backup parameters in the repeated template_parameter field.
-      optional int32 backup_index = 9;
-    };
-    repeated TemplateParameter template_parameter = 13;
-
     // The content of a native ad. Native ads consist of multiple building
     // blocks, which are rendered by the publisher. Only one of the following
-    // should be set: html_snippet, video_url, snippet_template, or native_ad.
+    // should be set: html_snippet, video_url, or native_ad.
     // Only set this field if the BidRequest is for a native ad
     // (BidRequest.adslot.native is present).
     //
@@ -1049,6 +1042,19 @@ message BidResponse {
     // These are deprecated. Please do not set.
     optional int64 DEPRECATED_creative_id = 8;
     optional string DEPRECATED_click_through_url = 2;
+    optional string DEPRECATED_snippet_template = 12;
+    message TemplateParameter {
+      optional string parameter_value = 1;
+      optional string blank_ad_parameter_value = 8;
+      optional string buyer_creative_id = 2;
+      optional string click_through_url = 3;
+      optional int32 left = 4;
+      optional int32 right = 5;
+      optional int32 top = 6;
+      optional int32 bottom = 7;
+      optional int32 backup_index = 9;
+    };
+    repeated TemplateParameter DEPRECATED_template_parameter = 13;
   }
   repeated Ad ad = 2;
 

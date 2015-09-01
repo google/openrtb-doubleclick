@@ -91,8 +91,12 @@ class CSVParser {
 
   public boolean parse(InputStream is, String regex, Function<List<String>, Boolean> sink)
       throws IOException {
+    return parse(is, Pattern.compile(regex), sink);
+  }
+
+  public boolean parse(InputStream is, Pattern pattern, Function<List<String>, Boolean> sink)
+      throws IOException {
     BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-    Pattern pattern = Pattern.compile(regex);
     String record;
     while ((record = rd.readLine()) != null) {
       if (pattern.matcher(record).matches()) {

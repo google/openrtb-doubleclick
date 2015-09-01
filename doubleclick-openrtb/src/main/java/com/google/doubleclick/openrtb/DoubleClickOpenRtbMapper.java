@@ -932,16 +932,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       dcAd.setVideoUrl(bid.getAdm());
       setAdSize(bid, dcAd, matchingImp);
     } else if (matchingImp.hasBanner()) {
-      if (dcAd.getTemplateParameterCount() == 0) {
-        dcAd.setHtmlSnippet(bid.getAdm());
-      } else {
-        if (!dcAd.hasSnippetTemplate()) {
-          if (bid.hasAdm()) {
-            logger.debug("Ad fragment has snippetTemplate, ignoring bid's adm");
-          }
-          dcAd.setSnippetTemplate(bid.getAdm());
-        }
-      }
+      dcAd.setHtmlSnippet(bid.getAdm());
       setAdSize(bid, dcAd, matchingImp);
     } else if (matchingImp.hasNative()) {
       dcAd.setNativeAd(nativeMapper.buildNativeResponse(bid, matchingImp));

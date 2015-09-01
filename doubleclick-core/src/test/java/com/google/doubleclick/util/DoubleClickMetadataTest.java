@@ -79,6 +79,7 @@ public class DoubleClickMetadataTest {
     assertEquals(
         new CityDMARegionValue(624, "West Bend", "Iowa"),
         metadata.dmaRegions().get(new CityDMARegionKey(1016100, "Sioux City, IA")));
+    assertEquals("Verizon", metadata.mobileCarriers().get(70092));
 
     GeoTarget geoTarget1 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "United States");
     GeoTarget geoTarget2 = new GeoTarget(
