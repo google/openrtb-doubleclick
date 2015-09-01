@@ -153,27 +153,6 @@ public class DoubleClickOpenRtbMapperTest {
     assertEquals(0, request.getImpCount());
   }
 
-  @Test
-  public void testResponse_htmlSnippetTemplateAd() {
-    OpenRtb.BidRequest request = TestUtil.newBidRequest(TestData.newRequest());
-    Bid bid = TestData.newBid(false)
-        .setAdid("99")
-        .setCrid("creativeId")
-        .setAdm("<img src=\"foo-templatized\">")
-        .setExtension(DcExt.ad,
-            NetworkBid.BidResponse.Ad.newBuilder()
-                .addTemplateParameter(NetworkBid.BidResponse.Ad.TemplateParameter.newBuilder())
-                .build())
-        .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
-    assertNotNull(ad);
-    assertFalse(ad.hasHtmlSnippet());
-    assertEquals("<img src=\"foo-templatized\">", ad.getSnippetTemplate());
-    assertEquals(1, ad.getTemplateParameterCount());
-    assertEquals("creativeId", ad.getBuyerCreativeId());
-    assertTrue(!ad.hasVideoUrl());
-  }
-
   @Test(expected = MapperException.class)
   public void testResponse_noCrid() {
     Bid bid = TestData.newBid(false)

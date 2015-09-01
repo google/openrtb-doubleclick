@@ -64,6 +64,8 @@ public class DoubleClickMetadata {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickMetadata.class);
   private static final String BASE_URL = "https://storage.googleapis.com";
   private static final String ADX_DICT = BASE_URL + "/adx-rtb-dictionaries/";
+  private static final Pattern SSV_PATTERN = Pattern.compile("(\\d+)\\s+(.*)");
+  private static final Pattern CSV_PATTERN = Pattern.compile("(\\d+),(.*)");
 
   private final ImmutableMap<Integer, String> vendors;
   private final ImmutableMap<Integer, String> gdnVendors;
@@ -80,6 +82,7 @@ public class DoubleClickMetadata {
   private final ImmutableMap<Integer, String> siteLists;
   private final ImmutableMap<Integer, String> contentLabels;
   private final ImmutableMap<Integer, String> publisherVerticals;
+  private final ImmutableMap<Integer, String> mobileCarriers;
   private final ImmutableMap<Integer, GeoTarget> geoTargetsByCriteriaId;
   private final ImmutableMap<CityDMARegionKey, CityDMARegionValue> dmaRegions;
   private final ImmutableMap<GeoTarget.CanonicalKey, GeoTarget> geoTargetsByCanonicalKey;
@@ -110,6 +113,8 @@ public class DoubleClickMetadata {
     siteLists = load(interner, transport, ADX_DICT + "site-lists.txt");
     contentLabels = load(interner, transport, ADX_DICT + "content-labels.txt");
     publisherVerticals = load(interner, transport, ADX_DICT + "publisher-verticals.txt");
+    mobileCarriers = load(interner, transport, ADX_DICT + "mobile-carriers.csv",
+        CSVParser.csvParser(), CSV_PATTERN);
     geoTargetsByCriteriaId = loadGeoTargets(interner, transport, ADX_DICT + "geo-table.csv");
     HashMap<GeoTarget.CanonicalKey, GeoTarget> byKey = new HashMap<>();
     for (GeoTarget target : geoTargetsByCriteriaId.values()) {
@@ -285,6 +290,13 @@ public class DoubleClickMetadata {
   }
 
   /**
+   * Maps mobile carriers.
+   */
+  public ImmutableMap<Integer, String> mobileCarriers() {
+    return mobileCarriers;
+  }
+
+  /**
    * Formats a code to the corresponding description from its domain.
    */
   public static String toString(Map<Integer, String> metadata, int code) {
@@ -301,6 +313,7 @@ public class DoubleClickMetadata {
         .add("buyDecCreativeAttributes#", buyDecCreativeAttributes.size())
         .add("contentLabels#", contentLabels.size())
         .add("countryCodes#", countryCodes.size())
+        .add("mobileCarriers#", mobileCarriers.size())
         .add("creativeStatusCodes#", creativeStatusCodes.size())
         .add("gdnVendorTypes#", gdnVendors.size())
         .add("productCategories#", adProductCategories.size())
@@ -319,22 +332,43 @@ public class DoubleClickMetadata {
   private static ImmutableMap<Integer, String> load(
       Interner<String> interner, Transport transport, String resourceName) {
     try (InputStream isMetadata = transport.open(resourceName)) {
-      Pattern pattern = Pattern.compile("(\\d+)\\s+(.*)");
       ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
       BufferedReader rd  = new BufferedReader(new InputStreamReader(isMetadata));
       String record;
 
       while ((record = rd.readLine()) != null) {
-        Matcher matcher = pattern.matcher(record);
+        Matcher matcher = SSV_PATTERN.matcher(record);
 
         if (matcher.matches()) {
           try {
             builder.put(Integer.parseInt(matcher.group(1)), interner.intern(matcher.group(2)));
           } catch (NumberFormatException e) {
-            logger.trace("Bad record, ignoring: {} - [{}]", e.toString(), record);
+            logger.trace("Bad record [{}]: {}", record, e.toString());
           }
         }
       }
+
+      return builder.build();
+    } catch (IOException e) {
+      throw new ExceptionInInitializerError(e);
+    }
+  }
+
+  private static ImmutableMap<Integer, String> load(
+      final Interner<String> interner, Transport transport, String resourceName,
+      CSVParser csvParser, Pattern pattern) {
+    try (InputStream is = transport.open(resourceName)) {
+      final ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
+      csvParser.parse(is, pattern, new Function<List<String>, Boolean>() {
+        @Override public Boolean apply(List<String> fields) {
+          try {
+            builder.put(Integer.parseInt(fields.get(0)), interner.intern(fields.get(1)));
+          } catch (NumberFormatException e) {
+            logger.trace("Bad record [{}]: {}", fields, e.toString());
+          }
+          return true;
+        }
+      });
 
       return builder.build();
     } catch (IOException e) {
@@ -448,7 +482,7 @@ public class DoubleClickMetadata {
             map.put(codes.alpha2(), codes);
             map.put(codes.alpha3(), codes);
           } catch (IllegalArgumentException e) {
-            logger.trace("Bad record: {}: {}", fields, e.toString());
+            logger.trace("Bad record [{}]: {}", fields, e.toString());
           }
           return true;
         }
