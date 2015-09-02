@@ -41,10 +41,12 @@ import javax.annotation.Nullable;
  * into records by looking at line breaks will fail to preserve the "internal line breaks".
  * In principle the caller can have the intelligence to split records correctly, but this
  * would ideally be implemented as part of the parser with a stream-oriented API.
+ * <p>
+ * WARNING: This class is public but it's an internal utility, not a supported API.
  */
-class CSVParser {
-  static final char EOT = (char) 0x03;
-  static final char NUL = (char) 0x00;
+public class CSVParser {
+  public static final char EOT = (char) 0x03;
+  public static final char NUL = (char) 0x00;
   private static final CSVParser TSV_PARSER = new CSVParser('\t', NUL, NUL, "", false);
   private static final CSVParser CSV_PARSER = new CSVParser(',', '"', NUL, "", false);
 

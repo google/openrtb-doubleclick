@@ -64,8 +64,6 @@ public class DoubleClickMetadata {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickMetadata.class);
   private static final String BASE_URL = "https://storage.googleapis.com";
   private static final String ADX_DICT = BASE_URL + "/adx-rtb-dictionaries/";
-  private static final Pattern SSV_PATTERN = Pattern.compile("(\\d+)\\s+(.*)");
-  private static final Pattern CSV_PATTERN = Pattern.compile("(\\d+),(.*)");
 
   private final ImmutableMap<Integer, String> vendors;
   private final ImmutableMap<Integer, String> gdnVendors;
@@ -90,31 +88,34 @@ public class DoubleClickMetadata {
 
   @Inject
   public DoubleClickMetadata(Transport transport) {
+    Pattern ssvp = Pattern.compile("(\\d+)\\s+(.*)");
+    Pattern csvp = Pattern.compile("(\\d+),(.*)");
+
     Interner<String> interner = Interners.<String>newStrongInterner();
-    vendors = load(interner, transport, ADX_DICT + "vendors.txt");
-    gdnVendors = load(interner, transport, ADX_DICT + "gdn-vendors.txt");
+    vendors = load(interner, transport, ssvp, ADX_DICT + "vendors.txt");
+    gdnVendors = load(interner, transport, ssvp, ADX_DICT + "gdn-vendors.txt");
     HashMap<Integer, String> cats = new HashMap<>();
     cats.putAll(adSensitiveCategories = load(
-        interner, transport, ADX_DICT + "ad-sensitive-categories.txt"));
+        interner, transport, ssvp, ADX_DICT + "ad-sensitive-categories.txt"));
     cats.putAll(adProductCategories = load(
-        interner, transport, ADX_DICT + "ad-product-categories.txt"));
+        interner, transport, ssvp, ADX_DICT + "ad-product-categories.txt"));
     cats.putAll(adRestrictedCategories = load(
-        interner, transport, ADX_DICT + "ad-restricted-categories.txt"));
+        interner, transport, ssvp, ADX_DICT + "ad-restricted-categories.txt"));
     allAdCategories = ImmutableMap.copyOf(cats);
-    agencies = load(interner, transport, ADX_DICT + "agencies.txt");
+    agencies = load(interner, transport, ssvp, ADX_DICT + "agencies.txt");
     HashMap<Integer, String> attrs = new HashMap<>();
     attrs.putAll(pubExcCreativeAttributes =
-        load(interner, transport, ADX_DICT + "publisher-excludable-creative-attributes.txt"));
+        load(interner, transport, ssvp, ADX_DICT + "publisher-excludable-creative-attributes.txt"));
     attrs.putAll(buyDecCreativeAttributes =
-        load(interner, transport, ADX_DICT + "buyer-declarable-creative-attributes.txt"));
+        load(interner, transport, ssvp, ADX_DICT + "buyer-declarable-creative-attributes.txt"));
     allCreativeAttributes = ImmutableMap.copyOf(attrs);
-    creativeStatusCodes = load(interner, transport, ADX_DICT + "creative-status-codes.txt");
-    sellerNetworks = load(interner, transport, ADX_DICT + "seller-network-ids.txt");
-    siteLists = load(interner, transport, ADX_DICT + "site-lists.txt");
-    contentLabels = load(interner, transport, ADX_DICT + "content-labels.txt");
-    publisherVerticals = load(interner, transport, ADX_DICT + "publisher-verticals.txt");
-    mobileCarriers = load(interner, transport, ADX_DICT + "mobile-carriers.csv",
-        CSVParser.csvParser(), CSV_PATTERN);
+    creativeStatusCodes = load(interner, transport, ssvp, ADX_DICT + "creative-status-codes.txt");
+    sellerNetworks = load(interner, transport, ssvp, ADX_DICT + "seller-network-ids.txt");
+    siteLists = load(interner, transport, ssvp, ADX_DICT + "site-lists.txt");
+    contentLabels = load(interner, transport, ssvp, ADX_DICT + "content-labels.txt");
+    publisherVerticals = load(interner, transport, ssvp, ADX_DICT + "publisher-verticals.txt");
+    mobileCarriers = load(interner, transport, CSVParser.csvParser(), csvp,
+        ADX_DICT + "mobile-carriers.csv");
     geoTargetsByCriteriaId = loadGeoTargets(interner, transport, ADX_DICT + "geo-table.csv");
     HashMap<GeoTarget.CanonicalKey, GeoTarget> byKey = new HashMap<>();
     for (GeoTarget target : geoTargetsByCriteriaId.values()) {
@@ -330,14 +331,14 @@ public class DoubleClickMetadata {
   }
 
   private static ImmutableMap<Integer, String> load(
-      Interner<String> interner, Transport transport, String resourceName) {
+      Interner<String> interner, Transport transport, Pattern pattern, String resourceName) {
     try (InputStream isMetadata = transport.open(resourceName)) {
       ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
       BufferedReader rd  = new BufferedReader(new InputStreamReader(isMetadata));
       String record;
 
       while ((record = rd.readLine()) != null) {
-        Matcher matcher = SSV_PATTERN.matcher(record);
+        Matcher matcher = pattern.matcher(record);
 
         if (matcher.matches()) {
           try {
@@ -355,8 +356,8 @@ public class DoubleClickMetadata {
   }
 
   private static ImmutableMap<Integer, String> load(
-      final Interner<String> interner, Transport transport, String resourceName,
-      CSVParser csvParser, Pattern pattern) {
+      final Interner<String> interner, Transport transport, CSVParser csvParser, Pattern pattern,
+      String resourceName) {
     try (InputStream is = transport.open(resourceName)) {
       final ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
       csvParser.parse(is, pattern, new Function<List<String>, Boolean>() {
