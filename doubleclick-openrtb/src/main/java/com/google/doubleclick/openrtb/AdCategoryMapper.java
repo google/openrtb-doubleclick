@@ -16,12 +16,13 @@
 
 package com.google.doubleclick.openrtb;
 
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.io.CharStreams;
+import com.google.doubleclick.util.CSVParser;
 import com.google.openrtb.OpenRtb.ContentCategory;
 
 import org.slf4j.Logger;
@@ -29,15 +30,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -53,29 +52,28 @@ public class AdCategoryMapper {
   private static ImmutableMap<ContentCategory, String> openrtbDesc;
 
   static {
-    Pattern pattern = Pattern.compile("(\\d+)\\|(.*)\\|(\\d+)\\|(.*)");
-    ImmutableSetMultimap.Builder<ContentCategory, Integer> data = ImmutableSetMultimap.builder();
-    Map<ContentCategory, String> openrtbDesc = new LinkedHashMap<>();
-    Map<Integer, String> dcDesc = new LinkedHashMap<>();
+    final ImmutableSetMultimap.Builder<ContentCategory, Integer> data = ImmutableSetMultimap.builder();
+    final Map<ContentCategory, String> openrtbDesc = new LinkedHashMap<>();
+    final Map<Integer, String> dcDesc = new LinkedHashMap<>();
 
-    try (InputStream isMetadata = AdCategoryMapper.class.getResourceAsStream(
+    try (InputStream is = AdCategoryMapper.class.getResourceAsStream(
         "/adx-openrtb/category-mapping-openrtb.txt")) {
-      for (String line : CharStreams.readLines(new InputStreamReader(isMetadata))) {
-        Matcher matcher = pattern.matcher(line);
-
-        if (matcher.matches()) {
-          int openrtbCode = Integer.parseInt(matcher.group(1));
-          int dcCode = Integer.parseInt(matcher.group(3));
+      CSVParser psvParser = new CSVParser('|', CSVParser.NUL, CSVParser.NUL, "", false);
+      psvParser.parse(is, "(\\d+)\\|(.*)\\|(\\d+)\\|(.*)", new Function<List<String>, Boolean>() {
+        @Override public Boolean apply(List<String> input) {
+          int openrtbCode = Integer.parseInt(input.get(0));
+          int dcCode = Integer.parseInt(input.get(2));
           ContentCategory openrtbCat = ContentCategory.valueOf(openrtbCode);
           if (openrtbCat == null) {
-            logger.warn("Ignoring unknown ContentCategory code: {}", line);
+            logger.warn("Ignoring unknown ContentCategory code: {}", input);
           } else {
             data.put(openrtbCat, dcCode);
-            dcDesc.put(dcCode, matcher.group(4));
-            openrtbDesc.put(openrtbCat, matcher.group(2));
+            dcDesc.put(dcCode, input.get(3));
+            openrtbDesc.put(openrtbCat, input.get(1));
           }
+          return true;
         }
-      }
+      });
 
       openrtbToDc = data.build();
       AdCategoryMapper.openrtbDesc = ImmutableMap.copyOf(openrtbDesc);
