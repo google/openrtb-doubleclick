@@ -2,8 +2,8 @@ RELEASE NOTES
 ----------------------------------------------------------------------
 
 ## Version 0.9.5, 02-09-2015
-* DoubleClick protocol v.68: Changed `MatchingAdData.adgroup_id` to
-  `repeated`; ads `AdSlot.auto_refresh`; deprecates `snippet_template`.
+* DoubleClick protocol v.68: Changes `MatchingAdData.adgroup_id` to
+  `repeated`; adds `AdSlot.auto_refresh`; deprecates `snippet_template`.
 * Added `DoubleClickMetadata.mobileCarriers()`.
 
 ## Version 0.9.4, 01-09-2015
