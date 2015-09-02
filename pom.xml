@@ -175,7 +175,7 @@
         <configuration>
           <windowtitle>${project.name}</windowtitle>
           <notimestamp>true</notimestamp>
-          <excludePackageNames />
+          <excludePackageNames>com.google.doubleclick.util.impl</excludePackageNames>
           <groups>
             <group>
               <title>DoubleClick Utilities</title>

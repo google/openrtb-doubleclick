@@ -23,6 +23,7 @@ import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import com.google.common.collect.Lists;
 import com.google.doubleclick.util.GeoTarget.Type;
+import com.google.doubleclick.util.impl.CSVParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

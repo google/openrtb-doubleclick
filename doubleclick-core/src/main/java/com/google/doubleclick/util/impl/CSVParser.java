@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.doubleclick.util;
+package com.google.doubleclick.util.impl;
 
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;

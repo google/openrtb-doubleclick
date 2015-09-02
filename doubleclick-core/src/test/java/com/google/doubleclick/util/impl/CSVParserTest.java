@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.doubleclick.util;
+package com.google.doubleclick.util.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.Assert.assertEquals;
+
+import com.google.doubleclick.util.impl.CSVParser;
 
 import org.junit.Test;
 

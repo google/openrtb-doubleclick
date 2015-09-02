@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.doubleclick.util.CSVParser;
+import com.google.doubleclick.util.impl.CSVParser;
 import com.google.openrtb.OpenRtb.ContentCategory;
 
 import org.slf4j.Logger;
