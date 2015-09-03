@@ -249,7 +249,7 @@ public class DoubleClickOpenRtbMapperTest {
             assertEquals(size >= 2, banner.hasTopframe());
           } else if (impNativ) {
             Native nativ = imp.getNative();
-            assertEquals(size == 0 ? 5 : 10, nativ.getRequest().getAssetsCount());
+            assertEquals(size == 0 ? 5 : 10, nativ.getRequestNative().getAssetsCount());
           }
 
           Bid.Builder bid = TestData.newBid(multiBid || imp.getInstl());

@@ -80,7 +80,7 @@ public class DoubleClickOpenRtbNativeMapper {
     } else {
       throw new MapperException("Not configured for OpenRTB/JSON native ads");
     }
-    return buildRespAd(matchingImp.getNative().getRequest(), natResp);
+    return buildRespAd(matchingImp.getNative().getRequestNative(), natResp);
   }
 
   protected NetworkBid.BidResponse.Ad.NativeAd.Builder buildRespAd(
@@ -230,42 +230,42 @@ public class DoubleClickOpenRtbNativeMapper {
       long bits = dcNativ.getRecommendedFields() | dcNativ.getRequiredFields();
 
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetTitle(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetTitle(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetBody(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetBody(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetCTA(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetCTA(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetAdvertiser(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetAdvertiser(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetImage(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetImage(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetLogo(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetLogo(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetIcon(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetIcon(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetStarRating(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetStarRating(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetPrice(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetPrice(dcNativ));
       }
       if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0) {
-        addAsset(++id, nativReq, buildReqAssetStore(dcNativ));
+        addAsset(nativReq, ++id, buildReqAssetStore(dcNativ));
       }
     }
 
-    return impNativ.setRequest(nativReq);
+    return impNativ.setRequestNative(nativReq);
   }
 
   protected static void addAsset(
-      int id, NativeRequest.Builder dcNativ, NativeRequest.Asset.Builder asset) {
+      NativeRequest.Builder dcNativ, int id, NativeRequest.Asset.Builder asset) {
     if (asset != null) {
       dcNativ.addAssets(asset.setId(id));
     }
@@ -412,8 +412,11 @@ public class DoubleClickOpenRtbNativeMapper {
 
   protected static NativeRequest.Asset.Builder newAsset(
       long reqBits, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields bit) {
-    return NativeRequest.Asset.newBuilder()
-        .setRequired((reqBits & bit.getNumber()) != 0);
+    NativeRequest.Asset.Builder asset = NativeRequest.Asset.newBuilder();
+    if ((reqBits & bit.getNumber()) != 0) {
+      asset.setRequired(true);
+    }
+    return asset;
   }
 
   protected NativeRequest.Asset.Builder extMapNative(
