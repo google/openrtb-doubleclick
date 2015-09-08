@@ -65,9 +65,6 @@ public class DoubleClickOpenRtbNativeMapper {
   }
 
   public NetworkBid.BidResponse.Ad.NativeAd.Builder buildNativeResponse(Bid bid, Imp matchingImp) {
-    if (bid.hasAdmNative() == bid.hasAdm()) {
-      throw new MapperException("Must provide only one of adm/admNative");
-    }
     NativeResponse natResp;
     if (bid.hasAdmNative()) {
       natResp = bid.getAdmNative();
@@ -113,25 +110,22 @@ public class DoubleClickOpenRtbNativeMapper {
       if (asset.hasLink()) {
         dcNatAd.setStore(asset.getLink().getUrl());
       }
-
       if (asset.hasTitle()) {
-        buildRespTitle(dcNatAd, asset, matchingReqAsset);
+        buildRespTitle(asset, matchingReqAsset, dcNatAd);
       }
-
       if (asset.hasImg()) {
-        buildRespImg(dcNatAd, asset, matchingReqAsset);
+        buildRespImg(asset, matchingReqAsset, dcNatAd);
       }
-
       if (asset.hasData()) {
-        buildRespData(dcNatAd, asset, matchingReqAsset);
+        buildRespData(asset, matchingReqAsset, dcNatAd);
       }
     }
 
     return dcNatAd;
   }
 
-  protected void buildRespTitle(NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd,
-      NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset) {
+  protected void buildRespTitle(NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset,
+      NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd) {
     if (!matchingReqAsset.hasTitle()) {
       failRespAsset(asset);
     } else {
@@ -139,8 +133,8 @@ public class DoubleClickOpenRtbNativeMapper {
     }
   }
 
-  protected void buildRespImg(NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd,
-      NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset) {
+  protected void buildRespImg(NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset,
+      NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd) {
     if (!matchingReqAsset.hasImg()) {
       failRespAsset(asset);
       return;
@@ -170,8 +164,8 @@ public class DoubleClickOpenRtbNativeMapper {
     }
   }
 
-  protected void buildRespData(NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd,
-      NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset) {
+  protected void buildRespData(NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset,
+      NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd) {
     if (!matchingReqAsset.hasData()) {
       failRespAsset(asset);
       return;
