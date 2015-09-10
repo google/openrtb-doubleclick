@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.68: + beta: CL 78263652
+// Synchronized with v.69: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2015 Google Inc. All Rights Reserved.
@@ -133,6 +133,9 @@ message BidRequest {
   // Hyperlocal targeting signal when available, encrypted as described at
   // https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-hyperlocal
   optional bytes encrypted_hyperlocal_set = 40;
+  // Unencrypted version of encrypted_hyperlocal_set. This field is only set
+  // when using an SSL connection.
+  optional HyperlocalSet hyperlocal_set = 53;
 
   // The offset of the user's time from GMT in minutes. For example, GMT+10 is
   // timezone_offset = 600.
@@ -332,16 +335,25 @@ message BidRequest {
     // Apple's identifier for advertising (IDFA) as described at
     // https://support.google.com/adxbuyer/answer/3221407 or Android's
     // advertising identifier. When the encrypted_advertising_id is an IDFA, the
-    // plaintext after decrypting the ciphertext is the IDFA returned by iOS's
-    // [ASIdentifierManager advertisingIdentifier]. For encrypted_hashed_idfa,
-    // the plaintext is the MD5 hash of the IDFA. Only one of the two fields
-    // will be available, depending on the version of the SDK making the
-    // request. Later SDKs provide unhashed values.  Not set if there is one or
-    // more user_data_treatment value in the BidRequest, see
-    // constrained_usage_encrypted_advertising_id and
-    // constrained_usage_encrypted_hashed_idfa instead.
+    // plaintext after decrypting the ciphertext is the IDFA (16 byte UUID)
+    // returned by iOS's [ASIdentifierManager advertisingIdentifier]. For
+    // encrypted_hashed_idfa, the plaintext is the 16 byte MD5 hash of the
+    // IDFA. Only one of the two fields will be available, depending on the
+    // version of the SDK making the request. Later SDKs provide unhashed
+    // values. They are not set if there is one or more user_data_treatment
+    // value in the BidRequest, see constrained_usage_encrypted_advertising_id
+    // and constrained_usage_encrypted_hashed_idfa instead.
     optional bytes encrypted_advertising_id = 20;
+
+    // Unencrypted version of encrypted_advertising_id. This field is only set
+    // when using an SSL connection. This field is a 16 byte UUID.
+    optional bytes advertising_id = 27;
+
     optional bytes encrypted_hashed_idfa = 21;
+
+    // Unencrypted version of encrypted_hashed_idfa. This field is only set
+    // when using an SSL connection. This field is a 16 byte MD5.
+    optional bytes hashed_idfa = 28;
 
     // Only set if the the BidRequest contains one or more user_data_treatment
     // value. If constrained_usage_encrypted_advertising_id or
@@ -349,7 +361,18 @@ message BidRequest {
     // non-constrained field is not set. You must be whitelisted for all
     // user_data_treatments in this request in order to receive these fields.
     optional bytes constrained_usage_encrypted_advertising_id = 22;
+
+    // Unencrypted version of constrained_usage_encrypted_advertising_id. This
+    // field is only set when using an SSL connection. This field is a 16 byte
+    // UUID.
+    optional bytes constrained_usage_advertising_id = 29;
+
     optional bytes constrained_usage_encrypted_hashed_idfa = 23;
+
+    // Unencrypted version of constrained_usage_encrypted_hashed_idfa. This
+    // field is only set when using an SSL connection. This field is a 16 byte
+    // MD5.
+    optional bytes constrained_usage_hashed_idfa = 30;
 
     // App name for Android apps in Google Play store.
     optional string app_name = 24;
@@ -375,6 +398,16 @@ message BidRequest {
 
     // If true, the video is embedded on pages out of the publisher's domain.
     optional bool is_embedded_offsite = 11 [default = false];
+
+    // Describes how the ad was played.
+    enum VideoPlaybackMethod {
+      METHOD_UNKNOWN = 0;
+      AUTO_PLAY_SOUND_ON = 1;
+      AUTO_PLAY_SOUND_OFF = 2;
+      CLICK_TO_PLAY = 3;
+    };
+    optional VideoPlaybackMethod playback_method = 14
+        [default = METHOD_UNKNOWN];
 
     // The time in milliseconds from the start of the video when the ad will be
     // displayed. 0 means pre-roll and -1 means post-roll. The value is valid
@@ -510,9 +543,22 @@ message BidRequest {
 
     // The width and height in pixels of the allowed ad sizes. Most requests
     // allow only a single size, but some allow more than one. Widths and
-    // heights must be at the same index. For example, if the width values are
+    // heights are at the same index. For example, if the width values are
     // [728, 300, 468] and the height values are [90, 250, 60], then the allowed
     // formats are 728x90, 300x250, and 468x60.
+    //
+    // For VAST video ad requests a single width/height pair specifies the
+    // Google-detected video player size.  If Google cannot detect the player
+    // size the publisher-provided player size, if available, is used.  For
+    // VAST video ads, this size is informational; there is no restriction on
+    // the size of the video ad that you can return.
+    //
+    // For mobile interstitial ads (including ones where video ads are eligible)
+    // the first width height pair is the screen size (this is also the video
+    // player size for VAST video ads).  Subsequent pairs are recommended
+    // interstitial ad sizes that satisfy the interstitial size restrictions,
+    // i.e. no bigger than the screen size and no smaller than 50% of width and
+    // 40% height.
     repeated int32 width = 2;
     repeated int32 height = 3;
 
@@ -568,8 +614,8 @@ message BidRequest {
     // Information about the pre-targeting configs that matched.
     //
     message MatchingAdData {
-      // The adgroup ids corresponding to the pretargeting configs that matched.
-      repeated int64 adgroup_id = 2 [
+      // The billing ids corresponding to the pretargeting configs that matched.
+      repeated int64 billing_id = 2 [
           packed = false
       ];
 
@@ -877,17 +923,17 @@ message BidResponse {
     optional string buyer_creative_id = 10;
 
     // The HTML snippet that will be placed on the web page to display the ad.
-    // Please use BidResponse.Ad.AdSlot.adgroup_id to indicate which adgroup
+    // Please use BidResponse.Ad.AdSlot.billing_id to indicate which billing id
     // this snippet is attributed to. Only one of the following should be set:
     // html_snippet, video_url.
     optional string html_snippet = 1;
 
     // The URL to fetch a video ad. The URL should return an XML response that
     // conforms to the VAST 2.0 standard. Please use
-    // BidResponse.Ad.AdSlot.adgroup_id to indicate which adgroup to attribute
-    // this ad to. Only one of the following should be set: html_snippet,
-    // video_url. Only set this field if the BidRequest is for
-    // an in-video ad (BidRequest.video is present).
+    // BidResponse.Ad.AdSlot.billing_id to indicate which billing id to
+    // attribute this ad to. Only one of the following should be set:
+    // html_snippet, video_url. Only set this field if the BidRequest is for an
+    // in-video ad (BidRequest.video is present).
     optional string video_url = 9;
 
     // The content of a native ad. Native ads consist of multiple building
@@ -1021,11 +1067,12 @@ message BidResponse {
       // optional and does not need to be set.
       optional int64 min_cpm_micros = 3;
 
-      // Id of the adgroup to attribute this impression to. The value must be in
-      // the set of adgroups for this slot that were sent in the
-      // BidRequest.AdSlot.matching_ad_data.adgroup_id. This must always be set
-      // if the BidRequest has more than one BidRequest.AdSlot.matching_ad_data.
-      optional int64 adgroup_id = 4;
+      // Billing id to attribute this impression to. The value must be in the
+      // set of billing ids for this slot that were sent in the
+      // BidRequest.AdSlot.matching_ad_data.billing_id. This must always be set
+      // if the BidRequest has more than one
+      // BidRequest.AdSlot.matching_ad_data.billing_id.
+      optional int64 billing_id = 4;
 
       // The deal id that you want this bid to participate in. If left unset,
       // then AdX will choose a deal if one is available or use the open auction

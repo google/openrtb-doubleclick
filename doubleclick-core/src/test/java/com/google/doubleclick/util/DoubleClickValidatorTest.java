@@ -46,7 +46,7 @@ public class DoubleClickValidatorTest {
           .addWidth(200)
           .addHeight(50)
           .addMatchingAdData(MatchingAdData.newBuilder()
-              .addAdgroupId(10)
+              .addBillingId(10)
               .addDirectDeal(DirectDeal.newBuilder()
                   .setDirectDealId(1)))
           .addExcludedAttribute(1)
@@ -138,7 +138,7 @@ public class DoubleClickValidatorTest {
             .setId(1)
             .addWidth(200)
             .addHeight(50)
-            .addMatchingAdData(MatchingAdData.newBuilder().addAdgroupId(10))
+            .addMatchingAdData(MatchingAdData.newBuilder().addBillingId(10))
             .addExcludedAttribute(DoubleClickValidator.CREATIVE_FLASH))
         .build();
 
@@ -160,7 +160,7 @@ public class DoubleClickValidatorTest {
             .setId(1)
             .addWidth(200)
             .addHeight(50)
-            .addMatchingAdData(MatchingAdData.newBuilder().addAdgroupId(10))
+            .addMatchingAdData(MatchingAdData.newBuilder().addBillingId(10))
             .addExcludedAttribute(DoubleClickValidator.CREATIVE_NON_SSL))
         .build();
 

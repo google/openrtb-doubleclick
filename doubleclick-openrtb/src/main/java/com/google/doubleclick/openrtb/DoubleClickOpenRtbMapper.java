@@ -234,21 +234,36 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcRequest.hasMobile()) {
       NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
 
-      if ((coppa && dcMobile.hasConstrainedUsageEncryptedAdvertisingId())
-          || (!coppa && dcMobile.hasEncryptedAdvertisingId())) {
-        device.setIfa(BaseEncoding.base16().encode((coppa
-            ? dcMobile.getConstrainedUsageEncryptedAdvertisingId()
-            : dcMobile.getEncryptedAdvertisingId()).toByteArray()));
-        device.setLmt(false);
-      }
-      else if ((coppa && dcMobile.hasConstrainedUsageEncryptedHashedIdfa())
-          || (!coppa && dcMobile.hasEncryptedHashedIdfa())) {
-        device.setDpidmd5(BaseEncoding.base16().encode((coppa
-            ? dcMobile.getConstrainedUsageEncryptedHashedIdfa()
-            : dcMobile.getEncryptedHashedIdfa()).toByteArray()));
-        device.setLmt(false);
+      if (coppa) {
+        if (dcMobile.hasConstrainedUsageAdvertisingId()) {
+          device.setIfa(BaseEncoding.base16().encode(
+              dcMobile.getConstrainedUsageAdvertisingId().toByteArray()));
+        } else if (dcMobile.hasConstrainedUsageEncryptedAdvertisingId()) {
+          device.setIfa(BaseEncoding.base16().encode(
+              dcMobile.getConstrainedUsageEncryptedAdvertisingId().toByteArray()));
+        }
+        if (dcMobile.hasConstrainedUsageHashedIdfa()) {
+          device.setDpidmd5(BaseEncoding.base16().encode(
+              dcMobile.getConstrainedUsageHashedIdfa().toByteArray()));
+        } else if (dcMobile.hasConstrainedUsageEncryptedHashedIdfa()) {
+          device.setDpidmd5(BaseEncoding.base16().encode(
+              dcMobile.getConstrainedUsageEncryptedHashedIdfa().toByteArray()));
+        }
       } else {
-        device.setLmt(true);
+        if (dcMobile.hasAdvertisingId()) {
+          device.setIfa(BaseEncoding.base16().encode(
+              dcMobile.getAdvertisingId().toByteArray()));
+        } else if (dcMobile.hasEncryptedAdvertisingId()) {
+          device.setIfa(BaseEncoding.base16().encode(
+              dcMobile.getEncryptedAdvertisingId().toByteArray()));
+        }
+        if (dcMobile.hasHashedIdfa()) {
+          device.setDpidmd5(BaseEncoding.base16().encode(
+              dcMobile.getHashedIdfa().toByteArray()));
+        } else if (dcMobile.hasEncryptedHashedIdfa()) {
+          device.setDpidmd5(BaseEncoding.base16().encode(
+              dcMobile.getEncryptedHashedIdfa().toByteArray()));
+        }
       }
 
       if (dcMobile.hasCarrierId()) {
@@ -296,8 +311,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   @Nullable protected Geo.Builder buildGeo(NetworkBid.BidRequest dcRequest) {
-    if (!dcRequest.hasGeoCriteriaId() && !dcRequest.hasEncryptedHyperlocalSet()
-        && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()) {
+    if (!dcRequest.hasGeoCriteriaId()
+        && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()
+        && !dcRequest.hasHyperlocalSet() && !dcRequest.hasEncryptedHyperlocalSet()) {
       return null;
     }
 
@@ -325,9 +341,12 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     NetworkBid.BidRequest.HyperlocalSet hyperlocalSet = null;
-    if (dcRequest.hasEncryptedHyperlocalSet() && hyperlocalCrypto != null) {
+    if (dcRequest.hasEncryptedHyperlocalSet()
+        || (hyperlocalCrypto != null && dcRequest.hasEncryptedHyperlocalSet())) {
       try {
-        hyperlocalSet = NetworkBid.BidRequest.HyperlocalSet
+        hyperlocalSet = dcRequest.hasHyperlocalSet()
+            ? dcRequest.getHyperlocalSet()
+            : NetworkBid.BidRequest.HyperlocalSet
             .parseFrom(hyperlocalCrypto.decryptHyperlocal(
                 dcRequest.getEncryptedHyperlocalSet().toByteArray()));
         if (hyperlocalSet.hasCenterPoint()) {
@@ -339,7 +358,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         }
       } catch (InvalidProtocolBufferException | SignatureException | IllegalArgumentException e) {
         invalidHyperlocal.inc();
-        logger.warn("Invalid encrypted_hyperlocal_set: {}", e.toString());
+        logger.warn("Invalid HyperlocalSet: {}", e.toString());
       }
     }
 
@@ -946,7 +965,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         .setMaxCpmMicros((long) (bid.getPrice() * MICROS_PER_CURRENCY_UNIT));
     if (matchingImp.getExtension(DcExt.adSlot).getMatchingAdDataCount() > 1) {
       if (bid.hasCid()) {
-        dcSlot.setAdgroupId(Long.parseLong(bid.getCid()));
+        dcSlot.setBillingId(Long.parseLong(bid.getCid()));
       } else {
         noCid.inc();
         if (logger.isDebugEnabled()) {

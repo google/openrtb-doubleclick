@@ -77,7 +77,7 @@ public class DoubleClickOpenRtbMapperTest {
     NetworkBid.BidResponse.Ad ad = dcResponse.getAd(0);
     assertEquals(1, ad.getAdslotCount());
     assertEquals(1, ad.getAdslot(0).getId());
-    assertFalse(ad.getAdslot(0).hasAdgroupId());
+    assertFalse(ad.getAdslot(0).hasBillingId());
     assertEquals(1200000, ad.getAdslot(0).getMaxCpmMicros());
   }
 
@@ -269,7 +269,7 @@ public class DoubleClickOpenRtbMapperTest {
             Ad ad = dcResponse.getAd(0);
             assertEquals(testDesc,
                 ((size > 1 && multiBid) || imp.getInstl()) && !impNativ, ad.hasWidth());
-            assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasAdgroupId());
+            assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasBillingId());
           }
         }
       }
