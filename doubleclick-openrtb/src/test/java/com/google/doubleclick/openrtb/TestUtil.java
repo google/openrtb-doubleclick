@@ -102,7 +102,6 @@ class TestUtil {
         new MetricRegistry(),
         getMetadata(),
         OpenRtbJsonFactory.create(),
-        new DoubleClickCrypto.Hyperlocal(KEYS),
         ImmutableList.of(DoubleClickLinkMapper.INSTANCE))
             .toOpenRtbBidRequest(dcRequest).build();
   }

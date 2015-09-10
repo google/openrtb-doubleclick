@@ -81,8 +81,7 @@ public abstract class ExtMapper {
   }
 
   public boolean toOpenRtbGeo(
-      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo,
-      NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
+      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo) {
     return false;
   }
 

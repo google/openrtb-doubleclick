@@ -86,8 +86,8 @@ public class DoubleClickOpenRtbNativeMapper {
         NetworkBid.BidResponse.Ad.NativeAd.newBuilder()
             .addAllImpressionTrackingUrl(natResp.getImptrackersList());
 
-    if (natResp.hasLink()) {
-      dcNatAd.setClickTrackingUrl(natResp.getLink().getUrl());
+    if (natResp.getLink().getClicktrackersCount() != 0) {
+      dcNatAd.setClickTrackingUrl(natResp.getLink().getClicktrackers(0));
     }
 
     for (NativeResponse.Asset asset : natResp.getAssetsList()) {
@@ -128,9 +128,9 @@ public class DoubleClickOpenRtbNativeMapper {
       NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd) {
     if (!matchingReqAsset.hasTitle()) {
       failRespAsset(asset);
-    } else {
-      dcNatAd.setHeadline(asset.getTitle().getText());
+      return;
     }
+    dcNatAd.setHeadline(asset.getTitle().getText());
   }
 
   protected void buildRespImg(NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset,

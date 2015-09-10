@@ -24,7 +24,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
-import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.doubleclick.util.CityDMARegionKey;
 import com.google.doubleclick.util.CityDMARegionValue;
 import com.google.doubleclick.util.CountryCodes;
@@ -61,7 +60,6 @@ import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.openrtb.mapper.OpenRtbMapper;
 import com.google.openrtb.util.OpenRtbUtils;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.TextFormat;
 import com.google.protos.adx.NetworkBid;
 
@@ -73,7 +71,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
@@ -104,7 +101,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
 
   private final DoubleClickMetadata metadata;
-  private final DoubleClickCrypto.Hyperlocal hyperlocalCrypto;
   private final ImmutableList<ExtMapper> extMappers;
   private final DoubleClickOpenRtbNativeMapper nativeMapper;
   private final Counter missingCrid = new Counter();
@@ -123,10 +119,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       MetricRegistry metricRegistry,
       DoubleClickMetadata metadata,
       @Nullable OpenRtbJsonFactory jsonFactory,
-      @Nullable DoubleClickCrypto.Hyperlocal hyperlocalCrypto,
       List<ExtMapper> extMappers) {
     this.metadata = metadata;
-    this.hyperlocalCrypto = hyperlocalCrypto;
     this.extMappers = ImmutableList.copyOf(extMappers);
     this.nativeMapper = new DoubleClickOpenRtbNativeMapper(metricRegistry, jsonFactory, extMappers);
     Class<? extends DoubleClickOpenRtbMapper> cls = getClass();
@@ -340,25 +334,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
     }
 
-    NetworkBid.BidRequest.HyperlocalSet hyperlocalSet = null;
-    if (dcRequest.hasEncryptedHyperlocalSet()
-        || (hyperlocalCrypto != null && dcRequest.hasEncryptedHyperlocalSet())) {
-      try {
-        hyperlocalSet = dcRequest.hasHyperlocalSet()
-            ? dcRequest.getHyperlocalSet()
-            : NetworkBid.BidRequest.HyperlocalSet
-            .parseFrom(hyperlocalCrypto.decryptHyperlocal(
-                dcRequest.getEncryptedHyperlocalSet().toByteArray()));
-        if (hyperlocalSet.hasCenterPoint()) {
-          NetworkBid.BidRequest.Hyperlocal.Point center = hyperlocalSet.getCenterPoint();
-          if (center.hasLatitude() && center.hasLongitude()) {
-            geo.setLat(center.getLatitude());
-            geo.setLon(center.getLongitude());
-          }
+    if (dcRequest.hasHyperlocalSet()) {
+      if (dcRequest.getHyperlocalSet().hasCenterPoint()) {
+        NetworkBid.BidRequest.Hyperlocal.Point center =
+            dcRequest.getHyperlocalSet().getCenterPoint();
+        if (center.hasLatitude() && center.hasLongitude()) {
+          geo.setLat(center.getLatitude());
+          geo.setLon(center.getLongitude());
         }
-      } catch (InvalidProtocolBufferException | SignatureException | IllegalArgumentException e) {
-        invalidHyperlocal.inc();
-        logger.warn("Invalid HyperlocalSet: {}", e.toString());
       }
     }
 
@@ -367,7 +350,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     for (ExtMapper extMapper : extMappers) {
-      extMapper.toOpenRtbGeo(dcRequest, geo, hyperlocalSet);
+      extMapper.toOpenRtbGeo(dcRequest, geo);
     }
 
     return geo;

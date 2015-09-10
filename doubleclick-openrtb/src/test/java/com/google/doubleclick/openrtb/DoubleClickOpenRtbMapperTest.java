@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
-import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
@@ -58,7 +57,6 @@ public class DoubleClickOpenRtbMapperTest {
       new MetricRegistry(),
       TestUtil.getMetadata(),
       OpenRtbJsonFactory.create(),
-      new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
       ImmutableList.of(DoubleClickLinkMapper.INSTANCE));
 
   @Test
@@ -206,7 +204,6 @@ public class DoubleClickOpenRtbMapperTest {
             new MetricRegistry(),
             TestUtil.getMetadata(),
             OpenRtbJsonFactory.create(),
-            new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
             extMappers.build());
 
         NetworkBid.BidRequest.Builder dcRequest = TestData.newRequest(size, coppa, impNativ);
