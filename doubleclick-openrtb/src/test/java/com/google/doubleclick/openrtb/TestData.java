@@ -196,7 +196,7 @@ public class TestData {
             .setSlotVisibility(SlotVisibility.ABOVE_THE_FOLD)
             .addTargetableChannel(size % 2 == 0 ? "afv_user_id_PewDiePie" : "pack-anon-x::y")
             .setIframingState(i == 1 ? IFramingState.NO_IFRAME : IFramingState.SAME_DOMAIN_IFRAME);
-        MatchingAdData.Builder mad = MatchingAdData.newBuilder().addAdgroupId(100 + i);
+        MatchingAdData.Builder mad = MatchingAdData.newBuilder().addBillingId(100 + i);
         if (i >= 2) {
           adSlot.setIframingDepth( // Only used by video, but keep things simple
               i == 2 ? IFramingDepth.ONE_IFRAME : IFramingDepth.MULTIPLE_IFRAME);

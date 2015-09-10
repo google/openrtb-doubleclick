@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
-import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
@@ -58,7 +57,6 @@ public class DoubleClickOpenRtbMapperTest {
       new MetricRegistry(),
       TestUtil.getMetadata(),
       OpenRtbJsonFactory.create(),
-      new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
       ImmutableList.of(DoubleClickLinkMapper.INSTANCE));
 
   @Test
@@ -77,7 +75,7 @@ public class DoubleClickOpenRtbMapperTest {
     NetworkBid.BidResponse.Ad ad = dcResponse.getAd(0);
     assertEquals(1, ad.getAdslotCount());
     assertEquals(1, ad.getAdslot(0).getId());
-    assertFalse(ad.getAdslot(0).hasAdgroupId());
+    assertFalse(ad.getAdslot(0).hasBillingId());
     assertEquals(1200000, ad.getAdslot(0).getMaxCpmMicros());
   }
 
@@ -206,7 +204,6 @@ public class DoubleClickOpenRtbMapperTest {
             new MetricRegistry(),
             TestUtil.getMetadata(),
             OpenRtbJsonFactory.create(),
-            new DoubleClickCrypto.Hyperlocal(TestUtil.KEYS),
             extMappers.build());
 
         NetworkBid.BidRequest.Builder dcRequest = TestData.newRequest(size, coppa, impNativ);
@@ -249,7 +246,7 @@ public class DoubleClickOpenRtbMapperTest {
             assertEquals(size >= 2, banner.hasTopframe());
           } else if (impNativ) {
             Native nativ = imp.getNative();
-            assertEquals(size == 0 ? 5 : 10, nativ.getRequest().getAssetsCount());
+            assertEquals(size == 0 ? 5 : 10, nativ.getRequestNative().getAssetsCount());
           }
 
           Bid.Builder bid = TestData.newBid(multiBid || imp.getInstl());
@@ -269,7 +266,7 @@ public class DoubleClickOpenRtbMapperTest {
             Ad ad = dcResponse.getAd(0);
             assertEquals(testDesc,
                 ((size > 1 && multiBid) || imp.getInstl()) && !impNativ, ad.hasWidth());
-            assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasAdgroupId());
+            assertEquals(testDesc, size > 2 && multiBid, ad.getAdslot(0).hasBillingId());
           }
         }
       }

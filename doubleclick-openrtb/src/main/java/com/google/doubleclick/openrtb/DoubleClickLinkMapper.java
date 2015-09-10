@@ -72,10 +72,10 @@ public class DoubleClickLinkMapper extends ExtMapper {
     return true;
   }
 
-  @Override public boolean toOpenRtbGeo(NetworkBid.BidRequest dcRequest,
-      OpenRtb.BidRequest.Geo.Builder geo, NetworkBid.BidRequest.HyperlocalSet hyperlocalSet) {
-    if (hyperlocalSet != null) {
-      geo.setExtension(DcExt.hyperLocal, hyperlocalSet);
+  @Override public boolean toOpenRtbGeo(
+      NetworkBid.BidRequest dcRequest, OpenRtb.BidRequest.Geo.Builder geo) {
+    if (dcRequest.getHyperlocalSet() != null) {
+      geo.setExtension(DcExt.hyperLocal, dcRequest.getHyperlocalSet());
       return true;
     } else {
       return false;
