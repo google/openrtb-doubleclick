@@ -51,6 +51,7 @@ public class DoubleClickOpenRtbNativeMapper {
   private final OpenRtbNativeJsonReader jsonReader;
   private final Counter invalid = new Counter();
   private final Counter incomplete = new Counter();
+  private final Counter unsupported = new Counter();
 
   @Inject
   public DoubleClickOpenRtbNativeMapper(
@@ -62,21 +63,34 @@ public class DoubleClickOpenRtbNativeMapper {
     Class<? extends DoubleClickOpenRtbNativeMapper> cls = getClass();
     metricRegistry.register(MetricRegistry.name(cls, "invalid"), invalid);
     metricRegistry.register(MetricRegistry.name(cls, "incomplete"), incomplete);
+    metricRegistry.register(MetricRegistry.name(cls, "unsupported"), unsupported);
   }
 
   public NetworkBid.BidResponse.Ad.NativeAd.Builder buildNativeResponse(Bid bid, Imp matchingImp) {
     NativeResponse natResp;
-    if (bid.hasAdmNative()) {
-      natResp = bid.getAdmNative();
-    } else if (jsonReader != null) {
-      try {
-        natResp = jsonReader.readNativeResponse(bid.getAdm());
-      } catch (IOException e) {
-        throw new MapperException("Failed parsing adm as a Native response: " + e.getMessage());
-      }
-    } else {
-      throw new MapperException("Not configured for OpenRTB/JSON native ads");
+
+    switch (bid.getAdmOneofCase()) {
+      case ADM_NATIVE:
+        natResp = bid.getAdmNative();
+        break;
+
+      case ADM:
+        if (jsonReader != null) {
+          try {
+            natResp = jsonReader.readNativeResponse(bid.getAdm());
+          } catch (IOException e) {
+            throw new MapperException("Failed parsing adm as a Native response: " + e.getMessage());
+          }
+        } else {
+          throw new MapperException("Not configured for OpenRTB/JSON native ads");
+        }
+        break;
+
+      case ADMONEOF_NOT_SET:
+      default:
+        throw new MapperException("Missing adm or adm_native");
     }
+
     return buildRespAd(matchingImp.getNative().getRequestNative(), natResp);
   }
 
@@ -101,8 +115,7 @@ public class DoubleClickOpenRtbNativeMapper {
       if (matchingReqAsset == null) {
         invalid.inc();
         if (logger.isDebugEnabled()) {
-          logger.debug(
-              "Asset.id doesn't match any request native asset: {}", asset.getId());
+          logger.debug("Asset.id doesn't match any request native asset: {}", asset.getId());
         }
         continue;
       }
@@ -110,14 +123,33 @@ public class DoubleClickOpenRtbNativeMapper {
       if (asset.hasLink()) {
         dcNatAd.setStore(asset.getLink().getUrl());
       }
-      if (asset.hasTitle()) {
-        buildRespTitle(asset, matchingReqAsset, dcNatAd);
-      }
-      if (asset.hasImg()) {
-        buildRespImg(asset, matchingReqAsset, dcNatAd);
-      }
-      if (asset.hasData()) {
-        buildRespData(asset, matchingReqAsset, dcNatAd);
+
+      switch (asset.getAssetOneofCase()) {
+        case TITLE:
+          buildRespTitle(asset, matchingReqAsset, dcNatAd);
+          break;
+
+        case IMG:
+          buildRespImg(asset, matchingReqAsset, dcNatAd);
+          break;
+
+        case DATA:
+          buildRespData(asset, matchingReqAsset, dcNatAd);
+          break;
+
+        case VIDEO:
+          unsupported.inc();
+          if (logger.isDebugEnabled()) {
+            logger.debug("Video Asset not supported: {}", asset.getId());
+          }
+          continue;
+
+        case ASSETONEOF_NOT_SET:
+          incomplete.inc();
+          if (logger.isDebugEnabled()) {
+            logger.debug("Asset is empty, need one of title/img/data: {}", asset.getId());
+          }
+          continue;
       }
     }
 
