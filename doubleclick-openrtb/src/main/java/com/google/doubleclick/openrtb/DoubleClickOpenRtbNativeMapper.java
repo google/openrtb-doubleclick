@@ -67,7 +67,31 @@ public class DoubleClickOpenRtbNativeMapper {
   }
 
   public NetworkBid.BidResponse.Ad.NativeAd.Builder buildNativeResponse(Bid bid, Imp matchingImp) {
+    NativeRequest natReq;
     NativeResponse natResp;
+
+    switch (matchingImp.getNative().getRequestOneofCase()) {
+      case REQUEST_NATIVE:
+        natReq = matchingImp.getNative().getRequestNative();
+        break;
+
+      case REQUEST:
+        if (jsonReader != null) {
+          try {
+            natReq = jsonReader.readNativeRequest(matchingImp.getNative().getRequest());
+          } catch (IOException e) {
+            throw new MapperException(
+                "Failed parsing the matching Native request: " + e.getMessage());
+          }
+        } else {
+          throw new MapperException("Not configured for OpenRTB/JSON native ads");
+        }
+        break;
+
+      case REQUESTONEOF_NOT_SET:
+      default:
+        throw new MapperException("Missing matching Native request or request_native");
+    }
 
     switch (bid.getAdmOneofCase()) {
       case ADM_NATIVE:
@@ -91,7 +115,7 @@ public class DoubleClickOpenRtbNativeMapper {
         throw new MapperException("Missing adm or adm_native");
     }
 
-    return buildRespAd(matchingImp.getNative().getRequestNative(), natResp);
+    return buildRespAd(natReq, natResp);
   }
 
   protected NetworkBid.BidResponse.Ad.NativeAd.Builder buildRespAd(
