@@ -4,7 +4,8 @@ RELEASE NOTES
 ## Version 0.9.6, ??-09-2015
 * DoubleClick protocol v.69: Adds unencrypted versions of several
   fields (SSL-exclusive); the mapper doesn't support the encrypted
-  hyperlocal anymore. Adds `Video.playback_method`.  Replaces / renames
+  hyperlocal anymore. Adds `Video.playback_method`, which now allows
+  mapping OpenRTB's `Video.playbackmethod`.  Replaces / renames
   fields `adgroup_id`->`billing_d`.
 
 ## Version 0.9.5, 02-09-2015

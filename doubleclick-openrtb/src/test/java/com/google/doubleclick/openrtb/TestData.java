@@ -289,6 +289,7 @@ public class TestData {
           .addAllHeight(createSizes(size, 200));
       if (size >= 2) {
         video.setVideoadStartDelay(5);
+        video.setPlaybackMethod(Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_OFF);
         compSlot.addCreativeFormat(CreativeFormat.IMAGE_CREATIVE);
         ContentAttributes.Builder vcont = ContentAttributes.newBuilder();
         if (size >= 3) {
