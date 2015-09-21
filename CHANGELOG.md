@@ -7,6 +7,8 @@ RELEASE NOTES
   hyperlocal anymore. Adds `Video.playback_method`, which now allows
   mapping OpenRTB's `Video.playbackmethod`.  Replaces / renames
   fields `adgroup_id`->`billing_d`.
+* Updated mapping for MRAD: The DoubleClick creative attribute 32
+  changed, now it means any MRAID (1 or 2) not just MRAID 1.
 
 ## Version 0.9.5, 02-09-2015
 * DoubleClick protocol v.68: Changes `MatchingAdData.adgroup_id` to
