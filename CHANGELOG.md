@@ -1,12 +1,15 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 0.9.6, ??-09-2015
+## Version 0.9.6, 22-09-2015
 * DoubleClick protocol v.69: Adds unencrypted versions of several
   fields (SSL-exclusive); the mapper doesn't support the encrypted
   hyperlocal anymore. Adds `Video.playback_method`, which now allows
   mapping OpenRTB's `Video.playbackmethod`.  Replaces / renames
-  fields `adgroup_id`->`billing_d`.
+  fields `adgroup_id`->`billing_id`.
+* Updated mapping for MRAID: The DoubleClick creative attribute 32
+  changed, now it means any MRAID (1 or 2) not just MRAID 1. Removed
+  the confusing mapping of OpenRTB's `USER_INTERACTIVE` attribute.
 
 ## Version 0.9.5, 02-09-2015
 * DoubleClick protocol v.68: Changes `MatchingAdData.adgroup_id` to

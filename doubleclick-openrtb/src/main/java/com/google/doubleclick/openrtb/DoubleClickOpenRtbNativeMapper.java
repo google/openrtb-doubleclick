@@ -269,10 +269,10 @@ public class DoubleClickOpenRtbNativeMapper {
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
     NativeRequest.Builder nativReq = NativeRequest.newBuilder().setVer("1.0");
 
-    if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
+    if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: MRAID */)) {
       impNativ.addApi(APIFramework.MRAID_1);
+      impNativ.addApi(APIFramework.MRAID_2);
     }
-    impNativ.addApi(APIFramework.MRAID_2);
 
     int id = 0;
 

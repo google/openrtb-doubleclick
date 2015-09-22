@@ -735,10 +735,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       video.addApi(APIFramework.VPAID_1);
       video.addApi(APIFramework.VPAID_2);
     }
-    if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
+    if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: MRAID */)) {
       video.addApi(APIFramework.MRAID_1);
+      video.addApi(APIFramework.MRAID_2);
     }
-    video.addApi(APIFramework.MRAID_2);
 
     if (dcSlot.getWidthCount() == 1) {
       video.setW(dcSlot.getWidth(0));

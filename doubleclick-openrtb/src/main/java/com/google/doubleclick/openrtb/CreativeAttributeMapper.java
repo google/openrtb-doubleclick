@@ -56,7 +56,6 @@ public class CreativeAttributeMapper {
       ImmutableMultimap.<Integer, CreativeAttribute>builder()
           .putAll(1, CreativeAttribute.TEXT_ONLY)
           .putAll(28, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
-          .putAll(32, CreativeAttribute.USER_INTERACTIVE)
           .putAll(44, CreativeAttribute.AD_CAN_BE_SKIPPED)
           .build());
 
