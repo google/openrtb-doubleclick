@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.69: + beta: CL 78263652
+// Synchronized with v.70: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2015 Google Inc. All Rights Reserved.
@@ -187,6 +187,11 @@ message BidRequest {
   // documentation for a list of ids. This is only set if the site is not
   // anonymous and the publisher allows site targeting.
   optional int32 seller_network_id = 41;
+  // Id for the partner that provides this inventory. This is only set when
+  // seller_network_id is also set and further partner information beyond the
+  // seller_network_id is also available. The value of the partner_id is not
+  // meaningful beyond providing a stable identifier.
+  optional fixed64 partner_id = 52;
 
   // The URL of the page with parameters removed. This is only set if the site
   // is not anonymous and the publisher allows site targeting. You can use
@@ -235,10 +240,72 @@ message BidRequest {
   // technical documentation for a list of ids.
   repeated int32 site_list_id = 36;
 
+  // Information about the device.
+  message Device {
+    // The type of device on which the ad will be shown.
+    enum DeviceType {
+      UNKNOWN_DEVICE = 0;
+      HIGHEND_PHONE = 1;
+      TABLET = 2;
+      PERSONAL_COMPUTER = 3;  // Desktop or laptop devices.
+      CONNECTED_TV = 4;  // Includes both TVs and set-top boxes.
+      GAME_CONSOLE = 5;
+    }
+    optional DeviceType device_type = 1 [default = UNKNOWN_DEVICE];
+
+    // The platform of the device. Examples: android, iphone, palm
+    optional string platform = 2;
+
+    // The brand of the device, e.g. Nokia, Samsung.
+    optional string brand = 3 [default = ""];
+
+    // The model of the device, e.g. N70, Galaxy.
+    optional string model = 4 [default = ""];
+
+    // Contains the OS version of the platform. For instance, for Android 2,
+    // major=2, minor=0. For iPhone 3.3.1, major=3 and minor=3.
+    message OsVersion {
+      optional int32 major = 1;
+      optional int32 minor = 2;
+      optional int32 micro = 3;
+    }
+    // The OS version; e.g. 2 for Android 2.1, or 3.3 for iOS 3.3.1.
+    optional OsVersion os_version = 5;
+
+    // Unique identifer for the mobile carrier if the device is connected to the
+    // internet via a carrier (as opposed to via WiFi). To look up carrier name
+    // and country from carrier ID, please refer to:
+    // https://developers.google.com/adwords/api/docs/appendix/mobilecarriers.
+    optional int64 carrier_id = 6;
+
+    // The width of the device screen in pixels.
+    optional int32 screen_width = 7 [default = 0];
+
+    // The height of the device screen in pixels.
+    optional int32 screen_height = 8 [default = 0];
+
+    // Used for high-density devices (e.g. iOS retina displays).  A non-default
+    // value indicates that the nominal screen size (with pixels as the unit)
+    // does not describe the actual number of pixels in the screen. For example,
+    // nominal width and height may be 320x640 for a screen that actually has
+    // 640x1080 pixels, in which case screen_width=320, screen_height=640, and
+    // screen_pixel_ratio_millis=2000, since each axis has twice as many pixels
+    // as its dimensions would indicate.
+    optional int32 screen_pixel_ratio_millis = 9 [default = 0];
+
+    enum ScreenOrientation {
+      UNKNOWN_ORIENTATION = 0;
+      PORTRAIT = 1;
+      LANDSCAPE = 2;
+    }
+    // The screen orientation of the device when the ad request is sent.
+    optional ScreenOrientation screen_orientation = 10 [
+        default = UNKNOWN_ORIENTATION];
+  }
+  optional Device device = 54;
+
   // Additional key-value attributes. Currently unused.
   message KeyValue {
-    optional string key = 1;
-    optional string value = 2;
   }
   repeated KeyValue key_value = 38;
 
@@ -246,35 +313,6 @@ message BidRequest {
   // either a smartphone or a tablet. This is present for ad queries both from
   // mobile devices browsing the web and from mobile apps.
   message Mobile {
-    // The platform of the mobile device. Examples: android, iphone, palm
-    optional string platform = 3;
-
-    // The brand of the mobile device, e.g. Nokia, Samsung.
-    optional string brand = 12;
-
-    // The model of the mobile device, e.g. N70, Galaxy.
-    optional string model = 13;
-
-    // This message contains the OS version of the platform. For instance, for
-    // Android 2.1, os_version_major=2, os_version_minor=1, and os_version_micro
-    // will remain unpopulated. For iPhone 3.3.1, os_version_major=3,
-    // os_version_minor=3, and os_version_micro=1.
-    message DeviceOsVersion {
-      optional int32 os_version_major = 1;
-      optional int32 os_version_minor = 2;
-      optional int32 os_version_micro = 3;
-    }
-
-    // The OS version; e.g. 2.1 for Android 2.1, or 3.3.1 for iOS 3.3.1.
-    optional DeviceOsVersion os_version = 14;
-
-    // This is the identifier uniquely identifies the mobile carrier when the
-    // mobile device is connected to the internet via the carrier (as opposed
-    // to via WiFi). To look up carrier name and country from carrier ID,
-    // please refer to
-    // https://developers.google.com/adwords/api/docs/appendix/mobilecarriers.
-    optional int64 carrier_id = 18;
-
     // If true, then this request is from a mobile application. Will always be
     // true when app_id is set. May also be true for anonymous inventory, in
     // which case anonymous_id will be set.
@@ -285,28 +323,6 @@ message BidRequest {
     // this is the app-store id. For Android devices, this is the fully
     // qualified package name. Examples: 343200656, com.rovio.angrybirds
     optional string app_id = 6;
-
-    // The type of mobile device in which the ad will be shown.
-    enum MobileDeviceType {
-      UNKNOWN = 0;
-      HIGHEND_PHONE = 1;
-      TABLET = 2;
-    }
-    optional MobileDeviceType mobile_device_type = 8 [default = UNKNOWN];
-
-    // The width of the mobile device screen in pixels.
-    optional int32 screen_width = 15;
-
-    // The height of the mobile device screen in pixels.
-    optional int32 screen_height = 16;
-
-    // The screen orientation of the device when the ad request is sent.
-    enum ScreenOrientation {
-      SCREEN_ORIENTATION_UNKNOWN = 0;
-      SCREEN_ORIENTATION_PORTRAIT = 1;
-      SCREEN_ORIENTATION_LANDSCAPE = 2;
-    }
-    optional int32 screen_orientation = 9 [default = 0];
 
     // If true, then this is a mobile full screen ad request.
     optional bool is_interstitial_request = 10 [default = false];
@@ -322,15 +338,6 @@ message BidRequest {
     // For a mobile web request, this field indicates whether the page is
     // optimized for mobile browsers on high-end mobile phones.
     optional bool is_mobile_web_optimized = 17 [default=false];
-
-    // Used for high-density devices (e.g. iOS retina displays), where non-
-    // default value indicates that the nominal screen size (with pixels as the
-    // unit) does not describe the actual number of pixels in the screen. For
-    // example, nominal width and height may be 320x640 for a screen that
-    // actually has 640x1080 pixels, in which case screen_width=320,
-    // screen_height=640, and device_pixel_ratio_millis=2000, since each axis
-    // has twice as many pixels as its dimensions would indicate.
-    optional int32 device_pixel_ratio_millis = 19 [default=1000];
 
     // Apple's identifier for advertising (IDFA) as described at
     // https://support.google.com/adxbuyer/answer/3221407 or Android's
@@ -355,7 +362,7 @@ message BidRequest {
     // when using an SSL connection. This field is a 16 byte MD5.
     optional bytes hashed_idfa = 28;
 
-    // Only set if the the BidRequest contains one or more user_data_treatment
+    // Only set if the BidRequest contains one or more user_data_treatment
     // value. If constrained_usage_encrypted_advertising_id or
     // constrained_usage_encrypted_hashed_idfa is set, then the corresponding
     // non-constrained field is not set. You must be whitelisted for all
@@ -384,8 +391,34 @@ message BidRequest {
     // These are deprecated. Please ignore.
     optional string DEPRECATED_app_name = 1;
     optional string DEPRECATED_company_name = 2;
+    optional string DEPRECATED_platform = 3;
     optional string DEPRECATED_carrier_name = 4;
     optional string DEPRECATED_carrier_country = 5;
+    enum MobileDeviceType {
+      UNKNOWN = 0;
+      HIGHEND_PHONE = 1;
+      TABLET = 2;
+    }
+    optional MobileDeviceType DEPRECATED_mobile_device_type = 8
+        [default = UNKNOWN];
+    enum ScreenOrientation {
+      SCREEN_ORIENTATION_UNKNOWN = 0;
+      SCREEN_ORIENTATION_PORTRAIT = 1;
+      SCREEN_ORIENTATION_LANDSCAPE = 2;
+    }
+    optional int32 DEPRECATED_screen_orientation = 9 [default = 0];
+    optional string DEPRECATED_brand = 12;
+    optional string DEPRECATED_model = 13;
+    message DeviceOsVersion {
+      optional int32 os_version_major = 1;
+      optional int32 os_version_minor = 2;
+      optional int32 os_version_micro = 3;
+    }
+    optional DeviceOsVersion DEPRECATED_os_version = 14;
+    optional int32 DEPRECATED_screen_width = 15;
+    optional int32 DEPRECATED_screen_height = 16;
+    optional int64 DEPRECATED_carrier_id = 18;
+    optional int32 DEPRECATED_device_pixel_ratio_millis = 19 [default = 1000];
   }
   optional Mobile mobile = 28;
 
