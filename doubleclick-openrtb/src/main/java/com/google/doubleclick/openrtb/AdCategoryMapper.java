@@ -52,7 +52,8 @@ public class AdCategoryMapper {
   private static ImmutableMap<ContentCategory, String> openrtbDesc;
 
   static {
-    final ImmutableSetMultimap.Builder<ContentCategory, Integer> data = ImmutableSetMultimap.builder();
+    final ImmutableSetMultimap.Builder<ContentCategory, Integer> data =
+        ImmutableSetMultimap.builder();
     final Map<ContentCategory, String> openrtbDesc = new LinkedHashMap<>();
     final Map<Integer, String> dcDesc = new LinkedHashMap<>();
 
@@ -92,11 +93,6 @@ public class AdCategoryMapper {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
 
-  public static ImmutableSet<Integer> toDoubleClick(ContentCategory openrtb) {
-    ImmutableSet<Integer> dc = openrtbToDc.get(openrtb);
-    return dc.contains(0) && dc.size() > 1 ? ImmutableSet.<Integer>of(0) : dc;
-  }
-
   public static EnumSet<ContentCategory> toOpenRtb(
       Collection<Integer> dcList, @Nullable EnumSet<ContentCategory> openrtbSet) {
     EnumSet<ContentCategory> ret = openrtbSet == null
@@ -106,6 +102,11 @@ public class AdCategoryMapper {
       ret.addAll(toOpenRtb(dc));
     }
     return ret;
+  }
+
+  public static ImmutableSet<Integer> toDoubleClick(ContentCategory openrtb) {
+    ImmutableSet<Integer> dc = openrtbToDc.get(openrtb);
+    return dc.contains(0) && dc.size() > 1 ? ImmutableSet.<Integer>of(0) : dc;
   }
 
   public static Set<Integer> toDoubleClick(

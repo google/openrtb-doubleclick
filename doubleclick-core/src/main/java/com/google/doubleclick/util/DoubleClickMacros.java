@@ -20,11 +20,11 @@ package com.google.doubleclick.util;
 /**
  * See <a href="https://developers.google.com/ad-exchange/rtb/response-guide#specifying-macros">
  * DoubleClick Ad Exchange's documentation for bid response macros</a>.
- * <p>
- * Specify a macro as part of an HTML snippet in the format %%MACRO%%, where MACRO is one of the
+ *
+ * <p>Specify a macro as part of an HTML snippet in the format %%MACRO%%, where MACRO is one of the
  * supported macros listed in the table below.
- * <p>
- * Google requires that you use use either the CLICK_URL_UNESC or the CLICK_URL_ESC macros within
+ *
+ * <p>Google requires that you use use either the CLICK_URL_UNESC or the CLICK_URL_ESC macros within
  * the creative of the third-party served ad. Google uses the CLICK_URL macros for click tracking.
  * To use a macro, include it in the ad so that the URL gets fetched when someone clicks on it.
  * The return value of the fetch is a redirect to another URL that you append to the CLICK_URL.

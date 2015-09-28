@@ -28,10 +28,11 @@ public class CreativeAttributeMapperTest {
   @Test
   public void testMapper() {
     assertEquals(
-        ImmutableSet.of(1),
-        CreativeAttributeMapper.toDoubleClick(ImmutableList.of(CreativeAttribute.TEXT_ONLY), null));
+        ImmutableSet.of(28),
+        CreativeAttributeMapper.toDoubleClick(
+            ImmutableList.of(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED), null));
     assertEquals(
-        ImmutableSet.of(CreativeAttribute.TEXT_ONLY),
-        CreativeAttributeMapper.toOpenRtb(ImmutableList.of(1), null));
+        ImmutableSet.of(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED),
+        CreativeAttributeMapper.toOpenRtb(ImmutableList.of(28), null));
   }
 }

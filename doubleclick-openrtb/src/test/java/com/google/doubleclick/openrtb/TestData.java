@@ -116,23 +116,6 @@ public class TestData {
     return newRequest(0, false, false).build();
   }
 
-  static List<Integer> createSizes(int size, int base) {
-    ImmutableList.Builder<Integer> sizes = ImmutableList.builder();
-    for (int i = 0; i < size; ++i) {
-      sizes.add(base + i);
-    }
-    return sizes.build();
-  }
-
-  @SafeVarargs
-  static <T> List<T> sublist(int size, T... items) {
-    ImmutableList.Builder<T> sizes = ImmutableList.builder();
-    for (int i = 0; i < min(size, items.length); ++i) {
-      sizes.add(items[i]);
-    }
-    return sizes.build();
-  }
-
   public static NetworkBid.BidRequest.Builder newRequest(int size, boolean coppa, boolean nativ) {
     NetworkBid.BidRequest.Builder req = NetworkBid.BidRequest.newBuilder()
         .setId(TestUtil.REQUEST_ID)
@@ -345,5 +328,22 @@ public class TestData {
 
   static Builder newNativeAdTemplate(int field) {
     return NativeAdTemplate.newBuilder().setRecommendedFields(field);
+  }
+
+  static List<Integer> createSizes(int size, int base) {
+    ImmutableList.Builder<Integer> sizes = ImmutableList.builder();
+    for (int i = 0; i < size; ++i) {
+      sizes.add(base + i);
+    }
+    return sizes.build();
+  }
+
+  @SafeVarargs
+  static <T> List<T> sublist(int size, T... items) {
+    ImmutableList.Builder<T> sizes = ImmutableList.builder();
+    for (int i = 0; i < min(size, items.length); ++i) {
+      sizes.add(items[i]);
+    }
+    return sizes.build();
   }
 }

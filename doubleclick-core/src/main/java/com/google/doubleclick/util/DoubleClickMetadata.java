@@ -53,11 +53,11 @@ import javax.inject.Singleton;
  * See <a href="https://developers.google.com/ad-exchange/rtb/downloads">
  * DoubleClick Ad Exchange Real-Time Bidding Protocol</a>, this class mostly encapsulates
  * the .txt and .csv files obtained there (loaded by HTTP at startup).
- * <p>
- * Note: validation is lenient: invalid codes are logged, but no failure is raised here
+ *
+ * <p>Note: validation is lenient: invalid codes are logged, but no failure is raised here
  * if the bidder is using old metadata. If a code is really invalid, AdX may reject the bid.
- * <p>
- * This class is threadsafe, as well as all nested helper classes. It's recommended to create
+ *
+ * <p>This class is threadsafe, as well as all nested helper classes. It's recommended to create
  * a single instance because its initialization can be slow (up to a few seconds).
  */
 @Singleton

@@ -67,7 +67,7 @@ public class TestUtil {
    *
    * @param different1 Some object, optionally Comparable.
    * @param different2 Some independent object that's not equal to different1. If the objects
-   * are Comparable, you should provide different1 < different2.
+   *     are Comparable, you should provide different1 < different2.
    * @return a map that contains <code>{ different1 : "0", different2 : "1" }</code>.
    */
   @SuppressWarnings("unchecked")
@@ -102,7 +102,7 @@ public class TestUtil {
    * @param equal1 Some object, optionally Comparable.
    * @param equal2 Some independent object that's equal to equal1
    * @param different Some independent object that's not equal to equal1 or equal2. If the objects
-   * are Comparable, you should provide equals1 < different.
+   *     are Comparable, you should provide equals1 < different.
    */
   @SuppressWarnings("unchecked")
   public static <T> Map<T, String> testCommonMethods(T equal1, T equal2, T different) {
@@ -167,14 +167,6 @@ public class TestUtil {
     }
   }
 
-  private static <T extends Throwable> void testParameterAnnotations(Constructor<T> constr) {
-    Annotation[][] anns = constr.getParameterAnnotations();
-
-    for (Annotation[] ann : anns) {
-      assertTrue(ann.length == 1 && ann[0] instanceof Nullable);
-    }
-  }
-
   public static void testCommonException(Exception e) {
     try {
       e.toString();
@@ -187,6 +179,14 @@ public class TestUtil {
   public static void testCommonEnum(Enum<?>[] e) {
     for (int i = 1; i < e.length; ++i) {
       testCommonMethods(e[i - 1], e[i]);
+    }
+  }
+
+  private static <T extends Throwable> void testParameterAnnotations(Constructor<T> constr) {
+    Annotation[][] anns = constr.getParameterAnnotations();
+
+    for (Annotation[] ann : anns) {
+      assertTrue(ann.length == 1 && ann[0] instanceof Nullable);
     }
   }
 }

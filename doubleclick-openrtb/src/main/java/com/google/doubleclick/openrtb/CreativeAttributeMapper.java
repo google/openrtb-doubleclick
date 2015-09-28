@@ -16,9 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.openrtb.OpenRtb.CreativeAttribute;
 
 import java.util.Collection;
@@ -32,39 +32,21 @@ import javax.annotation.Nullable;
  * Maps between AdX creative attributes and OpenRTB's {@link CreativeAttribute}.
  */
 public class CreativeAttributeMapper {
-  private static ImmutableSetMultimap<CreativeAttribute, Integer> openrtbToDc =
-      ImmutableSetMultimap.<CreativeAttribute, Integer>builder()
-          // Empty mappings listed only for documentation
-          .putAll(CreativeAttribute.AD_CAN_BE_SKIPPED, 44)
-          .putAll(CreativeAttribute.ANNOYING)
-          .putAll(CreativeAttribute.AUDIO_AUTO_PLAY)
-          .putAll(CreativeAttribute.AUDIO_USER_INITIATED)
-          .putAll(CreativeAttribute.EXPANDABLE_AUTOMATIC)
-          .putAll(CreativeAttribute.EXPANDABLE_CLICK_INITIATED)
-          .putAll(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED, 28)
-          .putAll(CreativeAttribute.HAS_AUDIO_ON_OFF_BUTTON)
-          .putAll(CreativeAttribute.POP)
-          .putAll(CreativeAttribute.PROVOCATIVE_OR_SUGGESTIVE)
-          .putAll(CreativeAttribute.SURVEYS)
-          .putAll(CreativeAttribute.TEXT_ONLY, 1)
-          .putAll(CreativeAttribute.USER_INTERACTIVE)
-          .putAll(CreativeAttribute.VIDEO_IN_BANNER_AUTO_PLAY, 2, 22)
-          .putAll(CreativeAttribute.VIDEO_IN_BANNER_USER_INITIATED, 2, 22)
-          .putAll(CreativeAttribute.WINDOWS_DIALOG_OR_ALERT_STYLE)
+  private static ImmutableMap<CreativeAttribute, Integer> openrtbToDc =
+      ImmutableMap.<CreativeAttribute, Integer>builder()
+          // Note: map only attributes from the publisher-excludables
+          // or buyer-declarable lists (that have OpenRTB mapping).
+          .put(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED, 28 /* ROLLOVER_TO_EXPAND */)
+          .put(CreativeAttribute.VIDEO_IN_BANNER_AUTO_PLAY, 22 /*VAST_VIDEO */)
+          .put(CreativeAttribute.VIDEO_IN_BANNER_USER_INITIATED, 22 /* VAST_VIDEO */)
       .build();
   private static ImmutableSet<CreativeAttribute>[] dcToOpenrtb = MapperUtil.multimapIntToEnumSets(
       ImmutableMultimap.<Integer, CreativeAttribute>builder()
-          .putAll(1, CreativeAttribute.TEXT_ONLY)
-          .putAll(28, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
-          .putAll(44, CreativeAttribute.AD_CAN_BE_SKIPPED)
+          .putAll(28 /* ROLLOVER_TO_EXPAND */, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
           .build());
 
   public static ImmutableSet<CreativeAttribute> toOpenRtb(int dc) {
     return MapperUtil.get(dcToOpenrtb, dc);
-  }
-
-  public static ImmutableSet<Integer> toDoubleClick(CreativeAttribute openrtb) {
-    return openrtbToDc.get(openrtb);
   }
 
   public static EnumSet<CreativeAttribute> toOpenRtb(
@@ -78,11 +60,18 @@ public class CreativeAttributeMapper {
     return ret;
   }
 
+  public static Integer toDoubleClick(CreativeAttribute openrtb) {
+    return openrtbToDc.get(openrtb);
+  }
+
   public static Set<Integer> toDoubleClick(
       Collection<CreativeAttribute> openrtbList, @Nullable Set<Integer> dcSet) {
     Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (CreativeAttribute openrtb : openrtbList) {
-      ret.addAll(toDoubleClick(openrtb));
+      Integer o = toDoubleClick(openrtb);
+      if (o != null) {
+        ret.add(o);
+      }
     }
     return ret;
   }

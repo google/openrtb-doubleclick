@@ -25,7 +25,8 @@ import javax.annotation.Nullable;
  * and OpenRTB's {@link DeviceType}.
  */
 public class DeviceTypeMapper {
-  @Nullable public static DeviceType toOpenRtb(com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType dc) {
+  @Nullable public static DeviceType toOpenRtb(
+      com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType dc) {
     switch (dc) {
       case HIGHEND_PHONE:
         return DeviceType.PHONE;
@@ -43,7 +44,8 @@ public class DeviceTypeMapper {
     }
   }
 
-  @Nullable public static com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType toDoubleClick(DeviceType openrtb) {
+  @Nullable public static com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType
+  toDoubleClick(DeviceType openrtb) {
     switch (openrtb) {
       case CONNECTED_TV:
         return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.CONNECTED_TV;

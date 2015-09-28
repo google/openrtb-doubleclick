@@ -37,12 +37,12 @@ final class ProtoUtils {
    * @param objs Message-or-builder objects
    * @param filter Function that returns {@code true} to retain an object, {@code false} to discard
    * @return Retained objects. If some elements are retained and others are discarded,
-   * this will be a new, mutable {@link List} that contains only the retained elements.
-   * If all elements are retained, returns the same, unmodified input sequence.
-   * If all elements are discarded, returns an immutable, empty sequence
+   *     this will be a new, mutable {@link List} that contains only the retained elements.
+   *     If all elements are retained, returns the same, unmodified input sequence.
+   *     If all elements are discarded, returns an immutable, empty sequence
    */
   public static <M extends MessageLiteOrBuilder>
-  Iterable<M> filter(Iterable<M> objs, Predicate<M> filter) {
+      Iterable<M> filter(Iterable<M> objs, Predicate<M> filter) {
 
     int i = 0;
     for (M obj : objs) {

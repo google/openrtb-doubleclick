@@ -53,8 +53,8 @@ public class GeoTarget {
 
   /**
    * Unique and persistent assigned ID.
-   * <p>
-   * Example: 1023191.
+   *
+   * <p>Example: 1023191.
    */
   public final int criteriaId() {
     return criteriaId;
@@ -62,8 +62,8 @@ public class GeoTarget {
 
   /**
    * Best available English name of the geo target.
-   * <p>
-   * Example: "New York".
+   *
+   * <p>Example: "New York".
    */
   public final String name() {
     return name;
@@ -74,8 +74,8 @@ public class GeoTarget {
    * and that of its parent and country. This field is meant only for disambiguating similar
    * target names—it is not yet supported in LocationCriterionService
    * (use location names or criteria IDs instead).
-   * <p>
-   * Example: "New York,New York,United States".
+   *
+   * <p>Example: "New York,New York,United States".
    */
   public final String canonicalName() {
     return key.canonicalName;
@@ -89,8 +89,8 @@ public class GeoTarget {
    * The immediate parent of this target. Computed from the canonical names (as indicated
    * by DoubleClick documentation, you shouldn't trust the "Parent Criteria IDs" column
    * so that's not even mapped to this model class).
-   * <p>
-   * Example: (New York city target) returns (New York state)
+   *
+   * <p>Example: (New York city target) returns (New York state)
    */
   @Nullable public final GeoTarget canonParent() {
     return canonParent;
@@ -106,8 +106,8 @@ public class GeoTarget {
    * which is not the preferred option but sometimes contains more detailed information
    * than the canonical names.
    * You should prefer {@link #canonParent()}, using this method as last resort.
-   * <p>
-   * Example: (33611 postal code) returns (Tampa city); which is the only way to get
+   *
+   * <p>Example: (33611 postal code) returns (Tampa city); which is the only way to get
    * that city, since the parent by canonical name is (Florida state), skipping the city.
    */
   @Nullable public final GeoTarget idParent() {
@@ -121,8 +121,8 @@ public class GeoTarget {
 
   /**
    * The ISO-3166-1 alpha-2 country code that is associated with the target.
-   * <p>
-   * Example: "US". Notice that OpenRTB uses alpha-3 codes (like "USA"), so you may have
+   *
+   * <p>Example: "US". Notice that OpenRTB uses alpha-3 codes (like "USA"), so you may have
    * to convert that via {@link DoubleClickMetadata#countryCodes()}.
    */
   public final String countryCode() {
@@ -131,8 +131,8 @@ public class GeoTarget {
 
   /**
    * The target type.
-   * <p>
-   * Example: (New York city target) returns {@link Type#CITY}
+   *
+   * <p>Example: (New York city target) returns {@link Type#CITY}
    */
   public final GeoTarget.Type type() {
     return key.type;
@@ -140,8 +140,8 @@ public class GeoTarget {
 
   /**
    * Finds an ancestor of a specific type, if possible.
-   * <p>
-   * Example: (New York city target, {@link Type#COUNTRY}) returns (US country target)
+   *
+   * <p>Example: (New York city target, {@link Type#COUNTRY}) returns (US country target)
    */
   @Nullable public GeoTarget getCanonAncestor(GeoTarget.Type type) {
     for (GeoTarget target = this; target != null; target = target.canonParent()) {
@@ -271,8 +271,8 @@ public class GeoTarget {
    * so we need a special case: if the name contains a comma, use its length as a prefix
    * for splitting. (Cannot use this rule for every record either, because that would fail
    * in a few records like "Burgos" / "Province of Burgos,Castile and Leon,Spain").
-   * <p>
-   * Some records fail to match the parent by canonical name, for example
+   *
+   * <p>Some records fail to match the parent by canonical name, for example
    * "Zalau,Salaj County,Romania", the parent record is "Salaj,Romania".
    */
   String findCanonParentName() {

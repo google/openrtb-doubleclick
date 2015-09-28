@@ -46,8 +46,8 @@ import javax.inject.Singleton;
  * Bids with any validation problems will cause debug logs and metric updates.
  * Fatal validation errors (that would cause the bid to be rejected by DoubleClick Ad Exchange)
  * will also be removed from the response.
- * <p>
- * This class is threadsafe. Recommended use is as a singleton, but you may also want to create
+ *
+ * <p>This class is threadsafe. Recommended use is as a singleton, but you may also want to create
  * multiple instances if you need to keep track of metrics separately for different uses
  * (for that to make sense, provide a different {@link MetricRegistry} to each instance).
  */
