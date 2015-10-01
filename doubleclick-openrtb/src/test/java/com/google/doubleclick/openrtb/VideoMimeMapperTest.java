@@ -16,10 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
 
 import org.junit.Test;
@@ -27,11 +26,9 @@ import org.junit.Test;
 public class VideoMimeMapperTest {
   @Test
   public void testMapper() {
-    assertEquals(
-        ImmutableSet.of("video/mp4", "video/webm"),
-        VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5), null));
-    assertEquals(
-        ImmutableSet.of(VideoFormat.VIDEO_HTML5),
-        VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm"), null));
+    assertThat(VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5), null))
+        .containsExactly("video/mp4", "video/webm");
+    assertThat(VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm"), null))
+        .containsExactly(VideoFormat.VIDEO_HTML5);
   }
 }

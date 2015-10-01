@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
 
@@ -25,11 +25,8 @@ import org.junit.Test;
 public class ContentRatingMapperTest {
   @Test
   public void testMapper() {
-    assertEquals(
-        "DV-UNRATED",
-        ContentRatingMapper.toOpenRtb(ImmutableList.of(39, 40, 41, 42, 43)));
-    assertEquals(
-        (Integer) 40,
-        ContentRatingMapper.toDoubleClick("DV-PG"));
+    assertThat(ContentRatingMapper.toOpenRtb(ImmutableList.of(39, 40, 41, 42, 43)))
+        .isEqualTo("DV-UNRATED");
+    assertThat(ContentRatingMapper.toDoubleClick("DV-PG")).isEqualTo(40);
   }
 }

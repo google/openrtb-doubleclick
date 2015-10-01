@@ -16,10 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.openrtb.OpenRtb.CreativeAttribute;
 
 import org.junit.Test;
@@ -27,12 +26,10 @@ import org.junit.Test;
 public class CreativeAttributeMapperTest {
   @Test
   public void testMapper() {
-    assertEquals(
-        ImmutableSet.of(28),
-        CreativeAttributeMapper.toDoubleClick(
-            ImmutableList.of(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED), null));
-    assertEquals(
-        ImmutableSet.of(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED),
-        CreativeAttributeMapper.toOpenRtb(ImmutableList.of(28), null));
+    assertThat(CreativeAttributeMapper.toDoubleClick(
+            ImmutableList.of(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED), null))
+        .containsExactly(28);
+    assertThat(CreativeAttributeMapper.toOpenRtb(ImmutableList.of(28), null))
+        .containsExactly(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED);
   }
 }

@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoStartDelay;
 
@@ -25,14 +25,12 @@ import org.junit.Test;
 public class VideoStartDelayMapperTest {
   @Test
   public void testMapper() {
-    assertEquals(
-        1,
-        VideoStartDelayMapper.toDoubleClick(VideoStartDelay.GENERIC_MID_ROLL_VALUE));
-    assertEquals(333, VideoStartDelayMapper.toDoubleClick(333));
-    assertEquals(
-        VideoStartDelay.GENERIC_POST_ROLL_VALUE,
-        VideoStartDelayMapper.toOpenRtb(-1));
-    assertEquals(333, VideoStartDelayMapper.toOpenRtb(333));
+    assertThat(VideoStartDelayMapper.toDoubleClick(VideoStartDelay.GENERIC_MID_ROLL_VALUE))
+        .isEqualTo(1);
+    assertThat(VideoStartDelayMapper.toDoubleClick(333)).isEqualTo(333);
+    assertThat(VideoStartDelayMapper.toOpenRtb(-1))
+        .isEqualTo(VideoStartDelay.GENERIC_POST_ROLL_VALUE);
+    assertThat(VideoStartDelayMapper.toOpenRtb(333)).isEqualTo(333);
 
     for (VideoStartDelay openrtb : VideoStartDelay.values()) {
       VideoStartDelayMapper.toDoubleClick(openrtb.getNumber());

@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertSame;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.openrtb.OpenRtb.BidRequest.AuctionType;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal.DealType;
@@ -26,12 +26,10 @@ import org.junit.Test;
 public class DealTypeMapperTest {
   @Test
   public void testMapper() {
-    assertSame(
-        AuctionType.FIXED_PRICE,
-        DealTypeMapper.toOpenRtb(DealType.PREFERRED_DEAL));
-    assertSame(
-        DealType.PREFERRED_DEAL,
-        DealTypeMapper.toDoubleClick(AuctionType.FIXED_PRICE));
+    assertThat(DealTypeMapper.toOpenRtb(DealType.PREFERRED_DEAL))
+        .isSameAs(AuctionType.FIXED_PRICE);
+    assertThat(DealTypeMapper.toDoubleClick(AuctionType.FIXED_PRICE))
+        .isSameAs(DealType.PREFERRED_DEAL);
 
     for (AuctionType openrtb : AuctionType.values()) {
       DealTypeMapper.toDoubleClick(openrtb);

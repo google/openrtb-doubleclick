@@ -16,8 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.doubleclick.util.DoubleClickMacros;
 import com.google.openrtb.OpenRtb.BidRequest;
@@ -37,19 +36,16 @@ public class DoubleClickSnippetProcessorTest {
 
   @Test
   public void testProcessor() {
-    assertEquals(
-        "1", // Not overridden
-        process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_ID.key()));
-    assertEquals(
-        DoubleClickMacros.WINNING_PRICE.key(), // Overridden
-        process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_PRICE.key()));
+    assertThat(process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_ID.key()))
+        .isEqualTo("1");  // Not overridden
+    assertThat(process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_PRICE.key()))
+        .isEqualTo(DoubleClickMacros.WINNING_PRICE.key());  // Overridden
   }
 
   @Test
   public void testNullProcessor() {
-    assertSame(
-        OpenRtbMacros.AUCTION_PRICE.key(),
-        process(DoubleClickSnippetProcessor.DC_NULL, OpenRtbMacros.AUCTION_PRICE.key()));
+    assertThat(process(DoubleClickSnippetProcessor.DC_NULL, OpenRtbMacros.AUCTION_PRICE.key()))
+        .isSameAs(OpenRtbMacros.AUCTION_PRICE.key());
   }
 
   private String process(DoubleClickSnippetProcessor processor, String snippet) {

@@ -16,13 +16,10 @@
 
 package com.google.doubleclick.util;
 
+import static com.google.common.truth.Truth.assertThat;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid.BidRequest;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
@@ -75,14 +72,14 @@ public class DoubleClickValidatorTest {
         .addVendorType(1)
         .addRestrictedCategory(1));
     validator.validate(request, response);
-    assertFalse(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isNotEmpty();
   }
 
   @Test
   public void testNoAttrs() {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(testBid());
     validator.validate(request, response);
-    assertFalse(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isNotEmpty();
   }
 
   @Test
@@ -90,7 +87,7 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(testBid()
         .addAllAttribute(asList(1, 2)));
     validator.validate(request, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
   }
 
   @Test
@@ -98,7 +95,7 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(testBid()
         .addAllCategory(asList(1, 2)));
     validator.validate(request, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
   }
 
   @Test
@@ -106,7 +103,7 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(testBid()
         .addAllCategory(asList(10, 11, 12, 4)));
     validator.validate(request, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
   }
 
   @Test
@@ -114,12 +111,12 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(testBid()
         .addAllVendorType(asList(2, 3)));
     validator.validate(request, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
     BidRequest gdnRequest = request.toBuilder().setSellerNetworkId(1 /* GDN */).build();
     response = BidResponse.newBuilder().addAd(testBid()
         .addAllVendorType(asList(2, 3)));
     validator.validate(gdnRequest, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
   }
 
   @Test
@@ -127,7 +124,7 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(testBid()
         .addAllRestrictedCategory(asList(2, 3)));
     validator.validate(request, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
   }
 
   @Test
@@ -145,11 +142,11 @@ public class DoubleClickValidatorTest {
     BidResponse.Builder goodResp = BidResponse.newBuilder().addAd(testBid()
         .addAttribute(DoubleClickValidator.CREATIVE_NON_FLASH));
     validator.validate(request, goodResp);
-    assertFalse(Iterables.isEmpty(bids(goodResp)));
+    assertThat(bids(goodResp)).isNotEmpty();
 
     BidResponse.Builder badResp1 = BidResponse.newBuilder().addAd(testBid());
     validator.validate(request, badResp1);
-    assertTrue(Iterables.isEmpty(bids(badResp1)));
+    assertThat(bids(badResp1)).isEmpty();
   }
 
   @Test
@@ -168,11 +165,11 @@ public class DoubleClickValidatorTest {
         .addAttribute(DoubleClickValidator.CREATIVE_SSL)
         .addClickThroughUrl("https://safe.com"));
     validator.validate(request, goodResp);
-    assertFalse(Iterables.isEmpty(bids(goodResp)));
+    assertThat(bids(goodResp)).isNotEmpty();
 
     BidResponse.Builder badResp1 = BidResponse.newBuilder().addAd(testBid());
     validator.validate(request, badResp1);
-    assertTrue(Iterables.isEmpty(bids(badResp1)));
+    assertThat(bids(badResp1)).isEmpty();
   }
 
   @Test
@@ -182,7 +179,7 @@ public class DoubleClickValidatorTest {
             .setId(3)
             .setMaxCpmMicros(100000000L)));
     validator.validate(request, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
   }
 
   @Test
@@ -198,14 +195,14 @@ public class DoubleClickValidatorTest {
                 .setDealId(3)
                 .setMaxCpmMicros(100000000L)));
     validator.validate(request, response);
-    assertEquals(1, Iterables.size(bids(response)));
+    assertThat(bids(response)).hasSize(1);
   }
 
   @Test
   public void testNoSlots() {
     BidResponse.Builder response = BidResponse.newBuilder().addAd(BidResponse.Ad.newBuilder());
     validator.validate(request, response);
-    assertTrue(Iterables.isEmpty(bids(response)));
+    assertThat(bids(response)).isEmpty();
   }
 
   private static ImmutableList<BidResponse.Ad.AdSlot.Builder> bids(BidResponse.Builder response) {

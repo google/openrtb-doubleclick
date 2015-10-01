@@ -17,9 +17,7 @@
 package com.google.doubleclick.util.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.junit.Assert.assertEquals;
-
-import com.google.doubleclick.util.impl.CSVParser;
+import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
 
@@ -131,9 +129,7 @@ public class CSVParserTest {
     for (String exp : expected) {
       expectedList.add(fix(csvParser, exp));
     }
-    assertEquals(
-        expectedList,
-        csvParser.parse(fix(csvParser, input)));
+    assertThat(csvParser.parse(fix(csvParser, input))).containsExactlyElementsIn(expectedList);
   }
 
   static String fix(CSVParser csvParser, String input) {
