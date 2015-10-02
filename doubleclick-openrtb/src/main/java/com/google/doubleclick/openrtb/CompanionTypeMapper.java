@@ -39,17 +39,6 @@ public class CompanionTypeMapper {
     return null;
   }
 
-  @Nullable public static CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
-    switch (openrtb) {
-      case STATIC:
-        return CreativeFormat.IMAGE_CREATIVE;
-      case COMPANION_IFRAME:
-      case HTML:
-        return CreativeFormat.HTML_CREATIVE;
-    }
-    return null;
-  }
-
   public static EnumSet<VASTCompanionType> toOpenRtb(
       Collection<CreativeFormat> dcList, @Nullable EnumSet<VASTCompanionType> openrtbSet) {
     EnumSet<VASTCompanionType> ret = openrtbSet == null
@@ -59,6 +48,17 @@ public class CompanionTypeMapper {
       ret.add(toOpenRtb(dc));
     }
     return ret;
+  }
+
+  @Nullable public static CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
+    switch (openrtb) {
+      case STATIC:
+        return CreativeFormat.IMAGE_CREATIVE;
+      case COMPANION_IFRAME:
+      case HTML:
+        return CreativeFormat.HTML_CREATIVE;
+    }
+    return null;
   }
 
   public static EnumSet<CreativeFormat> toDoubleClick(

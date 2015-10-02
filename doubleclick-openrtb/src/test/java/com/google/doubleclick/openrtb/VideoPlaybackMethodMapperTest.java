@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoPlaybackMethod;
 import com.google.protos.adx.NetworkBid;
@@ -26,13 +26,11 @@ import org.junit.Test;
 public class VideoPlaybackMethodMapperTest {
   @Test
   public void testMapper() {
-    assertEquals(
-        NetworkBid.BidRequest.Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_ON,
-        VideoPlaybackMethodMapper.toDoubleClick(VideoPlaybackMethod.AUTO_PLAY_SOUND_ON));
-    assertEquals(
-        VideoPlaybackMethod.AUTO_PLAY_SOUND_ON,
-        VideoPlaybackMethodMapper.toOpenRtb(
-            NetworkBid.BidRequest.Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_ON));
+    assertThat(VideoPlaybackMethodMapper.toDoubleClick(VideoPlaybackMethod.AUTO_PLAY_SOUND_ON))
+        .isSameAs(NetworkBid.BidRequest.Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_ON);
+    assertThat(VideoPlaybackMethodMapper.toOpenRtb(
+            NetworkBid.BidRequest.Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_ON))
+        .isSameAs(VideoPlaybackMethod.AUTO_PLAY_SOUND_ON);
 
     for (VideoPlaybackMethod openrtb : VideoPlaybackMethod.values()) {
       VideoPlaybackMethodMapper.toDoubleClick(openrtb);

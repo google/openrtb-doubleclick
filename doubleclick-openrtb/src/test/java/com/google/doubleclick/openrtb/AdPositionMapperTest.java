@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertSame;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.openrtb.OpenRtb.BidRequest.Imp.AdPosition;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
@@ -26,12 +26,10 @@ import org.junit.Test;
 public class AdPositionMapperTest {
   @Test
   public void testMapper() {
-    assertSame(
-        AdPosition.ABOVE_THE_FOLD,
-        AdPositionMapper.toOpenRtb(SlotVisibility.ABOVE_THE_FOLD));
-    assertSame(
-        SlotVisibility.ABOVE_THE_FOLD,
-        AdPositionMapper.toDoubleClick(AdPosition.ABOVE_THE_FOLD));
+    assertThat(AdPositionMapper.toOpenRtb(SlotVisibility.ABOVE_THE_FOLD))
+        .isSameAs(AdPosition.ABOVE_THE_FOLD);
+    assertThat(AdPositionMapper.toDoubleClick(AdPosition.ABOVE_THE_FOLD))
+        .isSameAs(SlotVisibility.ABOVE_THE_FOLD);
 
     for (AdPosition openrtb : AdPosition.values()) {
       AdPositionMapper.toDoubleClick(openrtb);

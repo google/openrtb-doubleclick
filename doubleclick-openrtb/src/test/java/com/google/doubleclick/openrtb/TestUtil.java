@@ -72,6 +72,18 @@ class TestUtil {
     return request;
   }
 
+  public static BidRequest newBidRequest(NetworkBid.BidRequestOrBuilder adxRequest) {
+    NetworkBid.BidRequest dcRequest = adxRequest instanceof NetworkBid.BidRequest
+        ? (NetworkBid.BidRequest) adxRequest
+        : ((NetworkBid.BidRequest.Builder) adxRequest).build();
+    return new DoubleClickOpenRtbMapper(
+        new MetricRegistry(),
+        getMetadata(),
+        OpenRtbJsonFactory.create(),
+        ImmutableList.of(DoubleClickLinkMapper.INSTANCE))
+            .toOpenRtbBidRequest(dcRequest).build();
+  }
+
   public static BidResponse newBidResponse(BidOrBuilder... bids) {
     SeatBid.Builder seat = SeatBid.newBuilder();
 
@@ -92,17 +104,5 @@ class TestUtil {
     }
 
     return metadata;
-  }
-
-  public static BidRequest newBidRequest(NetworkBid.BidRequestOrBuilder adxRequest) {
-    NetworkBid.BidRequest dcRequest = adxRequest instanceof NetworkBid.BidRequest
-        ? (NetworkBid.BidRequest) adxRequest
-        : ((NetworkBid.BidRequest.Builder) adxRequest).build();
-    return new DoubleClickOpenRtbMapper(
-        new MetricRegistry(),
-        getMetadata(),
-        OpenRtbJsonFactory.create(),
-        ImmutableList.of(DoubleClickLinkMapper.INSTANCE))
-            .toOpenRtbBidRequest(dcRequest).build();
   }
 }

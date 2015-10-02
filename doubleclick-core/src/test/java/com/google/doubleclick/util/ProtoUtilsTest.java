@@ -16,14 +16,11 @@
 
 package com.google.doubleclick.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
 
 import org.junit.Test;
@@ -39,11 +36,11 @@ public class ProtoUtilsTest {
         AdSlot.newBuilder().setId(1).build(),
         AdSlot.newBuilder().setId(2).build(),
         AdSlot.newBuilder().setId(3).build());
-    assertEquals(2, Iterables.size(ProtoUtils.filter(adslots, new Predicate<AdSlot>() {
+    assertThat(ProtoUtils.filter(adslots, new Predicate<AdSlot>() {
       @Override public boolean apply(AdSlot adslot) {
         return adslot.getId() >= 2;
-      }})));
-    assertSame(adslots, ProtoUtils.filter(adslots, Predicates.<AdSlot>alwaysTrue()));
-    assertTrue(Iterables.isEmpty(ProtoUtils.filter(adslots, Predicates.<AdSlot>alwaysFalse())));
+      }})).hasSize(2);
+    assertThat(ProtoUtils.filter(adslots, Predicates.<AdSlot>alwaysTrue())).isSameAs(adslots);
+    assertThat(ProtoUtils.filter(adslots, Predicates.<AdSlot>alwaysFalse())).isEmpty();
   }
 }

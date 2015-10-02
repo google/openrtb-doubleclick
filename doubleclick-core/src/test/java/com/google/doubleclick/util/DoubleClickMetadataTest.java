@@ -16,11 +16,7 @@
 
 package com.google.doubleclick.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.doubleclick.TestUtil;
 import com.google.doubleclick.util.DoubleClickMetadata.ResourceTransport;
@@ -42,44 +38,43 @@ public class DoubleClickMetadataTest {
     DoubleClickMetadata metadata = new DoubleClickMetadata(
         new DoubleClickMetadata.ResourceTransport());
 
-    assertNotNull(metadata.toString());
-    assertEquals("1: CreativeAttribute1",
-        DoubleClickMetadata.toString(metadata.publisherExcludableCreativeAttributes(), 1));
-    assertEquals("1: CreativeAttribute1",
-        DoubleClickMetadata.toString(metadata.buyerDeclarableCreativeAttributes(), 1));
-    assertEquals("1: CreativeAttribute1",
-        DoubleClickMetadata.toString(metadata.allCreativeAttributes(), 1));
-    assertEquals("1: Creative won the auction",
-        DoubleClickMetadata.toString(metadata.creativeStatusCodes(), 1));
-    assertEquals("1: SensitiveCategory1",
-        DoubleClickMetadata.toString(metadata.sensitiveCategories(), 1));
-    assertEquals("1: RestrictedCategory1",
-        DoubleClickMetadata.toString(metadata.restrictedCategories(), 1));
-    assertEquals("1: ProductCategory1",
-        DoubleClickMetadata.toString(metadata.productCategories(), 1));
-    assertEquals("1: NONE",
-        DoubleClickMetadata.toString(metadata.agencies(), 1));
-    assertEquals("1: Vendor1",
-        DoubleClickMetadata.toString(metadata.vendors(), 1));
-    assertEquals("1: GDNVendor1",
-        DoubleClickMetadata.toString(metadata.gdnVendors(), 1));
-    assertEquals("1: GDN",
-        DoubleClickMetadata.toString(metadata.sellerNetworks(), 1));
-    assertEquals("31: Brand Select",
-        DoubleClickMetadata.toString(metadata.siteLists(), 31));
-    assertEquals("1: ContentLabel1",
-        DoubleClickMetadata.toString(metadata.contentLabels(), 1));
-    assertEquals("1: /Vertical1",
-        DoubleClickMetadata.toString(metadata.publisherVerticals(), 1));
-    assertEquals("9999: <invalid>",
-        DoubleClickMetadata.toString(metadata.sensitiveCategories(), 9999));
-    assertEquals("United States",
-        metadata.geoTargetFor(1023191).canonParent().canonParent().name());
-    assertFalse(metadata.geoTargets().isEmpty());
-    assertEquals(
-        new CityDMARegionValue(624, "West Bend", "Iowa"),
-        metadata.dmaRegions().get(new CityDMARegionKey(1016100, "Sioux City, IA")));
-    assertEquals("Verizon", metadata.mobileCarriers().get(70092));
+    assertThat(metadata.toString()).isNotNull();
+    assertThat(DoubleClickMetadata.toString(metadata.publisherExcludableCreativeAttributes(), 1))
+        .isEqualTo("1: CreativeAttribute1");
+    assertThat(DoubleClickMetadata.toString(metadata.buyerDeclarableCreativeAttributes(), 1))
+        .isEqualTo("1: CreativeAttribute1");
+    assertThat(DoubleClickMetadata.toString(metadata.allCreativeAttributes(), 1))
+        .isEqualTo("1: CreativeAttribute1");
+    assertThat(DoubleClickMetadata.toString(metadata.creativeStatusCodes(), 1))
+        .isEqualTo("1: Creative won the auction");
+    assertThat(DoubleClickMetadata.toString(metadata.sensitiveCategories(), 1))
+        .isEqualTo("1: SensitiveCategory1");
+    assertThat(DoubleClickMetadata.toString(metadata.restrictedCategories(), 1))
+        .isEqualTo("1: RestrictedCategory1");
+    assertThat(DoubleClickMetadata.toString(metadata.productCategories(), 1))
+        .isEqualTo("1: ProductCategory1");
+    assertThat(DoubleClickMetadata.toString(metadata.agencies(), 1))
+        .isEqualTo("1: NONE");
+    assertThat(DoubleClickMetadata.toString(metadata.vendors(), 1))
+        .isEqualTo("1: Vendor1");
+    assertThat(DoubleClickMetadata.toString(metadata.gdnVendors(), 1))
+        .isEqualTo("1: GDNVendor1");
+    assertThat(DoubleClickMetadata.toString(metadata.sellerNetworks(), 1))
+        .isEqualTo("1: GDN");
+    assertThat(DoubleClickMetadata.toString(metadata.siteLists(), 31))
+        .isEqualTo("31: Brand Select");
+    assertThat(DoubleClickMetadata.toString(metadata.contentLabels(), 1))
+        .isEqualTo("1: ContentLabel1");
+    assertThat(DoubleClickMetadata.toString(metadata.publisherVerticals(), 1))
+        .isEqualTo("1: /Vertical1");
+    assertThat(DoubleClickMetadata.toString(metadata.sensitiveCategories(), 9999))
+        .isEqualTo("9999: <invalid>");
+    assertThat(metadata.geoTargetFor(1023191).canonParent().canonParent().name())
+        .isEqualTo("United States");
+    assertThat(metadata.geoTargets().isEmpty()).isFalse();
+    assertThat(metadata.dmaRegions().get(new CityDMARegionKey(1016100, "Sioux City, IA")))
+        .isEqualTo(new CityDMARegionValue(624, "West Bend", "Iowa"));
+    assertThat(metadata.mobileCarriers().get(70092)).isEqualTo("Verizon");
 
     GeoTarget geoTarget1 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "United States");
     GeoTarget geoTarget2 = new GeoTarget(
@@ -87,31 +82,31 @@ public class DoubleClickMetadataTest {
     GeoTarget geoTarget3 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "France");
     TestUtil.testCommonMethods(geoTarget1, geoTarget2, geoTarget3);
 
-    assertEquals(2840, geoTarget1.criteriaId());
-    assertEquals("United States", geoTarget1.name());
-    assertEquals("United States", geoTarget1.canonicalName());
-    assertEquals("US", geoTarget1.countryCode());
-    assertEquals(GeoTarget.Type.COUNTRY, geoTarget1.type());
-    assertSame(geoTarget1, geoTarget1.getCanonAncestor(GeoTarget.Type.COUNTRY));
-    assertNull(geoTarget1.getCanonAncestor(GeoTarget.Type.CITY));
-    assertSame(geoTarget1, geoTarget1.getIdAncestor(GeoTarget.Type.COUNTRY));
-    assertNull(geoTarget1.getIdAncestor(GeoTarget.Type.CITY));
+    assertThat(geoTarget1.criteriaId()).isEqualTo(2840);
+    assertThat(geoTarget1.name()).isEqualTo("United States");
+    assertThat(geoTarget1.canonicalName()).isEqualTo("United States");
+    assertThat(geoTarget1.countryCode()).isEqualTo("US");
+    assertThat(geoTarget1.type()).isEqualTo(GeoTarget.Type.COUNTRY);
+    assertThat(geoTarget1.getCanonAncestor(GeoTarget.Type.COUNTRY)).isSameAs(geoTarget1);
+    assertThat(geoTarget1.getCanonAncestor(GeoTarget.Type.CITY)).isNull();
+    assertThat(geoTarget1.getIdAncestor(GeoTarget.Type.COUNTRY)).isSameAs(geoTarget1);
+    assertThat(geoTarget1.getIdAncestor(GeoTarget.Type.CITY)).isNull();
     TestUtil.testCommonEnum(GeoTarget.Type.values());
 
     CountryCodes country1 = metadata.countryCodes().get("US");
     CountryCodes country2 = new CountryCodes(840, "US", "USA");
     CountryCodes country3 = new CountryCodes(840, "US", "USB");
     TestUtil.testCommonMethods(country1, country2, country3);
-    assertSame(country1, metadata.countryCodes().get("USA"));
-    assertSame(country1, metadata.countryCodes().get(840));
-    assertEquals(840, country1.numeric());
-    assertEquals("US", country1.alpha2());
-    assertEquals("USA", country1.alpha3());
+    assertThat(metadata.countryCodes().get("USA")).isSameAs(country1);
+    assertThat(metadata.countryCodes().get(840)).isSameAs(country1);
+    assertThat(country1.numeric()).isEqualTo(840);
+    assertThat(country1.alpha2()).isEqualTo("US");
+    assertThat(country1.alpha3()).isEqualTo("USA");
 
     // https://github.com/google/openrtb-doubleclick/issues/28
     GeoTarget postalTarget = metadata.geoTargetFor(9012102);
-    assertNull(postalTarget.getCanonAncestor(GeoTarget.Type.CITY));
-    assertEquals("Tampa", postalTarget.getIdAncestor(GeoTarget.Type.CITY).name());
+    assertThat(postalTarget.getCanonAncestor(GeoTarget.Type.CITY)).isNull();
+    assertThat(postalTarget.getIdAncestor(GeoTarget.Type.CITY).name()).isEqualTo("Tampa");
 
     GeoTarget.CanonicalKey canKey1 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");
     GeoTarget.CanonicalKey canKey2 = new GeoTarget.CanonicalKey(GeoTarget.Type.CITY, "A");
@@ -155,14 +150,14 @@ public class DoubleClickMetadataTest {
     CityDMARegionKey key2 = new CityDMARegionKey(1, "a");
     CityDMARegionKey key3 = new CityDMARegionKey(1, "b");
     TestUtil.testCommonMethods(key1, key2, key3);
-    assertEquals(1, key1.criteriaId());
-    assertEquals("a", key1.regionName());
+    assertThat(key1.criteriaId()).isEqualTo(1);
+    assertThat(key1.regionName()).isEqualTo("a");
     CityDMARegionValue value1 = new CityDMARegionValue(1, "a", "b");
     CityDMARegionValue value2 = new CityDMARegionValue(1, "a", "b");
     CityDMARegionValue value3 = new CityDMARegionValue(1, "a", "c");
-    assertEquals(1, value1.regionCode());
-    assertEquals("a", value1.city());
-    assertEquals("b", value1.state());
+    assertThat(value1.regionCode()).isEqualTo(1);
+    assertThat(value1.city()).isEqualTo("a");
+    assertThat(value1.state()).isEqualTo("b");
     TestUtil.testCommonMethods(value1, value2, value3);
   }
 }

@@ -16,10 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner.ExpandableDirection;
 
 import org.junit.Test;
@@ -31,17 +30,11 @@ public class ExpandableDirectionMapperTest {
     ImmutableList<ExpandableDirection> openrtbAll = ImmutableList.of(
         ExpandableDirection.LEFT, ExpandableDirection.RIGHT,
         ExpandableDirection.UP, ExpandableDirection.DOWN);
-    assertEquals(
-        ImmutableSet.copyOf(openrtbAll),
-        ExpandableDirectionMapper.toOpenRtb(ImmutableList.<Integer>of()));
-    assertEquals(
-        ImmutableSet.<ExpandableDirection>of(),
-        ExpandableDirectionMapper.toOpenRtb(dcAll));
-    assertEquals(
-        ImmutableSet.of(),
-        ExpandableDirectionMapper.toDoubleClick(openrtbAll));
-    assertEquals(
-        ImmutableSet.copyOf(dcAll),
-        ExpandableDirectionMapper.toDoubleClick(ImmutableList.<ExpandableDirection>of()));
+    assertThat(ExpandableDirectionMapper.toOpenRtb(ImmutableList.<Integer>of()))
+        .containsExactlyElementsIn(openrtbAll);
+    assertThat(ExpandableDirectionMapper.toOpenRtb(dcAll)).isEmpty();
+    assertThat(ExpandableDirectionMapper.toDoubleClick(openrtbAll)).isEmpty();
+    assertThat(ExpandableDirectionMapper.toDoubleClick(ImmutableList.<ExpandableDirection>of()))
+        .containsExactlyElementsIn(dcAll);
   }
 }

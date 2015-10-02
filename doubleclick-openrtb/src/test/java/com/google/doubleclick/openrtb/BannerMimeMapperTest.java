@@ -16,10 +16,9 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import org.junit.Test;
@@ -27,11 +26,9 @@ import org.junit.Test;
 public class BannerMimeMapperTest {
   @Test
   public void testMapper() {
-    assertEquals(
-        ImmutableSet.of("image/gif", "image/jpeg", "image/png"),
-        BannerMimeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.IMAGE_CREATIVE), null));
-    assertEquals(
-        ImmutableSet.of(CreativeFormat.IMAGE_CREATIVE),
-        BannerMimeMapper.toDoubleClick(ImmutableList.of("image/jpeg"), null));
+    assertThat(BannerMimeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.IMAGE_CREATIVE), null))
+        .containsExactly("image/gif", "image/jpeg", "image/png");
+    assertThat(BannerMimeMapper.toDoubleClick(ImmutableList.of("image/jpeg"), null))
+        .containsExactly(CreativeFormat.IMAGE_CREATIVE);
   }
 }

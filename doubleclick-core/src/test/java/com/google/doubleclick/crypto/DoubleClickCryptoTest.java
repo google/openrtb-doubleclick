@@ -16,10 +16,7 @@
 
 package com.google.doubleclick.crypto;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.TestUtil;
@@ -100,12 +97,12 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testEncodeDecode() {
-    assertNull(baseCrypto.decode(null));
-    assertNull(baseCrypto.encode(null));
+    assertThat(baseCrypto.decode(null)).isNull();
+    assertThat(baseCrypto.encode(null)).isNull();
     byte[] data = new byte[]{ 1, 2, 3 };
     String encoded = baseCrypto.encode(data);
-    assertNotNull(encoded);
-    assertArrayEquals(data, baseCrypto.decode(encoded));
+    assertThat(encoded).isNotNull();
+    assertThat(baseCrypto.decode(encoded)).isEqualTo(data);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -115,9 +112,8 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testEncryptBytes_noData() {
-    assertEquals(
-        DoubleClickCrypto.OVERHEAD_SIZE,
-        baseCrypto.encrypt(new byte[DoubleClickCrypto.OVERHEAD_SIZE]).length);
+    assertThat(baseCrypto.encrypt(new byte[DoubleClickCrypto.OVERHEAD_SIZE]))
+        .hasLength(DoubleClickCrypto.OVERHEAD_SIZE);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -132,9 +128,9 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testCreateNonce() {
-    assertArrayEquals(INITV, baseCrypto.createInitVector(INITV_TIMESTAMP, INITV_SERVERID));
-    assertEquals(INITV_TIMESTAMP, baseCrypto.getTimestamp(INITV));
-    assertEquals(INITV_SERVERID, baseCrypto.getServerId(INITV));
+    assertThat(baseCrypto.createInitVector(INITV_TIMESTAMP, INITV_SERVERID)).isEqualTo(INITV);
+    assertThat(baseCrypto.getTimestamp(INITV)).isEqualTo(INITV_TIMESTAMP);
+    assertThat(baseCrypto.getServerId(INITV)).isEqualTo(INITV_SERVERID);
   }
 
   @Test
@@ -149,14 +145,13 @@ public class DoubleClickCryptoTest {
 
   @Test
   public void testCreateNonce_nullTimestamp() {
-    assertArrayEquals(
-        new byte[] {
-          (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-          (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-          (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
-          (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
-        },
-        baseCrypto.createInitVector(null, INITV_SERVERID));
+    assertThat(baseCrypto.createInitVector(null, INITV_SERVERID))
+        .isEqualTo(new byte[] {
+            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
+            (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
+        });
   }
 
   @Test
@@ -176,13 +171,13 @@ public class DoubleClickCryptoTest {
   @Test
   public void testPriceEncrypt() {
     String cryptoData = priceCrypto.encodePriceValue(PLAIN_PRICE, INITV);
-    assertEquals(CIPHER_PRICE, cryptoData);
+    assertThat(cryptoData).isEqualTo(CIPHER_PRICE);
   }
 
   @Test
   public void testPriceDecrypt() throws SignatureException {
     double decryptedPrice = priceCrypto.decodePriceValue(CIPHER_PRICE);
-    assertEquals(PLAIN_PRICE, decryptedPrice, 1e-9);
+    assertThat(decryptedPrice).isWithin(1e-9).of(PLAIN_PRICE);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -205,20 +200,20 @@ public class DoubleClickCryptoTest {
   @Test
   public void testPriceRecrypt() throws SignatureException {
     String encrypted = priceCrypto.encodePriceValue(PLAIN_PRICE, INITV);
-    assertEquals(PLAIN_PRICE, priceCrypto.decodePriceValue(encrypted), 1e-9);
+    assertThat(priceCrypto.decodePriceValue(encrypted)).isWithin(1e-9).of(PLAIN_PRICE);
   }
 
   // DoubleClickCrypto.Idfa
 
   @Test
   public void testIdfaEncrypt() {
-    assertEquals(CIPHER_IDFA, idfaCrypto.encodeIdfa(PLAIN_IDFA, INITV));
+    assertThat(idfaCrypto.encodeIdfa(PLAIN_IDFA, INITV)).isEqualTo(CIPHER_IDFA);
   }
 
   @Test
   public void testIdfaDecrypt() throws SignatureException {
     byte[] decrypted = idfaCrypto.decodeIdfa(CIPHER_IDFA);
-    assertArrayEquals(PLAIN_IDFA, decrypted);
+    assertThat(decrypted).isEqualTo(PLAIN_IDFA);
   }
 
   @Test
@@ -237,14 +232,14 @@ public class DoubleClickCryptoTest {
   @Test
   public void testIdfaRecrypt() throws SignatureException {
     String encrypted = idfaCrypto.encodeIdfa(PLAIN_IDFA, INITV);
-    assertArrayEquals(PLAIN_IDFA, idfaCrypto.decodeIdfa(encrypted));
+    assertThat(idfaCrypto.decodeIdfa(encrypted)).isEqualTo(PLAIN_IDFA);
   }
 
   // DoubleClickCrypto.AdId
 
   @Test
   public void testAdidEncrypt() {
-    assertArrayEquals(CIPHER_ADID, adidCrypto.encryptAdId(PLAIN_ADID, INITV));
+    assertThat(adidCrypto.encryptAdId(PLAIN_ADID, INITV)).isEqualTo(CIPHER_ADID);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -255,7 +250,7 @@ public class DoubleClickCryptoTest {
   @Test
   public void testAdidDecrypt() throws SignatureException {
     byte[] decrypted = adidCrypto.decryptAdId(CIPHER_ADID);
-    assertArrayEquals(PLAIN_ADID, decrypted);
+    assertThat(decrypted).isEqualTo(PLAIN_ADID);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -266,23 +261,22 @@ public class DoubleClickCryptoTest {
   @Test
   public void testAdidRecrypt() throws SignatureException {
     byte[] encrypted = adidCrypto.encryptAdId(PLAIN_ADID, INITV);
-    assertArrayEquals(PLAIN_ADID, adidCrypto.decryptAdId(encrypted));
+    assertThat(adidCrypto.decryptAdId(encrypted)).isEqualTo(PLAIN_ADID);
   }
 
   // DoubleClickCrypto.Hyperlocal
 
   @Test
   public void testHyperlocalEncrypt() {
-    assertArrayEquals(
-        CIPHER_HYPERLOCAL,
-        hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, INITV));
+    assertThat(hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, INITV))
+        .isEqualTo(CIPHER_HYPERLOCAL);
   }
 
   @Test
   public void testHyperlocalDecrypt() throws InvalidProtocolBufferException, SignatureException {
     byte[] decrypted = hyperlocalCrypto.decryptHyperlocal(CIPHER_HYPERLOCAL);
     HyperlocalSet.parseFrom(decrypted);
-    assertArrayEquals(PLAIN_HYPERLOCAL, decrypted);
+    assertThat(decrypted).isEqualTo(PLAIN_HYPERLOCAL);
   }
 
   @Test
@@ -303,7 +297,7 @@ public class DoubleClickCryptoTest {
   @Test
   public void testHyperlocalRecrypt() throws SignatureException {
     byte[] encrypted = hyperlocalCrypto.encryptHyperlocal(PLAIN_HYPERLOCAL, INITV);
-    assertArrayEquals(PLAIN_HYPERLOCAL, hyperlocalCrypto.decryptHyperlocal(encrypted));
+    assertThat(hyperlocalCrypto.decryptHyperlocal(encrypted)).isEqualTo(PLAIN_HYPERLOCAL);
   }
 
   // Utilities

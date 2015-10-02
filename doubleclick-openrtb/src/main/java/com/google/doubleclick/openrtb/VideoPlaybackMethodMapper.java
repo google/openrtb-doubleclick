@@ -47,7 +47,7 @@ public class VideoPlaybackMethodMapper {
       case CLICK_TO_PLAY:
         return NetworkBid.BidRequest.Video.VideoPlaybackMethod.CLICK_TO_PLAY;
       case MOUSE_OVER:
-        default:
+      default:
         return null;
     }
   }

@@ -16,11 +16,10 @@
 
 package com.google.doubleclick.openrtb;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb.ContentCategory;
 
@@ -37,12 +36,10 @@ public class AdCategoryMapperTest {
 
   @Test
   public void testMapper() {
-    assertEquals(
-        ImmutableSet.of(10106, 13760),
-        AdCategoryMapper.toDoubleClick(ImmutableList.of(ContentCategory.IAB1_4), null));
-    assertEquals(
-        ImmutableSet.of(ContentCategory.IAB1_4),
-        AdCategoryMapper.toOpenRtb(ImmutableList.of(10106), null));
+    assertThat(AdCategoryMapper.toDoubleClick(ImmutableList.of(ContentCategory.IAB1_4), null))
+        .containsExactly(10106, 13760);
+    assertThat(AdCategoryMapper.toOpenRtb(ImmutableList.of(10106), null))
+        .containsExactly(ContentCategory.IAB1_4);
   }
 
   @Test

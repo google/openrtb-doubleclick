@@ -33,11 +33,11 @@ import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.BuyerPr
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.NativeAdTemplate;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Builder;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
+import com.google.protos.adx.NetworkBid.BidRequest.Device;
+import com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType;
 import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
 import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Mobile;
-import com.google.protos.adx.NetworkBid.BidRequest.Mobile.DeviceOsVersion;
-import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 import com.google.protos.adx.NetworkBid.BidRequest.UserDataTreatment;
 import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
 import com.google.protos.adx.NetworkBid.BidRequest.Vertical;
@@ -116,23 +116,6 @@ public class TestData {
     return newRequest(0, false, false).build();
   }
 
-  static List<Integer> createSizes(int size, int base) {
-    ImmutableList.Builder<Integer> sizes = ImmutableList.builder();
-    for (int i = 0; i < size; ++i) {
-      sizes.add(base + i);
-    }
-    return sizes.build();
-  }
-
-  @SafeVarargs
-  static <T> List<T> sublist(int size, T... items) {
-    ImmutableList.Builder<T> sizes = ImmutableList.builder();
-    for (int i = 0; i < min(size, items.length); ++i) {
-      sizes.add(items[i]);
-    }
-    return sizes.build();
-  }
-
   public static NetworkBid.BidRequest.Builder newRequest(int size, boolean coppa, boolean nativ) {
     NetworkBid.BidRequest.Builder req = NetworkBid.BidRequest.newBuilder()
         .setId(TestUtil.REQUEST_ID)
@@ -182,6 +165,7 @@ public class TestData {
                   HyperlocalSet.newBuilder().build().toByteArray(), new byte[16])));
     }
     if (size != NO_SLOT) {
+      req.setDevice(newDevice());
       AdSlot.Builder adSlot = AdSlot.newBuilder()
           .setId(1)
           .addAllWidth(createSizes(size, 100))
@@ -240,25 +224,28 @@ public class TestData {
     return req;
   }
 
+  static Device.Builder newDevice() {
+    return Device.newBuilder()
+        .setDeviceType(DeviceType.HIGHEND_PHONE)
+        .setOsVersion(Device.OsVersion.newBuilder().setMajor(3).setMinor(2).setMicro(1))
+        .setModel("MotoX")
+        .setScreenHeight(1024)
+        .setScreenWidth(800)
+        .setScreenPixelRatioMillis(1500)
+        .setCarrierId(10)
+        .setPlatform("android");
+  }
+
   static Mobile.Builder newMobile(int size, boolean coppa) {
     Mobile.Builder mobile = Mobile.newBuilder();
     if (size % 2 == 0) {
       mobile
           .setAppId("com.mygame")
-          .setMobileDeviceType(MobileDeviceType.HIGHEND_PHONE)
-          .setOsVersion(DeviceOsVersion.newBuilder()
-              .setOsVersionMajor(3).setOsVersionMinor(2).setOsVersionMicro(1))
-          .setModel("MotoX")
           .setEncryptedAdvertisingId(ByteString.EMPTY)
           .setEncryptedHashedIdfa(ByteString.EMPTY)
           .setAppName("Tic-Tac-Toe")
           .setAppRating(4.2f)
           .setIsInterstitialRequest(true)
-          .setScreenHeight(1024)
-          .setScreenWidth(800)
-          .setDevicePixelRatioMillis(1500)
-          .setCarrierId(10)
-          .setPlatform("android")
           .setIsMobileWebOptimized(size % 4 == 0);
 
       if (size % 4 == 0) {
@@ -341,5 +328,22 @@ public class TestData {
 
   static Builder newNativeAdTemplate(int field) {
     return NativeAdTemplate.newBuilder().setRecommendedFields(field);
+  }
+
+  static List<Integer> createSizes(int size, int base) {
+    ImmutableList.Builder<Integer> sizes = ImmutableList.builder();
+    for (int i = 0; i < size; ++i) {
+      sizes.add(base + i);
+    }
+    return sizes.build();
+  }
+
+  @SafeVarargs
+  static <T> List<T> sublist(int size, T... items) {
+    ImmutableList.Builder<T> sizes = ImmutableList.builder();
+    for (int i = 0; i < min(size, items.length); ++i) {
+      sizes.add(items[i]);
+    }
+    return sizes.build();
   }
 }

@@ -16,9 +16,7 @@
 
 package com.google.doubleclick.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
 
@@ -33,14 +31,14 @@ public class DoubleClickMacrosTest {
     for (int i = 1; i < e.length; ++i) {
       DoubleClickMacros e1 = e[i - 1];
       DoubleClickMacros e2 = e[i];
-      assertEquals(e1, e1);
-      assertNotEquals(e1, e2);
-      assertNotEquals(e1, "");
+      assertThat(e1).isEqualTo(e1);
+      assertThat(e2).isNotEqualTo(e1);
+      assertThat("").isNotEqualTo(e1);
       e1.hashCode();
     }
 
-    assertEquals("%%CLICK_URL_ESC%%", DoubleClickMacros.CLICK_URL_ESC.key());
-    assertTrue(DoubleClickMacros.CACHEBUSTER.htmlSupported());
-    assertTrue(DoubleClickMacros.CACHEBUSTER.videoSupported());
+    assertThat(DoubleClickMacros.CLICK_URL_ESC.key()).isEqualTo("%%CLICK_URL_ESC%%");
+    assertThat(DoubleClickMacros.CACHEBUSTER.htmlSupported()).isTrue();
+    assertThat(DoubleClickMacros.CACHEBUSTER.videoSupported()).isTrue();
   }
 }

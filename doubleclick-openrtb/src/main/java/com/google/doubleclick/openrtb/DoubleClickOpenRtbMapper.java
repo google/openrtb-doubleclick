@@ -84,8 +84,8 @@ import javax.inject.Singleton;
 
 /**
  * Mapping between the DoubleClick and OpenRTB models.
- * <p>
- * This class is threadsafe. Recommended use is as a singleton, but you may also want to create
+ *
+ * <p>This class is threadsafe. Recommended use is as a singleton, but you may also want to create
  * multiple instances if you need to keep track of metrics separately for different uses
  * (for that to make sense, provide a different {@link MetricRegistry} to each instance).
  */
@@ -259,41 +259,44 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
               dcMobile.getEncryptedHashedIdfa().toByteArray()));
         }
       }
+    }
 
-      if (dcMobile.hasCarrierId()) {
-        device.setCarrier(String.valueOf(dcMobile.getCarrierId()));
+    if (dcRequest.hasDevice()) {
+      NetworkBid.BidRequest.Device dcDevice = dcRequest.getDevice();
+      if (dcDevice.hasCarrierId()) {
+        device.setCarrier(String.valueOf(dcDevice.getCarrierId()));
       }
-      if (dcMobile.hasModel()) {
-        device.setModel(dcMobile.getModel());
+      if (dcDevice.hasModel()) {
+        device.setModel(dcDevice.getModel());
       }
-      if (dcMobile.hasPlatform()) {
-        device.setOs(dcMobile.getPlatform());
+      if (dcDevice.hasPlatform()) {
+        device.setOs(dcDevice.getPlatform());
       }
-      if (dcMobile.getOsVersion().hasOsVersionMajor()) {
-        NetworkBid.BidRequest.Mobile.DeviceOsVersion dcVer = dcMobile.getOsVersion();
-        StringBuilder osv = new StringBuilder().append(dcVer.getOsVersionMajor());
-        if (dcVer.hasOsVersionMinor()) {
-          osv.append('.').append(dcVer.getOsVersionMinor());
-          if (dcVer.hasOsVersionMicro()) {
-            osv.append('.').append(dcVer.getOsVersionMicro());
+      if (dcDevice.getOsVersion().hasMajor()) {
+        NetworkBid.BidRequest.Device.OsVersion dcVer = dcDevice.getOsVersion();
+        StringBuilder osv = new StringBuilder().append(dcVer.getMajor());
+        if (dcVer.hasMinor()) {
+          osv.append('.').append(dcVer.getMinor());
+          if (dcVer.hasMicro()) {
+            osv.append('.').append(dcVer.getMicro());
           }
         }
         device.setOsv(osv.toString());
       }
-      if (dcMobile.hasMobileDeviceType()) {
-        DeviceType type = DeviceTypeMapper.toOpenRtb(dcMobile.getMobileDeviceType());
+      if (dcDevice.hasDeviceType()) {
+        DeviceType type = DeviceTypeMapper.toOpenRtb(dcDevice.getDeviceType());
         if (type != null) {
           device.setDevicetype(type);
         }
       }
-      if (dcMobile.hasScreenWidth()) {
-        device.setW(dcMobile.getScreenWidth());
+      if (dcDevice.hasScreenWidth()) {
+        device.setW(dcDevice.getScreenWidth());
       }
-      if (dcMobile.hasScreenHeight()) {
-        device.setH(dcMobile.getScreenHeight());
+      if (dcDevice.hasScreenHeight()) {
+        device.setH(dcDevice.getScreenHeight());
       }
-      if (dcMobile.hasDevicePixelRatioMillis()) {
-        device.setPxratio(dcMobile.getDevicePixelRatioMillis() / 1000.0);
+      if (dcDevice.hasScreenPixelRatioMillis()) {
+        device.setPxratio(dcDevice.getScreenPixelRatioMillis() / 1000.0);
       }
     }
 

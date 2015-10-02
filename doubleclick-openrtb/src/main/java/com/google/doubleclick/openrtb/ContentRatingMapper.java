@@ -28,27 +28,23 @@ import javax.annotation.Nullable;
 public class ContentRatingMapper {
   private static ImmutableMap<String, Integer> openrtbToDc =
       ImmutableMap.<String, Integer>builder()
-          .put("DV-G", 39)
-          .put("DV-PG", 40)
-          .put("DV-T", 41)
-          .put("DV-MA", 42)
-          .put("DV-UNRATED", 43)
+          .put("DV-G",       39 /* DV_G */)
+          .put("DV-PG",      40 /* DV_PG */)
+          .put("DV-T",       41 /* DV_T */)
+          .put("DV-MA",      42 /* DV_MA */)
+          .put("DV-UNRATED", 43 /* UNRATED */)
           .build();
   private static ImmutableMap<Integer, String> dcToOpenrtb =
       ImmutableMap.<Integer, String>builder()
-          .put(39, "DV-G")
-          .put(40, "DV-PG")
-          .put(41, "DV-T")
-          .put(42, "DV-MA")
-          .put(43, "DV-UNRATED")
+          .put(39 /* DV_G */,    "DV-G")
+          .put(40 /* DV_PG */,   "DV-PG")
+          .put(41 /* DV_T */,    "DV-T")
+          .put(42 /* DV_MA */,   "DV-MA")
+          .put(43 /* UNRATED */, "DV-UNRATED")
           .build();
 
   @Nullable public static String toOpenRtb(int dc) {
     return dcToOpenrtb.get(dc);
-  }
-
-  @Nullable public static Integer toDoubleClick(String openrtb) {
-    return openrtbToDc.get(openrtb);
   }
 
   @Nullable public static String toOpenRtb(List<Integer> dcList) {
@@ -59,5 +55,9 @@ public class ContentRatingMapper {
       }
     }
     return dcMax == -1 ? null : toOpenRtb(dcMax);
+  }
+
+  @Nullable public static Integer toDoubleClick(String openrtb) {
+    return openrtbToDc.get(openrtb);
   }
 }

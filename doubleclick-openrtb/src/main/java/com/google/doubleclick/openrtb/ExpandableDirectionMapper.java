@@ -36,43 +36,43 @@ public class ExpandableDirectionMapper {
     openrtbSet.remove(ExpandableDirection.EXPANDABLE_FULLSCREEN);
     for (int dc : dcList) {
       switch (dc) {
-        case 13 /* ExpandingDirection: ExpandingUp */:
+        case 13 /* EXPANDING_UP */:
           openrtbSet.remove(ExpandableDirection.UP);
           break;
-        case 14 /* ExpandingDirection: ExpandingDown */:
+        case 14 /* EXPANDING_DOWN */:
           openrtbSet.remove(ExpandableDirection.DOWN);
           break;
-        case 15 /* ExpandingDirection: ExpandingLeft */:
+        case 15 /* EXPANDING_LEFT */:
           openrtbSet.remove(ExpandableDirection.LEFT);
           break;
-        case 16 /* ExpandingDirection: ExpandingRight */:
+        case 16 /* EXPANDING_RIGHT */:
           openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
-        case 17 /* ExpandingDirection: ExpandingUpLeft */:
+        case 17 /* EXPANDING_UP_LEFT */:
           openrtbSet.remove(ExpandableDirection.UP);
           openrtbSet.remove(ExpandableDirection.LEFT);
           break;
-        case 18 /* ExpandingDirection: ExpandingUpRight */:
+        case 18 /* EXPANDING_UP_RIGHT */:
           openrtbSet.remove(ExpandableDirection.UP);
           openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
-        case 19 /* ExpandingDirection: ExpandingDownLeft */:
+        case 19 /* EXPANDING_DOWN_LEFT */:
           openrtbSet.remove(ExpandableDirection.DOWN);
           openrtbSet.remove(ExpandableDirection.LEFT);
           break;
-        case 20 /* ExpandingDirection: ExpandingDownRight */:
+        case 20 /* EXPANDING_DOWN_RIGHT */:
           openrtbSet.remove(ExpandableDirection.DOWN);
           openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
-        case 25 /* ExpandingDirection: ExpandingUpOrDown */:
+        case 25 /* EXPANDING_UP_OR_DOWN */:
           openrtbSet.remove(ExpandableDirection.UP);
           openrtbSet.remove(ExpandableDirection.DOWN);
           break;
-        case 26 /* ExpandingDirection: ExpandingLeftOrRight */:
+        case 26 /* EXPANDING_LEFT_OR_RIGHT */:
           openrtbSet.remove(ExpandableDirection.LEFT);
           openrtbSet.remove(ExpandableDirection.RIGHT);
           break;
-        case 27 /* ExpandingDirection: ExpandingAnyDiagonal */:
+        case 27 /* EXPANDING_ANY_DIAGONAL */:
           openrtbSet.remove(ExpandableDirection.UP);
           openrtbSet.remove(ExpandableDirection.DOWN);
           openrtbSet.remove(ExpandableDirection.LEFT);

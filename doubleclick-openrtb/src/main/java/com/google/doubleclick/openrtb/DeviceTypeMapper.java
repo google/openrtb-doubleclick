@@ -17,38 +17,51 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
-import com.google.protos.adx.NetworkBid.BidRequest.Mobile.MobileDeviceType;
 
 import javax.annotation.Nullable;
 
 /**
- * Maps between AdX's {@link MobileDeviceType} and OpenRTB's {@link DeviceType}.
+ * Maps between AdX's {@link com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType}
+ * and OpenRTB's {@link DeviceType}.
  */
 public class DeviceTypeMapper {
-  @Nullable public static DeviceType toOpenRtb(MobileDeviceType dc) {
+  @Nullable public static DeviceType toOpenRtb(
+      com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType dc) {
     switch (dc) {
       case HIGHEND_PHONE:
         return DeviceType.PHONE;
       case TABLET:
         return DeviceType.TABLET;
-      case UNKNOWN:
+      case PERSONAL_COMPUTER:
+        return DeviceType.PERSONAL_COMPUTER;
+      case CONNECTED_TV:
+        return DeviceType.CONNECTED_TV;
+      case GAME_CONSOLE:
+        return DeviceType.CONNECTED_DEVICE;
+      case UNKNOWN_DEVICE:
       default:
         return null;
     }
   }
 
-  @Nullable public static MobileDeviceType toDoubleClick(DeviceType openrtb) {
+  @Nullable public static com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType
+  toDoubleClick(DeviceType openrtb) {
     switch (openrtb) {
       case CONNECTED_TV:
+        return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.CONNECTED_TV;
       case MOBILE:
+        return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.TABLET;
       case PHONE:
-        return MobileDeviceType.HIGHEND_PHONE;
+        return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.HIGHEND_PHONE;
       case TABLET:
-        return MobileDeviceType.TABLET;
+        return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.TABLET;
       case PERSONAL_COMPUTER:
+        return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.PERSONAL_COMPUTER;
       case SET_TOP_BOX:
-        // Mapping is UNKNOWN => AdX's default
+        return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.CONNECTED_TV;
+      case CONNECTED_DEVICE:
       default:
+        // Mapping is UNKNOWN => AdX's default
         return null;
     }
   }

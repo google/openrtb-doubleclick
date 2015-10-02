@@ -34,15 +34,15 @@ import javax.annotation.Nullable;
  * CSV (comma-separated) and TSV (tab-separated) parser for internal use only.
  * Remove this if we find some alternative that's small, bug-free / well-maintained,
  * and has all required features (including some extensions we need).
- * <p>
- * This parser is "record-oriented", it doesn't try to split a stream into records so this
+ *
+ * <p>This parser is "record-oriented", it doesn't try to split a stream into records so this
  * will be done by the caller before invoking the parser. Unfortunately RFC-4180 supports
  * unescaped line breaks inside quoted fields, so a naive caller that just splits the stream
  * into records by looking at line breaks will fail to preserve the "internal line breaks".
  * In principle the caller can have the intelligence to split records correctly, but this
  * would ideally be implemented as part of the parser with a stream-oriented API.
- * <p>
- * WARNING: This class is public but it's an internal utility, not a supported API.
+ *
+ * <p>WARNING: This class is public but it's an internal utility, not a supported API.
  */
 public class CSVParser {
   public static final char EOT = (char) 0x03;
@@ -62,11 +62,11 @@ public class CSVParser {
    * @param separator Separator. Normally comma (',' / 0x2C) for CSV, or tab ('\t' / 0x09) for TSV.
    * @param quote Quote. Normally the double-quote ('"', 0x22).
    * @param escape Escape. Non-RFC extension, allows escaping individual characters inside quoted
-   * or unquoted fields. Defaults to NUL (no support for escaping), a popular choice would be '\'.
+   *     or unquoted fields. Defaults to NUL (no support for escaping), a popular choice is '\'.
    * @param empty Empty value. Any absent field will be replaced by this value. Only a zero-char
-   * field is considered absent; a quoted empty field ("") is not, so you can differentiate
-   * between "no value at all" and "empty string value". The normal value for RFC-compliant CSV
-   * or TSP parsing is the empty string, which causes no distinction between empty and zero-length.
+   *     field is considered absent; a quoted empty field ("") is not, so you can differentiate
+   *     between "no value at all" and "empty string value". The normal value for RFC-compliant CSV
+   *     or TSP parsing is the empty string, which causes no distinction between empty and 0-length.
    * @param trim If {@code true}, trims whitespaces in the start or end of all fields.
    */
   public CSVParser(char separator, char quote, char escape, @Nullable String empty, boolean trim) {

@@ -64,6 +64,12 @@ public class MapperUtil {
         : ImmutableSet.<T>of();
   }
 
+  public static <E extends Enum<E>, T> ImmutableSet<T> get(ImmutableSet<T>[] sets, E e) {
+    return e != null && e.ordinal() < sets.length && sets[e.ordinal()] != null
+        ? sets[e.ordinal()]
+        : ImmutableSet.<T>of();
+  }
+
   @SuppressWarnings("unchecked")
   public static <E extends Enum<E>, T> ImmutableSet<T>[] multimapEnumToSets(
       ImmutableMultimap<E, T> mmap) {
@@ -73,12 +79,6 @@ public class MapperUtil {
       setArray[key.ordinal()] = ImmutableSet.copyOf(mmap.get(key));
     }
     return setArray;
-  }
-
-  public static <E extends Enum<E>, T> ImmutableSet<T> get(ImmutableSet<T>[] sets, E e) {
-    return e != null && e.ordinal() < sets.length && sets[e.ordinal()] != null
-        ? sets[e.ordinal()]
-        : ImmutableSet.<T>of();
   }
 
   public static String toIpv4String(ByteString bytes) {

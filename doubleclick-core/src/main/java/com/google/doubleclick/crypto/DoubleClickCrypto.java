@@ -44,8 +44,8 @@ import javax.inject.Inject;
 
 /**
 * Encryption and decryption support for the DoubleClick Ad Exchange RTB protocol.
-* <p>
-* Encrypted payloads are wrapped by "packages" in the general format:
+*
+* <p>Encrypted payloads are wrapped by "packages" in the general format:
 * <code>
 * initVector:16 || E(payload:?) || I(signature:4)
 * </code>
@@ -55,8 +55,8 @@ import javax.inject.Inject;
 *   <li>{@code E(payload) = payload ^ hmac(encryptionKey, initVector)} per max-20-byte block</li>
 *   <li>{@code I(signature) = hmac(integrityKey, payload || initVector)[0..3]}</li>
 * </ol>
-* <p>
-* This class, and all nested classes / subclasses, are threadsafe.
+*
+* <p>This class, and all nested classes / subclasses, are threadsafe.
 */
 public class DoubleClickCrypto {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickCrypto.class);
@@ -115,7 +115,7 @@ public class DoubleClickCrypto {
    *
    * @param cipherData {@code initVector || E(payload) || I(signature)}
    * @return {@code initVector || payload || I'(signature)}
-   * Where I'(signature) == I(signature) for success, different for failure
+   *     Where I'(signature) == I(signature) for success, different for failure
    */
   public byte[] decrypt(byte[] cipherData) throws SignatureException {
     checkArgument(cipherData.length >= OVERHEAD_SIZE,
@@ -192,8 +192,8 @@ public class DoubleClickCrypto {
    * Creates the initialization vector from component {@code (timestamp, serverId)} fields.
    * This is the format used by DoubleClick, and it's a good format generally,
    * even though the initialization vector can be any random data (a cryptographic nonce).
-   * <p>
-   * NOTE: Follow the advice from
+   *
+   * <p>NOTE: Follow the advice from
    * https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-price#detecting_stale
    * by using a high-resolution timestamp; also if the {@code serverId} is not necessary, providing
    * a random value there helps further to prevent replay attacks. In all methods that have
@@ -390,8 +390,8 @@ public class DoubleClickCrypto {
 
   /**
    * Encryption for winning price.
-   * <p>
-   * See <a href="https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-price">
+   *
+   * <p>See <a href="https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-price">
    * Decrypting Price Confirmations</a>.
    */
   public static class Price extends DoubleClickCrypto {
@@ -435,7 +435,7 @@ public class DoubleClickCrypto {
      *
      * @param priceMicros the price in micros (1/1.000.000th of the currency unit)
      * @param initVector up to 16 bytes of nonce data, or {@code null} for default
-     * generated data (see {@link #createInitVector(Date, long)}
+     *     generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted price, encoded as websafe-base64
      */
     public String encodePriceMicros(long priceMicros, @Nullable byte[] initVector) {
@@ -447,7 +447,7 @@ public class DoubleClickCrypto {
      *
      * @param priceValue the price
      * @param initVector up to 16 bytes of nonce data, or {@code null} for default
-     * generated data (see {@link #createInitVector(Date, long)}
+     *     generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted price, encoded as websafe-base64
      */
     public String encodePriceValue(double priceValue, @Nullable byte[] initVector) {
@@ -477,7 +477,8 @@ public class DoubleClickCrypto {
 
   /**
    * Encryption for Advertising ID.
-   * <p> See
+   *
+   * <p>See
    * <a href="https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-advertising-id">
    * Decrypting Advertising ID</a>.
    */
@@ -494,7 +495,7 @@ public class DoubleClickCrypto {
      *
      * @param adidPlain the AdId
      * @param initVector up to 16 bytes of nonce data, or {@code null} for default
-     * generated data (see {@link #createInitVector(Date, long)}
+     *     generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted AdId
      */
     public byte[] encryptAdId(byte[] adidPlain, @Nullable byte[] initVector) {
@@ -523,7 +524,8 @@ public class DoubleClickCrypto {
 
   /**
    * Encryption for IDFA.
-   * <p> See
+   *
+   * <p>See
    * <a href="https://support.google.com/adxbuyer/answer/3221407">
    * Targeting mobile app inventory with IDFA</a>.
    */
@@ -538,7 +540,7 @@ public class DoubleClickCrypto {
      *
      * @param idfaPlain the IDFA
      * @param initVector up to 16 bytes of nonce data, or {@code null} for default
-     * generated data (see {@link #createInitVector(Date, long)}
+     *     generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted IDFA
      */
     public byte[] encryptIdfa(byte[] idfaPlain, @Nullable byte[] initVector) {
@@ -563,7 +565,7 @@ public class DoubleClickCrypto {
      *
      * @param idfaPlain the IDFA
      * @param initVector up to 16 bytes of nonce data, or {@code null} for default
-     * generated data (see {@link #createInitVector(Date, long)}
+     *     generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted IDFA, websafe-base64 encoded
      */
     public String encodeIdfa(byte[] idfaPlain, @Nullable byte[] initVector) {
@@ -583,7 +585,8 @@ public class DoubleClickCrypto {
 
   /**
    * Encryption for {@code HyperlocalSet} geofence information.
-   * <p> See
+   *
+   * <p>See
    * <a href="https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-hyperlocal">
    * Decrypting Hyperlocal Targeting Signals</a>.
    */
@@ -598,7 +601,7 @@ public class DoubleClickCrypto {
      *
      * @param hyperlocalPlain the {@code HyperlocalSet}
      * @param initVector up to 16 bytes of nonce data, or {@code null} for default
-     * generated data (see {@link #createInitVector(Date, long)}
+     *     generated data (see {@link #createInitVector(Date, long)}
      * @return encrypted {@code HyperlocalSet}
      */
     public byte[] encryptHyperlocal(byte[] hyperlocalPlain, @Nullable byte[] initVector) {
