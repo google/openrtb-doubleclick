@@ -1,9 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 0.9.7, ??-09-2015
+## Version 0.9.7, 02-09-2015
 * DoubleClick protocol v.70: Refactors part of `BidRequest`'s `Mobile`
   into a new object `Device`; OpenRTB mapping is updated for that.
+* Big round of javadoc & style reviews; tests adopted Truth.
 
 ## Version 0.9.6, 22-09-2015
 * DoubleClick protocol v.69: Adds unencrypted versions of several
