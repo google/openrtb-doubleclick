@@ -122,7 +122,7 @@ public class DoubleClickOpenRtbMapperTest {
     assertThat(ad).isNotNull();
     assertThat(ad.getHtmlSnippet()).isEqualTo("<img src=\"foo\">");
     assertThat(ad.getBuyerCreativeId()).isEqualTo("creativeId");
-    assertThat(!ad.hasVideoUrl()).isTrue();
+    assertThat(ad.hasVideoUrl()).isFalse();
   }
 
   @Test
@@ -137,7 +137,7 @@ public class DoubleClickOpenRtbMapperTest {
     assertThat(ad).isNotNull();
     assertThat(ad.getVideoUrl()).isEqualTo("http://my-video");
     assertThat(ad.getBuyerCreativeId()).isEqualTo("creativeId");
-    assertThat(!ad.hasHtmlSnippet()).isTrue();
+    assertThat(ad.hasHtmlSnippet()).isFalse();
   }
 
   @Test
@@ -213,14 +213,14 @@ public class DoubleClickOpenRtbMapperTest {
 
         assertWithMessage(testDesc).that(request.getRegs().hasCoppa()).isEqualTo(coppa);
         assertWithMessage(testDesc).that(request.getRegs().getCoppa()).isEqualTo(coppa);
-        assertThat(request.getUser().getCustomdata())
+        assertWithMessage(testDesc).that(request.getUser().getCustomdata())
             .isEqualTo(coppa ? "" : "7CLmnMiwSsq7bNTaiPsztg");
 
         if (request.getImpCount() == 0) {
           BidResponse response = TestUtil.newBidResponse();
           NetworkBid.BidResponse dcResponse =
               mapper.toExchangeBidResponse(request, response).build();
-          assertThat(dcResponse.getAdCount()).isEqualTo(0);
+          assertWithMessage(testDesc).that(dcResponse.getAdCount()).isEqualTo(0);
         } else {
           Imp imp = request.getImp(0);
           assertWithMessage(testDesc).that(imp.hasVideo()).isEqualTo(impVideo);
@@ -244,10 +244,11 @@ public class DoubleClickOpenRtbMapperTest {
                 .isEqualTo(size > 1);
             assertWithMessage(testDesc).that(banner.hasW() && banner.hasH())
                 .isNotEqualTo(size != 1);
-            assertThat(banner.hasTopframe()).isEqualTo(size >= 2);
+            assertWithMessage(testDesc).that(banner.hasTopframe()).isEqualTo(size >= 2);
           } else if (impNativ) {
             Native nativ = imp.getNative();
-            assertThat(nativ.getRequestNative().getAssetsCount()).isEqualTo(size == 0 ? 5 : 10);
+            assertWithMessage(testDesc).that(nativ.getRequestNative().getAssetsCount())
+                .isEqualTo(size == 0 ? 5 : 10);
           }
 
           Bid.Builder bid = TestData.newBid(multiBid || imp.getInstl());
