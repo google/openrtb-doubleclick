@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.8, 06-09-2015
+* Fixed distinction of `App` vs. `Site` requests in the mapper.
+
 ## Version 0.9.7, 02-09-2015
 * DoubleClick protocol v.70: Refactors part of `BidRequest`'s `Mobile`
   into a new object `Device`; OpenRTB mapping is updated for that.

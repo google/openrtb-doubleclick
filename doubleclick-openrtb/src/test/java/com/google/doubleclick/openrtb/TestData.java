@@ -240,6 +240,7 @@ public class TestData {
     Mobile.Builder mobile = Mobile.newBuilder();
     if (size % 2 == 0) {
       mobile
+          .setIsApp(true)
           .setAppId("com.mygame")
           .setEncryptedAdvertisingId(ByteString.EMPTY)
           .setEncryptedHashedIdfa(ByteString.EMPTY)
