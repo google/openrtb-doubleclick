@@ -158,7 +158,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     request.setDevice(buildDevice(dcRequest, coppa));
 
-    if (dcRequest.hasMobile()) {
+    if (dcRequest.getMobile().getIsApp()) {
       App.Builder app = buildApp(dcRequest);
       if (app != null) {
         request.setApp(app);
