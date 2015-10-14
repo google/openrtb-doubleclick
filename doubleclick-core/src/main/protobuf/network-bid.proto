@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.70: + beta: CL 78263652
+// Synchronized with v.71: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2015 Google Inc. All Rights Reserved.
@@ -236,10 +236,6 @@ message BidRequest {
   // technical documentation for a list of ids.
   repeated int32 detected_content_label = 26 [packed=true];
 
-  // Site lists that apply to this publisher. See site-lists.txt in the
-  // technical documentation for a list of ids.
-  repeated int32 site_list_id = 36;
-
   // Information about the device.
   message Device {
     // The type of device on which the ad will be shown.
@@ -306,6 +302,8 @@ message BidRequest {
 
   // Additional key-value attributes. Currently unused.
   message KeyValue {
+    optional string key = 1;
+    optional string value = 2;
   }
   repeated KeyValue key_value = 38;
 
@@ -933,6 +931,7 @@ message BidRequest {
   }
   repeated MatchingNetwork DEPRECATED_matching_network = 27;
   optional bool DEPRECATED_experimental_deadline = 35 [default=false];
+  repeated int32 DEPRECATED_site_list_id = 36;
 }
 
 // This is the message that you return in response to a BidRequest. You may

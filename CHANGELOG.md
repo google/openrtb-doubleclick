@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.9, ??-09-2015
+* DoubleClick protocol v.71: Deprecates `BidRequest.site_list_id`.
+
 ## Version 0.9.8, 06-09-2015
 * Fixed distinction of `App` vs. `Site` requests in the mapper.
 
