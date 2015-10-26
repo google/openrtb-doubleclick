@@ -720,7 +720,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.hasPlaybackMethod()) {
-      video.addPlaybackmethod(VideoPlaybackMethodMapper.toOpenRtb(dcVideo.getPlaybackMethod()));
+      Video.VideoPlaybackMethod playbackMethod = VideoPlaybackMethodMapper.toOpenRtb(dcVideo.getPlaybackMethod());
+      if (playbackMethod != null) {
+        video.addPlaybackmethod(playbackMethod);
+      }
     }
 
     if (dcSlot.hasSlotVisibility()) {
