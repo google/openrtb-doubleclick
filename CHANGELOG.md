@@ -1,13 +1,14 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 0.9.9, ??-09-2015
+## Version 0.9.9, 26-09-2015
 * DoubleClick protocol v.71: Deprecates `BidRequest.site_list_id`.
+* Fix NPE in the mapping of `Video.playbackmethod`.
 
-## Version 0.9.8, 06-09-2015
+## Version 0.9.8, 06-10-2015
 * Fixed distinction of `App` vs. `Site` requests in the mapper.
 
-## Version 0.9.7, 02-09-2015
+## Version 0.9.7, 02-10-2015
 * DoubleClick protocol v.70: Refactors part of `BidRequest`'s `Mobile`
   into a new object `Device`; OpenRTB mapping is updated for that.
 * Big round of javadoc & style reviews; tests adopted Truth.
