@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.9, 26-09-2015
+* DoubleClick protocol v.71: Deprecates `BidRequest.site_list_id`.
+* Fix NPE in the mapping of `Video.playbackmethod`.
+
 ## Version 0.9.8, 06-10-2015
 * Fixed distinction of `App` vs. `Site` requests in the mapper.
 

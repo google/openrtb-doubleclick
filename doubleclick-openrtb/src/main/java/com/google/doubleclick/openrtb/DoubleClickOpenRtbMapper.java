@@ -665,9 +665,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       deal.setBidfloor(dcDeal.getFixedCpmMicros() / ((double) MICROS_PER_CURRENCY_UNIT));
     }
     if (dcDeal.hasDealType()) {
-      AuctionType type = DealTypeMapper.toOpenRtb(dcDeal.getDealType());
-      if (type != null) {
-        deal.setAt(type);
+      AuctionType at = DealTypeMapper.toOpenRtb(dcDeal.getDealType());
+      if (at != null) {
+        deal.setAt(at);
       }
     }
     return deal;
@@ -720,7 +720,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.hasPlaybackMethod()) {
-      Video.VideoPlaybackMethod playbackMethod = VideoPlaybackMethodMapper.toOpenRtb(dcVideo.getPlaybackMethod());
+      Video.VideoPlaybackMethod playbackMethod =
+          VideoPlaybackMethodMapper.toOpenRtb(dcVideo.getPlaybackMethod());
       if (playbackMethod != null) {
         video.addPlaybackmethod(playbackMethod);
       }
@@ -808,9 +809,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
 
     if (dcSlot.hasIframingState()) {
-      Boolean f = IFramingStateMapper.toOpenRtb(dcSlot.getIframingState());
-      if (f != null) {
-        banner.setTopframe(f);
+      Boolean topframe = IFramingStateMapper.toOpenRtb(dcSlot.getIframingState());
+      if (topframe != null) {
+        banner.setTopframe(topframe);
       }
     }
 
