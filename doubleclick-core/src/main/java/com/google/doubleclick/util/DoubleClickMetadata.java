@@ -16,7 +16,6 @@
 
 package com.google.doubleclick.util;
 
-import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Interner;
@@ -43,7 +42,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -361,15 +359,13 @@ public class DoubleClickMetadata {
       String resourceName) {
     try (InputStream is = transport.open(resourceName)) {
       final ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
-      csvParser.parse(is, pattern, new Function<List<String>, Boolean>() {
-        @Override public Boolean apply(List<String> fields) {
-          try {
-            builder.put(Integer.parseInt(fields.get(0)), interner.intern(fields.get(1)));
-          } catch (NumberFormatException e) {
-            logger.trace("Bad record [{}]: {}", fields, e.toString());
-          }
-          return true;
+      csvParser.parse(is, pattern, fields -> {
+        try {
+          builder.put(Integer.parseInt(fields.get(0)), interner.intern(fields.get(1)));
+        } catch (NumberFormatException e) {
+          logger.trace("Bad record [{}]: {}", fields, e.toString());
         }
+        return true;
       });
 
       return builder.build();
@@ -382,19 +378,17 @@ public class DoubleClickMetadata {
       final Interner<String> interner, Transport transport, String resourceName) {
     final Map<CityDMARegionKey, CityDMARegionValue> map = new LinkedHashMap<>();
     try (InputStream is = transport.open(resourceName)) {
-      CSVParser.csvParser().parse(is, ".*,(\\d+),.*,.*,(\\d+)",
-          new Function<List<String>, Boolean>() {
-        @Override public Boolean apply(List<String> fields) {
-          map.put(
-              new CityDMARegionKey(
-                  Integer.parseInt(fields.get(1)),
-                  interner.intern(fields.get(3))),
-              new CityDMARegionValue(
-                  Integer.parseInt(fields.get(4)),
-                  interner.intern(fields.get(0)),
-                  interner.intern(fields.get(2))));
-          return true;
-        }});
+      CSVParser.csvParser().parse(is, ".*,(\\d+),.*,.*,(\\d+)", fields -> {
+        map.put(
+            new CityDMARegionKey(
+                Integer.parseInt(fields.get(1)),
+                interner.intern(fields.get(3))),
+            new CityDMARegionValue(
+                Integer.parseInt(fields.get(4)),
+                interner.intern(fields.get(0)),
+                interner.intern(fields.get(2))));
+        return true;
+      });
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);
     }
@@ -409,37 +403,32 @@ public class DoubleClickMetadata {
     final Set<String> duplicateCanon = new LinkedHashSet<>();
 
     try (InputStream is = transport.open(resourceName)) {
-      CSVParser.csvParser().parse(is, "(\\d+),(.*)", new Function<List<String>, Boolean>() {
-        @Override public Boolean apply(List<String> fields) {
-          try {
-            if (fields.size() == 7) {
-              GeoTarget target = new GeoTarget(
-                  Integer.valueOf(fields.get(0)),
-                  Type.valueOf(toEnumName(fields.get(6))),
-                  interner.intern(fields.get(2)),
-                  interner.intern(fields.get(1)),
-                  interner.intern(fields.get(5)));
-              List<Integer> idParent = Lists.transform(
-                  CSVParser.csvParser().parse(fields.get(3)), new Function<String, Integer>(){
-                @Override public Integer apply(@Nullable String id) {
-                  return Integer.valueOf(id);
-                }});
+      CSVParser.csvParser().parse(is, "(\\d+),(.*)", fields -> {
+        try {
+          if (fields.size() == 7) {
+            GeoTarget target = new GeoTarget(
+                Integer.valueOf(fields.get(0)),
+                Type.valueOf(toEnumName(fields.get(6))),
+                interner.intern(fields.get(2)),
+                interner.intern(fields.get(1)),
+                interner.intern(fields.get(5)));
+            List<Integer> idParent = Lists.transform(
+                CSVParser.csvParser().parse(fields.get(3)), id -> Integer.valueOf(id));
 
-              targetsById.put(target.criteriaId(), target);
-              parentIdsById.put(target.criteriaId(), idParent);
+            targetsById.put(target.criteriaId(), target);
+            parentIdsById.put(target.criteriaId(), idParent);
 
-              if (targetsByCanon.containsKey(target.canonicalName())) {
-                duplicateCanon.add(target.canonicalName());
-                targetsByCanon.remove(target.canonicalName());
-              } else {
-                targetsByCanon.put(target.canonicalName(), target);
-              }
+            if (targetsByCanon.containsKey(target.canonicalName())) {
+              duplicateCanon.add(target.canonicalName());
+              targetsByCanon.remove(target.canonicalName());
+            } else {
+              targetsByCanon.put(target.canonicalName(), target);
             }
-          } catch (ParseException | IllegalArgumentException e) {
-            logger.trace("Bad record [{}]: {}", fields, e.toString());
           }
-          return true;
+        } catch (ParseException | IllegalArgumentException e) {
+          logger.trace("Bad record [{}]: {}", fields, e.toString());
         }
+        return true;
       });
 
       for (Map.Entry<Integer, GeoTarget> entry : targetsById.entrySet()) {
@@ -473,21 +462,19 @@ public class DoubleClickMetadata {
     final ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
 
     try (InputStream is = new ResourceTransport().open(resourceName)) {
-      CSVParser.tsvParser().parse(is, "(\\d+)\\s+(.*)", new Function<List<String>, Boolean>() {
-        @Override @Nullable public Boolean apply(@Nullable List<String> fields) {
-          try {
-            CountryCodes codes = new CountryCodes(
-                Integer.parseInt(fields.get(0)),
-                interner.intern(fields.get(2)),
-                interner.intern(fields.get(3)));
-            map.put(codes.numeric(), codes);
-            map.put(codes.alpha2(), codes);
-            map.put(codes.alpha3(), codes);
-          } catch (IllegalArgumentException e) {
-            logger.trace("Bad record [{}]: {}", fields, e.toString());
-          }
-          return true;
+      CSVParser.tsvParser().parse(is, "(\\d+)\\s+(.*)", fields -> {
+        try {
+          CountryCodes codes = new CountryCodes(
+              Integer.parseInt(fields.get(0)),
+              interner.intern(fields.get(2)),
+              interner.intern(fields.get(3)));
+          map.put(codes.numeric(), codes);
+          map.put(codes.alpha2(), codes);
+          map.put(codes.alpha3(), codes);
+        } catch (IllegalArgumentException e) {
+          logger.trace("Bad record [{}]: {}", fields, e.toString());
         }
+        return true;
       });
     } catch (IOException e) {
       throw new ExceptionInInitializerError(e);

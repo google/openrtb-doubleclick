@@ -16,7 +16,6 @@
 
 package com.google.doubleclick.util;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -117,11 +116,8 @@ public class DoubleClickValidator {
           logger.debug("Ad #{} removed, clean but empty adslot", iAd);
         }
       } else {
-        Iterable<BidResponse.Ad.AdSlot.Builder> filteredAdslots = ProtoUtils.filter(adslots,
-            new Predicate<BidResponse.Ad.AdSlot.Builder>() {
-          @Override public boolean apply(BidResponse.Ad.AdSlot.Builder adslot) {
-            return validate(request, ad, adslot);
-          }});
+        Iterable<BidResponse.Ad.AdSlot.Builder> filteredAdslots =
+            ProtoUtils.filter(adslots, adslot -> validate(request, ad, adslot));
 
         if (filteredAdslots != adslots) {
           hasBad = true;
@@ -298,11 +294,11 @@ public class DoubleClickValidator {
 
       for (T respValue : respAttrs) {
         if (!metadata.containsKey(respValue)) {
-          bad = (bad == null) ? new ArrayList<T>() : bad;
+          bad = (bad == null) ? new ArrayList<>() : bad;
           bad.add(respValue);
           unknownAttrTotal.inc();
         } else if (reqIndex.contains(respValue) != allowed) {
-          bad = (bad == null) ? new ArrayList<T>() : bad;
+          bad = (bad == null) ? new ArrayList<>() : bad;
           bad.add(respValue);
           invalidAttrTotal.inc();
         }
