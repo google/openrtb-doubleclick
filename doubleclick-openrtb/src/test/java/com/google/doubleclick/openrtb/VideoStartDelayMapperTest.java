@@ -29,7 +29,7 @@ public class VideoStartDelayMapperTest {
         .isEqualTo(1);
     assertThat(VideoStartDelayMapper.toDoubleClick(333)).isEqualTo(333);
     assertThat(VideoStartDelayMapper.toOpenRtb(-1))
-        .isEqualTo(VideoStartDelay.GENERIC_POST_ROLL_VALUE);
+        .isSameAs(VideoStartDelay.GENERIC_POST_ROLL_VALUE);
     assertThat(VideoStartDelayMapper.toOpenRtb(333)).isEqualTo(333);
 
     for (VideoStartDelay openrtb : VideoStartDelay.values()) {

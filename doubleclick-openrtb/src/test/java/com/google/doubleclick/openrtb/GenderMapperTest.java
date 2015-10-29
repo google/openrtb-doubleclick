@@ -26,8 +26,8 @@ import org.junit.Test;
 public class GenderMapperTest {
   @Test
   public void testMapper() {
-    assertThat(GenderMapper.toOpenRtb(UserDemographic.Gender.MALE)).isEqualTo(User.Gender.MALE);
-    assertThat(GenderMapper.toDoubleClick(User.Gender.MALE)).isEqualTo(UserDemographic.Gender.MALE);
+    assertThat(GenderMapper.toOpenRtb(UserDemographic.Gender.MALE)).isSameAs(User.Gender.MALE);
+    assertThat(GenderMapper.toDoubleClick(User.Gender.MALE)).isSameAs(UserDemographic.Gender.MALE);
 
     for (User.Gender openrtb : User.Gender.values()) {
       GenderMapper.toDoubleClick(openrtb);

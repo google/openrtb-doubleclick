@@ -86,7 +86,7 @@ public class DoubleClickMetadataTest {
     assertThat(geoTarget1.name()).isEqualTo("United States");
     assertThat(geoTarget1.canonicalName()).isEqualTo("United States");
     assertThat(geoTarget1.countryCode()).isEqualTo("US");
-    assertThat(geoTarget1.type()).isEqualTo(GeoTarget.Type.COUNTRY);
+    assertThat(geoTarget1.type()).isSameAs(GeoTarget.Type.COUNTRY);
     assertThat(geoTarget1.getCanonAncestor(GeoTarget.Type.COUNTRY)).isSameAs(geoTarget1);
     assertThat(geoTarget1.getCanonAncestor(GeoTarget.Type.CITY)).isNull();
     assertThat(geoTarget1.getIdAncestor(GeoTarget.Type.COUNTRY)).isSameAs(geoTarget1);
