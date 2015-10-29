@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.71: + beta: CL 78263652
+// Synchronized with v.73: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2015 Google Inc. All Rights Reserved.
@@ -26,7 +26,10 @@ message BidRequest {
   // Reasons for constrained usage treatment of user data (google_user_id,
   // hosted_match_data, IDFA, etc).
   enum UserDataTreatment {
-    // The current request should be treated as child-directed.
+    // The current request should be treated as child-directed for purposes of
+    // the Children’s Online Privacy Protection Act. See
+    // https://support.google.com/adxseller/answer/4442399 for more information.
+
     TAG_FOR_CHILD_DIRECTED_TREATMENT = 0;
   }
 
@@ -268,9 +271,9 @@ message BidRequest {
     // The OS version; e.g. 2 for Android 2.1, or 3.3 for iOS 3.3.1.
     optional OsVersion os_version = 5;
 
-    // Unique identifer for the mobile carrier if the device is connected to the
-    // internet via a carrier (as opposed to via WiFi). To look up carrier name
-    // and country from carrier ID, please refer to:
+    // Unique identifier for the mobile carrier if the device is connected to
+    // the internet via a carrier (as opposed to via WiFi). To look up carrier
+    // name and country from carrier ID, please refer to:
     // https://developers.google.com/adwords/api/docs/appendix/mobilecarriers.
     optional int64 carrier_id = 6;
 
@@ -848,6 +851,10 @@ message BidRequest {
       // inventory. This is repeated because publishers may
       // do multiple types of auto refresh on one piece of inventory.
       repeated AutoRefreshSettings refresh_settings = 1;
+
+      // The number of times this ad slot had been refreshed since last page
+      // load.
+      optional int32 refresh_count = 2 [default = 0];
     }
     optional AutoRefresh auto_refresh = 23;
 
@@ -884,8 +891,8 @@ message BidRequest {
     optional int32 creative_status_code = 3;
 
     // The second price cpm in micros of your account currency if your bid won
-    // the auction, or the winning bid that must be exceeded to win the auction
-    // if your ad did not win. This is only set if your bid participated in the
+    // the auction, or the cpm that must be exceeded to win the auction if your
+    // bid was outbid. This is only set if your bid participated in the
     // auction. It is not set if the bid was filtered prior to the auction. It
     // is also witheld if the publisher or winning bidder has opted out of price
     // feedback, or if your account has opted out of sharing winning prices with
