@@ -1,6 +1,15 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.10, ??-10-2015
+* THE BIG MOVE TO JAVA 8! The library now requires JDK 8, and takes
+  advantage of new APIs/features of Java 8.
+  - No, we won't maintain a JDK 7 compatible version of the library;
+    notice that JDK 7 was EOL'd since April 2015.
+* The `Device.ifa` and `Device.dpidmd5` fields are now mapped with
+  Websafe-Base64 formatting (instead of hexadecimal / Base16).
+  This change is consistent with AdX's native OpenRTB
+
 ## Version 0.9.9, 26-09-2015
 * DoubleClick protocol v.71: Deprecates `BidRequest.site_list_id`.
 * Fix NPE bug (0.9.6+) in the mapping of `Video.playbackmethod`.
