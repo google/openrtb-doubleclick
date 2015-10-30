@@ -71,6 +71,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
@@ -138,7 +139,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
   @Override public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
-        .setId(BaseEncoding.base64Url().omitPadding().encode(dcRequest.getId().toByteArray()));
+        .setId(Base64.getUrlEncoder().withoutPadding().encodeToString(
+            dcRequest.getId().toByteArray()));
 
     if (dcRequest.getIsPing()) {
       return request;
@@ -837,7 +839,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       ByteString dcHMD = coppa
           ? dcRequest.getConstrainedUsageHostedMatchData()
           : dcRequest.getHostedMatchData();
-      user.setCustomdata(BaseEncoding.base64Url().omitPadding().encode(dcHMD.toByteArray()));
+      user.setCustomdata(
+          Base64.getUrlEncoder().withoutPadding().encodeToString(dcHMD.toByteArray()));
     }
 
     if (dcRequest.hasUserDemographic()) {

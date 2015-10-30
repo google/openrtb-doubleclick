@@ -18,7 +18,6 @@ package com.google.doubleclick.crypto;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.TestUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
@@ -29,6 +28,7 @@ import org.junit.Test;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -84,9 +84,9 @@ public class DoubleClickCryptoTest {
   private static DoubleClickCrypto.Keys createKeys() {
     try {
       return new DoubleClickCrypto.Keys(
-          new SecretKeySpec(BaseEncoding.base64Url().decode(
+          new SecretKeySpec(Base64.getUrlDecoder().decode(
               "sIxwz7yw62yrfoLGt12lIHKuYrK_S5kLuApI2BQe7Ac="), "HmacSHA1"),
-          new SecretKeySpec(BaseEncoding.base64Url().decode(
+          new SecretKeySpec(Base64.getUrlDecoder().decode(
               "v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
     } catch (InvalidKeyException e) {
       throw new ExceptionInInitializerError(e);

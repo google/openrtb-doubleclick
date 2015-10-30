@@ -16,7 +16,6 @@
 
 package com.google.doubleclick.util;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.MessageLiteOrBuilder;
 
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Partial, private copy of the ProtoUtils class in openrtb-core,
@@ -46,7 +46,7 @@ final class ProtoUtils {
 
     int i = 0;
     for (M obj : objs) {
-      if (!filter.apply(obj)) {
+      if (!filter.test(obj)) {
         // At least one discarded object, go to slow-path.
         return filterFrom(objs, filter, i);
       }
@@ -60,7 +60,7 @@ final class ProtoUtils {
   private static <M extends MessageLiteOrBuilder> List<M> filterFrom(
       Iterable<M> objs, Predicate<M> filter, int firstDiscarded) {
     int initialCapacity = (objs instanceof Collection<?>) ? ((Collection<?>) objs).size() - 1 : 10;
-    List<M> filtered = (firstDiscarded == 0) ? null : new ArrayList<M>(initialCapacity);
+    List<M> filtered = (firstDiscarded == 0) ? null : new ArrayList<>(initialCapacity);
 
     Iterator<M> iter = objs.iterator();
     for (int i = 0; i < firstDiscarded; ++i) {
@@ -72,8 +72,8 @@ final class ProtoUtils {
     while (iter.hasNext()) {
       M obj = iter.next();
 
-      if (filter.apply(obj)) {
-        filtered = (filtered == null) ? new ArrayList<M>(initialCapacity) : filtered;
+      if (filter.test(obj)) {
+        filtered = (filtered == null) ? new ArrayList<>(initialCapacity) : filtered;
         filtered.add(obj);
       }
     }

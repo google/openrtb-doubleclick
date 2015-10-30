@@ -1,6 +1,13 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.10, 29-10-2015
+* THE BIG MOVE TO JAVA 8! The library now requires JDK 8, and takes
+  advantage of new APIs/features of Java 8.
+  - We won't maintain a JDK 7 compatible version of the library; notice
+    that JDK 7 was EOL'd since April 2015.
+* DoubleClick protocol v.73: Adds `AutoRefresh.refresh_count`.
+
 ## Version 0.9.9, 26-09-2015
 * DoubleClick protocol v.71: Deprecates `BidRequest.site_list_id`.
 * Fix NPE bug (0.9.6+) in the mapping of `Video.playbackmethod`.
