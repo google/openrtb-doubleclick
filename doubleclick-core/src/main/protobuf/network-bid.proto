@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.73: + beta: CL 78263652
+// Synchronized with v.74: + beta: CL 78263652
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2015 Google Inc. All Rights Reserved.
@@ -1113,9 +1113,8 @@ message BidResponse {
       // BidRequest.AdSlot.matching_ad_data.billing_id.
       optional int64 billing_id = 4;
 
-      // The deal id that you want this bid to participate in. If left unset,
-      // then AdX will choose a deal if one is available or use the open auction
-      // otherwise. Set this to "1" if a deal is available but you want to
+      // The deal id that you want this bid to participate in. Leave unset
+      // or set it to "1" if a deal is available but you want to
       // ignore the deal and participate in the open auction.
       optional int64 deal_id = 5 [default = 0];
     }
