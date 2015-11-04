@@ -750,7 +750,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcSlot.getWidthCount() != 0) {
-      if (dcSlot.getWidthCount() > 1 && interstitial) {
+      if (dcSlot.getWidthCount() > 1 && !interstitial) {
         logger.debug("Invalid Video, non-interstitial with multiple sizes");
         return null;
       } else {
