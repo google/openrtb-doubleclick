@@ -128,7 +128,7 @@ public class DoubleClickOpenRtbMapperTest {
   @Test
   public void testResponse_videoAd() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(
-        TestData.newRequest(5, false, false).setVideo(TestData.newVideo(5)));
+        TestData.newRequest(0, false, false).setVideo(TestData.newVideo(0)));
     Bid bid = TestData.newBid(false)
         .setAdm("http://my-video")
         .setCrid("creativeId")
@@ -144,7 +144,7 @@ public class DoubleClickOpenRtbMapperTest {
   public void testResponse_videoAd_missingSize() {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(
         TestData.newRequest(3, false, false).setVideo(TestData.newVideo(0)));
-    assertThat(request.getImpCount()).isEqualTo(1);
+    assertThat(request.getImpCount()).isEqualTo(0);
   }
 
   @Test
@@ -152,7 +152,7 @@ public class DoubleClickOpenRtbMapperTest {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(TestData.newRequest(3, false, false)
         .setMobile(TestData.newMobile(0, false).setIsInterstitialRequest(true))
         .setVideo(TestData.newVideo(0)));
-    assertThat(request.getImpCount()).isEqualTo(0);
+    assertThat(request.getImpCount()).isEqualTo(1);
   }
 
   @Test(expected = MapperException.class)
