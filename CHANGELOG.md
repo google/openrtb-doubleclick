@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.11, 04-11-2015
+* Fix mapping of non-interstitial video impressions.
+
 ## Version 0.9.10, 29-10-2015
 * THE BIG MOVE TO JAVA 8! The library now requires JDK 8, and takes
   advantage of new APIs/features of Java 8.

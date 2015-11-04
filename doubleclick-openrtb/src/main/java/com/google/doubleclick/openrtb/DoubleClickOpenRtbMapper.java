@@ -749,16 +749,13 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       video.addApi(APIFramework.MRAID_2);
     }
 
-    if (dcSlot.getWidthCount() == 1) {
-      video.setW(dcSlot.getWidth(0));
-      video.setH(dcSlot.getHeight(0));
-    } else if (dcSlot.getWidthCount() > 1) {
-      if (interstitial) {
-        video.setW(dcSlot.getWidth(0));
-        video.setH(dcSlot.getHeight(0));
-      } else {
+    if (dcSlot.getWidthCount() != 0) {
+      if (dcSlot.getWidthCount() > 1 && interstitial) {
         logger.debug("Invalid Video, non-interstitial with multiple sizes");
         return null;
+      } else {
+        video.setW(dcSlot.getWidth(0));
+        video.setH(dcSlot.getHeight(0));
       }
     }
 
