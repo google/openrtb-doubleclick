@@ -3,6 +3,9 @@ RELEASE NOTES
 
 ## Version 0.9.11, 04-11-2015
 * Fix mapping of non-interstitial video impressions.
+* Removed mapping of `AdSlot.targetable_channel` to `App`/`Site`.`id`;
+  this mapping was inadequate. May return later as an extension.
+* Avoid creating an `App` or `Site` that's empty except for extensions.
 
 ## Version 0.9.10, 29-10-2015
 * THE BIG MOVE TO JAVA 8! The library now requires JDK 8, and takes
