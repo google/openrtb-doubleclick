@@ -140,21 +140,6 @@ public class DoubleClickOpenRtbMapperTest {
     assertThat(ad.hasHtmlSnippet()).isFalse();
   }
 
-  @Test
-  public void testResponse_videoAd_missingSize() {
-    OpenRtb.BidRequest request = TestUtil.newBidRequest(
-        TestData.newRequest(3, false, false).setVideo(TestData.newVideo(0)));
-    assertThat(request.getImpCount()).isEqualTo(0);
-  }
-
-  @Test
-  public void testResponse_videoAd_multisizeInterstitial() {
-    OpenRtb.BidRequest request = TestUtil.newBidRequest(TestData.newRequest(3, false, false)
-        .setMobile(TestData.newMobile(0, false).setIsInterstitialRequest(true))
-        .setVideo(TestData.newVideo(0)));
-    assertThat(request.getImpCount()).isEqualTo(1);
-  }
-
   @Test(expected = MapperException.class)
   public void testResponse_noCrid() {
     Bid bid = TestData.newBid(false)
