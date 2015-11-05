@@ -77,7 +77,6 @@ import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -95,9 +94,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     NetworkBid.BidRequest, NetworkBid.BidResponse,
     NetworkBid.BidRequest.Builder, NetworkBid.BidResponse.Builder> {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickOpenRtbMapper.class);
-  private static final String YOUTUBE_AFV_USER_ID = "afv_user_id_";
-  private static final Pattern SEMITRANSPARENT_CHANNEL =
-      Pattern.compile("pack-(brand|semi|anon)-([^\\-]+)::(.+)");
   private static final Joiner csvJoiner = Joiner.on(",").skipNulls();
   private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
 
@@ -107,6 +103,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   private final Counter missingCrid = new Counter();
   private final Counter invalidImp = new Counter();
   private final Counter missingSize = new Counter();
+  private final Counter excessSizes = new Counter();
   private final Counter noVideoOrBanner = new Counter();
   private final Counter coppaTreatment = new Counter();
   private final Counter noImp = new Counter();
@@ -128,6 +125,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     metricRegistry.register(MetricRegistry.name(cls, "missing-crid"), missingCrid);
     metricRegistry.register(MetricRegistry.name(cls, "invalid-imp"), invalidImp);
     metricRegistry.register(MetricRegistry.name(cls, "missing-size"), missingSize);
+    metricRegistry.register(MetricRegistry.name(cls, "excess-sizes"), excessSizes);
     metricRegistry.register(MetricRegistry.name(cls, "no-video-or-banner"), noVideoOrBanner);
     metricRegistry.register(MetricRegistry.name(cls, "coppa-treatment"), coppaTreatment);
     metricRegistry.register(MetricRegistry.name(cls, "no-imp"), noImp);
@@ -433,23 +431,21 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       mapped = true;
     }
 
-    String channelId = findChannelId(dcRequest);
-    if (channelId != null) {
-      app.setId(channelId);
-      mapped = true;
-    }
-
     Publisher.Builder pub = buildPublisher(dcRequest);
     if (pub != null) {
       app.setPublisher(pub);
       mapped = true;
     }
 
-    for (ExtMapper extMapper : extMappers) {
-      mapped |= extMapper.toOpenRtbApp(dcRequest, app);
+    if (!mapped) {
+      return null;
     }
 
-    return mapped ? app : null;
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toOpenRtbApp(dcRequest, app);
+    }
+
+    return app;
   }
 
   @Nullable protected Content.Builder buildAppContent(NetworkBid.BidRequest dcRequest) {
@@ -505,17 +501,15 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       mapped = true;
     }
 
-    String channelId = findChannelId(dcRequest);
-    if (channelId != null) {
-      site.setId(channelId);
-      mapped = true;
+    if (!mapped) {
+      return null;
     }
 
     for (ExtMapper extMapper : extMappers) {
-      mapped |= extMapper.toOpenRtbSite(dcRequest, site);
+      extMapper.toOpenRtbSite(dcRequest, site);
     }
 
-    return mapped ? site : null;
+    return site;
   }
 
   @Nullable protected Content.Builder buildContent(NetworkBid.BidRequest dcRequest) {
@@ -751,12 +745,13 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcSlot.getWidthCount() != 0) {
       if (dcSlot.getWidthCount() > 1 && !interstitial) {
-        logger.debug("Invalid Video, non-interstitial with multiple sizes");
-        return null;
-      } else {
-        video.setW(dcSlot.getWidth(0));
-        video.setH(dcSlot.getHeight(0));
+        excessSizes.inc();
+        if (logger.isDebugEnabled()) {
+          logger.debug("Non-interstitial video has {} sizes", dcSlot.getWidthCount());
+        }
       }
+      video.setW(dcSlot.getWidth(0));
+      video.setH(dcSlot.getHeight(0));
     }
 
     if (dcVideo.getCompanionSlotCount() != 0) {
@@ -884,20 +879,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     return user;
-  }
-
-  @Nullable protected String findChannelId(NetworkBid.BidRequest dcRequest) {
-    for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
-      for (String dcChannel : dcSlot.getTargetableChannelList()) {
-        if (dcChannel.startsWith(YOUTUBE_AFV_USER_ID)) {
-          return dcChannel.substring(YOUTUBE_AFV_USER_ID.length());
-        } else if (SEMITRANSPARENT_CHANNEL.matcher(dcChannel).matches()) {
-          return dcChannel;
-        }
-      }
-    }
-
-    return null;
   }
 
   @Override public NetworkBid.BidResponse.Builder toExchangeBidResponse(
