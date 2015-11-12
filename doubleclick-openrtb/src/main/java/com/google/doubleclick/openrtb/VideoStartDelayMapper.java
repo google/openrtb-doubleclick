@@ -29,7 +29,7 @@ public class VideoStartDelayMapper {
       case 0:
         return VideoStartDelay.PRE_ROLL_VALUE;
       default:
-        return dc;
+        return dc / 1000;
     }
   }
 
@@ -42,7 +42,7 @@ public class VideoStartDelayMapper {
       case VideoStartDelay.PRE_ROLL_VALUE:
         return 0;
       default:
-        return openrtb;
+        return openrtb * 1000;
     }
   }
 }
