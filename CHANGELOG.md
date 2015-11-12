@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.12, 12-11-2015
+* Fix mapping of `Video.minduration/maxduration/startdelay`.
+
 ## Version 0.9.11, 04-11-2015
 * Fix mapping of non-interstitial video impressions.
 * Removed mapping of `AdSlot.targetable_channel` to `App`/`Site`.`id`;

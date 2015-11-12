@@ -27,10 +27,10 @@ public class VideoStartDelayMapperTest {
   public void testMapper() {
     assertThat(VideoStartDelayMapper.toDoubleClick(VideoStartDelay.GENERIC_MID_ROLL_VALUE))
         .isEqualTo(1);
-    assertThat(VideoStartDelayMapper.toDoubleClick(333)).isEqualTo(333);
+    assertThat(VideoStartDelayMapper.toDoubleClick(333)).isEqualTo(333000);
     assertThat(VideoStartDelayMapper.toOpenRtb(-1))
         .isSameAs(VideoStartDelay.GENERIC_POST_ROLL_VALUE);
-    assertThat(VideoStartDelayMapper.toOpenRtb(333)).isEqualTo(333);
+    assertThat(VideoStartDelayMapper.toOpenRtb(333000)).isEqualTo(333);
 
     for (VideoStartDelay openrtb : VideoStartDelay.values()) {
       VideoStartDelayMapper.toDoubleClick(openrtb.getNumber());
