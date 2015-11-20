@@ -75,7 +75,10 @@ public class TestData {
 
   public static NativeResponse.Builder newNativeResponse(int size) {
     NativeResponse.Builder nativ = NativeResponse.newBuilder().setVer("1.0")
-        .setLink(NativeResponse.Link.newBuilder().setUrl("http://herewego"));
+        .setLink(NativeResponse.Link.newBuilder()
+            .setUrl("http://clickthrough")
+            .addClicktrackers("http://clicktracker1"))
+        .addAllImptrackers(asList("http://imptracker1", "http://imptracker2"));
     if (size != NO_SLOT) {
       nativ
           .addAssets(newRespAssetTitle(1, "title"))
@@ -87,7 +90,8 @@ public class TestData {
           .addAssets(newRespAssetImage(7, size, "http://appicon"))
           .addAssets(newRespAssetData(8, "4.5"))
           .addAssets(newRespAssetData(9, "$9.99"))
-          .addAssets(newRespAssetData(10, "store"));
+          .addAssets(newRespAssetData(10, "Play Store")
+              .setLink(NativeResponse.Link.newBuilder().setUrl("http://store")));
     }
     return nativ;
   }

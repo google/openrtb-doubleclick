@@ -929,7 +929,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       dcAd.setHtmlSnippet(bid.getAdm());
       setAdSize(bid, dcAd, matchingImp);
     } else if (matchingImp.hasNative()) {
-      dcAd.setNativeAd(nativeMapper.buildNativeResponse(bid, matchingImp));
+      nativeMapper.buildNativeResponse(dcAd, bid, matchingImp);
     } else {
       noVideoOrBanner.inc();
       throw new MapperException("Imp has neither of Video or Banner");
@@ -956,7 +956,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     dcAd.addAllAttribute(CreativeAttributeMapper.toDoubleClick(bid.getAttrList(), null));
 
     if (bid.hasNurl()) {
-      dcAd.setImpressionTrackingUrl(bid.getNurl());
+      dcAd.addImpressionTrackingUrl(bid.getNurl());
     }
 
     Set<Integer> cats = new LinkedHashSet<>();
