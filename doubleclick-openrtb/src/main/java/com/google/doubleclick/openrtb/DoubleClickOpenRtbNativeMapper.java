@@ -66,7 +66,8 @@ public class DoubleClickOpenRtbNativeMapper {
     metricRegistry.register(MetricRegistry.name(cls, "unsupported"), unsupported);
   }
 
-  public NetworkBid.BidResponse.Ad.NativeAd.Builder buildNativeResponse(Bid bid, Imp matchingImp) {
+  public void buildNativeResponse(
+      NetworkBid.BidResponse.Ad.Builder dcAd, Bid bid, Imp matchingImp) {
     NativeRequest natReq;
     NativeResponse natResp;
 
@@ -115,15 +116,18 @@ public class DoubleClickOpenRtbNativeMapper {
         throw new MapperException("Missing adm or adm_native");
     }
 
-    return buildRespAd(natReq, natResp);
+    buildRespAd(dcAd, natReq, natResp);
   }
 
-  protected NetworkBid.BidResponse.Ad.NativeAd.Builder buildRespAd(
-      NativeRequest natReq, NativeResponse natResp) {
+  protected void buildRespAd(
+      NetworkBid.BidResponse.Ad.Builder dcAd, NativeRequest natReq, NativeResponse natResp) {
     NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd =
-        NetworkBid.BidResponse.Ad.NativeAd.newBuilder()
-            .addAllImpressionTrackingUrl(natResp.getImptrackersList());
+        NetworkBid.BidResponse.Ad.NativeAd.newBuilder();
 
+    dcAd.addAllImpressionTrackingUrl(natResp.getImptrackersList());
+    if (natResp.getLink().hasUrl()) {
+      dcAd.addClickThroughUrl(natResp.getLink().getUrl());
+    }
     if (natResp.getLink().getClicktrackersCount() != 0) {
       dcNatAd.setClickTrackingUrl(natResp.getLink().getClicktrackers(0));
     }
@@ -177,7 +181,7 @@ public class DoubleClickOpenRtbNativeMapper {
       }
     }
 
-    return dcNatAd;
+    dcAd.setNativeAd(dcNatAd);
   }
 
   protected void buildRespTitle(NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset,
@@ -241,7 +245,9 @@ public class DoubleClickOpenRtbNativeMapper {
         dcNatAd.setPrice(data.getValue());
         break;
       case ADDRESS:
-        dcNatAd.setStore(data.getValue());
+        if (asset.getLink().hasUrl()) {
+          dcNatAd.setStore(asset.getLink().getUrl());
+        }
         break;
       case RATING:
         dcNatAd.setStarRating(Double.parseDouble(data.getValue()));

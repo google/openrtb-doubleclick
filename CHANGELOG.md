@@ -1,6 +1,14 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.13, 12-20-2015
+* DoubleClick protocol v.74: `NativeAd.impression_tracking_url` is
+  deprecated; use the now-GA field `Ad.impression_tracking_url`.
+* Native response improvements: changes mapping `link.imprackers`
+  to `Ad.impression_tracking_url`; changes ADDRESS asset ->
+  `NativeAd.store` to map from the asset's `link.url`; adds mapping
+  `link.url` -> `Ad.click_through_url`.
+
 ## Version 0.9.12, 12-11-2015
 * Fix mapping of `Video.minduration/maxduration/startdelay`.
 
