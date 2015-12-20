@@ -26,7 +26,8 @@ import org.junit.Test;
 public class BannerMimeMapperTest {
   @Test
   public void testMapper() {
-    assertThat(BannerMimeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.IMAGE_CREATIVE), null))
+    assertThat(
+        BannerMimeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.IMAGE_CREATIVE), false, null))
         .containsExactly("image/gif", "image/jpeg", "image/png");
     assertThat(BannerMimeMapper.toDoubleClick(ImmutableList.of("image/jpeg"), null))
         .containsExactly(CreativeFormat.IMAGE_CREATIVE);

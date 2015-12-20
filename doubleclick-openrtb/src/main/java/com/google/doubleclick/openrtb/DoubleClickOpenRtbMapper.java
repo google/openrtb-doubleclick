@@ -266,11 +266,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       if (dcDevice.hasCarrierId()) {
         device.setCarrier(String.valueOf(dcDevice.getCarrierId()));
       }
+      if (dcDevice.hasBrand()) {
+        device.setMake(dcDevice.getBrand());
+      }
       if (dcDevice.hasModel()) {
         device.setModel(dcDevice.getModel());
       }
       if (dcDevice.hasPlatform()) {
-        device.setOs(dcDevice.getPlatform());
+        device.setOs(DeviceOSMapper.toOpenRtb(dcDevice.getPlatform()));
       }
       if (dcDevice.getOsVersion().hasMajor()) {
         NetworkBid.BidRequest.Device.OsVersion dcVer = dcDevice.getOsVersion();
@@ -702,7 +705,19 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     Video.Builder video = Video.newBuilder()
         .addProtocols(VideoBidResponseProtocol.VAST_2_0)
         .addProtocols(VideoBidResponseProtocol.VAST_3_0)
+        .addProtocols(VideoBidResponseProtocol.VAST_2_0_WRAPPER)
+        .addProtocols(VideoBidResponseProtocol.VAST_3_0_WRAPPER)
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
+
+    boolean vpaid = !dcSlot.getExcludedAttributeList().contains(30 /* Vpaid Flash */);
+    if (vpaid) {
+      video.addApi(APIFramework.VPAID_1);
+      video.addApi(APIFramework.VPAID_2);
+    }
+    if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: MRAID */)) {
+      video.addApi(APIFramework.MRAID_1);
+      video.addApi(APIFramework.MRAID_2);
+    }
 
     if (dcVideo.hasMinAdDuration()) {
       video.setMinduration(dcVideo.getMinAdDuration() / 1000);
@@ -712,7 +727,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.getAllowedVideoFormatsCount() != 0) {
-      video.addAllMimes(VideoMimeMapper.toOpenRtb(dcVideo.getAllowedVideoFormatsList(), null));
+      video.addAllMimes(VideoMimeMapper.toOpenRtb(
+          dcVideo.getAllowedVideoFormatsList(), vpaid, null));
     }
 
     if (dcVideo.hasPlaybackMethod()) {
@@ -732,15 +748,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcVideo.hasVideoadStartDelay()) {
       video.setStartdelay(VideoStartDelayMapper.toOpenRtb(dcVideo.getVideoadStartDelay()));
-    }
-
-    if (!dcSlot.getExcludedAttributeList().contains(30 /* InstreamVastVideoType: Vpaid Flash */)) {
-      video.addApi(APIFramework.VPAID_1);
-      video.addApi(APIFramework.VPAID_2);
-    }
-    if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: MRAID */)) {
-      video.addApi(APIFramework.MRAID_1);
-      video.addApi(APIFramework.MRAID_2);
     }
 
     if (dcSlot.getWidthCount() != 0) {
@@ -764,7 +771,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
         if (dcCompSlot.getCreativeFormatCount() != 0) {
           companion.addAllMimes(
-              BannerMimeMapper.toOpenRtb(dcCompSlot.getCreativeFormatList(), null));
+              BannerMimeMapper.toOpenRtb(dcCompSlot.getCreativeFormatList(), vpaid, null));
           CompanionTypeMapper.toOpenRtb(dcCompSlot.getCreativeFormatList(), companionTypes);
         }
 

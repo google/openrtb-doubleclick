@@ -1,6 +1,11 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 0.9.14, ??-01-2016
+* Video mapping improvements: includes VAST Wrapper values; additional
+  mime types for video and companion ads with VPAID enabled.
+* `Device.os` mapping fixed for iphone/ipad="iOS"; `Device.make` added.
+
 ## Version 0.9.13, 12-20-2015
 * DoubleClick protocol v.74: `NativeAd.impression_tracking_url` is
   deprecated; use the now-GA field `Ad.impression_tracking_url`.
