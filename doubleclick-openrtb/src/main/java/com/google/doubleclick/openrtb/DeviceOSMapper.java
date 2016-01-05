@@ -19,7 +19,7 @@ package com.google.doubleclick.openrtb;
 import javax.annotation.Nullable;
 
 /**
- * Maps between AdX's {@code platform} and OpenRTB's {@link os}.
+ * Maps between AdX's {@code platform} and OpenRTB's {@code os}.
  */
 public class DeviceOSMapper {
   @Nullable public static String toOpenRtb(String dc) {

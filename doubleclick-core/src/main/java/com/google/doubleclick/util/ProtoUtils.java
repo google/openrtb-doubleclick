@@ -16,6 +16,8 @@
 
 package com.google.doubleclick.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.MessageLiteOrBuilder;
 
@@ -31,6 +33,9 @@ import java.util.function.Predicate;
  */
 final class ProtoUtils {
 
+  private ProtoUtils() {
+  }
+
   /**
    * Runs a filter through a sequence of objects.
    *
@@ -43,6 +48,7 @@ final class ProtoUtils {
    */
   public static <M extends MessageLiteOrBuilder>
       Iterable<M> filter(Iterable<M> objs, Predicate<M> filter) {
+    checkNotNull(filter);
 
     int i = 0;
     for (M obj : objs) {
