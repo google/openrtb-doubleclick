@@ -1,10 +1,19 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 0.9.14, ??-01-2016
+## Version 1.0.0, 04-01-2016
+* Happy new year!!  And here's the one-dot-zero release of the library.
+* This release follow the GA of the native AdX/OpenRTB protocol support;
+  the OpenRTB mapper here makes the same mappings for standard fields.
+  The only advantage of the client-side mapper at this point is making
+  all AdX fields available via the `DcExt` extension, which isn't and
+  won't be supported by the native protocol. The latter will be improved
+  with extensions for critical fields missing from OpenRTB, and later
+  this year the client-side mapper will be retired.
 * Video mapping improvements: includes VAST Wrapper values; additional
   mime types for video and companion ads with VPAID enabled.
 * `Device.os` mapping fixed for iphone/ipad="iOS"; `Device.make` added.
+* Cleanups: Dependency updates; Minor javadoc and test reviews.
 
 ## Version 0.9.13, 12-20-2015
 * DoubleClick protocol v.74: `NativeAd.impression_tracking_url` is
