@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Google Inc. All Rights Reserved.
+ * Copyright 2015 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,12 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.common.collect.ImmutableList;
-import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
-
 import org.junit.Test;
 
-public class VideoMimeMapperTest {
+public class DeviceOSMapperTest {
   @Test
   public void testMapper() {
-    assertThat(VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5), false, null))
-        .containsExactly("video/mp4", "video/webm");
-    assertThat(VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm"), null))
-        .containsExactly(VideoFormat.VIDEO_HTML5);
+    assertThat(DeviceOSMapper.toOpenRtb("iphone")).isSameAs("iOS");
+    assertThat(DeviceOSMapper.toDoubleClick("iOS", false)).isSameAs("iphone");
   }
 }

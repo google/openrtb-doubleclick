@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Google Inc. All Rights Reserved.
+ * Copyright 2015 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,28 @@
 
 package com.google.doubleclick.openrtb;
 
-import static com.google.common.truth.Truth.assertThat;
+import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
-import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
+/**
+ * Maps between AdX's {@code platform} and OpenRTB's {@code os}.
+ */
+public class DeviceOSMapper {
+  @Nullable public static String toOpenRtb(String dc) {
+    switch (dc) {
+      case "iphone":
+      case "ipad":
+        return "iOS";
+      default:
+        return dc;
+    }
+  }
 
-import org.junit.Test;
-
-public class VideoMimeMapperTest {
-  @Test
-  public void testMapper() {
-    assertThat(VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5), false, null))
-        .containsExactly("video/mp4", "video/webm");
-    assertThat(VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm"), null))
-        .containsExactly(VideoFormat.VIDEO_HTML5);
+  @Nullable public static String toDoubleClick(String openrtb, boolean isTablet) {
+    switch (openrtb) {
+      case "iOS":
+        return isTablet ? "ipad" : "iphone";
+      default:
+        return openrtb;
+    }
   }
 }

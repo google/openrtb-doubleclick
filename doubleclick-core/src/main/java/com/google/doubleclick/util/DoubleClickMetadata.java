@@ -85,6 +85,13 @@ public class DoubleClickMetadata {
   private final ImmutableMap<GeoTarget.CanonicalKey, GeoTarget> geoTargetsByCanonicalKey;
   private final ImmutableMap<Object, CountryCodes> countryCodes;
 
+  /**
+   * Creates the DoubleClickMetadata object.
+   *
+   * @param transport How to read the many files providing metadata information.
+   *     Typically you will use one of the provided implementations,
+   *     {@link URLConnectionTransport} or {@link ResourceTransport}
+   */
   @Inject
   public DoubleClickMetadata(Transport transport) {
     Pattern ssvp = Pattern.compile("(\\d+)\\s+(.*)");
@@ -487,9 +494,19 @@ public class DoubleClickMetadata {
   }
 
   /**
-   * Object that can load the content of an URL as a stream.
+   * Object that can load the content of an AdX metadata URL as a stream.
    */
   public static interface Transport {
+
+    /**
+     * Loads an Ad Exchange metadata file.
+     *
+     * @param url Points to a metadata file provided by AdX, as listed in
+     *     https://developers.google.com/ad-exchange/rtb/downloads and
+     *     https://developers.google.com/adwords/api/docs/appendix/cities-DMAregions
+     * @return Stream to read the metadata file
+     * @throws IOException if the metadata file cannot be opened
+     */
     InputStream open(String url) throws IOException;
   }
 
@@ -504,6 +521,10 @@ public class DoubleClickMetadata {
 
   /**
    * Implementation of {@link Transport} that loads a local resource.
+   * This assumes that all necessary metadata files are available in the
+   * JVM's classpath, at the relative path /adx-rtb-dictionaries.
+   * Reading these files from local resources is faster and more reliable than reading
+   * from the web, but you need to manually keep these resources in sync with AdX's updates.
    */
   public static class ResourceTransport implements Transport {
     @Override public InputStream open(String url) throws IOException {

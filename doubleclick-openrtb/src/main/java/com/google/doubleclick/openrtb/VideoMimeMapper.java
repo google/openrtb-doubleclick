@@ -36,24 +36,32 @@ public class VideoMimeMapper {
       ImmutableMap.<String, VideoFormat>builder()
           .put("video/mp4", VideoFormat.VIDEO_HTML5)
           .put("video/webm", VideoFormat.VIDEO_HTML5)
+          .put("application/javascript", VideoFormat.VIDEO_HTML5)
           .put("video/x-flv", VideoFormat.VIDEO_FLASH)
+          .put("application/x-shockwave-flash", VideoFormat.VIDEO_FLASH)
           .build();
-  private static ImmutableSet<String>[] dcToOpenrtb = MapperUtil.multimapEnumToSets(
+  private static ImmutableSet<String>[] dcToOpenrtbNoVPAID = MapperUtil.multimapEnumToSets(
       ImmutableMultimap.<VideoFormat, String>builder()
           .putAll(VideoFormat.VIDEO_FLASH, "video/x-flv")
           .putAll(VideoFormat.VIDEO_HTML5, "video/mp4", "video/webm")
           .putAll(VideoFormat.YT_HOSTED, "video/x-flv", "video/mp4", "video/webm")
           .build());
+  private static ImmutableSet<String>[] dcToOpenrtbVPAID = MapperUtil.multimapEnumToSets(
+      ImmutableMultimap.<VideoFormat, String>builder()
+          .putAll(VideoFormat.VIDEO_FLASH, "video/x-flv", "application/x-shockwave-flash")
+          .putAll(VideoFormat.VIDEO_HTML5, "video/mp4", "video/webm", "application/javascript")
+          .putAll(VideoFormat.YT_HOSTED, "video/x-flv", "video/mp4", "video/webm")
+          .build());
 
-  public static ImmutableSet<String> toOpenRtb(VideoFormat dc) {
-    return MapperUtil.get(dcToOpenrtb, dc);
+  public static ImmutableSet<String> toOpenRtb(VideoFormat dc, boolean vpaid) {
+    return MapperUtil.get(vpaid ? dcToOpenrtbVPAID : dcToOpenrtbNoVPAID, dc);
   }
 
   public static Set<String> toOpenRtb(
-      Collection<VideoFormat> dcList, @Nullable Set<String> openrtbSet) {
+      Collection<VideoFormat> dcList, boolean vpaid, @Nullable Set<String> openrtbSet) {
     Set<String> ret = openrtbSet == null ? new LinkedHashSet<>() : openrtbSet;
     for (VideoFormat dc : dcList) {
-      ret.addAll(toOpenRtb(dc));
+      ret.addAll(toOpenRtb(dc, vpaid));
     }
     return ret;
   }

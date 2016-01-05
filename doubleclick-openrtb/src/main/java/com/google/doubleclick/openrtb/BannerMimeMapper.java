@@ -42,22 +42,28 @@ public class BannerMimeMapper {
           .put("text/html", CreativeFormat.HTML_CREATIVE)
           .put("video/x-flv", CreativeFormat.FLASH_CREATIVE)
           .build();
-  private static ImmutableSet<String>[] dcToOpenrtb = MapperUtil.multimapEnumToSets(
+  private static ImmutableSet<String>[] dcToOpenrtbNoVPAID = MapperUtil.multimapEnumToSets(
       ImmutableMultimap.<CreativeFormat, String>builder()
           .putAll(CreativeFormat.FLASH_CREATIVE, "video/x-flv")
+          .putAll(CreativeFormat.HTML_CREATIVE, "text/html", "text/css")
+          .putAll(CreativeFormat.IMAGE_CREATIVE, "image/gif", "image/jpeg", "image/png")
+          .build());
+  private static ImmutableSet<String>[] dcToOpenrtbVPAID = MapperUtil.multimapEnumToSets(
+      ImmutableMultimap.<CreativeFormat, String>builder()
+          .putAll(CreativeFormat.FLASH_CREATIVE, "video/x-flv", "application/x-shockwave-flash")
           .putAll(CreativeFormat.HTML_CREATIVE, "text/html", "text/css", "application/javascript")
           .putAll(CreativeFormat.IMAGE_CREATIVE, "image/gif", "image/jpeg", "image/png")
           .build());
 
-  public static ImmutableSet<String> toOpenRtb(CreativeFormat dc) {
-    return MapperUtil.get(dcToOpenrtb, dc);
+  public static ImmutableSet<String> toOpenRtb(CreativeFormat dc, boolean vpaid) {
+    return MapperUtil.get(vpaid ? dcToOpenrtbVPAID : dcToOpenrtbNoVPAID, dc);
   }
 
   public static Set<String> toOpenRtb(
-      Collection<CreativeFormat> dcList, @Nullable Set<String> openrtbSet) {
+      Collection<CreativeFormat> dcList, boolean vpaid, @Nullable Set<String> openrtbSet) {
     Set<String> ret = openrtbSet == null ? new LinkedHashSet<>() : openrtbSet;
     for (CreativeFormat dc : dcList) {
-      ret.addAll(toOpenRtb(dc));
+      ret.addAll(toOpenRtb(dc, vpaid));
     }
     return ret;
   }
