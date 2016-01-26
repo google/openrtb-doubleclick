@@ -2,9 +2,10 @@ RELEASE NOTES
 ----------------------------------------------------------------------
 
 ## Version 1.0.1, ??-01-2016
-* DoubleClick protocol v.76: `BidRequest.vertical_dictionary_version`
+* DoubleClick protocol v.77: `BidRequest.vertical_dictionary_version`
   deprecated; added `Video.is_clickable`, `Video.end_cap_support`,
-  `AdSlot.click_through_rate`.
+  `AdSlot.click_through_rate`, `Device.hardware_version`.
+* Maps `Device.hwv`.
 
 ## Version 1.0.0, 04-01-2016
 * Happy new year!!  And here's the one-dot-zero release of the library.

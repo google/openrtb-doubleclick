@@ -2,10 +2,10 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.76
+// Synchronized with v.77
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
-// Copyright 2015 Google Inc. All Rights Reserved.
+// Copyright 2016 Google Inc. All Rights Reserved.
 
 // This is the message that Google uses to request bids. A single BidRequest
 // includes all applicable ad slots from a single impression.
@@ -296,6 +296,9 @@ message BidRequest {
     // The screen orientation of the device when the ad request is sent.
     optional ScreenOrientation screen_orientation = 10 [
         default = UNKNOWN_ORIENTATION];
+
+    // Apple iOS device model, e.g., "iphone 5s", "iphone 6+", "ipad 4".
+    optional string hardware_version = 11;
   }
   optional Device device = 54;
 
@@ -426,10 +429,24 @@ message BidRequest {
     // content, with parameters removed.
     optional string description_url = 10;
 
-    // If true, the video is embedded on pages out of the publisher's domain.
+    // If true, the video is embedded on a page outside the publisher's domain.
+    // When this is set, description_url points to a description of the video
+    // (as it always does), and the url field in BidRequest is the page in which
+    // the video is embedded. For example, a request for an in-stream ad in a
+    // Vimeo video shared on Facebook has is_embedded_offsite set. The url field
+    // is for a Facebook page and the description_url points to the video on
+    // Vimeo.
     optional bool is_embedded_offsite = 11 [default = false];
 
-    // Describes how the ad was played.
+    // Describes how the video ad will be played. The playback method is
+    // determined to be auto-play or click-to-play based on the best measurement
+    // available. This includes things like how recently the user interacted
+    // with a web page. For auto-play, ads can start playing with the sound on
+    // or off. Some ads (e.g. in-feed ads) are muted until the user interacts
+    // with the ad. Alternatively, if an ad would normally play with the sound
+    // on but the device is muted then the value will be set to sound off. For
+    // devices where it is not possible to determine if the device is muted
+    // (e.g. desktop), we assume that sound is on.
     enum VideoPlaybackMethod {
       METHOD_UNKNOWN = 0;
       AUTO_PLAY_SOUND_ON = 1;

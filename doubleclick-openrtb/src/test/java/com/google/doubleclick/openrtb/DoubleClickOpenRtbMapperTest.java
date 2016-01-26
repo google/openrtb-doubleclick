@@ -94,7 +94,7 @@ public class DoubleClickOpenRtbMapperTest {
     Bid bid = TestData.newBid(false)
         .setAdm("snippet")
         .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.mapResponseAd(request, bid);
     assertThat(ad).isNotNull();
   }
 
@@ -106,7 +106,7 @@ public class DoubleClickOpenRtbMapperTest {
         .setAdm("snippet")
         .build();
 
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.mapResponseAd(request, bid);
     assertThat(ad).isNotNull();
   }
 
@@ -118,7 +118,7 @@ public class DoubleClickOpenRtbMapperTest {
         .setCrid("creativeId")
         .setAdm("<img src=\"foo\">")
         .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.mapResponseAd(request, bid);
     assertThat(ad).isNotNull();
     assertThat(ad.getHtmlSnippet()).isEqualTo("<img src=\"foo\">");
     assertThat(ad.getBuyerCreativeId()).isEqualTo("creativeId");
@@ -133,7 +133,7 @@ public class DoubleClickOpenRtbMapperTest {
         .setAdm("http://my-video")
         .setCrid("creativeId")
         .build();
-    NetworkBid.BidResponse.Ad.Builder ad = mapper.buildResponseAd(request, bid);
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.mapResponseAd(request, bid);
     assertThat(ad).isNotNull();
     assertThat(ad.getVideoUrl()).isEqualTo("http://my-video");
     assertThat(ad.getBuyerCreativeId()).isEqualTo("creativeId");
@@ -145,7 +145,7 @@ public class DoubleClickOpenRtbMapperTest {
     Bid bid = TestData.newBid(false)
         .clearCrid()
         .build();
-    mapper.buildResponseAd(TestUtil.newBidRequest(TestData.newRequest()), bid);
+    mapper.mapResponseAd(TestUtil.newBidRequest(TestData.newRequest()), bid);
   }
 
   @Test
@@ -162,9 +162,9 @@ public class DoubleClickOpenRtbMapperTest {
     Bid bid1 = TestData.newBid(false).build();
     Bid bid2 = TestData.newBid(true).build();
     OpenRtb.BidRequest request = OpenRtb.BidRequest.newBuilder().setId("1").addImp(imp).build();
-    NetworkBid.BidResponse.Ad.Builder ad1 = mapper.buildResponseAd(request, bid1);
+    NetworkBid.BidResponse.Ad.Builder ad1 = mapper.mapResponseAd(request, bid1);
     assertThat(!ad1.hasWidth() && !ad1.hasHeight()).isTrue();
-    NetworkBid.BidResponse.Ad.Builder ad2 = mapper.buildResponseAd(request, bid2);
+    NetworkBid.BidResponse.Ad.Builder ad2 = mapper.mapResponseAd(request, bid2);
     assertThat(ad2.getWidth()).isEqualTo(bid2.getW());
     assertThat(ad2.getHeight()).isEqualTo(bid2.getH());
   }
@@ -227,7 +227,7 @@ public class DoubleClickOpenRtbMapperTest {
                       && compAd.hasHmin() && compAd.hasHmax())
                   .isEqualTo(size > 1);
               assertWithMessage(testDesc).that(compAd.hasW() && compAd.hasH())
-                  .isNotEqualTo(size != 1);
+                  .isNotEqualTo(size == 0);
             }
           } else if (impBanner) {
             Banner banner = imp.getBanner();
@@ -236,7 +236,7 @@ public class DoubleClickOpenRtbMapperTest {
                     && banner.hasHmin() && banner.hasHmax())
                 .isEqualTo(size > 1);
             assertWithMessage(testDesc).that(banner.hasW() && banner.hasH())
-                .isNotEqualTo(size != 1);
+                .isNotEqualTo(size == 0);
             assertWithMessage(testDesc).that(banner.hasTopframe()).isEqualTo(size >= 2);
           } else if (impNativ) {
             Native nativ = imp.getNative();
