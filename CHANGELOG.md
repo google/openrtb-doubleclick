@@ -6,6 +6,16 @@ RELEASE NOTES
   deprecated; added `Video.is_clickable`, `Video.end_cap_support`,
   `AdSlot.click_through_rate`, `Device.hardware_version`.
 * Maps `Device.hwv`.
+* Support for AdX/OpenRTB JSON extensions! Some background: this library
+  always supported "client-side extensions" (`doubleclick-ext.proto`)
+  which are just links from the OpenRTB messages to their source AdX
+  messages, allowing a fallback for fields that couldn't be mapped.
+  Now AdX's new native (on-wire) support for OpenRTB is also introducing
+  its own proper OpenRTB extensions, defined in `openrtb-adx.proto`.
+  These two kinds of extensions are mutually exclusive: you can only
+  use the first when receiving the native AdX protocol on-wire and
+  mapping it to OpenRTB with this library; you can only use the second
+  when receiving AdX/OpenRTB messages (either Protobuf or JSON encoding).
 
 ## Version 1.0.0, 04-01-2016
 * Happy new year!!  And here's the one-dot-zero release of the library.

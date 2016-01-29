@@ -1,0 +1,46 @@
+/*
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto2";
+package com.google.doubleclick;
+option java_outer_classname = "AdxExt";
+
+import "openrtb.proto";
+
+// Protocol buffer for Ad Exchange OpenRTB specification.
+
+message ImpExt {
+  // [AdX: BidRequest.AdSlot.MatchingAdData.billing_id]
+  repeated int64 billing_id = 1;
+
+  // [AdX: BidRequest.publisher_settings_list_id]
+  // [AdX: BidRequest.AdSlot.publisher_settings_list_id]
+  repeated fixed64 publisher_settings_list_id = 2;
+}
+
+extend com.google.openrtb.BidRequest.Imp {
+  /** Reference to the corresponding node in the DoubleClick request. */
+  optional ImpExt imp = 101;
+}
+
+message BidExt {
+  // [AdX: BidResponse.Ad.impression_tracking_url]
+  repeated string impression_tracking_url = 1;
+}
+
+extend com.google.openrtb.BidResponse.SeatBid.Bid {
+  optional BidExt bid = 101;
+}
