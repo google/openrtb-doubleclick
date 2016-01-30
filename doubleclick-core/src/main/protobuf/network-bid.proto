@@ -2,10 +2,10 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.74
+// Synchronized with v.77
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
-// Copyright 2015 Google Inc. All Rights Reserved.
+// Copyright 2016 Google Inc. All Rights Reserved.
 
 // This is the message that Google uses to request bids. A single BidRequest
 // includes all applicable ad slots from a single impression.
@@ -27,7 +27,7 @@ message BidRequest {
   // hosted_match_data, IDFA, etc).
   enum UserDataTreatment {
     // The current request should be treated as child-directed for purposes of
-    // the Children’s Online Privacy Protection Act. See
+    // the Children's Online Privacy Protection Act. See
     // https://support.google.com/adxseller/answer/4442399 for more information.
 
     TAG_FOR_CHILD_DIRECTED_TREATMENT = 0;
@@ -99,7 +99,7 @@ message BidRequest {
   // city, and metro fields.
   optional int32 geo_criteria_id = 39;
 
-  // Detected postal code of the appropriate type for the country (e.g., zip code
+  // Detected postal code of the appropriate type for the country (e.g. zip code
   // if the country is "US"). The postal_code_prefix field is set when accuracy
   // is too low to imply a full code, otherwise the postal_code field is set.
   optional string postal_code = 33;
@@ -231,10 +231,6 @@ message BidRequest {
   // ids.
   repeated Vertical detected_vertical = 13;
 
-  // The dictionary version used in the detected_vertical field. This is
-  // currently always "2".
-  optional int32 vertical_dictionary_version = 24;
-
   // List of detected content labels. See content-labels.txt file in the
   // technical documentation for a list of ids.
   repeated int32 detected_content_label = 26 [packed=true];
@@ -255,10 +251,10 @@ message BidRequest {
     // The platform of the device. Examples: android, iphone, palm
     optional string platform = 2;
 
-    // The brand of the device, e.g., Nokia, Samsung.
+    // The brand of the device, e.g. Nokia, Samsung.
     optional string brand = 3 [default = ""];
 
-    // The model of the device, e.g., N70, Galaxy.
+    // The model of the device, e.g. N70, Galaxy.
     optional string model = 4 [default = ""];
 
     // Contains the OS version of the platform. For instance, for Android 2,
@@ -268,7 +264,7 @@ message BidRequest {
       optional int32 minor = 2;
       optional int32 micro = 3;
     }
-    // The OS version; e.g., 2 for Android 2.1, or 3.3 for iOS 3.3.1.
+    // The OS version; e.g. 2 for Android 2.1, or 3.3 for iOS 3.3.1.
     optional OsVersion os_version = 5;
 
     // Unique identifier for the mobile carrier if the device is connected to
@@ -283,7 +279,7 @@ message BidRequest {
     // The height of the device screen in pixels.
     optional int32 screen_height = 8 [default = 0];
 
-    // Used for high-density devices (e.g., iOS retina displays). A non-default
+    // Used for high-density devices (e.g. iOS retina displays).  A non-default
     // value indicates that the nominal screen size (with pixels as the unit)
     // does not describe the actual number of pixels in the screen. For example,
     // nominal width and height may be 320x640 for a screen that actually has
@@ -300,6 +296,9 @@ message BidRequest {
     // The screen orientation of the device when the ad request is sent.
     optional ScreenOrientation screen_orientation = 10 [
         default = UNKNOWN_ORIENTATION];
+
+    // Apple iOS device model, e.g., "iphone 5s", "iphone 6+", "ipad 4".
+    optional string hardware_version = 11;
   }
   optional Device device = 54;
 
@@ -430,10 +429,24 @@ message BidRequest {
     // content, with parameters removed.
     optional string description_url = 10;
 
-    // If true, the video is embedded on pages out of the publisher's domain.
+    // If true, the video is embedded on a page outside the publisher's domain.
+    // When this is set, description_url points to a description of the video
+    // (as it always does), and the url field in BidRequest is the page in which
+    // the video is embedded. For example, a request for an in-stream ad in a
+    // Vimeo video shared on Facebook has is_embedded_offsite set. The url field
+    // is for a Facebook page and the description_url points to the video on
+    // Vimeo.
     optional bool is_embedded_offsite = 11 [default = false];
 
-    // Describes how the ad was played.
+    // Describes how the video ad will be played. The playback method is
+    // determined to be auto-play or click-to-play based on the best measurement
+    // available. This includes things like how recently the user interacted
+    // with a web page. For auto-play, ads can start playing with the sound on
+    // or off. Some ads (e.g. in-feed ads) are muted until the user interacts
+    // with the ad. Alternatively, if an ad would normally play with the sound
+    // on but the device is muted then the value will be set to sound off. For
+    // devices where it is not possible to determine if the device is muted
+    // (e.g. desktop), we assume that sound is on.
     enum VideoPlaybackMethod {
       METHOD_UNKNOWN = 0;
       AUTO_PLAY_SOUND_ON = 1;
@@ -442,6 +455,11 @@ message BidRequest {
     };
     optional VideoPlaybackMethod playback_method = 14
         [default = METHOD_UNKNOWN];
+
+    // Whether the inventory allows clicking on the video ad to take the user to
+    // an advertiser site.  Some platforms, notably connected TVs, do not
+    // support clicking on video ads, in which case this field is set to false.
+    optional bool is_clickable = 15;
 
     // The time in milliseconds from the start of the video when the ad will be
     // displayed. 0 means pre-roll and -1 means post-roll. The value is valid
@@ -519,6 +537,23 @@ message BidRequest {
     }
     repeated CompanionSlot companion_slot = 7;
 
+    // End cap support. When enabled, the companion ad can be picked to be
+    // rendered as an end cap (info card) in the video slot after the video
+    // ad finishes playing. If multiple companion ads are returned, IMA SDK
+    // chooses one which best matches the device screen size. End cap is
+    // supported only on mobile video interstitial inventory. As of August 2015,
+    // END_CAP_FORBIDDEN and END_CAP_REQUIRED are not supported.
+    enum EndCapSupport {
+      END_CAP_NOT_ENABLED = 0;  // Companion ad won't be rendered as end cap.
+      END_CAP_OPTIONAL = 1;     // End cap will be rendered if response contains
+                                // eligible companion banner, but companion
+                                // banner is not required.
+      END_CAP_FORBIDDEN = 2;    // Response with companion ad is filtered.
+      END_CAP_REQUIRED = 3;     // Response without companion ad is filtered.
+    }
+    optional EndCapSupport end_cap_support = 13 [default =
+        END_CAP_NOT_ENABLED];
+
     // Attributes of the video that the user is viewing, not the video ad.
     // These fields are based on the availability of the video metadata from the
     // video publisher and may not always be populated.
@@ -582,14 +617,14 @@ message BidRequest {
     // formats are 728x90, 300x250, and 468x60.
     //
     // For VAST video ad requests a single width/height pair specifies the
-    // Google-detected video player size. If Google cannot detect the player
-    // size the publisher-provided player size, if available, is used. For
+    // Google-detected video player size.  If Google cannot detect the player
+    // size the publisher-provided player size, if available, is used.  For
     // VAST video ads, this size is informational; there is no restriction on
     // the size of the video ad that you can return.
     //
     // For mobile interstitial ads (including ones where video ads are eligible)
     // the first width height pair is the screen size (this is also the video
-    // player size for VAST video ads). Subsequent pairs are recommended
+    // player size for VAST video ads).  Subsequent pairs are recommended
     // interstitial ad sizes that satisfy the interstitial size restrictions,
     // i.e. no bigger than the screen size and no smaller than 50% of width and
     // 40% height.
@@ -741,10 +776,15 @@ message BidRequest {
     // Historical viewability percentage for the ad slot. This is an estimate of
     // the likelihood that this slot will be viewable by the end user, based on
     // how often it has been viewable in the past. Expressed as a percentage in
-    // the range of [0, 100] and rounded down to the next multiple of 10. The
+    // the range of [0, 100] and rounded down to the next multiple of 10.  The
     // default value -1 indicates that historical viewability data is not
     // available.
     optional int32 viewability = 21 [default = -1];
+
+    // Historical click-through rate for ads served in the ad slot. This is
+    // expressed as a fraction in the range [0.0, 1.0]. The default value of
+    // -1.0 indicates that historical click-through rate data is not available.
+    optional float click_through_rate = 25 [default = -1.0];
 
     // iFraming state of the ad slot on the webpage where it is present.
     enum IFramingState {
@@ -939,6 +979,7 @@ message BidRequest {
   repeated MatchingNetwork DEPRECATED_matching_network = 27;
   optional bool DEPRECATED_experimental_deadline = 35 [default=false];
   repeated int32 DEPRECATED_site_list_id = 36;
+  optional int32 DEPRECATED_vertical_dictionary_version = 24;
 }
 
 // This is the message that you return in response to a BidRequest. You may
@@ -1017,10 +1058,6 @@ message BidResponse {
       // The app rating in the app store. Must be in the range [0-5].
       optional double star_rating = 8;
 
-      // The URLs to call when the impression is rendered.
-      // DEPRECATED. Use the regular impression tracking URL instead.
-      repeated string impression_tracking_url = 9;
-
       // The URL to use for click tracking. The SDK pings click tracking url on
       // a background thread. When resolving the url, HTTP 30x redirects are
       // followed. The SDK ignores the contents of the response.
@@ -1031,14 +1068,12 @@ message BidResponse {
 
       // The URL to the app store to purchase/download the promoted app.
       optional string store = 12;
+
+      // This field is deprecated.  Please use
+      // BidResponse.Ad.impression_tracking_url instead.
+      repeated string DEPRECATED_impression_tracking_url = 9;
     };
     optional NativeAd native_ad = 18;
-
-    // The URLs to call when the impression is rendered. The SDK pings
-    // impression urls on a background thread and ignores the contents
-    // of the response. This is supported for all inventory types and
-    // all formats except for VAST video.
-    repeated string impression_tracking_url = 19;
 
     // The set of destination URLs for the snippet or native ad. This should
     // include the URLs that the user will go to if they click on the displayed
@@ -1124,6 +1159,10 @@ message BidResponse {
       optional int64 deal_id = 5 [default = 0];
     }
     repeated AdSlot adslot = 3;
+
+    // The URLs to call when the impression is rendered.  This is supported for
+    // all inventory types and all formats except for VAST video.
+    repeated string impression_tracking_url = 19;
 
     // These are deprecated. Please do not set.
     optional int64 DEPRECATED_creative_id = 8;

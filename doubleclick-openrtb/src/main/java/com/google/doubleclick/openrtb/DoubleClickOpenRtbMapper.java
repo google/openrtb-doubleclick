@@ -156,15 +156,15 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       request.setRegs(Regs.newBuilder().setCoppa(true));
     }
 
-    request.setDevice(buildDevice(dcRequest, coppa));
+    request.setDevice(mapDevice(dcRequest, coppa));
 
     if (dcRequest.getMobile().getIsApp()) {
-      App.Builder app = buildApp(dcRequest);
+      App.Builder app = mapApp(dcRequest);
       if (app != null) {
         request.setApp(app);
       }
     } else {
-      Site.Builder site = buildSite(dcRequest);
+      Site.Builder site = mapSite(dcRequest);
       if (site != null) {
         request.setSite(site);
       }
@@ -172,7 +172,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     EnumSet<ContentCategory> cats = EnumSet.noneOf(ContentCategory.class);
     for (NetworkBid.BidRequest.AdSlot dcSlot : dcRequest.getAdslotList()) {
-      Imp.Builder imp = buildImp(dcRequest, dcSlot);
+      Imp.Builder imp = mapImp(dcRequest, dcSlot);
       if (imp != null) {
         request.addImp(imp);
         AdCategoryMapper.toOpenRtb(dcSlot.getExcludedProductCategoryList(), cats);
@@ -188,7 +188,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       logger.debug("Request has no impressions");
     }
 
-    User.Builder user = buildUser(dcRequest, coppa);
+    User.Builder user = mapUser(dcRequest, coppa);
     if (user != null) {
       request.setUser(user);
     }
@@ -205,7 +205,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return request;
   }
 
-  protected Device.Builder buildDevice(NetworkBid.BidRequest dcRequest, boolean coppa) {
+  protected Device.Builder mapDevice(NetworkBid.BidRequest dcRequest, boolean coppa) {
     Device.Builder device = Device.newBuilder();
 
     if (dcRequest.hasIp()) {
@@ -220,7 +220,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       device.setUa(dcRequest.getUserAgent());
     }
 
-    Geo.Builder geo = buildGeo(dcRequest);
+    Geo.Builder geo = mapGeo(dcRequest);
     if (geo != null) {
       device.setGeo(geo);
     }
@@ -286,6 +286,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
         }
         device.setOsv(osv.toString());
       }
+      if (dcDevice.hasHardwareVersion()) {
+        device.setHwv(dcDevice.getHardwareVersion());
+      }
       if (dcDevice.hasDeviceType()) {
         DeviceType type = DeviceTypeMapper.toOpenRtb(dcDevice.getDeviceType());
         if (type != null) {
@@ -310,7 +313,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return device;
   }
 
-  @Nullable protected Geo.Builder buildGeo(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Geo.Builder mapGeo(NetworkBid.BidRequest dcRequest) {
     if (!dcRequest.hasGeoCriteriaId()
         && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()
         && !dcRequest.hasHyperlocalSet() && !dcRequest.hasEncryptedHyperlocalSet()) {
@@ -336,7 +339,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
           logger.debug("Received unknown geo_criteria_id: {}", geoCriteriaId);
         }
       } else {
-        mapGeo(geoTarget, geo);
+        mapGeoTarget(geoTarget, geo);
       }
     }
 
@@ -362,7 +365,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return geo;
   }
 
-  protected void mapGeo(GeoTarget geoTarget, Geo.Builder geo) {
+  protected void mapGeoTarget(GeoTarget geoTarget, Geo.Builder geo) {
     for (int chain = 0; chain < 2; ++chain) {
       String countryAlpha2 = null;
       int cityCriteriaId = -1;
@@ -414,12 +417,12 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
   }
 
-  @Nullable protected App.Builder buildApp(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected App.Builder mapApp(NetworkBid.BidRequest dcRequest) {
     NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
     App.Builder app = App.newBuilder();
     boolean mapped = false;
 
-    Content.Builder content = buildAppContent(dcRequest);
+    Content.Builder content = mapAppContent(dcRequest);
     if (content != null) {
       app.setContent(content);
       mapped = true;
@@ -434,7 +437,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       mapped = true;
     }
 
-    Publisher.Builder pub = buildPublisher(dcRequest);
+    Publisher.Builder pub = mapPublisher(dcRequest);
     if (pub != null) {
       app.setPublisher(pub);
       mapped = true;
@@ -451,8 +454,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return app;
   }
 
-  @Nullable protected Content.Builder buildAppContent(NetworkBid.BidRequest dcRequest) {
-    Content.Builder content = buildContent(dcRequest);
+  @Nullable protected Content.Builder mapAppContent(NetworkBid.BidRequest dcRequest) {
+    Content.Builder content = mapContent(dcRequest);
     if (content == null) {
       if (!dcRequest.hasUrl() && !dcRequest.hasAnonymousId()
           && !dcRequest.getMobile().hasAppRating()) {
@@ -475,11 +478,11 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return content;
   }
 
-  @Nullable protected Site.Builder buildSite(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Site.Builder mapSite(NetworkBid.BidRequest dcRequest) {
     Site.Builder site = Site.newBuilder();
     boolean mapped = false;
 
-    Builder content = buildContent(dcRequest);
+    Builder content = mapContent(dcRequest);
     if (content != null) {
       site.setContent(content);
       mapped = true;
@@ -493,7 +496,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       mapped = true;
     }
 
-    Publisher.Builder pub = buildPublisher(dcRequest);
+    Publisher.Builder pub = mapPublisher(dcRequest);
     if (pub != null) {
       site.setPublisher(pub);
       mapped = true;
@@ -515,7 +518,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return site;
   }
 
-  @Nullable protected Content.Builder buildContent(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Content.Builder mapContent(NetworkBid.BidRequest dcRequest) {
     if (dcRequest.getDetectedLanguageCount() == 0
         && dcRequest.getDetectedContentLabelCount() == 0
         && !dcRequest.getVideo().hasContentAttributes()) {
@@ -526,14 +529,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     int nLangs = dcRequest.getDetectedLanguageCount();
 
     if (nLangs == 1) {
-      content.setLanguage(getLanguage(dcRequest.getDetectedLanguage(0)));
+      content.setLanguage(mapLanguage(dcRequest.getDetectedLanguage(0)));
     } else if (nLangs != 0) {
       StringBuilder sb = new StringBuilder(nLangs * 3 - 1);
       for (String langCulture : dcRequest.getDetectedLanguageList()) {
         if (sb.length() != 0) {
           sb.append(',');
         }
-        sb.append(getLanguage(langCulture));
+        sb.append(mapLanguage(langCulture));
       }
       content.setLanguage(sb.toString());
     }
@@ -558,7 +561,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return content;
   }
 
-  @Nullable protected Publisher.Builder buildPublisher(NetworkBid.BidRequest dcRequest) {
+  @Nullable protected Publisher.Builder mapPublisher(NetworkBid.BidRequest dcRequest) {
     if (!dcRequest.hasSellerNetworkId()) {
       return null;
     }
@@ -574,7 +577,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return publisher;
   }
 
-  @Nullable protected Imp.Builder buildImp(
+  @Nullable protected Imp.Builder mapImp(
       NetworkBid.BidRequest dcRequest, NetworkBid.BidRequest.AdSlot dcSlot) {
     Imp.Builder imp = Imp.newBuilder()
         .setId(String.valueOf(dcSlot.getId()));
@@ -588,7 +591,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
             : min(bidFloor, dcAdData.getMinimumCpmMicros());
       }
 
-      Pmp.Builder pmp = buildPmp(dcAdData);
+      Pmp.Builder pmp = mapPmp(dcAdData);
       if (pmp != null) {
         imp.setPmp(pmp);
       }
@@ -608,17 +611,17 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcSlot.getNativeAdTemplateCount() != 0) {
-      Native.Builder nativ = nativeMapper.buildNativeRequest(dcSlot);
+      Native.Builder nativ = nativeMapper.mapNativeRequest(dcSlot);
       if (nativ != null) {
         imp.setNative(nativ);
       }
     } else if (dcRequest.hasVideo()) {
-      Video.Builder video = buildVideo(dcSlot, dcRequest.getVideo(), interstitial);
+      Video.Builder video = mapVideo(dcSlot, dcRequest.getVideo(), interstitial);
       if (video != null) {
         imp.setVideo(video);
       }
     } else {
-      Banner.Builder banner = buildBanner(dcSlot);
+      Banner.Builder banner = mapBanner(dcSlot);
       if (banner != null) {
         imp.setBanner(banner);
       }
@@ -631,7 +634,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return imp.hasVideo() || imp.hasBanner() || imp.hasNative() ? imp : null;
   }
 
-  @Nullable protected Pmp.Builder buildPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
+  @Nullable protected Pmp.Builder mapPmp(NetworkBid.BidRequest.AdSlot.MatchingAdData dcAdData) {
     if (dcAdData.getDirectDealCount() == 0) {
       return null;
     }
@@ -639,7 +642,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     Pmp.Builder pmp = Pmp.newBuilder();
     for (NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal dcDeal
         : dcAdData.getDirectDealList()) {
-      Deal.Builder deal = buildDeal(dcDeal);
+      Deal.Builder deal = mapDeal(dcDeal);
       if (deal != null) {
         pmp.addDeals(deal);
       }
@@ -652,7 +655,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return pmp;
   }
 
-  @Nullable protected Deal.Builder buildDeal(
+  @Nullable protected Deal.Builder mapDeal(
       NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal dcDeal) {
     if (!dcDeal.hasDirectDealId()) {
       return null;
@@ -672,34 +675,37 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return deal;
   }
 
-  protected void setSize(Banner.Builder banner, List<Integer> widths, List<Integer> heights) {
-    if (!widths.isEmpty()) {
-      int wMin = Integer.MAX_VALUE, wMax = 0, hMin = Integer.MAX_VALUE, hMax = 0;
-      for (int sizeIndex = 0; sizeIndex < widths.size(); ++sizeIndex) {
-        int w = widths.get(sizeIndex);
-        wMin = min(wMin, w);
-        wMax = max(wMax, w);
-        int h = heights.get(sizeIndex);
-        hMin = min(hMin, h);
-        hMax = max(hMax, h);
-      }
+  protected void mapBannerSize(Banner.Builder banner, List<Integer> widths, List<Integer> heights) {
+    if (widths.isEmpty()) {
+      return;
+    }
 
-      if (wMin == wMax) {
-        banner.setW(wMin);
-      } else {
-        banner.setWmin(wMin);
-        banner.setWmax(wMax);
-      }
-      if (hMin == hMax) {
-        banner.setH(hMin);
-      } else {
-        banner.setHmin(hMin);
-        banner.setHmax(hMax);
-      }
+    banner.setW(widths.get(0));
+    banner.setH(heights.get(0));
+
+    if (widths.size() == 1) {
+      return;
+    }
+
+    int wMin = Integer.MAX_VALUE, wMax = 0, hMin = Integer.MAX_VALUE, hMax = 0;
+    for (int sizeIndex = 0; sizeIndex < widths.size(); ++sizeIndex) {
+      int w = widths.get(sizeIndex);
+      wMin = min(wMin, w);
+      wMax = max(wMax, w);
+      int h = heights.get(sizeIndex);
+      hMin = min(hMin, h);
+      hMax = max(hMax, h);
+    }
+
+    if (wMin != wMax || hMin != hMax) {
+      banner.setWmin(wMin);
+      banner.setWmax(wMax);
+      banner.setHmin(hMin);
+      banner.setHmax(hMax);
     }
   }
 
-  protected Video.Builder buildVideo(
+  protected Video.Builder mapVideo(
       NetworkBid.BidRequest.AdSlot dcSlot, NetworkBid.BidRequest.Video dcVideo,
       boolean interstitial) {
     Video.Builder video = Video.newBuilder()
@@ -767,7 +773,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       for (NetworkBid.BidRequest.Video.CompanionSlot dcCompSlot
           : dcVideo.getCompanionSlotList()) {
         Banner.Builder companion = Banner.newBuilder();
-        setSize(companion, dcCompSlot.getWidthList(), dcCompSlot.getHeightList());
+        mapBannerSize(companion, dcCompSlot.getWidthList(), dcCompSlot.getHeightList());
 
         if (dcCompSlot.getCreativeFormatCount() != 0) {
           companion.addAllMimes(
@@ -788,12 +794,12 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return video;
   }
 
-  protected Banner.Builder buildBanner(NetworkBid.BidRequest.AdSlot dcSlot) {
+  protected Banner.Builder mapBanner(NetworkBid.BidRequest.AdSlot dcSlot) {
     Banner.Builder banner = Banner.newBuilder()
         .setId(String.valueOf(dcSlot.getId()))
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
 
-    setSize(banner, dcSlot.getWidthList(), dcSlot.getHeightList());
+    mapBannerSize(banner, dcSlot.getWidthList(), dcSlot.getHeightList());
 
     if (dcSlot.hasSlotVisibility()) {
       AdPosition pos = AdPositionMapper.toOpenRtb(dcSlot.getSlotVisibility());
@@ -823,7 +829,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return banner;
   }
 
-  @Nullable protected User.Builder buildUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
+  @Nullable protected User.Builder mapUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
     if ((!coppa && !dcRequest.hasGoogleUserId())
         || (coppa && !dcRequest.hasConstrainedUsageGoogleUserId())) {
       return null;
@@ -899,14 +905,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     for (SeatBid seatBid : response.getSeatbidList()) {
       for (Bid bid : seatBid.getBidList()) {
-        dcResponse.addAd(buildResponseAd(request, bid));
+        dcResponse.addAd(mapResponseAd(request, bid));
       }
     }
 
     return dcResponse;
   }
 
-  protected NetworkBid.BidResponse.Ad.Builder buildResponseAd(
+  protected NetworkBid.BidResponse.Ad.Builder mapResponseAd(
       OpenRtb.BidRequest request, Bid bid) {
     NetworkBid.BidResponse.Ad.Builder dcAd;
 
@@ -931,12 +937,12 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (matchingImp.hasVideo()) {
       dcAd.setVideoUrl(bid.getAdm());
-      setAdSize(bid, dcAd, matchingImp);
+      mapAdSize(bid, dcAd, matchingImp);
     } else if (matchingImp.hasBanner()) {
       dcAd.setHtmlSnippet(bid.getAdm());
-      setAdSize(bid, dcAd, matchingImp);
+      mapAdSize(bid, dcAd, matchingImp);
     } else if (matchingImp.hasNative()) {
-      nativeMapper.buildNativeResponse(dcAd, bid, matchingImp);
+      nativeMapper.mapNativeResponse(dcAd, bid, matchingImp);
     } else {
       noVideoOrBanner.inc();
       throw new MapperException("Imp has neither of Video or Banner");
@@ -996,7 +1002,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return dcAd;
   }
 
-  protected void setAdSize(Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd, Imp matchingImp) {
+  protected void mapAdSize(Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd, Imp matchingImp) {
     boolean multisize = matchingImp.getExtension(DcExt.adSlot).getWidthCount() > 1;
 
     if (multisize || matchingImp.getInstl()) {
@@ -1013,7 +1019,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
   }
 
-  protected static String getLanguage(String langCulture) {
+  protected static String mapLanguage(String langCulture) {
     int iSep = langCulture.indexOf('_');
     return iSep == -1 ? langCulture : langCulture.substring(0, iSep);
   }
