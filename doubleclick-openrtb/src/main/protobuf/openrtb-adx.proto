@@ -33,7 +33,7 @@ message ImpExt {
 
 extend com.google.openrtb.BidRequest.Imp {
   /** Reference to the corresponding node in the DoubleClick request. */
-  optional ImpExt imp = 101;
+  optional ImpExt imp = 1009;
 }
 
 message BidExt {
@@ -42,5 +42,5 @@ message BidExt {
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
-  optional BidExt bid = 101;
+  optional BidExt bid = 1014;
 }
