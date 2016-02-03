@@ -16,6 +16,8 @@
 
 package com.google.doubleclick.openrtb;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.APIFramework;
@@ -270,6 +272,7 @@ public class DoubleClickOpenRtbNativeMapper {
   }
 
   public Imp.Native.Builder mapNativeRequest(NetworkBid.BidRequest.AdSlot dcSlot) {
+    checkArgument(dcSlot.getNativeAdTemplateCount() != 0);
     Imp.Native.Builder impNativ = Imp.Native.newBuilder()
         .setVer("1.0")
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
@@ -280,44 +283,49 @@ public class DoubleClickOpenRtbNativeMapper {
       impNativ.addApi(APIFramework.MRAID_2);
     }
 
-    int id = 0;
-
-    for (NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ : dcSlot.getNativeAdTemplateList()) {
-      long bits = dcNativ.getRecommendedFields() | dcNativ.getRequiredFields();
-
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetTitle(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetBody(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetCTA(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetAdvertiser(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetImage(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetLogo(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetIcon(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetStarRating(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetPrice(dcNativ));
-      }
-      if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0) {
-        addAsset(nativReq, ++id, mapReqAssetStore(dcNativ));
-      }
-    }
+    // Ignoring any templates after the first.
+    mapReqAssets(nativReq, dcSlot.getNativeAdTemplate(0));
 
     return impNativ.setRequestNative(nativReq);
+  }
+
+  protected boolean mapReqAssets(NativeRequest.Builder nativReq,
+      NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    int id = 0;
+    long bits = dcNativ.getRecommendedFields() | dcNativ.getRequiredFields();
+
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetTitle(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetBody(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetCTA(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetAdvertiser(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetImage(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetLogo(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetIcon(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetStarRating(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetPrice(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetStore(dcNativ));
+    }
+
+    return nativReq.getAssetsCount() != 0;
   }
 
   protected static void addAsset(

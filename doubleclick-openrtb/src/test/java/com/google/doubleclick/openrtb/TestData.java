@@ -31,7 +31,6 @@ import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.BuyerPricingRule;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.NativeAdTemplate;
-import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Builder;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 import com.google.protos.adx.NetworkBid.BidRequest.Device;
 import com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType;
@@ -297,42 +296,44 @@ public class TestData {
   }
 
   static void newNative(AdSlot.Builder adSlot, int size) {
-    NativeAdTemplate.Builder[] assets = {
-        newNativeAdTemplate(NativeAdTemplate.Fields.HEADLINE_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.BODY_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.ADVERTISER_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.IMAGE_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.LOGO_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.APP_ICON_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.STAR_RATING_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.PRICE_VALUE),
-        newNativeAdTemplate(NativeAdTemplate.Fields.STORE_VALUE),
-    };
+    NativeAdTemplate.Builder asset = NativeAdTemplate.newBuilder()
+        .setRecommendedFields(0
+            | NativeAdTemplate.Fields.HEADLINE_VALUE
+            | NativeAdTemplate.Fields.BODY_VALUE
+            | NativeAdTemplate.Fields.CALL_TO_ACTION_VALUE
+            | NativeAdTemplate.Fields.ADVERTISER_VALUE
+            | NativeAdTemplate.Fields.IMAGE_VALUE
+            | NativeAdTemplate.Fields.LOGO_VALUE
+            | NativeAdTemplate.Fields.APP_ICON_VALUE
+            | NativeAdTemplate.Fields.STAR_RATING_VALUE
+            | NativeAdTemplate.Fields.PRICE_VALUE
+            | NativeAdTemplate.Fields.STORE_VALUE);
 
     if (size >= 1) {
-      assets[0 /* HEADLINE   */].setHeadlineMaxSafeLength(10);
-      assets[1 /* BODY       */].setBodyMaxSafeLength(10);
-      assets[2 /* CTA        */].setCallToActionMaxSafeLength(10);
-      assets[3 /* ADVERTISER */].setAdvertiserMaxSafeLength(10);
-      assets[4 /* IMAGE      */].setImageWidth(100).setImageHeight(200);
-      assets[5 /* LOGO       */].setLogoWidth(100).setLogoHeight(200);
-      assets[6 /* APP_ICON   */].setAppIconWidth(100).setAppIconHeight(200);
-      assets[8 /* PRICE      */].setPriceMaxSafeLength(10);
-      assets[9 /* STORE      */].setStoreMaxSafeLength(10);
-    }
+      asset.setHeadlineMaxSafeLength(10);
+      asset.setBodyMaxSafeLength(10);
+      asset.setCallToActionMaxSafeLength(10);
+      asset.setAdvertiserMaxSafeLength(10);
+      asset.setImageWidth(100).setImageHeight(200);
+      asset.setLogoWidth(100).setLogoHeight(200);
+      asset.setAppIconWidth(100).setAppIconHeight(200);
+      asset.setPriceMaxSafeLength(10);
+      asset.setStoreMaxSafeLength(10);
 
-    for (NativeAdTemplate.Builder asset : assets) {
       if (size >= 2) {
         asset.setRequiredFields(asset.getRecommendedFields());
         asset.clearRequiredFields();
       }
-      adSlot.addNativeAdTemplate(asset);
     }
-  }
 
-  static Builder newNativeAdTemplate(int field) {
-    return NativeAdTemplate.newBuilder().setRecommendedFields(field);
+    adSlot.addNativeAdTemplate(asset);
+
+    if (size >= 1) {
+      adSlot.addNativeAdTemplate(NativeAdTemplate.newBuilder()
+          .setRecommendedFields(NativeAdTemplate.Fields.HEADLINE_VALUE)
+          .setRequiredFields(NativeAdTemplate.Fields.HEADLINE_VALUE)
+          .setHeadlineMaxSafeLength(99));
+    }
   }
 
   static List<Integer> createSizes(int size, int base) {
