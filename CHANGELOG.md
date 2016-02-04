@@ -1,16 +1,16 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.0.1, ??-01-2016
+## Version 1.0.1, 04-02-2016
 * DoubleClick protocol v.77: `BidRequest.vertical_dictionary_version`
   deprecated; added `Video.is_clickable`, `Video.end_cap_support`,
   `AdSlot.click_through_rate`, `Device.hardware_version`.
 * Maps `Device.hwv`.
 * Native request mapping uses only first `NativeAdTemplate`; previous
   mapping (merging assets from multiple templates) was ambiguous.
-* Support for AdX/OpenRTB JSON extensions! Some background: this library
-  always supported "client-side extensions" (`doubleclick-ext.proto`)
-  which are just links from the OpenRTB messages to their source AdX
+* Support for AdX/OpenRTB JSON extensions! Background: this library
+  always supported client-side extensions (`doubleclick-ext.proto`)
+  which are just soft links from the OpenRTB messages to their source AdX
   messages, allowing a fallback for fields that couldn't be mapped.
   Now AdX's new native (on-wire) support for OpenRTB is also introducing
   its own proper OpenRTB extensions, defined in `openrtb-adx.proto`.
