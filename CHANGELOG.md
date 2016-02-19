@@ -3,7 +3,7 @@ RELEASE NOTES
 
 ## Version 1.0.2, ??-02-2016
 * Mapping of mobile interstitial video impression doesn't fail if
-  it's multisze, just picks the first size. 
+  it's multisize, just picks the first size. 
 
 ## Version 1.0.1, 04-02-2016
 * DoubleClick protocol v.77: `BidRequest.vertical_dictionary_version`
