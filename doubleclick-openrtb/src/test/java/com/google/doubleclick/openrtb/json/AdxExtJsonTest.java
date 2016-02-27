@@ -58,20 +58,20 @@ public class AdxExtJsonTest {
     OpenRtbJsonFactory jsonFactory = AdxExtUtils.registerAdxExt(OpenRtbJsonFactory.create());
     String jsonReq = jsonFactory.newWriter().writeBidRequest(req);
     logger.info(jsonReq);
-    jsonFactory.setStrict(true).newWriter().writeBidRequest(req);
+    jsonFactory.setStrict(false).newWriter().writeBidRequest(req);
     BidRequest req2 = jsonFactory.newReader().readBidRequest(jsonReq);
     assertThat(req2).isEqualTo(req);
-    jsonFactory.setStrict(true).newReader().readBidRequest(jsonReq);
+    jsonFactory.setStrict(false).newReader().readBidRequest(jsonReq);
   }
 
   static String testResponse(BidResponse resp) throws IOException {
     OpenRtbJsonFactory jsonFactory = AdxExtUtils.registerAdxExt(OpenRtbJsonFactory.create());
     String jsonResp = jsonFactory.newWriter().writeBidResponse(resp);
     logger.info(jsonResp);
-    jsonFactory.setStrict(true).newWriter().writeBidResponse(resp);
+    jsonFactory.setStrict(false).newWriter().writeBidResponse(resp);
     OpenRtb.BidResponse resp2 = jsonFactory.newReader().readBidResponse(jsonResp);
     assertThat(resp2).isEqualTo(resp);
-    jsonFactory.setStrict(true).newReader().readBidResponse(jsonResp);
+    jsonFactory.setStrict(false).newReader().readBidResponse(jsonResp);
     return jsonResp;
   }
 }
