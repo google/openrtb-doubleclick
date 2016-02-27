@@ -732,7 +732,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcVideo.getAllowedVideoFormatsCount() != 0) {
       video.addAllMimes(VideoMimeMapper.toOpenRtb(
-          dcVideo.getAllowedVideoFormatsList(), vpaid, null));
+          dcVideo.getAllowedVideoFormatsList(), null));
     }
 
     if (dcVideo.hasPlaybackMethod()) {

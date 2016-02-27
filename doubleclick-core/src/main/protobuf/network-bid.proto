@@ -425,6 +425,24 @@ message BidRequest {
   // Information about the video if this is an in-video ad request.
   //
   message Video {
+    // Describes where the video ad will play.
+    enum Placement {
+      UNKNOWN_PLACEMENT = 0;
+
+      // Instream means the ad plays before, during, or after other video
+      // content. This is similar to a traditional TV commercial. The video
+      // content the user is watching does not play while the ad is playing.
+      INSTREAM = 1;
+
+      // Interstitial means the video ad plays in front of non-video content,
+      // (e.g. a news article or video game). The ad covers all or nearly all of
+      // the space on the screen occupied by the content and the user is not
+      // able to proceed to the content until the ad has finished or been
+      // skipped.
+      INTERSTITIAL = 2;
+    }
+    optional Placement placement = 16 [default=UNKNOWN_PLACEMENT];
+
     // The URL of the page that the publisher gives Google to describe the video
     // content, with parameters removed.
     optional string description_url = 10;
@@ -480,15 +498,6 @@ message BidRequest {
     // value but cannot exceed it.
     optional int32 max_ads_in_pod = 12;
 
-    // The type of inventory from which request is sent.
-    enum InventoryType {
-      WEB_VIDEO = 0;
-      GAMES = 1;
-      MOBILE_INTERSTITIAL = 2;
-      MOBILE_APP_VIDEO = 3;
-    }
-    optional InventoryType inventory_type = 3 [default = WEB_VIDEO];
-
     // Does the publisher allow/require/block skippable video ads?
     enum SkippableBidRequestType {
       ALLOW_SKIPPABLE = 0;
@@ -504,14 +513,15 @@ message BidRequest {
     // duration is allowed.
     optional int32 skippable_max_ad_duration = 5;
 
-    // The video technologies that are allowed for this request. The response
+    // The video file formats that are allowed for this request. The response
     // should support at least one of them.
     enum VideoFormat {
-      VIDEO_FLASH = 0;
-      VIDEO_HTML5 = 1;  // Valid HTML5 VAST ads contain both mp4 and webm media
-                        // files in the first Ad/Creative VAST node.
+      VIDEO_FLV = 0;    // Flash video files are accepted (FLV).
+      VIDEO_MP4 = 1;
       YT_HOSTED = 2;    // Valid VAST ads with at least one media file hosted
                         // on youtube.com.
+      VPAID_FLASH = 3;  // Flash VPAID (SWF).
+      VPAID_JS = 4;     // JavaScript VPAID.
     };
     repeated VideoFormat allowed_video_formats = 6;
 
@@ -571,6 +581,28 @@ message BidRequest {
       repeated string keywords = 3;
     }
     optional ContentAttributes content_attributes = 9;
+
+    // The type of inventory from which request is sent.
+    // Deprecated but will continue to be filled in until January 2017.
+    // Use the placement field to determine if inventory is interstitial or
+    // instream.  Use Device.device_type to determine if the request comes from
+    // a mobile device and Mobile.is_app to determine if the request comes from
+    // an app.
+    // WEB_VIDEO is INSTREAM placements from web browsers.
+    // GAMES consists of INTERSTITIAL placements from both apps and web
+    // browsers.
+    // MOBILE_INTERSTITIAL is INTERSTITIAL placements from apps only.
+    // This inventory also allows display ads. You can tell if an adslot allows
+    // display ads if adslot->excluded_attributes does not contain 21
+    // (CreativeType: Html)
+    // MOBILE_APP_VIDEO is INSTREAM placement from apps only.
+    enum InventoryType {
+      WEB_VIDEO = 0;
+      GAMES = 1;
+      MOBILE_INTERSTITIAL = 2;
+      MOBILE_APP_VIDEO = 3;
+    }
+    optional InventoryType DEPRECATED_inventory_type = 3 [default = WEB_VIDEO];
   }
   optional Video video = 29;
 
@@ -727,13 +759,14 @@ message BidRequest {
         // An id identifying the deal.
         optional int64 direct_deal_id = 1;
 
-        // The fixed CPM deal that applies to your account for this adslot. If
-        // you choose to bid on this impression, then you must bid at least the
-        // value of fixed_cpm_micros, and if you win, you will always be charged
-        // fixed_cpm_micros. The value is in micros of your account currency.
-        // For example, if the fixed cpm is 1290000 (1.29 in your account
-        // currency), then you need to bid at least this amount. If you win, you
-        // will be charged a CPM of 1.29 in your account currency.
+        // You must bid at least fixed_cpm_micros (in micros of your account
+        // currency) in order to paticipate in the deal. If you win, you will be
+        // charged fixed_cpm_micros. This does not apply when
+        // deal_type=PRIVATE_AUCTION. For private auctions, you must bid at
+        // least fixed_cpm_micros and you pay the second price. Bidding higher
+        // CPM than fixed_cpm_micros will increase your chance to win when
+        // deal_type=PRIVATE_AUCTION, however it will not increase your chance
+        // to win in other types of deals.
         optional int64 fixed_cpm_micros = 2;
 
         // The type of the deal.
@@ -905,6 +938,21 @@ message BidRequest {
       IS_STICKY = 1;
     }
     optional Stickiness stickiness = 24 [default = UNKNOWN_STICKINESS];
+
+    // Defines who controls the environment that made the ad request and will
+    // render the ad. On platforms where code written by Google will handle
+    // the ad this field is set to GOOGLE. When this field is PUBLISHER the
+    // publisher has placed their own code on the device to handle playback of
+    // the ad. There is no technical difference in how these request are
+    // handled. You may use this field to differentiate between different
+    // environments for non-technical reasons. This field is only set for
+    // requests that allow VAST video ads.
+    enum Renderer {
+      UNKNOWN_RENDERER = 0;
+      GOOGLE = 1;
+      PUBLISHER = 2;
+    }
+    optional Renderer renderer = 26 [default = UNKNOWN_RENDERER];
 
     // These are deprecated. Please ignore.
     repeated int32 DEPRECATED_allowed_attribute = 5;
