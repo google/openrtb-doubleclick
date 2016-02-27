@@ -271,7 +271,7 @@ public class TestData {
 
   static Video.Builder newVideo(int size) {
     Video.Builder video = Video.newBuilder()
-        .addAllAllowedVideoFormats(sublist(size, VideoFormat.VIDEO_FLASH, VideoFormat.VIDEO_HTML5))
+        .addAllAllowedVideoFormats(sublist(size, VideoFormat.VIDEO_FLV, VideoFormat.VIDEO_MP4))
         .setMinAdDuration(15)
         .setMaxAdDuration(60);
     if (size != NO_SLOT) {

@@ -26,9 +26,9 @@ import org.junit.Test;
 public class VideoMimeMapperTest {
   @Test
   public void testMapper() {
-    assertThat(VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_HTML5), false, null))
+    assertThat(VideoMimeMapper.toOpenRtb(ImmutableList.of(VideoFormat.VIDEO_MP4), null))
         .containsExactly("video/mp4", "video/webm");
     assertThat(VideoMimeMapper.toDoubleClick(ImmutableList.of("video/webm"), null))
-        .containsExactly(VideoFormat.VIDEO_HTML5);
+        .containsExactly(VideoFormat.VIDEO_MP4);
   }
 }

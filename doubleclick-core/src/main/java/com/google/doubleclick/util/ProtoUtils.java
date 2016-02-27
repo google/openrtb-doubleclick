@@ -22,8 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.MessageLiteOrBuilder;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -47,16 +45,14 @@ final class ProtoUtils {
    *     If all elements are discarded, returns an immutable, empty sequence
    */
   public static <M extends MessageLiteOrBuilder>
-      Iterable<M> filter(Iterable<M> objs, Predicate<M> filter) {
+      List<M> filter(List<M> objs, Predicate<M> filter) {
     checkNotNull(filter);
 
-    int i = 0;
-    for (M obj : objs) {
-      if (!filter.test(obj)) {
+    for (int i = 0; i < objs.size(); ++i) {
+      if (!filter.test(objs.get(i))) {
         // At least one discarded object, go to slow-path.
         return filterFrom(objs, filter, i);
       }
-      ++i;
     }
 
     // Optimized common case: all items filtered, return the input sequence.
@@ -64,22 +60,25 @@ final class ProtoUtils {
   }
 
   private static <M extends MessageLiteOrBuilder> List<M> filterFrom(
-      Iterable<M> objs, Predicate<M> filter, int firstDiscarded) {
-    int initialCapacity = (objs instanceof Collection<?>) ? ((Collection<?>) objs).size() - 1 : 10;
-    List<M> filtered = (firstDiscarded == 0) ? null : new ArrayList<>(initialCapacity);
+      List<M> objs, Predicate<M> filter, int firstDiscarded) {
+    List<M> filtered;
 
-    Iterator<M> iter = objs.iterator();
-    for (int i = 0; i < firstDiscarded; ++i) {
-      filtered.add(iter.next());
+    if (firstDiscarded == 0) {
+      filtered = null;
+    } else {
+      filtered = new ArrayList<>(objs.size() - 1);
+      for (int i = 0; i < firstDiscarded; ++i) {
+        filtered.add(objs.get(i));
+      }
     }
 
-    iter.next(); // Ignore object at firstDiscarded position
-
-    while (iter.hasNext()) {
-      M obj = iter.next();
+    for (int i = firstDiscarded + 1; i < objs.size(); ++i) {
+      M obj = objs.get(i);
 
       if (filter.test(obj)) {
-        filtered = (filtered == null) ? new ArrayList<>(initialCapacity) : filtered;
+        if (filtered == null) {
+          filtered = new ArrayList<>(objs.size() - i);
+        }
         filtered.add(obj);
       }
     }

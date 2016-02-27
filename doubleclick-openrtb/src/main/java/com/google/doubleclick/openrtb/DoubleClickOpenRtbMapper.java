@@ -103,7 +103,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   private final Counter missingCrid = new Counter();
   private final Counter invalidImp = new Counter();
   private final Counter missingSize = new Counter();
-  private final Counter excessSizes = new Counter();
   private final Counter noVideoOrBanner = new Counter();
   private final Counter coppaTreatment = new Counter();
   private final Counter noImp = new Counter();
@@ -125,7 +124,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     metricRegistry.register(MetricRegistry.name(cls, "missing-crid"), missingCrid);
     metricRegistry.register(MetricRegistry.name(cls, "invalid-imp"), invalidImp);
     metricRegistry.register(MetricRegistry.name(cls, "missing-size"), missingSize);
-    metricRegistry.register(MetricRegistry.name(cls, "excess-sizes"), excessSizes);
     metricRegistry.register(MetricRegistry.name(cls, "no-video-or-banner"), noVideoOrBanner);
     metricRegistry.register(MetricRegistry.name(cls, "coppa-treatment"), coppaTreatment);
     metricRegistry.register(MetricRegistry.name(cls, "no-imp"), noImp);
@@ -734,7 +732,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcVideo.getAllowedVideoFormatsCount() != 0) {
       video.addAllMimes(VideoMimeMapper.toOpenRtb(
-          dcVideo.getAllowedVideoFormatsList(), vpaid, null));
+          dcVideo.getAllowedVideoFormatsList(), null));
     }
 
     if (dcVideo.hasPlaybackMethod()) {
@@ -757,12 +755,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcSlot.getWidthCount() != 0) {
-      if (dcSlot.getWidthCount() > 1 && !interstitial) {
-        excessSizes.inc();
-        if (logger.isDebugEnabled()) {
-          logger.debug("Non-interstitial video has {} sizes", dcSlot.getWidthCount());
-        }
-      }
       video.setW(dcSlot.getWidth(0));
       video.setH(dcSlot.getHeight(0));
     }
