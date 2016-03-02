@@ -63,7 +63,7 @@
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
     <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.0.2</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
-    <slf4jVersion>1.7.16</slf4jVersion>
+    <slf4jVersion>1.7.18</slf4jVersion>
     <truthVersion>0.28</truthVersion>
 
     <!-- Plugin versions -->

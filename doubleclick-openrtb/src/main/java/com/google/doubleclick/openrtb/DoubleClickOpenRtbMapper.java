@@ -110,6 +110,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   private final Counter invalidHyperlocal = new Counter();
   private final Counter noCid = new Counter();
   private final Counter invalidContentCategory = new Counter();
+  private final Counter unsupportedNurl = new Counter();
 
   @Inject
   public DoubleClickOpenRtbMapper(
@@ -131,6 +132,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     metricRegistry.register(MetricRegistry.name(cls, "invalid-hyperlocal"), invalidHyperlocal);
     metricRegistry.register(MetricRegistry.name(cls, "no-cid"), noCid);
     metricRegistry.register(MetricRegistry.name(cls, "invalid-cat"), invalidContentCategory);
+    metricRegistry.register(MetricRegistry.name(cls, "unsupported-nurl"), unsupportedNurl);
   }
 
   @Override public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
@@ -920,6 +922,11 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
     dcAd.setBuyerCreativeId(bid.getCrid());
 
+    if (bid.hasNurl()) {
+      unsupportedNurl.inc();
+      throw new MapperException("Bid.nurl is set, unsupported for DoubleClick");
+    }
+
     Imp matchingImp = OpenRtbUtils.impWithId(request, bid.getImpid());
     if (matchingImp == null) {
       invalidImp.inc();
@@ -959,10 +966,6 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     dcAd.addAllAttribute(CreativeAttributeMapper.toDoubleClick(bid.getAttrList(), null));
-
-    if (bid.hasNurl()) {
-      dcAd.addImpressionTrackingUrl(bid.getNurl());
-    }
 
     Set<Integer> cats = new LinkedHashSet<>();
     for (String catName : bid.getCatList()) {

@@ -65,7 +65,6 @@ public class TestData {
           .setDealid("5")
           .setW(200)
           .setH(220)
-          .setNurl("http://impression.com")
           .addAllAdomain(asList("myads1.com", "https://myads2.com"))
           .addCat("IAB1");
     }
