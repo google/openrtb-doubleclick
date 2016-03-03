@@ -80,7 +80,7 @@ class TestUtil {
         new MetricRegistry(),
         getMetadata(),
         OpenRtbJsonFactory.create(),
-        ImmutableList.of(DoubleClickLinkMapper.INSTANCE))
+        ImmutableList.of(DoubleClickLinkMapper.INSTANCE, AdxExtMapper.INSTANCE))
             .toOpenRtbBidRequest(dcRequest).build();
   }
 

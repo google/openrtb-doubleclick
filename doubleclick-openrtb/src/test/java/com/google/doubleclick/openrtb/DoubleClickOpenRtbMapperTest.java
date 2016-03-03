@@ -53,7 +53,7 @@ public class DoubleClickOpenRtbMapperTest {
       new MetricRegistry(),
       TestUtil.getMetadata(),
       OpenRtbJsonFactory.create(),
-      ImmutableList.of(DoubleClickLinkMapper.INSTANCE));
+      ImmutableList.of(DoubleClickLinkMapper.INSTANCE, AdxExtMapper.INSTANCE));
 
   @Test
   public void testResponse() {

@@ -21,7 +21,7 @@ import com.google.openrtb.OpenRtb;
 import com.google.protos.adx.NetworkBid;
 
 /**
- * Extension mapper for DoubleClick "Link"extensions: each OpenRTB object will have an
+ * Extension mapper for DoubleClick "Link" extensions: each OpenRTB object will have an
  * extension that's just a reference for the corresponding node in the native message
  * (which also happens to be protobuf-based, so we can do this).
  */

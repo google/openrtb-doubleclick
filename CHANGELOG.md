@@ -4,6 +4,8 @@ RELEASE NOTES
 ## Version 1.0.3, ??-03-2016
 * Drop support for `Bid.nurl` mapping to impression URL. Please use
   the extension `AdxExt.BidExt.impression_tracking_url` only.
+* Added `AdxExtMapper` to support some `AdxExt` extensions as part of
+  the AdX->OpenRTB protocol mapping.
 
 ## Version 1.0.2, 26-02-2016
 * Mapping of mobile interstitial video impression doesn't fail if
