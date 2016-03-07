@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.0.3, ??-03-2016
+## Version 1.0.3, 07-03-2016
 * Drop support for `Bid.nurl` mapping to impression URL. Please use
   the extension `AdxExt.BidExt.impression_tracking_url` only.
 * Added `AdxExtMapper` to support some `AdxExt` extensions as part of
