@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.0.4, ??-04-2016
+* Drop mapping of `Mobile.constrained_usage_*` fields to standard
+  OpenRTB `Device` fields, in sync with the AdX/OpenRTB protocol.
+
 ## Version 1.0.3, 07-03-2016
 * Drop support for `Bid.nurl` mapping to impression URL. Please use
   the extension `AdxExt.BidExt.impression_tracking_url` only.

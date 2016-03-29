@@ -156,7 +156,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       request.setRegs(Regs.newBuilder().setCoppa(true));
     }
 
-    request.setDevice(mapDevice(dcRequest, coppa));
+    request.setDevice(mapDevice(dcRequest));
 
     if (dcRequest.getMobile().getIsApp()) {
       App.Builder app = mapApp(dcRequest);
@@ -205,7 +205,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return request;
   }
 
-  protected Device.Builder mapDevice(NetworkBid.BidRequest dcRequest, boolean coppa) {
+  protected Device.Builder mapDevice(NetworkBid.BidRequest dcRequest) {
     Device.Builder device = Device.newBuilder();
 
     if (dcRequest.hasIp()) {
@@ -228,36 +228,19 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcRequest.hasMobile()) {
       NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
 
-      if (coppa) {
-        if (dcMobile.hasConstrainedUsageAdvertisingId()) {
-          device.setIfa(BaseEncoding.base16().encode(
-              dcMobile.getConstrainedUsageAdvertisingId().toByteArray()));
-        } else if (dcMobile.hasConstrainedUsageEncryptedAdvertisingId()) {
-          device.setIfa(BaseEncoding.base16().encode(
-              dcMobile.getConstrainedUsageEncryptedAdvertisingId().toByteArray()));
-        }
-        if (dcMobile.hasConstrainedUsageHashedIdfa()) {
-          device.setDpidmd5(BaseEncoding.base16().encode(
-              dcMobile.getConstrainedUsageHashedIdfa().toByteArray()));
-        } else if (dcMobile.hasConstrainedUsageEncryptedHashedIdfa()) {
-          device.setDpidmd5(BaseEncoding.base16().encode(
-              dcMobile.getConstrainedUsageEncryptedHashedIdfa().toByteArray()));
-        }
-      } else {
-        if (dcMobile.hasAdvertisingId()) {
-          device.setIfa(BaseEncoding.base16().encode(
-              dcMobile.getAdvertisingId().toByteArray()));
-        } else if (dcMobile.hasEncryptedAdvertisingId()) {
-          device.setIfa(BaseEncoding.base16().encode(
-              dcMobile.getEncryptedAdvertisingId().toByteArray()));
-        }
-        if (dcMobile.hasHashedIdfa()) {
-          device.setDpidmd5(BaseEncoding.base16().encode(
-              dcMobile.getHashedIdfa().toByteArray()));
-        } else if (dcMobile.hasEncryptedHashedIdfa()) {
-          device.setDpidmd5(BaseEncoding.base16().encode(
-              dcMobile.getEncryptedHashedIdfa().toByteArray()));
-        }
+      if (dcMobile.hasAdvertisingId()) {
+        device.setIfa(BaseEncoding.base16().encode(
+            dcMobile.getAdvertisingId().toByteArray()));
+      } else if (dcMobile.hasEncryptedAdvertisingId()) {
+        device.setIfa(BaseEncoding.base16().encode(
+            dcMobile.getEncryptedAdvertisingId().toByteArray()));
+      }
+      if (dcMobile.hasHashedIdfa()) {
+        device.setDpidmd5(BaseEncoding.base16().encode(
+            dcMobile.getHashedIdfa().toByteArray()));
+      } else if (dcMobile.hasEncryptedHashedIdfa()) {
+        device.setDpidmd5(BaseEncoding.base16().encode(
+            dcMobile.getEncryptedHashedIdfa().toByteArray()));
       }
     }
 
