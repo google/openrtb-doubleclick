@@ -137,8 +137,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
   @Override public OpenRtb.BidRequest.Builder toOpenRtbBidRequest(NetworkBid.BidRequest dcRequest) {
     OpenRtb.BidRequest.Builder request = OpenRtb.BidRequest.newBuilder()
-        .setId(Base64.getUrlEncoder().withoutPadding().encodeToString(
-            dcRequest.getId().toByteArray()));
+        .setId(Base64.getEncoder().encodeToString(dcRequest.getId().toByteArray()));
 
     if (dcRequest.getIsPing()) {
       return request;
@@ -229,17 +228,17 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
 
       if (dcMobile.hasAdvertisingId()) {
-        device.setIfa(BaseEncoding.base16().encode(
+        device.setIfa(BaseEncoding.base64().encode(
             dcMobile.getAdvertisingId().toByteArray()));
       } else if (dcMobile.hasEncryptedAdvertisingId()) {
-        device.setIfa(BaseEncoding.base16().encode(
+        device.setIfa(BaseEncoding.base64().encode(
             dcMobile.getEncryptedAdvertisingId().toByteArray()));
       }
       if (dcMobile.hasHashedIdfa()) {
-        device.setDpidmd5(BaseEncoding.base16().encode(
+        device.setDpidmd5(BaseEncoding.base64().encode(
             dcMobile.getHashedIdfa().toByteArray()));
       } else if (dcMobile.hasEncryptedHashedIdfa()) {
-        device.setDpidmd5(BaseEncoding.base16().encode(
+        device.setDpidmd5(BaseEncoding.base64().encode(
             dcMobile.getEncryptedHashedIdfa().toByteArray()));
       }
     }
@@ -821,8 +820,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       ByteString dcHMD = coppa
           ? dcRequest.getConstrainedUsageHostedMatchData()
           : dcRequest.getHostedMatchData();
-      user.setCustomdata(
-          Base64.getUrlEncoder().withoutPadding().encodeToString(dcHMD.toByteArray()));
+      user.setCustomdata(Base64.getEncoder().encodeToString(dcHMD.toByteArray()));
     }
 
     if (dcRequest.hasUserDemographic()) {
