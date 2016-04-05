@@ -207,7 +207,7 @@ public class DoubleClickOpenRtbMapperTest {
         assertWithMessage(testDesc).that(request.getRegs().hasCoppa()).isEqualTo(coppa);
         assertWithMessage(testDesc).that(request.getRegs().getCoppa()).isEqualTo(coppa);
         assertWithMessage(testDesc).that(request.getUser().getCustomdata())
-            .isEqualTo(coppa ? "" : "7CLmnMiwSsq7bNTaiPsztg==");
+            .isEqualTo(coppa ? "" : "7CLmnMiwSsq7bNTaiPsztg");
 
         if (request.getImpCount() == 0) {
           BidResponse response = TestUtil.newBidResponse();
@@ -277,7 +277,7 @@ public class DoubleClickOpenRtbMapperTest {
         .build();
     OpenRtb.BidRequest request = mapper.toOpenRtbBidRequest(dcRequest).build();
     assertThat(request).isEqualTo(OpenRtb.BidRequest.newBuilder()
-        .setId(Base64.getEncoder().encodeToString(dcRequest.getId().toByteArray()))
+        .setId(Base64.getEncoder().withoutPadding().encodeToString(dcRequest.getId().toByteArray()))
         .build());
   }
 

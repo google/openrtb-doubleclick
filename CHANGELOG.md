@@ -5,8 +5,7 @@ RELEASE NOTES
 * Drop mapping of `Mobile.constrained_usage_*` fields to standard
   OpenRTB `Device` fields, in sync with the AdX/OpenRTB protocol.
 * `BidRequest.id`, `User.customdata`, `Device.ifa/dpidm5` are now
-  in standard Base64 format, instead of Websafe-Base64 or Base16.
-  Change necessary for consistency with upcoming Proto3/JSON support.
+  in a single format: Base64, standard alphabet, no padding.
 
 ## Version 1.0.3, 07-03-2016
 * Drop support for `Bid.nurl` mapping to impression URL. Please use
