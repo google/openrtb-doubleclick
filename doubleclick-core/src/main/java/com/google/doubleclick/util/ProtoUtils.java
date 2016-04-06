@@ -18,12 +18,12 @@ package com.google.doubleclick.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.MessageLiteOrBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Partial, private copy of the ProtoUtils class in openrtb-core,
@@ -49,7 +49,7 @@ final class ProtoUtils {
     checkNotNull(filter);
 
     for (int i = 0; i < objs.size(); ++i) {
-      if (!filter.test(objs.get(i))) {
+      if (!filter.apply(objs.get(i))) {
         // At least one discarded object, go to slow-path.
         return filterFrom(objs, filter, i);
       }
@@ -75,7 +75,7 @@ final class ProtoUtils {
     for (int i = firstDiscarded + 1; i < objs.size(); ++i) {
       M obj = objs.get(i);
 
-      if (filter.test(obj)) {
+      if (filter.apply(obj)) {
         if (filtered == null) {
           filtered = new ArrayList<>(objs.size() - i);
         }

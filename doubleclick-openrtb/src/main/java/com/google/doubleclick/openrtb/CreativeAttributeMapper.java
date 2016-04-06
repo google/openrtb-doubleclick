@@ -66,7 +66,7 @@ public class CreativeAttributeMapper {
 
   public static Set<Integer> toDoubleClick(
       Collection<CreativeAttribute> openrtbList, @Nullable Set<Integer> dcSet) {
-    Set<Integer> ret = dcSet == null ? new LinkedHashSet<>() : dcSet;
+    Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (CreativeAttribute openrtb : openrtbList) {
       Integer o = toDoubleClick(openrtb);
       if (o != null) {

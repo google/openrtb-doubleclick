@@ -9,7 +9,7 @@
   <groupId>com.google.doubleclick</groupId>
   <artifactId>doubleclick-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.4.compat-SNAPSHOT</version>
   <name>Google DoubleClick Libraries</name>
   <description>
     Utilities for DoubleClick Ad Exchange, including OpenRTB mapping,
@@ -59,9 +59,9 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>1.0.4-SNAPSHOT</openrtbVersion>
-    <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/master</openrtbSource>
+    <openrtbVersion>1.0.4.compat-SNAPSHOT</openrtbVersion>
+    <!-- Use .../compat for snapshot, .../${openrtbVersion} for release. -->
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/compat</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
     <slf4jVersion>1.7.21</slf4jVersion>
     <truthVersion>0.28</truthVersion>
@@ -217,8 +217,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
     </plugins>

@@ -33,7 +33,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.text.DateFormat;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -100,7 +99,7 @@ public class DoubleClickCrypto {
    * The default implementation performs websafe-base64 decoding (RFC 3548).
    */
   @Nullable protected byte[] decode(@Nullable String data) {
-    return data == null ? null : Base64.getUrlDecoder().decode(data);
+    return data == null ? null : BaseEncoding.base64Url().decode(data);
   }
 
   /**
@@ -108,7 +107,7 @@ public class DoubleClickCrypto {
    * The default implementation performs websafe-base64 encoding (RFC 3548).
    */
   @Nullable protected String encode(@Nullable byte[] data) {
-    return data == null ? null : Base64.getUrlEncoder().encodeToString(data);
+    return data == null ? null : BaseEncoding.base64Url().encode(data);
   }
 
   /**

@@ -16,6 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -33,6 +34,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,18 +60,20 @@ public class AdCategoryMapper {
     try (InputStream is = AdCategoryMapper.class.getResourceAsStream(
         "/adx-openrtb/category-mapping-openrtb.txt")) {
       CSVParser psvParser = new CSVParser('|', CSVParser.NUL, CSVParser.NUL, "", false);
-      psvParser.parse(is, "(\\d+)\\|(.*)\\|(\\d+)\\|(.*)", input -> {
-        int openrtbCode = Integer.parseInt(input.get(0));
-        int dcCode = Integer.parseInt(input.get(2));
-        ContentCategory openrtbCat = ContentCategory.valueOf(openrtbCode);
-        if (openrtbCat == null) {
-          logger.warn("Ignoring unknown ContentCategory code: {}", input);
-        } else {
-          data.put(openrtbCat, dcCode);
-          dcDesc.put(dcCode, input.get(3));
-          openrtbDesc.put(openrtbCat, input.get(1));
+      psvParser.parse(is, "(\\d+)\\|(.*)\\|(\\d+)\\|(.*)", new Function<List<String>, Boolean>() {
+        @Override public Boolean apply(List<String> input) {
+          int openrtbCode = Integer.parseInt(input.get(0));
+          int dcCode = Integer.parseInt(input.get(2));
+          ContentCategory openrtbCat = ContentCategory.valueOf(openrtbCode);
+          if (openrtbCat == null) {
+            logger.warn("Ignoring unknown ContentCategory code: {}", input);
+          } else {
+            data.put(openrtbCat, dcCode);
+            dcDesc.put(dcCode, input.get(3));
+            openrtbDesc.put(openrtbCat, input.get(1));
+          }
+          return true;
         }
-        return true;
       });
 
       openrtbToDc = data.build();
@@ -107,7 +111,7 @@ public class AdCategoryMapper {
 
   public static Set<Integer> toDoubleClick(
       Collection<ContentCategory> openrtbList, @Nullable Set<Integer> dcSet) {
-    Set<Integer> ret = dcSet == null ? new LinkedHashSet<>() : dcSet;
+    Set<Integer> ret = dcSet == null ? new LinkedHashSet<Integer>() : dcSet;
     for (ContentCategory openrtb : openrtbList) {
       ret.addAll(toDoubleClick(openrtb));
     }

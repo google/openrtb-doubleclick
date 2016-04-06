@@ -29,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
-import java.util.Base64;
 import java.util.Collections;
 
 /**
@@ -111,7 +110,7 @@ public class MapperUtil {
   }
 
   public static String toBase64(ByteString bytes) {
-    return Base64.getEncoder().withoutPadding().encodeToString(bytes.toByteArray());
+    return BaseEncoding.base64().omitPadding().encode(bytes.toByteArray());
   }
 
   protected static String decodeUri(String uri) {

@@ -21,6 +21,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static java.util.Arrays.asList;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
@@ -42,7 +43,6 @@ import com.codahale.metrics.MetricRegistry;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Base64;
 
 /**
  * Tests for {@link DoubleClickOpenRtbMapper}.
@@ -277,7 +277,7 @@ public class DoubleClickOpenRtbMapperTest {
         .build();
     OpenRtb.BidRequest request = mapper.toOpenRtbBidRequest(dcRequest).build();
     assertThat(request).isEqualTo(OpenRtb.BidRequest.newBuilder()
-        .setId(Base64.getEncoder().withoutPadding().encodeToString(dcRequest.getId().toByteArray()))
+        .setId(BaseEncoding.base64().omitPadding().encode(dcRequest.getId().toByteArray()))
         .build());
   }
 

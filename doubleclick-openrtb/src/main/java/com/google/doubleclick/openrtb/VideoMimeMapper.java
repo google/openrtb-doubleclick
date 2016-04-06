@@ -55,7 +55,7 @@ public class VideoMimeMapper {
 
   public static Set<String> toOpenRtb(
       Collection<VideoFormat> dcList, @Nullable Set<String> openrtbSet) {
-    Set<String> ret = openrtbSet == null ? new LinkedHashSet<>() : openrtbSet;
+    Set<String> ret = openrtbSet == null ? new LinkedHashSet<String>() : openrtbSet;
     for (VideoFormat dc : dcList) {
       ret.addAll(toOpenRtb(dc));
     }

@@ -6,6 +6,7 @@ RELEASE NOTES
   OpenRTB `Device` fields, in sync with the AdX/OpenRTB protocol.
 * `BidRequest.id`, `User.customdata`, `Device.ifa/dpidm5` are now
   in a single format: Base64, standard alphabet, no padding.
+* Reintroduced JDK 7 support in the "compat" branch.
 
 ## Version 1.0.3, 07-03-2016
 * Drop support for `Bid.nurl` mapping to impression URL. Please use

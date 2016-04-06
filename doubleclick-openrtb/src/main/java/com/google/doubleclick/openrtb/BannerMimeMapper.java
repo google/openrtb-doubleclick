@@ -61,7 +61,7 @@ public class BannerMimeMapper {
 
   public static Set<String> toOpenRtb(
       Collection<CreativeFormat> dcList, boolean vpaid, @Nullable Set<String> openrtbSet) {
-    Set<String> ret = openrtbSet == null ? new LinkedHashSet<>() : openrtbSet;
+    Set<String> ret = openrtbSet == null ? new LinkedHashSet<String>() : openrtbSet;
     for (CreativeFormat dc : dcList) {
       ret.addAll(toOpenRtb(dc, vpaid));
     }

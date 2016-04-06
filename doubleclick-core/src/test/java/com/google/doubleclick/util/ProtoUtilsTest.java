@@ -18,6 +18,8 @@ package com.google.doubleclick.util;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
 
@@ -34,8 +36,11 @@ public class ProtoUtilsTest {
         AdSlot.newBuilder().setId(1).build(),
         AdSlot.newBuilder().setId(2).build(),
         AdSlot.newBuilder().setId(3).build());
-    assertThat(ProtoUtils.filter(adslots, adslot -> adslot.getId() >= 2)).hasSize(2);
-    assertThat(ProtoUtils.filter(adslots, adslot -> true)).isSameAs(adslots);
-    assertThat(ProtoUtils.filter(adslots, adslot -> false)).isEmpty();
+    assertThat(ProtoUtils.filter(adslots, new Predicate<AdSlot>() {
+      @Override public boolean apply(AdSlot adslot) {
+        return adslot.getId() >= 2;
+      }})).hasSize(2);
+    assertThat(ProtoUtils.filter(adslots, Predicates.<AdSlot>alwaysTrue())).isSameAs(adslots);
+    assertThat(ProtoUtils.filter(adslots, Predicates.<AdSlot>alwaysFalse())).isEmpty();
   }
 }
