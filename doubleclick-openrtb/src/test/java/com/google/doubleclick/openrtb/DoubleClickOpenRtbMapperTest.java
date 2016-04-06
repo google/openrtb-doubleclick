@@ -277,8 +277,7 @@ public class DoubleClickOpenRtbMapperTest {
         .build();
     OpenRtb.BidRequest request = mapper.toOpenRtbBidRequest(dcRequest).build();
     assertThat(request).isEqualTo(OpenRtb.BidRequest.newBuilder()
-        .setId(Base64.getUrlEncoder().withoutPadding().encodeToString(
-            dcRequest.getId().toByteArray()))
+        .setId(Base64.getEncoder().withoutPadding().encodeToString(dcRequest.getId().toByteArray()))
         .build());
   }
 
