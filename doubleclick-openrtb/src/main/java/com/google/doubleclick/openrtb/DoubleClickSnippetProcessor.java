@@ -36,11 +36,11 @@ public class DoubleClickSnippetProcessor extends OpenRtbSnippetProcessor {
     }};
 
   @Override protected void processMacroAt(
-      SnippetProcessorContext ctx, StringBuilder sb, SnippetMacroType macroDef) {
+      SnippetProcessorContext ctx, SnippetMacroType macroDef) {
     if (macroDef instanceof OpenRtbMacros) {
       switch ((OpenRtbMacros) macroDef) {
         case AUCTION_PRICE: {
-          sb.append(DoubleClickMacros.WINNING_PRICE.key());
+          ctx.builder().append(DoubleClickMacros.WINNING_PRICE.key());
           return;
         }
 
@@ -48,6 +48,6 @@ public class DoubleClickSnippetProcessor extends OpenRtbSnippetProcessor {
       }
     }
 
-    super.processMacroAt(ctx, sb, macroDef);
+    super.processMacroAt(ctx, macroDef);
   }
 }
