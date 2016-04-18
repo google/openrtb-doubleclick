@@ -30,24 +30,33 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class DoubleClickSnippetProcessor extends OpenRtbSnippetProcessor {
-  public static final DoubleClickSnippetProcessor DC_NULL = new DoubleClickSnippetProcessor() {
+  public static final DoubleClickSnippetProcessor DC_NULL = new DoubleClickSnippetProcessor(false) {
     @Override public String process(SnippetProcessorContext ctx, String snippet) {
       return SnippetProcessor.NULL.process(ctx, snippet);
     }};
 
-  @Override protected void processMacroAt(
+  public DoubleClickSnippetProcessor(boolean extendedFields) {
+    super(extendedFields);
+  }
+
+  @Deprecated
+  public DoubleClickSnippetProcessor() {
+    this(false);
+  }
+
+  @Override protected boolean processMacroAt(
       SnippetProcessorContext ctx, SnippetMacroType macroDef) {
     if (macroDef instanceof OpenRtbMacros) {
       switch ((OpenRtbMacros) macroDef) {
         case AUCTION_PRICE: {
           ctx.builder().append(DoubleClickMacros.WINNING_PRICE.key());
-          return;
+          return true;
         }
 
         default:
       }
     }
 
-    super.processMacroAt(ctx, macroDef);
+    return super.processMacroAt(ctx, macroDef);
   }
 }
