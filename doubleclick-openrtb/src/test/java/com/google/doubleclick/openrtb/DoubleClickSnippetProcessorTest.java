@@ -36,9 +36,9 @@ public class DoubleClickSnippetProcessorTest {
 
   @Test
   public void testProcessor() {
-    assertThat(process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_ID.key()))
+    assertThat(process(new DoubleClickSnippetProcessor(false), OpenRtbMacros.AUCTION_ID.key()))
         .isEqualTo("1");  // Not overridden
-    assertThat(process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_PRICE.key()))
+    assertThat(process(new DoubleClickSnippetProcessor(false), OpenRtbMacros.AUCTION_PRICE.key()))
         .isEqualTo(DoubleClickMacros.WINNING_PRICE.key());  // Overridden
   }
 
