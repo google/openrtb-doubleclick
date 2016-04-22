@@ -52,7 +52,7 @@
 21|Hybrid|10001|Vehicles
 22|Luxury|10001|Vehicles
 23|MiniVan|10001|Vehicles
-24|Mororcycles|10001|Vehicles
+24|Motorcycles|10001|Vehicles
 25|Off-Road Vehicles|10001|Vehicles
 26|Performance Vehicles|10001|Vehicles
 27|Pickup|10001|Vehicles
@@ -95,6 +95,7 @@
 38|Construction|13797|Building Materials & Supplies
 39|Forestry|11083|Forestry
 39|Forestry|12366|Logging & Milling
+40|Government|32|Gambling
 40|Government|12014|Lotteries *Mopub IAB categorization.
 40|Government|13291|Government Mortgages
 41|Green Solutions|10295|/Business & Industrial/Energy Industry
@@ -143,8 +144,8 @@
 60|Adult Education|10763|Colleges, Universities & Post-Secondary Education
 60|Adult Education|10766|Community & Continuing Education
 61|Art History|0|Ignored  // Do not know how to map this to any of AdX categories.
-62|Colledge Administration|10763|Colleges, Universities & Post-Secondary Education
-62|Colledge Administration|10766|Community & Continuing Education
+62|College Administration|10763|Colleges, Universities & Post-Secondary Education
+62|College Administration|10766|Community & Continuing Education
 63|College Life|10763|Colleges, Universities & Post-Secondary Education
 64|Distance Learning|10763|Colleges, Universities & Post-Secondary Education
 64|Distance Learning|10752|Online Education & Degree Programs
@@ -371,6 +372,7 @@
 148|Wine|13008|/Hobbies & Leisure/Wine & Beer Collecting & Brewing/Wine Collecting/Wine Clubs
 149|Hobbies & Interests|10015|Hobbies & Leisure
 149|Hobbies & Interests|10137|Gambling
+149|Hobbies & Interests|32|Gambling
 149|Hobbies & Interests|10671|Toys
 149|Hobbies & Interests|13425|Fun & Trivia
 150|Art/Technology|13388|/Arts & Entertainment/Visual Art & Design
@@ -595,7 +597,6 @@
 240|Reptiles|11976|/Hobbies & Leisure/Pets & Animals/Pets By Breed/Reptiles & Amphibians
 241|Veterinary Medicine|11979|/Hobbies & Leisure/Pets & Animals/Veterinary
 242|Sports|10014|/Sports & Fitness
-242|Sports|10021|Apparel
 242|Sports|10116|Sports Fan Gear & Apparel
 242|Sports|10121|Sporting Goods
 242|Sports|11883|Sports Event Tickets & Ticketing Services
@@ -623,6 +624,7 @@
 256|Game & Fish|10628|/Sports & Fitness/Boating & Water Recreation/Fishing
 257|Golf|10653|Golf Equipment
 257|Golf|13627|/Sports & Fitness/Sports/Golf
+258|Horse Racing|32|Gambling
 258|Horse Racing|12015|/Hobbies & Leisure/Gambling/Horse & Dog Racing
 259|Horses|11975|/Hobbies & Leisure/Pets & Animals/Pets By Breed/Horses
 260|Hunting/Shooting|13612|/Sports & Fitness/Sports/Hunting & Shooting
@@ -694,6 +696,7 @@
 291|Jewelry|10171|/Apparel/Jewelry
 291|Jewelry|12236|/Apparel/Jewelry/Precious Metal Jewelry/Silver Jewelry
 291|Jewelry|10893|/Apparel/Jewelry/Precious & Semi-Precious Gems & Gemstone Jewelry
+292|Clothing|10021|Apparel
 292|Clothing|10176|Clothing
 292|Clothing|10177|Footwear
 292|Clothing|10913|Underwear
