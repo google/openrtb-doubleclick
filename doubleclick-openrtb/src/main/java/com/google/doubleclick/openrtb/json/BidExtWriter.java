@@ -32,5 +32,8 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
   @Override protected void write(BidExt ext, JsonGenerator gen) throws IOException {
     OpenRtbJsonUtils.writeStrings(
         "impression_tracking_url", ext.getImpressionTrackingUrlList(), gen);
+    if (ext.hasAdChoicesDestinationUrl()) {
+      gen.writeStringField("ad_choices_destination_url", ext.getAdChoicesDestinationUrl());
+    }
   }
 }

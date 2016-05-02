@@ -28,6 +28,9 @@ message ImpExt {
   // [AdX: BidRequest.publisher_settings_list_id]
   // [AdX: BidRequest.AdSlot.publisher_settings_list_id]
   repeated fixed64 publisher_settings_list_id = 2;
+
+  // [AdX: BidRequest.AdSlot.allowed_vendor_type]
+  repeated int32 allowed_vendor_type = 6 [packed=true];
 }
 
 extend com.google.openrtb.BidRequest.Imp {
@@ -39,6 +42,9 @@ extend com.google.openrtb.BidRequest.Imp {
 message BidExt {
   // [AdX: BidResponse.Ad.impression_tracking_url]
   repeated string impression_tracking_url = 1;
+
+  // [AdX: BidResponse.Ad.ad_choices_destination_url]
+  optional string ad_choices_destination_url = 2;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {

@@ -35,6 +35,7 @@ public class AdxExtJsonTest {
             .setExtension(AdxExt.imp, ImpExt.newBuilder()
                 .addAllBillingId(asList(100L, 101L, 102L))
                 .addAllPublisherSettingsListId(asList(200L, 201L, 202L))
+                .addAllAllowedVendorType(asList(300, 301, 302))
                 .build()))
         .build());
   }
@@ -50,6 +51,7 @@ public class AdxExtJsonTest {
                 .setPrice(1.0)
                 .setExtension(AdxExt.bid, BidExt.newBuilder()
                     .addAllImpressionTrackingUrl(asList("http://site.com/1", "http://site.com/2"))
+                    .setAdChoicesDestinationUrl("http://adchoices.com")
                     .build())))
         .build());
   }
