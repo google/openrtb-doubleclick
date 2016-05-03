@@ -45,6 +45,9 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
           ext.addImpressionTrackingUrl(par.getText());
         }
         break;
+      case "ad_choices_destination_url":
+        ext.setAdChoicesDestinationUrl(par.nextTextValue());
+        break;
     }
   }
 }
