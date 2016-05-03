@@ -30,7 +30,7 @@ message ImpExt {
   repeated fixed64 publisher_settings_list_id = 2;
 
   // [AdX: BidRequest.AdSlot.allowed_vendor_type]
-  repeated int32 allowed_vendor_type = 6 [packed=true];
+  repeated int32 allowed_vendor_type = 3 [packed=true];
 }
 
 extend com.google.openrtb.BidRequest.Imp {
