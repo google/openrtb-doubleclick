@@ -4,8 +4,11 @@ RELEASE NOTES
 ## Version 1.0.4, ??-04-2016
 * Drop mapping of `Mobile.constrained_usage_*` fields to standard
   OpenRTB `Device` fields, in sync with the AdX/OpenRTB protocol.
-* `BidRequest.id`, `User.customdata`, `Device.ifa/dpidm5` are now
-  in a single format: Base64, standard alphabet, no padding.
+* Drop mapping of AdX's `encrypted_*` fields, deprecated with SSL.
+* `BidRequest.id`, `User.customdata` are now formatted in Base64 with
+  the standard alphabet (not URL-safe), no padding.
+* `Device.ifa` is now formatted as a 36-char UUID, for mobile platforms
+  that use an UUID as device identifier (both Android and iOS do).
 * New AdX/OpenRTB extensions: `ImpExt.allowed_vendor_type`,
   `BidExt.ad_choices_destination_url`.
 
