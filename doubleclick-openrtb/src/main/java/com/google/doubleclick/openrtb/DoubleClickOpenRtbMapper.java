@@ -22,6 +22,7 @@ import static java.lang.Math.min;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.DcExt;
 import com.google.doubleclick.util.CityDMARegionKey;
 import com.google.doubleclick.util.CityDMARegionValue;
@@ -184,7 +185,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       logger.debug("Request has no impressions");
     }
 
-    User.Builder user = mapUser(dcRequest, coppa);
+    User.Builder user = mapUser(dcRequest);
     if (user != null) {
       request.setUser(user);
     }
@@ -225,14 +226,11 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       NetworkBid.BidRequest.Mobile dcMobile = dcRequest.getMobile();
 
       if (dcMobile.hasAdvertisingId()) {
-        device.setIfa(MapperUtil.toBase64(dcMobile.getAdvertisingId()));
-      } else if (dcMobile.hasEncryptedAdvertisingId()) {
-        device.setIfa(MapperUtil.toBase64(dcMobile.getEncryptedAdvertisingId()));
+        device.setIfa(MapperUtil.toUUID(dcMobile.getAdvertisingId(),
+            "iOS".equals(DeviceOSMapper.toOpenRtb(dcRequest.getDevice().getPlatform()))));
       }
       if (dcMobile.hasHashedIdfa()) {
-        device.setDpidmd5(MapperUtil.toBase64(dcMobile.getHashedIdfa()));
-      } else if (dcMobile.hasEncryptedHashedIdfa()) {
-        device.setDpidmd5(MapperUtil.toBase64(dcMobile.getEncryptedHashedIdfa()));
+        device.setDpidmd5(BaseEncoding.base16().encode(dcMobile.getHashedIdfa().toByteArray()));
       }
     }
 
@@ -289,9 +287,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
   }
 
   @Nullable protected Geo.Builder mapGeo(NetworkBid.BidRequest dcRequest) {
-    if (!dcRequest.hasGeoCriteriaId()
-        && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()
-        && !dcRequest.hasHyperlocalSet() && !dcRequest.hasEncryptedHyperlocalSet()) {
+    if (!dcRequest.hasGeoCriteriaId() && !dcRequest.hasHyperlocalSet()
+        && !dcRequest.hasPostalCode() && !dcRequest.hasPostalCodePrefix()) {
       return null;
     }
 
@@ -442,10 +439,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (dcRequest.hasUrl()) {
       content.setUrl(dcRequest.getUrl());
-    } else if (dcRequest.hasAnonymousId()) {
+    }
+    if (dcRequest.hasAnonymousId()) {
       content.setId(dcRequest.getAnonymousId());
     }
-
     if (dcRequest.getMobile().hasAppRating()) {
       content.setUserrating(String.valueOf(dcRequest.getMobile().getAppRating()));
     }
@@ -466,7 +463,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     if (dcRequest.hasUrl()) {
       site.setPage(dcRequest.getUrl());
       mapped = true;
-    } else if (dcRequest.hasAnonymousId()) {
+    }
+    if (dcRequest.hasAnonymousId()) {
       site.setName(dcRequest.getAnonymousId());
       mapped = true;
     }
@@ -798,21 +796,15 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     return banner;
   }
 
-  @Nullable protected User.Builder mapUser(NetworkBid.BidRequest dcRequest, boolean coppa) {
-    if ((!coppa && !dcRequest.hasGoogleUserId())
-        || (coppa && !dcRequest.hasConstrainedUsageGoogleUserId())) {
+  @Nullable protected User.Builder mapUser(NetworkBid.BidRequest dcRequest) {
+    if (!dcRequest.hasGoogleUserId()) {
       return null;
     }
 
-    User.Builder user = User.newBuilder().setId(coppa
-        ? dcRequest.getConstrainedUsageGoogleUserId()
-        : dcRequest.getGoogleUserId());
+    User.Builder user = User.newBuilder().setId(dcRequest.getGoogleUserId());
 
-    if ((coppa && dcRequest.hasConstrainedUsageHostedMatchData())
-        || (!coppa && dcRequest.hasHostedMatchData())) {
-      user.setCustomdata(MapperUtil.toBase64(coppa
-          ? dcRequest.getConstrainedUsageHostedMatchData()
-          : dcRequest.getHostedMatchData()));
+    if (dcRequest.hasHostedMatchData()) {
+      user.setCustomdata(MapperUtil.toBase64(dcRequest.getHostedMatchData()));
     }
 
     if (dcRequest.hasUserDemographic()) {
