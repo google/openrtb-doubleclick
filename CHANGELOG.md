@@ -11,6 +11,7 @@ RELEASE NOTES
   that use an UUID as device identifier (both Android and iOS do).
 * New AdX/OpenRTB extensions: `ImpExt.allowed_vendor_type`,
   `BidExt.ad_choices_destination_url`.
+* Reintroduced JDK 7 support in the "compat" branch.
 
 ## Version 1.0.3, 07-03-2016
 * Drop support for `Bid.nurl` mapping to impression URL. Please use

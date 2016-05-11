@@ -1212,6 +1212,8 @@ message BidResponse {
     // all inventory types and all formats except for VAST video.
     repeated string impression_tracking_url = 19;
 
+    optional string ad_choices_destination_url = 21;
+
     // These are deprecated. Please do not set.
     optional int64 DEPRECATED_creative_id = 8;
     optional string DEPRECATED_click_through_url = 2;
