@@ -33,5 +33,6 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
     OpenRtbJsonUtils.writeLongs("billing_id", ext.getBillingIdList(), gen);
     OpenRtbJsonUtils.writeLongs(
         "publisher_settings_list_id", ext.getPublisherSettingsListIdList(), gen);
+    OpenRtbJsonUtils.writeInts("allowed_vendor_type", ext.getAllowedVendorTypeList(), gen);
   }
 }

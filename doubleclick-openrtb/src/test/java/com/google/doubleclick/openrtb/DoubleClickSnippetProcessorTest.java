@@ -30,15 +30,16 @@ import com.google.openrtb.snippet.SnippetProcessorContext;
 import org.junit.Test;
 
 /**
- * Tests for {@link DoubleClickSnippetProcessor}.
- */
+ * Tests for {@link DoubleClickSnippetProcessor}. */
 public class DoubleClickSnippetProcessorTest {
 
   @Test
   public void testProcessor() {
-    assertThat(process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_ID.key()))
+    assertThat(process(new DoubleClickSnippetProcessor(false), OpenRtbMacros.AUCTION_ID.key()))
         .isEqualTo("1");  // Not overridden
-    assertThat(process(new DoubleClickSnippetProcessor(), OpenRtbMacros.AUCTION_PRICE.key()))
+    assertThat(process(new DoubleClickSnippetProcessor(false), "${UNKNOWN}"))
+    .isEqualTo("${UNKNOWN}");  // Not overridden
+    assertThat(process(new DoubleClickSnippetProcessor(false), OpenRtbMacros.AUCTION_PRICE.key()))
         .isEqualTo(DoubleClickMacros.WINNING_PRICE.key());  // Overridden
   }
 

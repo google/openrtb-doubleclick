@@ -24,12 +24,15 @@ import com.google.common.collect.Sets;
 import com.google.common.io.BaseEncoding;
 import com.google.common.net.InetAddresses;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.CodedInputStream;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.UUID;
 
 /**
  * Utilities for Mappers.
@@ -111,6 +114,19 @@ public class MapperUtil {
 
   public static String toBase64(ByteString bytes) {
     return BaseEncoding.base64().omitPadding().encode(bytes.toByteArray());
+  }
+
+  public static String toUUID(ByteString bytes, boolean iOS) {
+    if (bytes.size() == 16) {
+      try {
+        CodedInputStream cis = bytes.newCodedInput();
+        String uuid = new UUID(cis.readFixed64(), cis.readFixed64()).toString();
+        return iOS ? uuid.toUpperCase() : uuid;
+      } catch (IOException e) {
+        // Fall-through
+      }
+    }
+    return BaseEncoding.base16().encode(bytes.toByteArray());
   }
 
   protected static String decodeUri(String uri) {
