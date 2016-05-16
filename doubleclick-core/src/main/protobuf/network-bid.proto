@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.77
+// Synchronized with v.84
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -806,12 +806,11 @@ message BidRequest {
     }
     optional SlotVisibility slot_visibility = 12 [default = NO_DETECTION];
 
-    // Historical viewability percentage for the ad slot. This is an estimate of
-    // the likelihood that this slot will be viewable by the end user, based on
-    // how often it has been viewable in the past. Expressed as a percentage in
-    // the range of [0, 100] and rounded down to the next multiple of 10.  The
-    // default value -1 indicates that historical viewability data is not
-    // available.
+    // Viewability percentage for the ad slot. This is an estimate of the
+    // likelihood that this slot will be viewable by the end user based on
+    // historical and environment data. It is expressed as a percentage in the
+    // range of [0, 100] and rounded down to the next multiple of 10. The
+    // default value -1 indicates that viewability could not be estimated.
     optional int32 viewability = 21 [default = -1];
 
     // Historical click-through rate for ads served in the ad slot. This is
@@ -969,9 +968,8 @@ message BidRequest {
     // The unique id from BidRequest.id
     optional bytes request_id = 1;
 
-    // The index of the creative within the BidResponse if there was more than
-    // one. The index starts at zero for the first creative. This is usually the
-    // index of the BidResponse.Ad.
+    // The index of the BidResponse_Ad if there was more than one. The index
+    // starts at zero for the first creative.
     optional int32 creative_index = 2;
 
     // The status code for the ad. See creative-status-codes.txt in the
@@ -1057,7 +1055,7 @@ message BidResponse {
     optional string html_snippet = 1;
 
     // The URL to fetch a video ad. The URL should return an XML response that
-    // conforms to the VAST 2.0 standard. Please use
+    // conforms to the VAST 2.0 or 3.0 standard. Please use
     // BidResponse.Ad.AdSlot.billing_id to indicate which billing id to
     // attribute this ad to. Only one of the following should be set:
     // html_snippet, video_url. Only set this field if the BidRequest is for an
@@ -1212,6 +1210,9 @@ message BidResponse {
     // all inventory types and all formats except for VAST video.
     repeated string impression_tracking_url = 19;
 
+    // Link to ad preferences page. This is only suppported for native ads.
+    // If present, a standard AdChoices icon is added to the native creative and
+    // linked to this URL.
     optional string ad_choices_destination_url = 21;
 
     // These are deprecated. Please do not set.
