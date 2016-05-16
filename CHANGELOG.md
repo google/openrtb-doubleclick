@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.0.4, ??-04-2016
+## Version 1.0.4, 16-05-2016
 * Drop mapping of `Mobile.constrained_usage_*` fields to standard
   OpenRTB `Device` fields, in sync with the AdX/OpenRTB protocol.
 * Drop mapping of AdX's `encrypted_*` fields, deprecated with SSL.
@@ -11,6 +11,8 @@ RELEASE NOTES
   that use an UUID as device identifier (both Android and iOS do).
 * New AdX/OpenRTB extensions: `ImpExt.allowed_vendor_type`,
   `BidExt.ad_choices_destination_url`.
+* DoubleClick protocol v.84: Adds `Ad.ad_choices_destination_url`.
+  https://developers.google.com/ad-exchange/rtb/relnotes#may-13-2016
 * Reintroduced JDK 7 support in the "compat" branch.
 
 ## Version 1.0.3, 07-03-2016

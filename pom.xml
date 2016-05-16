@@ -59,9 +59,9 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>1.0.4.compat-SNAPSHOT</openrtbVersion>
-    <!-- Use .../compat for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/compat</openrtbSource>
+    <openrtbVersion>1.0.4.compat</openrtbVersion>
+    <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.0.4.compat</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
     <slf4jVersion>1.7.21</slf4jVersion>
     <truthVersion>0.28</truthVersion>
@@ -108,7 +108,7 @@
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.6</version>
+        <version>3.0.0</version>
       </plugin>
 
       <plugin>
