@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
+import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
@@ -36,6 +37,7 @@ public class AdxExtJsonTest {
                 .addAllBillingId(asList(100L, 101L, 102L))
                 .addAllPublisherSettingsListId(asList(200L, 201L, 202L))
                 .addAllAllowedVendorType(asList(300, 301, 302))
+                .addAllPublisherParameter(asList("a", "b", "c"))
                 .build()))
         .build());
   }
@@ -52,7 +54,10 @@ public class AdxExtJsonTest {
                 .setExtension(AdxExt.bid, BidExt.newBuilder()
                     .addAllImpressionTrackingUrl(asList("http://site.com/1", "http://site.com/2"))
                     .setAdChoicesDestinationUrl("http://adchoices.com")
+                    .setBidderName("x")
                     .build())))
+        .setExtension(AdxExt.bidResponse,
+            BidResponseExt.newBuilder().setProcessingTimeMs(99).build())
         .build());
   }
 

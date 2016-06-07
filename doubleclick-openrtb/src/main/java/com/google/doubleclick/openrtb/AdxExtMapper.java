@@ -18,8 +18,10 @@ package com.google.doubleclick.openrtb;
 
 import com.google.doubleclick.AdxExt;
 import com.google.openrtb.OpenRtb.BidRequest;
+import com.google.openrtb.OpenRtb.BidRequest.Imp;
+import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
-import com.google.protos.adx.NetworkBid.BidResponse.Ad;
+import com.google.protos.adx.NetworkBid;
 
 /**
  * Extension mapper for AdX/OpenRTB extensions.
@@ -31,10 +33,45 @@ public class AdxExtMapper extends ExtMapper {
   }
 
   @Override
-  public boolean toDoubleClickAd(BidRequest request, Bid bid, Ad.Builder dcAd) {
+  public boolean toDoubleClickAd(
+      BidRequest request, Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
     if (bid.hasExtension(AdxExt.bid)) {
       AdxExt.BidExt bidExt = bid.getExtension(AdxExt.bid);
       dcAd.addAllImpressionTrackingUrl(bidExt.getImpressionTrackingUrlList());
+      if (bidExt.hasAdChoicesDestinationUrl()) {
+        dcAd.setAdChoicesDestinationUrl(bidExt.getAdChoicesDestinationUrl());
+      }
+      if (bidExt.hasBidderName()) {
+        dcAd.setBidderName(bidExt.getBidderName());
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean toDoubleClickBidResponse(
+      BidResponse response, NetworkBid.BidResponse.Builder dcResponse) {
+    if (response.hasExtension(AdxExt.bidResponse)) {
+      AdxExt.BidResponseExt responseExt = response.getExtension(AdxExt.bidResponse);
+      if (responseExt.hasProcessingTimeMs()) {
+        dcResponse.setProcessingTimeMs(responseExt.getProcessingTimeMs());
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean toOpenRtbImp(NetworkBid.BidRequest.AdSlot dcSlot, Imp.Builder imp) {
+    if (dcSlot.getAllowedVendorTypeCount() != 0
+        || dcSlot.getExchangeBidding().getPublisherParameterCount() != 0) {
+      AdxExt.ImpExt.Builder impExt = imp.getExtension(AdxExt.imp).toBuilder();
+      impExt.addAllAllowedVendorType(dcSlot.getAllowedVendorTypeList());
+      impExt.addAllPublisherParameter(dcSlot.getExchangeBidding().getPublisherParameterList());
+      // TODO: impExt.addAllBillingId()
       return true;
     } else {
       return false;

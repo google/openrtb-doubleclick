@@ -35,7 +35,8 @@ import java.io.IOException;
 class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Builder> {
 
   public ImpExtReader() {
-    super(AdxExt.imp, false, "billing_id", "publisher_settings_list_id");
+    super(AdxExt.imp, false,
+        "billing_id", "publisher_settings_list_id", "allowed_vendor_type", "publisher_parameter");
   }
 
   @Override protected void read(ImpExt.Builder ext, JsonParser par) throws IOException {
@@ -55,6 +56,12 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
       case "allowed_vendor_type":
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addAllowedVendorType(par.getIntValue());
+        }
+        break;
+
+      case "publisher_parameter":
+        for (startArray(par); endArray(par); par.nextToken()) {
+          ext.addPublisherParameter(par.getText());
         }
         break;
     }

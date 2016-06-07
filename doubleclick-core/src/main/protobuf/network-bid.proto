@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.84
+// Synchronized with v.86
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -210,7 +210,7 @@ message BidRequest {
 
   // Detected user languages, based on the language of the web page, the browser
   // settings, and other signals. The order is arbitrary. The codes are 2 or 5
-  // letters and are documented at
+  // characters and are documented at
   // https://developers.google.com/adwords/api/docs/appendix/languagecodes
   repeated string detected_language = 12;
 
@@ -705,6 +705,12 @@ message BidRequest {
     // the values in this field.
     repeated int32 allowed_restricted_category_for_deals = 22 [packed=true];
 
+    // List of creative languages allowed by the publisher. The order is
+    // arbitrary. The codes are 2 or 5 characters and are documented at
+    // https://developers.google.com/adwords/api/docs/appendix/languagecodes.
+    // When not set, all languages are allowed.
+    repeated string allowed_languages = 27;
+
     // The disallowed ad product categories. See the ad-product-categories.txt
     // file in the technical documentation for a list of ids. You should enforce
     // these exclusions if you have the ability to classify ads into the listed
@@ -792,11 +798,25 @@ message BidRequest {
     }
     repeated MatchingAdData matching_ad_data = 9;
 
-    // The publisher settings list ids that apply to this slot.
-    // See the RTB Publisher Settings guide at
-    // https://developers.google.com/ad-exchange/rtb/pub-settings-guide
-    // for details.
+    // The publisher settings list ids that apply to this slot.  See the RTB
+    // Publisher Settings guide at
+    // https://developers.google.com/ad-exchange/rtb/pub-settings-guide for
+    // details.
     repeated fixed64 publisher_settings_list_id = 15;
+
+    // Parameters related to exchange bidding (third party exchanges doing
+    // real-time bidding on DFP). This is never populated in calls to AdX
+    // real-time bidders.
+    //
+    message ExchangeBidding {
+      // UTF8 strings optionally provided by the publisher as part of their
+      // matching yield group configurations in the DFP UI. The format is
+      // arbitrary and should be agreed upon by the publisher and the exchange
+      // bidder.
+      repeated string publisher_parameter = 1;
+    }
+    optional ExchangeBidding exchange_bidding = 28;
+
 
     // Visibility information for the slot.
     enum SlotVisibility  {
@@ -1161,6 +1181,13 @@ message BidResponse {
     // All names of the ad's advertisers.
     repeated string advertiser_name = 11;
 
+    // For exchange bidders (third party exchanges doing real-time bidding on
+    // DFP), the name of the bidder that the exchange called to provide the ad.
+    // This is arbitrary UTF8 text but should be sufficient to identify the
+    // bidder and should be set consistently to the same value for the same
+    // bidder.
+    optional string bidder_name = 22;
+
     // The width and the height in pixels of the ad. Setting these is optional.
     // However, these must be set if the bid BidRequest.AdSlot has more than one
     // width and height or if BidRequest.Mobile.is_interstitial_request is true.
@@ -1210,7 +1237,7 @@ message BidResponse {
     // all inventory types and all formats except for VAST video.
     repeated string impression_tracking_url = 19;
 
-    // Link to ad preferences page. This is only suppported for native ads.
+    // Link to ad preferences page. This is only supported for native ads.
     // If present, a standard AdChoices icon is added to the native creative and
     // linked to this URL.
     optional string ad_choices_destination_url = 21;

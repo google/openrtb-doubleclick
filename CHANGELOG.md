@@ -1,6 +1,13 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.0.5, ??-06-2016
+* DoubleClick protocol v.86: Adds `AdSlot.allowed_languages`,
+  `AdSlot.exchange_bidding` and `Ad.bidder_name`.
+* AdX/OpenRTB extensions v.4: Adds `BidResponseExt.processing_time_ms`,
+  `ImpExt.publisher_parameter` and `BidExt.bidder_name`.
+* Fix incomplete JSON & mapping support for AdX/OpenRTB extensions.
+
 ## Version 1.0.4, 16-05-2016
 * Drop mapping of `Mobile.constrained_usage_*` fields to standard
   OpenRTB `Device` fields, in sync with the AdX/OpenRTB protocol.

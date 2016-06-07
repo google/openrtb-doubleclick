@@ -868,6 +868,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       }
     }
 
+    for (ExtMapper extMapper : extMappers) {
+      extMapper.toDoubleClickBidResponse(response, dcResponse);
+    }
+
     return dcResponse;
   }
 
