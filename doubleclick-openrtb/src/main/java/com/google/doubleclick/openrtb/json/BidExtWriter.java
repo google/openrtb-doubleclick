@@ -35,5 +35,8 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     if (ext.hasAdChoicesDestinationUrl()) {
       gen.writeStringField("ad_choices_destination_url", ext.getAdChoicesDestinationUrl());
     }
+    if (ext.hasBidderName()) {
+      gen.writeStringField("bidder_name", ext.getBidderName());
+    }
   }
 }

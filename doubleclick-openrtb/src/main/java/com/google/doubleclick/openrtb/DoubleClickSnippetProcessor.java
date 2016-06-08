@@ -39,7 +39,6 @@ public class DoubleClickSnippetProcessor extends OpenRtbSnippetProcessor {
     super(extendedFields);
   }
 
-  @Deprecated
   public DoubleClickSnippetProcessor() {
     this(false);
   }
