@@ -16,24 +16,21 @@
 
 package com.google.doubleclick.openrtb.json;
 
-import com.google.doubleclick.AdxExt.ImpExt;
+import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
-import com.google.openrtb.json.OpenRtbJsonUtils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.io.IOException;
 
 /**
- * Writer for {@link ImpExt}.
+ * Writer for {@link BidResponseExt}.
  */
-class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
+class BidResponseExtWriter extends OpenRtbJsonExtWriter<BidResponseExt> {
 
-  @Override protected void write(ImpExt ext, JsonGenerator gen) throws IOException {
-    OpenRtbJsonUtils.writeLongs("billing_id", ext.getBillingIdList(), gen);
-    OpenRtbJsonUtils.writeLongs(
-        "publisher_settings_list_id", ext.getPublisherSettingsListIdList(), gen);
-    OpenRtbJsonUtils.writeInts("allowed_vendor_type", ext.getAllowedVendorTypeList(), gen);
-    OpenRtbJsonUtils.writeStrings("publisher_parameter", ext.getPublisherParameterList(), gen);
+  @Override protected void write(BidResponseExt ext, JsonGenerator gen) throws IOException {
+    if (ext.hasProcessingTimeMs()) {
+      gen.writeNumberField("processing_time_ms", ext.getProcessingTimeMs());
+    }
   }
 }

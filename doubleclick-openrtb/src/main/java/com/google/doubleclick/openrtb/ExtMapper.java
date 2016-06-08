@@ -17,6 +17,7 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb;
+import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.protos.adx.NetworkBid;
 
 /**
@@ -87,6 +88,11 @@ public abstract class ExtMapper {
 
   public boolean toDoubleClickAd(OpenRtb.BidRequest request,
       OpenRtb.BidResponse.SeatBid.Bid bid, NetworkBid.BidResponse.Ad.Builder dcAd) {
+    return false;
+  }
+
+  public boolean toDoubleClickBidResponse(
+      BidResponse response, NetworkBid.BidResponse.Builder dcResponse) {
     return false;
   }
 }

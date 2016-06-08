@@ -1,22 +1,8 @@
-/*
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
+
+// Copyright 2016 Google Inc. All Rights Reserved.
 
 // Protocol buffer for Ad Exchange OpenRTB specification.
 
@@ -31,11 +17,25 @@ message ImpExt {
 
   // [AdX: BidRequest.AdSlot.allowed_vendor_type]
   repeated int32 allowed_vendor_type = 3 [packed=true];
+
+  // [AdX: BidRequest.AdSlot.ExchangeBidding.publisher_parameter]
+  repeated string publisher_parameter = 4;
 }
 
 extend com.google.openrtb.BidRequest.Imp {
   // Extension key for AdX Imp.ext.
   optional ImpExt imp = 1009;
+}
+
+// Ad Exchange extensions for the BidResponse object.
+message BidResponseExt {
+  // [AdX: BidResponse.processing_time_ms]
+  optional int32 processing_time_ms = 1;
+}
+
+extend com.google.openrtb.BidResponse {
+  // Extension key for AdX BidResponse.ext.
+  optional BidResponseExt bid_response = 1005;
 }
 
 // Ad Exchange extensions for the Bid object.
@@ -45,6 +45,9 @@ message BidExt {
 
   // [AdX: BidResponse.Ad.ad_choices_destination_url]
   optional string ad_choices_destination_url = 2;
+
+  // [AdX: BidResponse.Ad.bidder_name]
+  optional string bidder_name = 3;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {

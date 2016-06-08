@@ -16,13 +16,11 @@
 
 package com.google.doubleclick.openrtb.json;
 
-import static com.google.openrtb.json.OpenRtbJsonUtils.endArray;
 import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
-import static com.google.openrtb.json.OpenRtbJsonUtils.startArray;
 
 import com.google.doubleclick.AdxExt;
-import com.google.doubleclick.AdxExt.BidExt;
-import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.doubleclick.AdxExt.BidResponseExt;
+import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -30,27 +28,19 @@ import com.fasterxml.jackson.core.JsonParser;
 import java.io.IOException;
 
 /**
- * Reader for {@link BidExt}.
+ * Reader for {@link BidResponseExt}.
  */
-class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Builder> {
+class BidResponseExtReader
+extends OpenRtbJsonExtComplexReader<BidResponse.Builder, BidResponseExt.Builder> {
 
-  public BidExtReader() {
-    super(AdxExt.bid, false,
-        "impression_tracking_url", "ad_choices_destination_url", "bidder_name");
+  public BidResponseExtReader() {
+    super(AdxExt.bidResponse, false, "processing_time_ms");
   }
 
-  @Override protected void read(BidExt.Builder ext, JsonParser par) throws IOException {
+  @Override protected void read(BidResponseExt.Builder ext, JsonParser par) throws IOException {
     switch (getCurrentName(par)) {
-      case "impression_tracking_url":
-        for (startArray(par); endArray(par); par.nextToken()) {
-          ext.addImpressionTrackingUrl(par.getText());
-        }
-        break;
-      case "ad_choices_destination_url":
-        ext.setAdChoicesDestinationUrl(par.nextTextValue());
-        break;
-      case "bidder_name":
-        ext.setBidderName(par.nextTextValue());
+      case "processing_time_ms":
+        ext.setProcessingTimeMs(par.nextIntValue(0));
         break;
     }
   }
