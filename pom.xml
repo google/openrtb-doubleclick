@@ -59,7 +59,7 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>1.0.5.compat-SNAPSHOT</openrtbVersion>
+    <openrtbVersion>1.0.5.compat</openrtbVersion>
     <!-- Use .../compat for snapshot, .../${openrtbVersion} for release. -->
     <openrtbSource>https://raw.githubusercontent.com/google/openrtb/compat</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
@@ -108,7 +108,7 @@
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
       </plugin>
 
       <plugin>
@@ -174,7 +174,7 @@
 
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>2.10.4</version>
         <configuration>
           <windowtitle>${project.name}</windowtitle>
           <notimestamp>true</notimestamp>

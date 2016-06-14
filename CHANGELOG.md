@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.0.5, ??-06-2016
+## Version 1.0.5, 13-06-2016
 * DoubleClick protocol v.86: Adds `AdSlot.allowed_languages`,
   `AdSlot.exchange_bidding` and `Ad.bidder_name`.
 * AdX/OpenRTB extensions v.4: Adds `BidResponseExt.processing_time_ms`,
