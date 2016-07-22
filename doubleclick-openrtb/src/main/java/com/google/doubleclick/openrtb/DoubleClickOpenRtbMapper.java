@@ -777,8 +777,8 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
 
     if (!dcSlot.getExcludedAttributeList().contains(32 /* MraidType: Mraid 1.0 */)) {
       banner.addApi(APIFramework.MRAID_1);
+      banner.addApi(APIFramework.MRAID_2);
     }
-    banner.addApi(APIFramework.MRAID_2);
 
     banner.addAllExpdir(ExpandableDirectionMapper.toOpenRtb(dcSlot.getExcludedAttributeList()));
 

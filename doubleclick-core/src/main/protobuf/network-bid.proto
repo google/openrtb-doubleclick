@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.90
+// Synchronized with v.91
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -89,7 +89,7 @@ message BidRequest {
   optional bytes constrained_usage_hosted_match_data = 48;
 
   // A string that identifies the browser and type of device that sent the
-  // request.
+  // request. Certain data may be redacted or replaced.
   optional string user_agent = 6;
 
   // Geo information. These use a subset of the codes used in the AdWords API.
@@ -1125,7 +1125,8 @@ message BidResponse {
 
       // The URL to use for click tracking. The SDK pings click tracking url on
       // a background thread. When resolving the url, HTTP 30x redirects are
-      // followed. The SDK ignores the contents of the response.
+      // followed. The SDK ignores the contents of the response; this URL
+      // has no effect on the landing page for the user.
       optional string click_tracking_url = 11;
 
       // The price of the promoted app including the currency info.
@@ -1140,16 +1141,17 @@ message BidResponse {
     };
     optional NativeAd native_ad = 18;
 
-    // The set of destination URLs for the snippet or native ad. This should
-    // include the URLs that the user will go to if they click on the displayed
-    // ad, and any URLs that are visible in the rendered ad. It should not
+    // The set of destination URLs for the snippet. This includes
+    // the URLs that the user will go to if they click on the displayed
+    // ad, and any URLs that are visible in the rendered ad. Do not
     // include intermediate calls to the adserver that are unrelated to the
     // final landing page. This data is used for post-filtering of
     // publisher-blocked URLs among other things. A BidResponse that returns a
     // snippet or video ad but declares no click_through_url will be discarded.
     // For native ads, only the first value is used as the click URL, though
     // all values are subject to categorization and review. Only set this
-    // field if html_snippet or video_url or native_ad are set.
+    // field if html_snippet or video_url or native_ad are set. For native ads,
+    // the first value is used to direct the user to the landing page.
     repeated string click_through_url = 4;
 
     // All vendor types for the ads that may be shown from this snippet. You
