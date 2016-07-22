@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.0.6, ??-07-2016
+## Version 1.0.6, 22-07-2016
 * DoubleClick protocol v.91: Only documentation changes.
 * Fixed mapping of `Banner.api` for `MRAID_2`.
 
