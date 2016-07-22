@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.0.6, 22-07-2016
+* DoubleClick protocol v.91: Only documentation changes.
+* Fixed mapping of `Banner.api` for `MRAID_2`.
+
 ## Version 1.0.5, 13-06-2016
 * DoubleClick protocol v.86: Adds `AdSlot.allowed_languages`,
   `AdSlot.exchange_bidding` and `Ad.bidder_name`.
