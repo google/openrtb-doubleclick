@@ -130,14 +130,29 @@ public class DoubleClickOpenRtbMapperTest {
     OpenRtb.BidRequest request = TestUtil.newBidRequest(
         TestData.newRequest(0, false, false).setVideo(TestData.newVideo(0)));
     Bid bid = TestData.newBid(false)
-        .setAdm("http://my-video")
+        .setAdm("https://my-video")
         .setCrid("creativeId")
         .build();
     NetworkBid.BidResponse.Ad.Builder ad = mapper.mapResponseAd(request, bid);
     assertThat(ad).isNotNull();
-    assertThat(ad.getVideoUrl()).isEqualTo("http://my-video");
-    assertThat(ad.getBuyerCreativeId()).isEqualTo("creativeId");
+    assertThat(ad.getVideoUrl()).isEqualTo("https://my-video");
     assertThat(ad.hasHtmlSnippet()).isFalse();
+    assertThat(ad.getBuyerCreativeId()).isEqualTo("creativeId");
+  }
+
+  @Test
+  public void testResponse_mraidAd() {
+    OpenRtb.BidRequest request = TestUtil.newBidRequest(
+        TestData.newRequest(0, false, false).setVideo(TestData.newVideo(0)));
+    Bid bid = TestData.newBid(false)
+        .setAdm("<script my mraid content...>")
+        .setCrid("creativeId")
+        .build();
+    NetworkBid.BidResponse.Ad.Builder ad = mapper.mapResponseAd(request, bid);
+    assertThat(ad).isNotNull();
+    assertThat(ad.getHtmlSnippet()).isEqualTo("<script my mraid content...>");
+    assertThat(ad.hasVideoUrl()).isFalse();
+    assertThat(ad.getBuyerCreativeId()).isEqualTo("creativeId");
   }
 
   @Test(expected = MapperException.class)

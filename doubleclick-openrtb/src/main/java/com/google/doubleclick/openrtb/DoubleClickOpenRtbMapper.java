@@ -903,14 +903,14 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
           "Impresson.id doesn't match any request impression: %s", bid.getImpid());
     }
 
-    if (matchingImp.hasVideo()) {
+    if (matchingImp.hasNative()) {
+      nativeMapper.mapNativeResponse(dcAd, bid, matchingImp);
+    } else if (matchingImp.hasVideo() && bid.getAdm().regionMatches(true, 0, "https://", 0, 8)) {
       dcAd.setVideoUrl(bid.getAdm());
       mapAdSize(bid, dcAd, matchingImp);
-    } else if (matchingImp.hasBanner()) {
+    } else if (matchingImp.hasBanner() || matchingImp.hasVideo()) {
       dcAd.setHtmlSnippet(bid.getAdm());
       mapAdSize(bid, dcAd, matchingImp);
-    } else if (matchingImp.hasNative()) {
-      nativeMapper.mapNativeResponse(dcAd, bid, matchingImp);
     } else {
       noVideoOrBanner.inc();
       throw new MapperException("Imp has neither of Video or Banner");
