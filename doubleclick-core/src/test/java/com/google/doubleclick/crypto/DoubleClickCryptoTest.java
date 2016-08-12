@@ -18,6 +18,7 @@ package com.google.doubleclick.crypto;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.TestUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
@@ -40,40 +41,18 @@ public class DoubleClickCryptoTest {
 
   static final DoubleClickCrypto.Keys KEYS = createKeys();
   static final double PLAIN_PRICE = 1.2;
-  static final Date INITV_TIMESTAMP = new Date(0xE679B0BE000CD140L);
+  static final Date INITV_TIMESTAMP = new Date(946748096789L);
   static final long INITV_SERVERID = 0x0123456789ABCDEFL;
-  static final byte[] INITV = new byte[] {
-    (byte) 0xE6, (byte) 0x79, (byte) 0xB0, (byte) 0xBE,
-    (byte) 0x00, (byte) 0x0C, (byte) 0xD1, (byte) 0x40,
-    (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
-    (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
-  };
-  static final String CIPHER_PRICE = "5nmwvgAM0UABI0VniavN72_sy3T6V9ohlpvOpA==";
+  static final byte[] INITV = BaseEncoding.base16().decode("386E3AC0000C0A080123456789ABCDEF");
+  static final String CIPHER_PRICE = "OG46wAAMCggBI0VniavN7-mNy0VTKPbB3o5CMQ==";
   static final byte[] PLAIN_IDFA = new byte[]{ 0,1,2,3,4,5,6,7 };
-  static final String CIPHER_IDFA = "5nmwvgAM0UABI0VniavN72_tyXf-QJOmeDOf7A==";
+  static final String CIPHER_IDFA = "OG46wAAMCggBI0VniavN7-mMyUZXP79GV5XMEA==";
   static final byte[] PLAIN_ADID = new byte[]{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-  static final byte[] CIPHER_ADID = new byte[]{
-    (byte) 0xE6, (byte) 0x79, (byte) 0xB0, (byte) 0xBE,
-    (byte) 0x00, (byte) 0x0C, (byte) 0xD1, (byte) 0x40,
-    (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
-    (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
-    (byte) 0x6F, (byte) 0xED, (byte) 0xC9, (byte) 0x77,
-    (byte) 0xFE, (byte) 0x40, (byte) 0x93, (byte) 0xA6,
-    (byte) 0x41, (byte) 0xD2, (byte) 0xF4, (byte) 0xB6,
-    (byte) 0x68, (byte) 0x7F, (byte) 0x7D, (byte) 0xDB,
-    (byte) 0x81, (byte) 0xDA, (byte) 0x0A, (byte) 0x3F,
-  };
+  static final byte[] CIPHER_ADID = BaseEncoding.base16().decode(
+      "386E3AC0000C0A080123456789ABCDEFE98CC946573FBF4645EF060B17A667A617C66BCB");
   static final byte[] PLAIN_HYPERLOCAL = createHyperlocal(1);
-  static final byte[] CIPHER_HYPERLOCAL = new byte[]{
-    (byte) 0xE6, (byte) 0x79, (byte) 0xB0, (byte) 0xBE,
-    (byte) 0x00, (byte) 0x0C, (byte) 0xD1, (byte) 0x40,
-    (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
-    (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
-    (byte) 0x7D, (byte) 0xE6, (byte) 0xC6, (byte) 0x74,
-    (byte) 0xFA, (byte) 0x71, (byte) 0xD7, (byte) 0xB4,
-    (byte) 0x49, (byte) 0xDB, (byte) 0xCA, (byte) 0xFF,
-    (byte) 0x68, (byte) 0xB1, (byte) 0xC9, (byte) 0x1A,
-  };
+  static final byte[] CIPHER_HYPERLOCAL = BaseEncoding.base16().decode(
+      "386E3AC0000C0A080123456789ABCDEFFB87C645530EFB544DE63842A609CC0C");
   static final DoubleClickCrypto baseCrypto = new DoubleClickCrypto(KEYS);
   static final DoubleClickCrypto.Price priceCrypto = new DoubleClickCrypto.Price(KEYS);
   static final DoubleClickCrypto.Idfa idfaCrypto = new DoubleClickCrypto.Idfa(KEYS);
@@ -146,12 +125,7 @@ public class DoubleClickCryptoTest {
   @Test
   public void testCreateNonce_nullTimestamp() {
     assertThat(baseCrypto.createInitVector(null, INITV_SERVERID))
-        .isEqualTo(new byte[] {
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-            (byte) 0x01, (byte) 0x23, (byte) 0x45, (byte) 0x67,
-            (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF,
-        });
+        .isEqualTo(BaseEncoding.base16().decode("00000000000000000123456789ABCDEF"));
   }
 
   @Test
