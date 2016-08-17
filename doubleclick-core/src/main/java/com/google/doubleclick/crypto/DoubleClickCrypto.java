@@ -201,9 +201,7 @@ public class DoubleClickCrypto {
   @SuppressWarnings("deprecation")
   public byte[] createInitVector(@Nullable Date timestamp, long serverId) {
     return createInitVector(
-        timestamp == null
-            ? 0L
-            : ((timestamp.getTime() / 1000) << 32) | ((timestamp.getTime() % 1000) * 1000),
+        timestamp == null ? 0L : millisToSecsAndMicros(timestamp.getTime()),
         serverId);
   }
 
@@ -245,7 +243,7 @@ public class DoubleClickCrypto {
    */
   public Date getTimestamp(byte[] data) {
     long secondsAndMicros = ByteBuffer.wrap(data).getLong(INITV_BASE + INITV_TIMESTAMP_OFFSET);
-    return new Date(((secondsAndMicros >> 32) * 1000) + (secondsAndMicros & 0xFFFFFFFFL) / 1000);
+    return new Date(secsAndMicrosToMillis(secondsAndMicros));
   }
 
   /**
@@ -267,7 +265,7 @@ public class DoubleClickCrypto {
 
     if (initVector == null) {
       ByteBuffer byteBuffer = ByteBuffer.wrap(plainData);
-      byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, System.nanoTime() / 1000L);
+      byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, millisToSecsAndMicros(System.currentTimeMillis()));
       byteBuffer.putLong(INITV_SERVERID_OFFSET, fastRandom.nextLong());
     } else {
       System.arraycopy(initVector, 0, plainData, INITV_BASE, min(INITV_SIZE, initVector.length));
@@ -360,6 +358,14 @@ public class DoubleClickCrypto {
     return MoreObjects.toStringHelper(this).omitNullValues()
         .add("keys", keys)
         .toString();
+  }
+
+  private static long millisToSecsAndMicros(long timestamp) {
+    return ((timestamp / 1000) << 32) | ((timestamp % 1000) * 1000);
+  }
+
+  private static long secsAndMicrosToMillis(long secondsAndMicros) {
+    return ((secondsAndMicros >> 32) * 1000) + (secondsAndMicros & 0xFFFFFFFFL) / 1000;
   }
 
   /**
