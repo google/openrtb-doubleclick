@@ -191,6 +191,22 @@ public class DoubleClickCrypto {
 
   /**
    * Creates the initialization vector from component {@code (timestamp, serverId)} fields.
+   *
+   * @param timestamp Timestamp subfield. Notice that Data is not ideal for this because it's
+   *     limited to millisecond precision, which leaves leave some bits unused in the init vector
+   * @param serverId Server ID subfield (whatever a server uses as a public ID, e.g. its IPv4)
+   * @return initialization vector
+   * @see #createInitVector(long, long)
+   */
+  @SuppressWarnings("deprecation")
+  public byte[] createInitVector(@Nullable Date timestamp, long serverId) {
+    return createInitVector(
+        timestamp == null ? 0L : millisToSecsAndMicros(timestamp.getTime()),
+        serverId);
+  }
+
+  /**
+   * Creates the initialization vector from component {@code (timestamp, serverId)} fields.
    * This is the format used by DoubleClick, and it's a good format generally,
    * even though the initialization vector can be any random data (a cryptographic nonce).
    *
@@ -201,15 +217,17 @@ public class DoubleClickCrypto {
    * a {@code initVector} parameter, passing null will cause {@code (current time, random)}
    * to be used (so if you really want all-zeros {@code initVector}, e.g. in unit tests to make
    * results reproducible, pass a zero-filled array).
+   *
+   * @param timestamp Timestamp subfield. Notice this is not supposed to be a millis/nanos value
+   *     like in common Java API; it should be: seconds-since-epoch in the upper 32bits,
+   *     microseconds in the lower 32 bits
+   * @param serverId Server ID subfield (whatever a server uses as a public ID, e.g. its IPv4)
+   * @return initialization vector
    */
-  public byte[] createInitVector(@Nullable Date timestamp, long serverId) {
+  public byte[] createInitVector(long timestamp, long serverId) {
     byte[] initVector = new byte[INITV_SIZE];
     ByteBuffer byteBuffer = ByteBuffer.wrap(initVector);
-
-    if (timestamp != null) {
-      byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, timestamp.getTime());
-    }
-
+    byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, timestamp);
     byteBuffer.putLong(INITV_SERVERID_OFFSET, serverId);
     return initVector;
   }
@@ -219,10 +237,13 @@ public class DoubleClickCrypto {
    * initialization vector has the structure {@code (timestamp, serverId)}.
    *
    * @param data Encrypted or decrypted data (the initialization vector is never encrypted)
-   * @return Timestamp subfield of the initialization vector.
+   * @return Timestamp subfield of the initialization vector, in the form of a Date.
+   *     This assumes the init vector was created with {@link #createInitVector(Date, long)}
+   *     or similar method consistent with the DoubleClick crypto specification
    */
   public Date getTimestamp(byte[] data) {
-    return new Date(ByteBuffer.wrap(data).getLong(INITV_BASE + INITV_TIMESTAMP_OFFSET));
+    long secondsAndMicros = ByteBuffer.wrap(data).getLong(INITV_BASE + INITV_TIMESTAMP_OFFSET);
+    return new Date(secsAndMicrosToMillis(secondsAndMicros));
   }
 
   /**
@@ -244,7 +265,7 @@ public class DoubleClickCrypto {
 
     if (initVector == null) {
       ByteBuffer byteBuffer = ByteBuffer.wrap(plainData);
-      byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, System.nanoTime());
+      byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, millisToSecsAndMicros(System.currentTimeMillis()));
       byteBuffer.putLong(INITV_SERVERID_OFFSET, fastRandom.nextLong());
     } else {
       System.arraycopy(initVector, 0, plainData, INITV_BASE, min(INITV_SIZE, initVector.length));
@@ -337,6 +358,14 @@ public class DoubleClickCrypto {
     return MoreObjects.toStringHelper(this).omitNullValues()
         .add("keys", keys)
         .toString();
+  }
+
+  private static long millisToSecsAndMicros(long timestamp) {
+    return ((timestamp / 1000) << 32) | ((timestamp % 1000) * 1000);
+  }
+
+  private static long secsAndMicrosToMillis(long secondsAndMicros) {
+    return ((secondsAndMicros >> 32) * 1000) + (secondsAndMicros & 0xFFFFFFFFL) / 1000;
   }
 
   /**
