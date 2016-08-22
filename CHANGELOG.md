@@ -5,6 +5,7 @@ RELEASE NOTES
 * DoubleClick protocol v.94: AMP support.
 * Fixed `DoubleClickCrypto`'s handling of the initialization vector to
   be compliant with DoubleClick's recommended encoding of timestamp.
+* Mapping of `Video.battr` supports in-banner video publisher block.
 
 ## Version 1.0.7, 27-07-2016
 * Fixed mapping of `Bid.adm` for non-VAST video ads (e.g. MRAID).
