@@ -18,18 +18,17 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.openrtb.OpenRtb.BidRequest.User;
+import com.google.openrtb.Gender;
 import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
-
 import org.junit.Test;
 
 public class GenderMapperTest {
   @Test
   public void testMapper() {
-    assertThat(GenderMapper.toOpenRtb(UserDemographic.Gender.MALE)).isSameAs(User.Gender.MALE);
-    assertThat(GenderMapper.toDoubleClick(User.Gender.MALE)).isSameAs(UserDemographic.Gender.MALE);
+    assertThat(GenderMapper.toOpenRtb(UserDemographic.Gender.MALE)).isSameAs(Gender.MALE);
+    assertThat(GenderMapper.toDoubleClick(Gender.MALE)).isSameAs(UserDemographic.Gender.MALE);
 
-    for (User.Gender openrtb : User.Gender.values()) {
+    for (Gender openrtb : Gender.values()) {
       GenderMapper.toDoubleClick(openrtb);
     }
     for (UserDemographic.Gender dc : UserDemographic.Gender.values()) {

@@ -20,7 +20,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static java.util.Arrays.asList;
 
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
-
 import org.junit.Test;
 
 public class IFramingStateMapperTest {

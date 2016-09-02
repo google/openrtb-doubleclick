@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoStartDelay;
+import com.google.openrtb.OpenRtb.StartDelay;
 
 /**
  * Maps between AdX's {@code videoad_start_delay} and OpenRTB's {@code startdelay}.
@@ -25,9 +25,9 @@ public class VideoStartDelayMapper {
   public static int toOpenRtb(int dc) {
     switch (dc) {
       case -1:
-        return VideoStartDelay.GENERIC_POST_ROLL_VALUE;
+        return StartDelay.GENERIC_POST_ROLL_VALUE;
       case 0:
-        return VideoStartDelay.PRE_ROLL_VALUE;
+        return StartDelay.PRE_ROLL_VALUE;
       default:
         return dc / 1000;
     }
@@ -35,11 +35,11 @@ public class VideoStartDelayMapper {
 
   public static int toDoubleClick(int openrtb) {
     switch (openrtb) {
-      case VideoStartDelay.GENERIC_MID_ROLL_VALUE:
+      case StartDelay.GENERIC_MID_ROLL_VALUE:
         return 1;
-      case VideoStartDelay.GENERIC_POST_ROLL_VALUE:
+      case StartDelay.GENERIC_POST_ROLL_VALUE:
         return -1;
-      case VideoStartDelay.PRE_ROLL_VALUE:
+      case StartDelay.PRE_ROLL_VALUE:
         return 0;
       default:
         return openrtb * 1000;

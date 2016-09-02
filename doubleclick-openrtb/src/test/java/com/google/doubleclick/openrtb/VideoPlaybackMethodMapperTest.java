@@ -18,26 +18,25 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoPlaybackMethod;
+import com.google.openrtb.OpenRtb.PlaybackMethod;
 import com.google.protos.adx.NetworkBid;
-
 import org.junit.Test;
 
 public class VideoPlaybackMethodMapperTest {
   @Test
   public void testMapper() {
-    assertThat(VideoPlaybackMethodMapper.toDoubleClick(VideoPlaybackMethod.AUTO_PLAY_SOUND_ON))
+    assertThat(PlaybackMethodMapper.toDoubleClick(PlaybackMethod.AUTO_PLAY_SOUND_ON))
         .isSameAs(NetworkBid.BidRequest.Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_ON);
-    assertThat(VideoPlaybackMethodMapper.toOpenRtb(
+    assertThat(PlaybackMethodMapper.toOpenRtb(
             NetworkBid.BidRequest.Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_ON))
-        .isSameAs(VideoPlaybackMethod.AUTO_PLAY_SOUND_ON);
+        .isSameAs(PlaybackMethod.AUTO_PLAY_SOUND_ON);
 
-    for (VideoPlaybackMethod openrtb : VideoPlaybackMethod.values()) {
-      VideoPlaybackMethodMapper.toDoubleClick(openrtb);
+    for (PlaybackMethod openrtb : PlaybackMethod.values()) {
+      PlaybackMethodMapper.toDoubleClick(openrtb);
     }
     for (NetworkBid.BidRequest.Video.VideoPlaybackMethod dc :
         NetworkBid.BidRequest.Video.VideoPlaybackMethod.values()) {
-      VideoPlaybackMethodMapper.toOpenRtb(dc);
+      PlaybackMethodMapper.toOpenRtb(dc);
     }
   }
 }

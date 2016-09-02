@@ -18,8 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
-
+import com.google.openrtb.OpenRtb.DeviceType;
 import org.junit.Test;
 
 public class DeviceTypeMapperTest {
@@ -27,8 +26,8 @@ public class DeviceTypeMapperTest {
   public void testMapper() {
     assertThat(DeviceTypeMapper.toOpenRtb(
             com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.HIGHEND_PHONE))
-        .isSameAs(DeviceType.PHONE);
-    assertThat(DeviceTypeMapper.toDoubleClick(DeviceType.PHONE))
+        .isSameAs(DeviceType.HIGHEND_PHONE);
+    assertThat(DeviceTypeMapper.toDoubleClick(DeviceType.HIGHEND_PHONE))
         .isSameAs(com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.HIGHEND_PHONE);
 
     for (DeviceType openrtb : DeviceType.values()) {

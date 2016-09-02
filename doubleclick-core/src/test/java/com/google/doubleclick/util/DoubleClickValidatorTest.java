@@ -19,15 +19,13 @@ package com.google.doubleclick.util;
 import static com.google.common.truth.Truth.assertThat;
 import static java.util.Arrays.asList;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid.BidRequest;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal;
 import com.google.protos.adx.NetworkBid.BidResponse;
-
-import com.codahale.metrics.MetricRegistry;
-
 import org.junit.Before;
 import org.junit.Test;
 

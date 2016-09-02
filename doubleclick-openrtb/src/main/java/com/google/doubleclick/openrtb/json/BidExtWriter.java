@@ -16,12 +16,10 @@
 
 package com.google.doubleclick.openrtb.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import com.google.openrtb.json.OpenRtbJsonUtils;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-
 import java.io.IOException;
 
 /**

@@ -20,6 +20,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
@@ -29,45 +31,40 @@ import com.google.doubleclick.util.CityDMARegionValue;
 import com.google.doubleclick.util.CountryCodes;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.doubleclick.util.GeoTarget;
+import com.google.openrtb.Gender;
 import com.google.openrtb.OpenRtb;
+import com.google.openrtb.OpenRtb.APIFramework;
+import com.google.openrtb.OpenRtb.AdPosition;
+import com.google.openrtb.OpenRtb.AuctionType;
 import com.google.openrtb.OpenRtb.BidRequest.App;
-import com.google.openrtb.OpenRtb.BidRequest.AuctionType;
 import com.google.openrtb.OpenRtb.BidRequest.Content;
 import com.google.openrtb.OpenRtb.BidRequest.Content.Builder;
 import com.google.openrtb.OpenRtb.BidRequest.Data;
 import com.google.openrtb.OpenRtb.BidRequest.Data.Segment;
 import com.google.openrtb.OpenRtb.BidRequest.Device;
-import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
 import com.google.openrtb.OpenRtb.BidRequest.Geo;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
-import com.google.openrtb.OpenRtb.BidRequest.Imp.APIFramework;
-import com.google.openrtb.OpenRtb.BidRequest.Imp.AdPosition;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Native;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp.Deal;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Video;
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VASTCompanionType;
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoBidResponseProtocol;
 import com.google.openrtb.OpenRtb.BidRequest.Publisher;
 import com.google.openrtb.OpenRtb.BidRequest.Regs;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidRequest.User;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.openrtb.OpenRtb.CompanionType;
 import com.google.openrtb.OpenRtb.ContentCategory;
+import com.google.openrtb.OpenRtb.DeviceType;
+import com.google.openrtb.OpenRtb.PlaybackMethod;
+import com.google.openrtb.OpenRtb.Protocol;
 import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.openrtb.mapper.OpenRtbMapper;
 import com.google.openrtb.util.OpenRtbUtils;
 import com.google.protobuf.TextFormat;
 import com.google.protos.adx.NetworkBid;
-
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
@@ -75,10 +72,11 @@ import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mapping between the DoubleClick and OpenRTB models.
@@ -682,10 +680,10 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       NetworkBid.BidRequest.AdSlot dcSlot, NetworkBid.BidRequest.Video dcVideo,
       boolean interstitial) {
     Video.Builder video = Video.newBuilder()
-        .addProtocols(VideoBidResponseProtocol.VAST_2_0)
-        .addProtocols(VideoBidResponseProtocol.VAST_3_0)
-        .addProtocols(VideoBidResponseProtocol.VAST_2_0_WRAPPER)
-        .addProtocols(VideoBidResponseProtocol.VAST_3_0_WRAPPER)
+        .addProtocols(Protocol.VAST_2_0)
+        .addProtocols(Protocol.VAST_3_0)
+        .addProtocols(Protocol.VAST_2_0_WRAPPER)
+        .addProtocols(Protocol.VAST_3_0_WRAPPER)
         .addAllBattr(CreativeAttributeMapper.toOpenRtb(dcSlot.getExcludedAttributeList(), null));
 
     boolean vpaid = !dcSlot.getExcludedAttributeList().contains(30 /* Vpaid Flash */);
@@ -711,8 +709,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.hasPlaybackMethod()) {
-      Video.VideoPlaybackMethod playbackMethod =
-          VideoPlaybackMethodMapper.toOpenRtb(dcVideo.getPlaybackMethod());
+      PlaybackMethod playbackMethod = PlaybackMethodMapper.toOpenRtb(dcVideo.getPlaybackMethod());
       if (playbackMethod != null) {
         video.addPlaybackmethod(playbackMethod);
       }
@@ -735,7 +732,7 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
     }
 
     if (dcVideo.getCompanionSlotCount() != 0) {
-      EnumSet<VASTCompanionType> companionTypes = EnumSet.noneOf(VASTCompanionType.class);
+      EnumSet<CompanionType> companionTypes = EnumSet.noneOf(CompanionType.class);
 
       for (NetworkBid.BidRequest.Video.CompanionSlot dcCompSlot
           : dcVideo.getCompanionSlotList()) {
@@ -811,9 +808,9 @@ public class DoubleClickOpenRtbMapper implements OpenRtbMapper<
       NetworkBid.BidRequest.UserDemographic dcUser = dcRequest.getUserDemographic();
 
       if (dcUser.hasGender()) {
-        User.Gender gender = GenderMapper.toOpenRtb(dcUser.getGender());
+        Gender gender = GenderMapper.toOpenRtb(dcUser.getGender());
         if (gender != null) {
-          user.setGender(OpenRtbUtils.genderToJsonName(gender));
+          user.setGender(gender.code());
         }
       }
       if (dcUser.hasAgeLow() || dcUser.hasAgeHigh()) {

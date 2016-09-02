@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.MessageLiteOrBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;

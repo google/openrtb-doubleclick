@@ -22,14 +22,12 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.util.DoubleClickMetadata;
 import com.google.openrtb.OpenRtb.ContentCategory;
-
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import org.junit.Test;
 
 public class AdCategoryMapperTest {
   private static final boolean SLOW = Boolean.getBoolean("slowTests");

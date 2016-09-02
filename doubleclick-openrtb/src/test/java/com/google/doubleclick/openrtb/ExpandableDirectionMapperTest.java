@@ -19,8 +19,7 @@ package com.google.doubleclick.openrtb;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Banner.ExpandableDirection;
-
+import com.google.openrtb.OpenRtb.ExpandableDirection;
 import org.junit.Test;
 
 public class ExpandableDirectionMapperTest {

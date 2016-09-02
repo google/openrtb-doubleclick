@@ -20,7 +20,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
-
 import org.junit.Test;
 
 /**

@@ -17,7 +17,6 @@
 package com.google.doubleclick.util.impl;
 
 import com.google.common.base.MoreObjects;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
 
 /**

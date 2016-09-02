@@ -26,7 +26,6 @@ import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.snippet.OpenRtbMacros;
 import com.google.openrtb.snippet.SnippetProcessorContext;
-
 import org.junit.Test;
 
 /**

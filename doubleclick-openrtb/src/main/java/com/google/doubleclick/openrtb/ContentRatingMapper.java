@@ -17,9 +17,7 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.common.collect.ImmutableMap;
-
 import java.util.List;
-
 import javax.annotation.Nullable;
 
 /**

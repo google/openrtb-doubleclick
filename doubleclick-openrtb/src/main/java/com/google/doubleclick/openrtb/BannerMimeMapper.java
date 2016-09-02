@@ -20,12 +20,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
-
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 
 /**

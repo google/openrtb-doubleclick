@@ -20,13 +20,11 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.endArray;
 import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
 import static com.google.openrtb.json.OpenRtbJsonUtils.startArray;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
-
-import com.fasterxml.jackson.core.JsonParser;
-
 import java.io.IOException;
 
 /**

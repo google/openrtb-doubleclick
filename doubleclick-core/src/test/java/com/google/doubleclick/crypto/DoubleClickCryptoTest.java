@@ -23,16 +23,13 @@ import com.google.doubleclick.TestUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protos.adx.NetworkBid.BidRequest.Hyperlocal;
 import com.google.protos.adx.NetworkBid.BidRequest.HyperlocalSet;
-
-import org.junit.Test;
-
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.util.Base64;
 import java.util.Date;
-
 import javax.crypto.spec.SecretKeySpec;
+import org.junit.Test;
 
 /**
  * Tests for {@link DoubleClickCrypto}.

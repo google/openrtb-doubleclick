@@ -16,33 +16,31 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VASTCompanionType;
+import com.google.openrtb.OpenRtb.CompanionType;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
-
 import java.util.Collection;
 import java.util.EnumSet;
-
 import javax.annotation.Nullable;
 
 /**
  * Maps between AdX's {@link CreativeFormat} and OpenRTB's {@link VASTCompanionType}.
  */
 public class CompanionTypeMapper {
-  @Nullable public static VASTCompanionType toOpenRtb(CreativeFormat dc) {
+  @Nullable public static CompanionType toOpenRtb(CreativeFormat dc) {
     switch (dc) {
       case IMAGE_CREATIVE:
-        return VASTCompanionType.STATIC;
+        return CompanionType.STATIC;
       case FLASH_CREATIVE:
       case HTML_CREATIVE:
-        return VASTCompanionType.HTML;
+        return CompanionType.HTML;
     }
     return null;
   }
 
-  public static EnumSet<VASTCompanionType> toOpenRtb(
-      Collection<CreativeFormat> dcList, @Nullable EnumSet<VASTCompanionType> openrtbSet) {
-    EnumSet<VASTCompanionType> ret = openrtbSet == null
-        ? EnumSet.noneOf(VASTCompanionType.class)
+  public static EnumSet<CompanionType> toOpenRtb(
+      Collection<CreativeFormat> dcList, @Nullable EnumSet<CompanionType> openrtbSet) {
+    EnumSet<CompanionType> ret = openrtbSet == null
+        ? EnumSet.noneOf(CompanionType.class)
         : openrtbSet;
     for (CreativeFormat dc : dcList) {
       ret.add(toOpenRtb(dc));
@@ -50,7 +48,7 @@ public class CompanionTypeMapper {
     return ret;
   }
 
-  @Nullable public static CreativeFormat toDoubleClick(VASTCompanionType openrtb) {
+  @Nullable public static CreativeFormat toDoubleClick(CompanionType openrtb) {
     switch (openrtb) {
       case STATIC:
         return CreativeFormat.IMAGE_CREATIVE;
@@ -62,9 +60,9 @@ public class CompanionTypeMapper {
   }
 
   public static EnumSet<CreativeFormat> toDoubleClick(
-      Collection<VASTCompanionType> openrtbList, @Nullable EnumSet<CreativeFormat> dcSet) {
+      Collection<CompanionType> openrtbList, @Nullable EnumSet<CreativeFormat> dcSet) {
     EnumSet<CreativeFormat> ret = dcSet == null ? EnumSet.noneOf(CreativeFormat.class) : dcSet;
-    for (VASTCompanionType openrtb : openrtbList) {
+    for (CompanionType openrtb : openrtbList) {
       CreativeFormat dc = toDoubleClick(openrtb);
       if (dc != null) {
         ret.add(dc);
