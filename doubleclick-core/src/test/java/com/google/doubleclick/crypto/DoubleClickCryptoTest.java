@@ -63,9 +63,9 @@ public class DoubleClickCryptoTest {
   private static DoubleClickCrypto.Keys createKeys() {
     try {
       return new DoubleClickCrypto.Keys(
-          new SecretKeySpec(Base64.getUrlDecoder().decode(
-              "sIxwz7yw62yrfoLGt12lIHKuYrK_S5kLuApI2BQe7Ac="), "HmacSHA1"),
-          new SecretKeySpec(Base64.getUrlDecoder().decode(
+          new SecretKeySpec(Base64.getDecoder().decode(
+              "sIxwz7yw62yrfoLGt12lIHKuYrK/S5kLuApI2BQe7Ac="), "HmacSHA1"),
+          new SecretKeySpec(Base64.getDecoder().decode(
               "v3fsVcMBMMHYzRhi7SpM0sdqwzvAxM6KPTu9OtVod5I="), "HmacSHA1"));
     } catch (InvalidKeyException e) {
       throw new ExceptionInInitializerError(e);
