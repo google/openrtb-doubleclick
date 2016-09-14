@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.openrtb.OpenRtb.AdPosition;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
+
 import org.junit.Test;
 
 public class AdPositionMapperTest {

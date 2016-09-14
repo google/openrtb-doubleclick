@@ -18,6 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb.AuctionType;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal.DealType;
+
 import javax.annotation.Nullable;
 
 /**

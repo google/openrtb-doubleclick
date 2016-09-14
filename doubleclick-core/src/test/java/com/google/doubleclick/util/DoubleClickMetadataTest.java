@@ -22,9 +22,11 @@ import com.google.doubleclick.TestUtil;
 import com.google.doubleclick.util.DoubleClickMetadata.ResourceTransport;
 import com.google.doubleclick.util.DoubleClickMetadata.Transport;
 import com.google.doubleclick.util.DoubleClickMetadata.URLConnectionTransport;
+
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
-import org.junit.Test;
 
 /**
  * Tests for  {@link DoubleClickMetadata}.

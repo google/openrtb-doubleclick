@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.1.0, ??-09-2016
+## Version 1.1.0, 14-09-2016
 * DoubleClick protocol v.96: AMP support; improved exchange bidding.
 * Fixed `DoubleClickCrypto`'s handling of the initialization vector to
   be compliant with DoubleClick's recommended encoding of timestamp.

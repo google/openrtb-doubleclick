@@ -17,6 +17,7 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb.DeviceType;
+
 import javax.annotation.Nullable;
 
 /**

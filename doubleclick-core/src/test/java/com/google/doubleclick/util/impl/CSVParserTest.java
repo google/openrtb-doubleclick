@@ -19,10 +19,11 @@ package com.google.doubleclick.util.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.truth.Truth.assertThat;
 
+import org.junit.Test;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
 
 /**
  * Tests for {@link CSVParser}.

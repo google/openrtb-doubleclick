@@ -18,6 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.Gender;
 import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
+
 import javax.annotation.Nullable;
 
 /**

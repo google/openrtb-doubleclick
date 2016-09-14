@@ -16,7 +16,6 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.doubleclick.util.DoubleClickMetadata;
@@ -30,7 +29,11 @@ import com.google.openrtb.OpenRtb.BidResponse.SeatBid.BidOrBuilder;
 import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.protobuf.ByteString;
 import com.google.protos.adx.NetworkBid;
+
+import com.codahale.metrics.MetricRegistry;
+
 import java.security.InvalidKeyException;
+
 import javax.crypto.spec.SecretKeySpec;
 
 class TestUtil {

@@ -45,6 +45,7 @@ import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.ContentAttributes;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
+
 import java.util.List;
 
 public class TestData {

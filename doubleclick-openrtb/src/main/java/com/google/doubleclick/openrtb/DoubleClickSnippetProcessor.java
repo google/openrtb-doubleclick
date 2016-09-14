@@ -22,6 +22,7 @@ import com.google.openrtb.snippet.OpenRtbSnippetProcessor;
 import com.google.openrtb.snippet.SnippetMacroType;
 import com.google.openrtb.snippet.SnippetProcessor;
 import com.google.openrtb.snippet.SnippetProcessorContext;
+
 import javax.inject.Singleton;
 
 /**

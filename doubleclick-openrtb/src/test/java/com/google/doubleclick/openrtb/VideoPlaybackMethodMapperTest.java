@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.openrtb.OpenRtb.PlaybackMethod;
 import com.google.protos.adx.NetworkBid;
+
 import org.junit.Test;
 
 public class VideoPlaybackMethodMapperTest {

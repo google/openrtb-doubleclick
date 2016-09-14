@@ -17,6 +17,7 @@
 package com.google.doubleclick.openrtb;
 
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.IFramingState;
+
 import javax.annotation.Nullable;
 
 /**

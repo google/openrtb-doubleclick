@@ -23,6 +23,10 @@ import com.google.common.collect.Interners;
 import com.google.common.collect.Lists;
 import com.google.doubleclick.util.GeoTarget.Type;
 import com.google.doubleclick.util.impl.CSVParser;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,10 +41,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DoubleClickMetadata for DoubleClick Ad Exchange dictionaries. Helps code that need to

@@ -20,6 +20,7 @@ import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.mapper.OpenRtbMapper;
 import com.google.protos.adx.NetworkBid;
+
 import javax.annotation.Nullable;
 
 /**

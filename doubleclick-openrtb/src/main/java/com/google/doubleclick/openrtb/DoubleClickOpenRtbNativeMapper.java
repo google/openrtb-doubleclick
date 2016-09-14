@@ -18,8 +18,6 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.APIFramework;
@@ -31,12 +29,18 @@ import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.openrtb.json.OpenRtbNativeJsonReader;
 import com.google.protobuf.TextFormat;
 import com.google.protos.adx.NetworkBid;
+
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Mapping between the DoubleClick and OpenRTB Native models.

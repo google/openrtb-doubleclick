@@ -18,11 +18,13 @@ package com.google.doubleclick.openrtb.json;
 
 import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
+
+import com.fasterxml.jackson.core.JsonParser;
+
 import java.io.IOException;
 
 /**

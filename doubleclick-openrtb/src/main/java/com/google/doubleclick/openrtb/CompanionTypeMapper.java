@@ -18,8 +18,10 @@ package com.google.doubleclick.openrtb;
 
 import com.google.openrtb.OpenRtb.CompanionType;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
+
 import java.util.Collection;
 import java.util.EnumSet;
+
 import javax.annotation.Nullable;
 
 /**

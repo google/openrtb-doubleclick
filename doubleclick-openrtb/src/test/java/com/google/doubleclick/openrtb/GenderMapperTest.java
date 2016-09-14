@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.openrtb.Gender;
 import com.google.protos.adx.NetworkBid.BidRequest.UserDemographic;
+
 import org.junit.Test;
 
 public class GenderMapperTest {
