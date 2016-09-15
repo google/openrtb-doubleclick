@@ -95,9 +95,9 @@ public class TestData {
   }
 
   static NativeResponse.Asset.Builder newRespAssetImage(int id, int size, String url) {
-    NativeResponse.Asset.Image.Builder img = NativeResponse.Asset.Image.newBuilder();
+    NativeResponse.Asset.Image.Builder img = NativeResponse.Asset.Image.newBuilder().setUrl(url);
     if (size >= 1) {
-      img.setUrl(url).setW(100).setH(200);
+      img.setW(100).setH(200);
     }
     return NativeResponse.Asset.newBuilder().setId(id).setImg(img);
   }

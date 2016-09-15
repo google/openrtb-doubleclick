@@ -43,6 +43,9 @@ public class CreativeAttributeMapper {
   private static ImmutableSet<CreativeAttribute>[] dcToOpenrtb = MapperUtil.multimapIntToEnumSets(
       ImmutableMultimap.<Integer, CreativeAttribute>builder()
           .putAll(28 /* ROLLOVER_TO_EXPAND */, CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED)
+          .putAll(95 /* IN_BANNER_VIDEO_PUBLISHER_BLOCKABLE */,
+              CreativeAttribute.VIDEO_IN_BANNER_AUTO_PLAY,
+              CreativeAttribute.VIDEO_IN_BANNER_USER_INITIATED)
           .build());
 
   public static ImmutableSet<CreativeAttribute> toOpenRtb(int dc) {

@@ -18,21 +18,21 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoStartDelay;
+import com.google.openrtb.OpenRtb.StartDelay;
 
 import org.junit.Test;
 
 public class VideoStartDelayMapperTest {
   @Test
   public void testMapper() {
-    assertThat(VideoStartDelayMapper.toDoubleClick(VideoStartDelay.GENERIC_MID_ROLL_VALUE))
+    assertThat(VideoStartDelayMapper.toDoubleClick(StartDelay.GENERIC_MID_ROLL_VALUE))
         .isEqualTo(1);
     assertThat(VideoStartDelayMapper.toDoubleClick(333)).isEqualTo(333000);
     assertThat(VideoStartDelayMapper.toOpenRtb(-1))
-        .isSameAs(VideoStartDelay.GENERIC_POST_ROLL_VALUE);
+        .isSameAs(StartDelay.GENERIC_POST_ROLL_VALUE);
     assertThat(VideoStartDelayMapper.toOpenRtb(333000)).isEqualTo(333);
 
-    for (VideoStartDelay openrtb : VideoStartDelay.values()) {
+    for (StartDelay openrtb : StartDelay.values()) {
       VideoStartDelayMapper.toDoubleClick(openrtb.getNumber());
     }
     for (int dc : new int[]{ 0, -1, 1 }) {

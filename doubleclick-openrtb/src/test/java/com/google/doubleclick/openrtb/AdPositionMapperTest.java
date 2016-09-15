@@ -18,7 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import com.google.openrtb.OpenRtb.BidRequest.Imp.AdPosition;
+import com.google.openrtb.OpenRtb.AdPosition;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 
 import org.junit.Test;

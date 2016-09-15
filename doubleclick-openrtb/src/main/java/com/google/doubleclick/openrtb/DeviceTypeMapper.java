@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Device.DeviceType;
+import com.google.openrtb.OpenRtb.DeviceType;
 
 import javax.annotation.Nullable;
 
@@ -29,7 +29,7 @@ public class DeviceTypeMapper {
       com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType dc) {
     switch (dc) {
       case HIGHEND_PHONE:
-        return DeviceType.PHONE;
+        return DeviceType.HIGHEND_PHONE;
       case TABLET:
         return DeviceType.TABLET;
       case PERSONAL_COMPUTER:
@@ -51,7 +51,7 @@ public class DeviceTypeMapper {
         return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.CONNECTED_TV;
       case MOBILE:
         return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.TABLET;
-      case PHONE:
+      case HIGHEND_PHONE:
         return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.HIGHEND_PHONE;
       case TABLET:
         return com.google.protos.adx.NetworkBid.BidRequest.Device.DeviceType.TABLET;
