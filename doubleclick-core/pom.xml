@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.google.doubleclick</groupId>
     <artifactId>doubleclick-parent</artifactId>
-    <version>1.0.8.compat-SNAPSHOT</version>
+    <version>1.1.0.compat</version>
   </parent>
 
   <dependencies>
