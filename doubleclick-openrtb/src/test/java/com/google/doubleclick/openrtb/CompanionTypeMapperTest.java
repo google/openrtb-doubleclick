@@ -19,7 +19,7 @@ package com.google.doubleclick.openrtb;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VASTCompanionType;
+import com.google.openrtb.OpenRtb.CompanionType;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 
 import org.junit.Test;
@@ -28,11 +28,11 @@ public class CompanionTypeMapperTest {
   @Test
   public void testMapper() {
     assertThat(CompanionTypeMapper.toOpenRtb(ImmutableList.of(CreativeFormat.HTML_CREATIVE), null))
-        .containsExactly(VASTCompanionType.HTML);
-    assertThat(CompanionTypeMapper.toDoubleClick(ImmutableList.of(VASTCompanionType.HTML), null))
+        .containsExactly(CompanionType.HTML);
+    assertThat(CompanionTypeMapper.toDoubleClick(ImmutableList.of(CompanionType.HTML), null))
         .containsExactly(CreativeFormat.HTML_CREATIVE);
 
-    for (VASTCompanionType openrtb : VASTCompanionType.values()) {
+    for (CompanionType openrtb : CompanionType.values()) {
       CompanionTypeMapper.toDoubleClick(openrtb);
     }
     for (CreativeFormat dc : CreativeFormat.values()) {

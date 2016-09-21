@@ -16,7 +16,7 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Imp.AdPosition;
+import com.google.openrtb.OpenRtb.AdPosition;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.SlotVisibility;
 
 import javax.annotation.Nullable;

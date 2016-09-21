@@ -19,8 +19,9 @@ package com.google.doubleclick.openrtb;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
+import com.google.openrtb.OpenRtb;
+import com.google.openrtb.OpenRtb.APIFramework;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
-import com.google.openrtb.OpenRtb.BidRequest.Imp.APIFramework;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.NativeRequest;
 import com.google.openrtb.OpenRtb.NativeResponse;
@@ -341,7 +342,7 @@ public class DoubleClickOpenRtbNativeMapper {
       NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
           NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE);
       return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
-          .setType(NativeRequest.Asset.Data.DataAssetType.ADDRESS)
+          .setType(OpenRtb.DataAssetType.ADDRESS)
           .setLen(dcNativ.getStoreMaxSafeLength())));
     } else {
       return failReqAsset(dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE);
@@ -354,7 +355,7 @@ public class DoubleClickOpenRtbNativeMapper {
       NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
           NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE);
       return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
-          .setType(NativeRequest.Asset.Data.DataAssetType.PRICE)
+          .setType(OpenRtb.DataAssetType.PRICE)
           .setLen(dcNativ.getPriceMaxSafeLength())));
     } else {
       return failReqAsset(dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.PRICE);
@@ -366,7 +367,7 @@ public class DoubleClickOpenRtbNativeMapper {
     NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
         NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STAR_RATING);
     return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
-        .setType(NativeRequest.Asset.Data.DataAssetType.RATING)));
+        .setType(OpenRtb.DataAssetType.RATING)));
   }
 
   protected NativeRequest.Asset.Builder mapReqAssetAdvertiser(
@@ -374,7 +375,7 @@ public class DoubleClickOpenRtbNativeMapper {
     NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
         NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.ADVERTISER);
     return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
-        .setType(NativeRequest.Asset.Data.DataAssetType.SPONSORED)));
+        .setType(OpenRtb.DataAssetType.SPONSORED)));
   }
 
   protected NativeRequest.Asset.Builder mapReqAssetCTA(
@@ -383,7 +384,7 @@ public class DoubleClickOpenRtbNativeMapper {
       NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
           NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.CALL_TO_ACTION);
       return extMapNative(dcNativ, asset.setData(NativeRequest.Asset.Data.newBuilder()
-          .setType(NativeRequest.Asset.Data.DataAssetType.CTATEXT)
+          .setType(OpenRtb.DataAssetType.CTATEXT)
           .setLen(dcNativ.getCallToActionMaxSafeLength())));
     } else {
       return failReqAsset(
@@ -397,7 +398,7 @@ public class DoubleClickOpenRtbNativeMapper {
       NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
           NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.BODY);
       NativeRequest.Asset.Data.Builder data = NativeRequest.Asset.Data.newBuilder()
-          .setType(NativeRequest.Asset.Data.DataAssetType.DESC)
+          .setType(OpenRtb.DataAssetType.DESC)
           .setLen(dcNativ.getBodyMaxSafeLength());
       return extMapNative(dcNativ, asset.setData(data));
     } else {
@@ -410,7 +411,7 @@ public class DoubleClickOpenRtbNativeMapper {
     NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
         NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.APP_ICON);
     NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
-        .setType(NativeRequest.Asset.Image.ImageAssetType.ICON);
+        .setType(OpenRtb.ImageAssetType.ICON);
     if (dcNativ.hasAppIconWidth()) {
       image.setWmin(dcNativ.getAppIconWidth());
     }
@@ -425,7 +426,7 @@ public class DoubleClickOpenRtbNativeMapper {
     NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
         NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.LOGO);
     NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
-        .setType(NativeRequest.Asset.Image.ImageAssetType.LOGO);
+        .setType(OpenRtb.ImageAssetType.LOGO);
     if (dcNativ.hasLogoWidth()) {
       image.setWmin(dcNativ.getLogoWidth());
     }
@@ -440,7 +441,7 @@ public class DoubleClickOpenRtbNativeMapper {
     NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
         NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.IMAGE);
     NativeRequest.Asset.Image.Builder image = NativeRequest.Asset.Image.newBuilder()
-        .setType(NativeRequest.Asset.Image.ImageAssetType.MAIN);
+        .setType(OpenRtb.ImageAssetType.MAIN);
     if (dcNativ.hasImageWidth()) {
       image.setWmin(dcNativ.getImageWidth());
     }

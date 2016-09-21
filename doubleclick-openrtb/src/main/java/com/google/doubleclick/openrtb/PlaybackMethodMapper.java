@@ -16,21 +16,21 @@
 
 package com.google.doubleclick.openrtb;
 
-import com.google.openrtb.OpenRtb.BidRequest.Imp.Video.VideoPlaybackMethod;
+import com.google.openrtb.OpenRtb.PlaybackMethod;
 import com.google.protos.adx.NetworkBid;
 
 /**
  * Maps between AdX's {@code playback_method} and OpenRTB's {@code playbackmethod}.
  */
-public class VideoPlaybackMethodMapper {
-  public static VideoPlaybackMethod toOpenRtb(NetworkBid.BidRequest.Video.VideoPlaybackMethod dc) {
+public class PlaybackMethodMapper {
+  public static PlaybackMethod toOpenRtb(NetworkBid.BidRequest.Video.VideoPlaybackMethod dc) {
     switch (dc) {
       case AUTO_PLAY_SOUND_OFF:
-        return VideoPlaybackMethod.AUTO_PLAY_SOUND_OFF;
+        return PlaybackMethod.AUTO_PLAY_SOUND_OFF;
       case AUTO_PLAY_SOUND_ON:
-        return VideoPlaybackMethod.AUTO_PLAY_SOUND_ON;
+        return PlaybackMethod.AUTO_PLAY_SOUND_ON;
       case CLICK_TO_PLAY:
-        return VideoPlaybackMethod.CLICK_TO_PLAY;
+        return PlaybackMethod.CLICK_TO_PLAY;
       case METHOD_UNKNOWN:
       default:
         return null;
@@ -38,7 +38,7 @@ public class VideoPlaybackMethodMapper {
   }
 
   public static NetworkBid.BidRequest.Video.VideoPlaybackMethod toDoubleClick(
-      VideoPlaybackMethod openrtb) {
+      PlaybackMethod openrtb) {
     switch (openrtb) {
       case AUTO_PLAY_SOUND_OFF:
         return NetworkBid.BidRequest.Video.VideoPlaybackMethod.AUTO_PLAY_SOUND_OFF;

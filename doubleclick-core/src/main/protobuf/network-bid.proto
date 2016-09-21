@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.91
+// Synchronized with v.96
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -813,6 +813,12 @@ message BidRequest {
       // arbitrary and should be agreed upon by the publisher and the exchange
       // bidder.
       repeated string publisher_parameter = 1;
+
+      // DFP network code of the publisher.  This is always set for exchange
+      // bidding requests.  It is the same network code that the publisher
+      // provides to the exchange as part of initially enabling the exchange for
+      // exchange bidding.
+      optional int64 dfp_network_code = 2;
     }
     optional ExchangeBidding exchange_bidding = 28;
 
@@ -908,13 +914,11 @@ message BidRequest {
     }
     repeated NativeAdTemplate native_ad_template = 51;
 
-    // Whether the ad request comes directly from the publisher, or whether it
-    // is a "passback" impression that has already been offered to and rejected
-    // by another ad network or ad exchange.
+    // Whether the ad request has been determined to come directly from the
+    // publisher.
     enum MediationStatus {
       UNKNOWN = 0;
       DIRECT_REQUEST = 1;
-      MEDIATED = 2;
     };
     optional MediationStatus mediation_status = 52 [default = UNKNOWN];
 
@@ -972,6 +976,23 @@ message BidRequest {
     }
     optional Renderer renderer = 26 [default = UNKNOWN_RENDERER];
 
+    // Whether this request is for an Accelerated Mobile Page (AMP). AMP HTML
+    // pages load faster, by restricting parts of HTML, CSS and Javascript. For
+    // more information on how AMP ads render, refer to the AMP ads README:
+    // https://github.com/ampproject/amphtml/blob/master/ads/README.md
+    enum AmpAdRequestType {
+      // AMP status unknown. Request may or may not be from an AMP page.
+      UNKNOWN_AMP = 0;
+
+      // Not an AMP page. Could be regular HTML, VAST video, etc.
+      NON_AMP_PAGE = 1;
+
+      // Late-loading request from an AMP HTML page. Ad will render with a
+      // slight delay so it will not negatively impact page render performance.
+      AMP_PAGE_LATE_REQUEST = 2;
+    }
+    optional AmpAdRequestType amp_ad_request_type = 29 [default = NON_AMP_PAGE];
+
     // These are deprecated. Please ignore.
     repeated int32 DEPRECATED_allowed_attribute = 5;
     repeated bytes DEPRECATED_publisher_settings_list_id = 11;
@@ -1012,7 +1033,9 @@ message BidRequest {
   // If true, then this is a test request. Results will not be displayed to
   // users and you will not be billed for a response even if it wins the
   // auction. You should still do regular processing since the request may be
-  // used to evaluate latencies or for other testing.
+  // used to evaluate latencies or for other testing. During your initial
+  // testing with Google traffic any response that you make will be filtered
+  // out of the auction whether this flag has a value of true or false.
   optional bool is_test = 15 [default=false];
 
   // If true, then this request is intended to measure network latency. Please

@@ -1,6 +1,14 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.1.0, 14-09-2016
+* DoubleClick protocol v.96: AMP support; improved exchange bidding.
+* Fixed `DoubleClickCrypto`'s handling of the initialization vector to
+  be compliant with DoubleClick's recommended encoding of timestamp.
+* Mapping of `Video.battr` supports in-banner video publisher block.
+* The doubleclick-openrtb module works with openrtb-core v1.1.0,
+  which has breaking changes at the source level (see release notes).
+
 ## Version 1.0.7, 27-07-2016
 * Fixed mapping of `Bid.adm` for non-VAST video ads (e.g. MRAID).
 
