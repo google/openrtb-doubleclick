@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.96
+// Synchronized with v.98
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -380,7 +380,8 @@ message BidRequest {
     // MD5.
     optional bytes constrained_usage_hashed_idfa = 30;
 
-    // App name for Android apps in Google Play store.
+    // App names for Android apps are from the Google Play store.
+    // App names for iOS apps are provided by AppAnnie.
     optional string app_name = 24;
 
     // Average user rating for the app. The range of user rating is between 1.0
@@ -881,6 +882,7 @@ message BidRequest {
         STAR_RATING = 0x80;
         PRICE = 0x100;
         STORE = 0x200;
+        VIDEO = 0x400;
       }
 
       // Bitfield describing which fields are required by the publisher. Bid
@@ -1142,6 +1144,11 @@ message BidResponse {
 
       // The app icon, for app download ads.
       optional Image app_icon = 7;
+
+      // The URL to fetch a video ad. The URL should return an XML response that
+      // conforms to the VAST 2.0 standard. Only set this field if the
+      // BidRequest is for native ads and the video field is requested.
+      optional string video_url = 13;
 
       // The app rating in the app store. Must be in the range [0-5].
       optional double star_rating = 8;
