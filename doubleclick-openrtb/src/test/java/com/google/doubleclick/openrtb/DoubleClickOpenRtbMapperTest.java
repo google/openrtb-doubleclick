@@ -20,6 +20,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static java.util.Arrays.asList;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.doubleclick.DcExt;
 import com.google.openrtb.OpenRtb;
@@ -36,13 +37,9 @@ import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.protos.adx.NetworkBid;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
 import com.google.protos.adx.NetworkBid.BidResponse.Ad;
-
-import com.codahale.metrics.MetricRegistry;
-
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Base64;
+import org.junit.Test;
 
 /**
  * Tests for {@link DoubleClickOpenRtbMapper}.
@@ -256,7 +253,7 @@ public class DoubleClickOpenRtbMapperTest {
           } else if (impNativ) {
             Native nativ = imp.getNative();
             assertWithMessage(testDesc).that(nativ.getRequestNative().getAssetsCount())
-                .isEqualTo(size == 0 ? 5 : 10);
+                .isEqualTo(size == 0 ? 6 : 11);
           }
 
           Bid.Builder bid = TestData.newBid(multiBid || imp.getInstl());

@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.96
+// Synchronized with v.101
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -338,17 +338,22 @@ message BidRequest {
     // optimized for mobile browsers on high-end mobile phones.
     optional bool is_mobile_web_optimized = 17 [default=false];
 
-    // Apple's identifier for advertising (IDFA) as described at
-    // https://support.google.com/adxbuyer/answer/3221407 or Android's
-    // advertising identifier. When the encrypted_advertising_id is an IDFA, the
-    // plaintext after decrypting the ciphertext is the IDFA (16 byte UUID)
-    // returned by iOS's [ASIdentifierManager advertisingIdentifier]. For
-    // encrypted_hashed_idfa, the plaintext is the 16 byte MD5 hash of the
-    // IDFA. Only one of the two fields will be available, depending on the
-    // version of the SDK making the request. Later SDKs provide unhashed
-    // values. They are not set if there is one or more user_data_treatment
-    // value in the BidRequest, see constrained_usage_encrypted_advertising_id
-    // and constrained_usage_encrypted_hashed_idfa instead.
+    // This field is used for advertising identifiers for
+    // 1) iOS devices (This is called Identifier for Advertising, or IDFA, as
+    // described at https://support.google.com/adxbuyer/answer/3221407),
+    // 2) Android devices,
+    // 3) Roku devices,
+    // 4) Microsoft Xbox devices.
+    //
+    // When the encrypted_advertising_id is an IDFA, the plaintext after
+    // decrypting the ciphertext is the IDFA (16 byte UUID) returned by iOS's
+    // [ASIdentifierManager advertisingIdentifier]. For encrypted_hashed_idfa,
+    // the plaintext is the 16 byte MD5 hash of the IDFA. Only one of the two
+    // fields will be available, depending on the version of the SDK making the
+    // request. Later SDKs provide unhashed values. They are not set if there is
+    // one or more user_data_treatment value in the BidRequest, see
+    // constrained_usage_encrypted_advertising_id and
+    // constrained_usage_encrypted_hashed_idfa instead.
     optional bytes encrypted_advertising_id = 20;
 
     // Unencrypted version of encrypted_advertising_id. This field is only set
@@ -380,7 +385,8 @@ message BidRequest {
     // MD5.
     optional bytes constrained_usage_hashed_idfa = 30;
 
-    // App name for Android apps in Google Play store.
+    // App names for Android apps are from the Google Play store.
+    // App names for iOS apps are provided by AppAnnie.
     optional string app_name = 24;
 
     // Average user rating for the app. The range of user rating is between 1.0
@@ -843,6 +849,13 @@ message BidRequest {
     // This figure does not include data aggregated from AdWords.
     optional float click_through_rate = 25 [default = -1.0];
 
+    // Historical completion rate for video ads served in the ad slot. This is
+    // expressed as a fraction in the range [0.0, 1.0]. The default value of
+    // -1.0 indicates that historical completion rate data is not available.
+    // This field is only applicable to video inventory, and does not include
+    // data aggregated from AdWords.
+    optional float video_completion_rate = 30 [default = -1.0];
+
     // iFraming state of the ad slot on the webpage where it is present.
     enum IFramingState {
       UNKNOWN_IFRAME_STATE = 0;
@@ -863,9 +876,11 @@ message BidRequest {
     optional IFramingDepth iframing_depth = 20 [default = UNKNOWN_IFRAME_DEPTH];
 
     // A native ad consists of pieces that are rendered by the publisher. A
-    // publisher may support multiple distinct native ad templates. If any
-    // native templates exist, you must set the native_ad field in the response,
-    // and must not set html_snippet or video_url.
+    // publisher may support multiple distinct native ad templates.  If the
+    // request also allows banners or videos, you can respond with other
+    // types of ads by setting html_snippet or video_url instead.  If only
+    // native templates exist, you must set the native_ad field in any
+    // response you send.
     //
     message NativeAdTemplate {
       // Defines the bits used in required_fields and recommended_fields. There
@@ -881,6 +896,7 @@ message BidRequest {
         STAR_RATING = 0x80;
         PRICE = 0x100;
         STORE = 0x200;
+        VIDEO = 0x400;
       }
 
       // Bitfield describing which fields are required by the publisher. Bid
@@ -1090,10 +1106,12 @@ message BidResponse {
     // approval status is assigned on a per-id basis.
     optional string buyer_creative_id = 10;
 
+    // Only one of the following should be set:
+    // 1) html_snippet, 2) video_url, or 3) native_ad.
+
     // The HTML snippet that will be placed on the web page to display the ad.
     // Please use BidResponse.Ad.AdSlot.billing_id to indicate which billing id
-    // this snippet is attributed to. Only one of the following should be set:
-    // html_snippet, video_url.
+    // this snippet is attributed to.
     optional string html_snippet = 1;
 
     // The URL to fetch a video ad. The URL should return an XML response that
@@ -1142,6 +1160,11 @@ message BidResponse {
 
       // The app icon, for app download ads.
       optional Image app_icon = 7;
+
+      // The URL to fetch a video ad. The URL should return an XML response that
+      // conforms to the VAST 2.0 standard. Only set this field if the
+      // BidRequest is for native ads and the video field is requested.
+      optional string video_url = 13;
 
       // The app rating in the app store. Must be in the range [0-5].
       optional double star_rating = 8;

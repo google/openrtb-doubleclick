@@ -45,7 +45,6 @@ import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.CompanionSlot.CreativeFormat;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.ContentAttributes;
 import com.google.protos.adx.NetworkBid.BidRequest.Video.VideoFormat;
-
 import java.util.List;
 
 public class TestData {
@@ -78,18 +77,20 @@ public class TestData {
             .addClicktrackers("http://clicktracker1"))
         .addAllImptrackers(asList("http://imptracker1", "http://imptracker2"));
     if (size != NO_SLOT) {
+      int id = 0;
       nativ
-          .addAssets(newRespAssetTitle(1, "title"))
-          .addAssets(newRespAssetData(2, "body"))
-          .addAssets(newRespAssetData(3, "ctatext"))
-          .addAssets(newRespAssetData(4, "advertiser"))
-          .addAssets(newRespAssetImage(5, size, "http://image"))
-          .addAssets(newRespAssetImage(6, size, "http://logo"))
-          .addAssets(newRespAssetImage(7, size, "http://appicon"))
-          .addAssets(newRespAssetData(8, "4.5"))
-          .addAssets(newRespAssetData(9, "$9.99"))
-          .addAssets(newRespAssetData(10, "Play Store")
-              .setLink(NativeResponse.Link.newBuilder().setUrl("http://store")));
+          .addAssets(newRespAssetTitle(++id, "title"))
+          .addAssets(newRespAssetData(++id, "body"))
+          .addAssets(newRespAssetData(++id, "ctatext"))
+          .addAssets(newRespAssetData(++id, "advertiser"))
+          .addAssets(newRespAssetImage(++id, size, "http://image"))
+          .addAssets(newRespAssetImage(++id, size, "http://logo"))
+          .addAssets(newRespAssetImage(++id, size, "http://appicon"))
+          .addAssets(newRespAssetData(++id, "4.5"))
+          .addAssets(newRespAssetData(++id, "$9.99"))
+          .addAssets(newRespAssetData(++id, "Play Store")
+              .setLink(NativeResponse.Link.newBuilder().setUrl("http://store")))
+          .addAssets(newRespAssetVideo(++id, "http://vast.xml"));
     }
     return nativ;
   }
@@ -112,6 +113,12 @@ public class TestData {
     return NativeResponse.Asset.newBuilder()
         .setId(id)
         .setTitle(NativeResponse.Asset.Title.newBuilder().setText(text));
+  }
+
+  static NativeResponse.Asset.Builder newRespAssetVideo(int id, String vasttag) {
+    return NativeResponse.Asset.newBuilder()
+        .setId(id)
+        .setVideo(NativeResponse.Asset.Video.newBuilder().setVasttag(vasttag));
   }
 
   public static NetworkBid.BidRequest newRequest() {
@@ -306,7 +313,8 @@ public class TestData {
             | NativeAdTemplate.Fields.APP_ICON_VALUE
             | NativeAdTemplate.Fields.STAR_RATING_VALUE
             | NativeAdTemplate.Fields.PRICE_VALUE
-            | NativeAdTemplate.Fields.STORE_VALUE);
+            | NativeAdTemplate.Fields.STORE_VALUE
+            | NativeAdTemplate.Fields.VIDEO_VALUE);
 
     if (size >= 1) {
       asset.setHeadlineMaxSafeLength(10);
