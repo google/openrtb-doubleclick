@@ -18,6 +18,8 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.APIFramework;
@@ -29,18 +31,12 @@ import com.google.openrtb.json.OpenRtbJsonFactory;
 import com.google.openrtb.json.OpenRtbNativeJsonReader;
 import com.google.protobuf.TextFormat;
 import com.google.protos.adx.NetworkBid;
-
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mapping between the DoubleClick and OpenRTB Native models.
@@ -169,11 +165,8 @@ public class DoubleClickOpenRtbNativeMapper {
           break;
 
         case VIDEO:
-          unsupported.inc();
-          if (logger.isDebugEnabled()) {
-            logger.debug("Video Asset not supported: {}", asset.getId());
-          }
-          continue;
+          mapRespVideo(asset, matchingReqAsset, dcNatAd);
+          break;
 
         case ASSETONEOF_NOT_SET:
           incomplete.inc();
@@ -264,6 +257,16 @@ public class DoubleClickOpenRtbNativeMapper {
     }
   }
 
+  protected void mapRespVideo(NativeResponse.Asset asset, NativeRequest.Asset matchingReqAsset,
+      NetworkBid.BidResponse.Ad.NativeAd.Builder dcNatAd) {
+    if (!matchingReqAsset.hasVideo()) {
+      failRespAsset(asset);
+      return;
+    }
+    NativeResponse.Asset.Video video = asset.getVideo();
+    dcNatAd.setVideoUrl(video.getVasttag());
+  }
+
   protected void failRespAsset(NativeResponse.Asset asset) {
     invalid.inc();
     if (logger.isDebugEnabled()) {
@@ -324,6 +327,9 @@ public class DoubleClickOpenRtbNativeMapper {
     }
     if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.STORE_VALUE) != 0) {
       addAsset(nativReq, ++id, mapReqAssetStore(dcNativ));
+    }
+    if ((bits & NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.VIDEO_VALUE) != 0) {
+      addAsset(nativReq, ++id, mapReqAssetVideo(dcNativ));
     }
 
     return nativReq.getAssetsCount() != 0;
@@ -462,6 +468,14 @@ public class DoubleClickOpenRtbNativeMapper {
     } else {
       return failReqAsset(dcNativ, NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.HEADLINE);
     }
+  }
+
+  protected NativeRequest.Asset.Builder mapReqAssetVideo(
+    NetworkBid.BidRequest.AdSlot.NativeAdTemplate dcNativ) {
+    NativeRequest.Asset.Builder asset = newAsset(dcNativ.getRequiredFields(),
+        NetworkBid.BidRequest.AdSlot.NativeAdTemplate.Fields.VIDEO);
+    OpenRtb.BidRequest.Imp.Video.Builder video = OpenRtb.BidRequest.Imp.Video.newBuilder();
+    return extMapNative(dcNativ, asset.setVideo(video));
   }
 
   @Nullable protected NativeRequest.Asset.Builder failReqAsset(

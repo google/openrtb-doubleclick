@@ -1,8 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.1.1, ??-10-2016
-* DoubleClick protocol v.98: Added native video support.
+## Version 1.1.1, 07-10-2016
+* DoubleClick protocol v.101: Added `Video.video_completion_rate`;
+  Native Video support with `Field.VIDEO` and `NativeAd.video_url`.
+* Preliminary, beta-quality OpenRTB mapping for Native Video.
 
 ## Version 1.1.0, 14-09-2016
 * DoubleClick protocol v.96: AMP support; improved exchange bidding.
