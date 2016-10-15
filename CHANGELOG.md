@@ -1,6 +1,13 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.1.2, ??-10-2016
+* OpenRTB core mapping updated for 2.4:
+  - Banner sizes are now mapped to `Banner.format`.   The deprecated
+    `wmin`, `wmax`, `hmin`, `hmax` won't be populated anymore.
+    Fields `w` and `h` are still populated with the first dimension.
+  - `Video.skip` and `Bid.api` are now mapped.
+
 ## Version 1.1.1, 07-10-2016
 * DoubleClick protocol v.101: Added `Video.video_completion_rate`;
   Native Video support with `Field.VIDEO` and `NativeAd.video_url`.

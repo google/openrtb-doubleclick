@@ -50,7 +50,7 @@ import java.util.List;
 public class TestData {
   static final int NO_SLOT = -1;
 
-  public static Bid.Builder newBid(boolean full) {
+  public static Bid.Builder newBid(boolean fullBid) {
     Bid.Builder bid = Bid.newBuilder()
         .setId("0")
         .setImpid("1")
@@ -58,7 +58,7 @@ public class TestData {
         .setCrid("4")
         .setPrice(1.2)
         .setAdm("<blink>hello world</blink>");
-    if (full) {
+    if (fullBid) {
       bid
           .setCid("3")
           .setDealid("5")

@@ -19,17 +19,21 @@ package com.google.doubleclick.openrtb;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.openrtb.OpenRtb.APIFramework;
 import com.google.openrtb.OpenRtb.CreativeAttribute;
-
 import org.junit.Test;
 
 public class CreativeAttributeMapperTest {
   @Test
   public void testMapper() {
     assertThat(CreativeAttributeMapper.toDoubleClick(
-            ImmutableList.of(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED), null))
-        .containsExactly(28);
+            ImmutableList.of(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED),
+            APIFramework.MRAID_2,
+            null))
+        .containsExactly(28, 80);
     assertThat(CreativeAttributeMapper.toOpenRtb(ImmutableList.of(28), null))
         .containsExactly(CreativeAttribute.EXPANDABLE_ROLLOVER_INITIATED);
+    assertThat(CreativeAttributeMapper.toOpenRtbApiFrameworkBits(ImmutableList.of(80)))
+        .isEqualTo(CreativeAttributeMapper.API_FRAMEWORK_MRAID);
   }
 }

@@ -18,6 +18,7 @@ package com.google.doubleclick.openrtb;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static java.lang.Math.max;
 import static java.util.Arrays.asList;
 
 import com.codahale.metrics.MetricRegistry;
@@ -191,12 +192,12 @@ public class DoubleClickOpenRtbMapperTest {
         boolean impVideo = (flags & 0b10) != 0;
         boolean impNativ = !impVideo && (flags & 0b100) != 0;
         boolean impBanner = !impVideo && !impNativ;
-        boolean multiBid = (flags & 0b1000) != 0;
+        boolean fullBid = (flags & 0b1000) != 0;
         boolean linkExt = (flags & 0b1000) != 0;
         String testDesc = String.format(
             "imp=%s, mobile=%s, coppa=%s, link=%s, size=%s%s",
             (impNativ ? "native" : impVideo ? "video" : "banner"),
-            mobile, coppa, linkExt, size, multiBid ? "/full" : "");
+            mobile, coppa, linkExt, size, fullBid ? "/full" : "");
         ImmutableList.Builder<ExtMapper> extMappers = ImmutableList.builder();
         if (linkExt) {
           extMappers.add(DoubleClickLinkMapper.INSTANCE);
@@ -234,21 +235,13 @@ public class DoubleClickOpenRtbMapperTest {
           if (impVideo) {
             if (imp.getVideo().getCompanionadCount() != 0) {
               Banner compAd = imp.getVideo().getCompanionad(0);
-              assertWithMessage(testDesc)
-                  .that(compAd.hasWmin() && compAd.hasWmax()
-                      && compAd.hasHmin() && compAd.hasHmax())
-                  .isEqualTo(size > 1);
-              assertWithMessage(testDesc).that(compAd.hasW() && compAd.hasH())
-                  .isNotEqualTo(size == 0);
+              assertWithMessage(testDesc).that(compAd.hasW() && compAd.hasH()).isEqualTo(size >= 1);
+              assertWithMessage(testDesc).that(compAd.getFormatCount()).isEqualTo(max(0, size));
             }
           } else if (impBanner) {
             Banner banner = imp.getBanner();
-            assertWithMessage(testDesc)
-                .that(banner.hasWmin() && banner.hasWmax()
-                    && banner.hasHmin() && banner.hasHmax())
-                .isEqualTo(size > 1);
-            assertWithMessage(testDesc).that(banner.hasW() && banner.hasH())
-                .isNotEqualTo(size == 0);
+            assertWithMessage(testDesc).that(banner.hasW() && banner.hasH()).isEqualTo(size >= 1);
+            assertWithMessage(testDesc).that(banner.getFormatCount()).isEqualTo(max(0, size));
             assertWithMessage(testDesc).that(banner.hasTopframe()).isEqualTo(size >= 2);
           } else if (impNativ) {
             Native nativ = imp.getNative();
@@ -256,7 +249,7 @@ public class DoubleClickOpenRtbMapperTest {
                 .isEqualTo(size == 0 ? 6 : 11);
           }
 
-          Bid.Builder bid = TestData.newBid(multiBid || imp.getInstl());
+          Bid.Builder bid = TestData.newBid((fullBid || imp.getInstl()) && !impNativ);
           if (impNativ) {
             NativeResponse nativResp = TestData.newNativeResponse(size - 1).build();
             if (size % 2 == 0) {
@@ -271,10 +264,9 @@ public class DoubleClickOpenRtbMapperTest {
               mapper.toExchangeBidResponse(request, response).build();
           if (linkExt) {
             Ad ad = dcResponse.getAd(0);
-            assertWithMessage(testDesc).that(ad.hasWidth())
-                .isEqualTo(((size > 1 && multiBid) || imp.getInstl()) && !impNativ);
+            assertWithMessage(testDesc).that(ad.hasWidth()).isEqualTo(bid.hasW());
             assertWithMessage(testDesc).that(ad.getAdslot(0).hasBillingId())
-                .isEqualTo(size > 2 && multiBid);
+                .isEqualTo(bid.hasCid());
           }
         }
       }

@@ -19,13 +19,12 @@ package com.google.doubleclick.openrtb;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.openrtb.OpenRtb.APIFramework;
 import com.google.openrtb.OpenRtb.CreativeAttribute;
-
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 
 /**
@@ -48,6 +47,9 @@ public class CreativeAttributeMapper {
               CreativeAttribute.VIDEO_IN_BANNER_USER_INITIATED)
           .build());
 
+  public static final int API_FRAMEWORK_MRAID = 0x01;
+  public static final int API_FRAMEWORK_VPAID = 0x02;
+
   public static ImmutableSet<CreativeAttribute> toOpenRtb(int dc) {
     return MapperUtil.get(dcToOpenrtb, dc);
   }
@@ -63,17 +65,46 @@ public class CreativeAttributeMapper {
     return ret;
   }
 
+  public static int toOpenRtbApiFrameworkBits(Collection<Integer> dcList) {
+    int ret = 0;
+    if (dcList.contains(32 /* MRAID_1_0 */) || dcList.contains(80 /* MRAID_2_0 */)) {
+      ret |= API_FRAMEWORK_MRAID;
+    }
+    if (dcList.contains(30 /* VPAID */)) {
+      ret |= API_FRAMEWORK_VPAID;
+    }
+    return ret;
+  }
+
   public static Integer toDoubleClick(CreativeAttribute openrtb) {
     return openrtbToDc.get(openrtb);
   }
 
   public static Set<Integer> toDoubleClick(
-      Collection<CreativeAttribute> openrtbList, @Nullable Set<Integer> dcSet) {
+      Collection<CreativeAttribute> openrtbList,
+      @Nullable APIFramework api,
+      @Nullable Set<Integer> dcSet) {
     Set<Integer> ret = dcSet == null ? new LinkedHashSet<>() : dcSet;
     for (CreativeAttribute openrtb : openrtbList) {
       Integer o = toDoubleClick(openrtb);
       if (o != null) {
         ret.add(o);
+      }
+    }
+    if (api != null) {
+      switch (api) {
+        case MRAID_1:
+          ret.add(32 /* MRAID_1_0 */);
+          break;
+        case MRAID_2:
+          ret.add(80 /* MRAID_2_0 */);
+          break;
+        case ORMMA:
+          break;
+        case VPAID_1:
+        case VPAID_2:
+          ret.add(30 /* VPAID */);
+          break;
       }
     }
     return ret;
