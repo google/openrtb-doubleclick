@@ -23,16 +23,6 @@
       <version>${protobufVersion}</version>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${guavaVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.codahale.metrics</groupId>
-      <artifactId>metrics-core</artifactId>
-      <version>${metricsVersion}</version>
-    </dependency>
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>${fasterxmlJacksonVersion}</version>
@@ -70,13 +60,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
       <version>${slf4jVersion}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.doubleclick</groupId>
-      <artifactId>doubleclick-core</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
