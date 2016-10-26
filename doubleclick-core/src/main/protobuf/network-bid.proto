@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.101
+// Synchronized with v.102
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -241,8 +241,14 @@ message BidRequest {
       UNKNOWN_DEVICE = 0;
       HIGHEND_PHONE = 1;
       TABLET = 2;
-      PERSONAL_COMPUTER = 3;  // Desktop or laptop devices.
-      CONNECTED_TV = 4;  // Includes both TVs and set-top boxes.
+
+      // Desktop or laptop devices.
+      PERSONAL_COMPUTER = 3;
+
+      // Both connected TVs (that is, smart TVs) and connected devices
+      // (such as Roku and Apple TV).
+      CONNECTED_TV = 4;
+
       GAME_CONSOLE = 5;
     }
     optional DeviceType device_type = 1 [default = UNKNOWN_DEVICE];
@@ -278,7 +284,7 @@ message BidRequest {
     // The height of the device screen in pixels.
     optional int32 screen_height = 8 [default = 0];
 
-    // Used for high-density devices (e.g. iOS retina displays).  A non-default
+    // Used for high-density devices (e.g. iOS retina displays). A non-default
     // value indicates that the nominal screen size (with pixels as the unit)
     // does not describe the actual number of pixels in the screen. For example,
     // nominal width and height may be 320x640 for a screen that actually has
@@ -480,7 +486,7 @@ message BidRequest {
         [default = METHOD_UNKNOWN];
 
     // Whether the inventory allows clicking on the video ad to take the user to
-    // an advertiser site.  Some platforms, notably connected TVs, do not
+    // an advertiser site. Some platforms, notably connected TVs, do not
     // support clicking on video ads, in which case this field is set to false.
     optional bool is_clickable = 15;
 
@@ -590,7 +596,7 @@ message BidRequest {
     // The type of inventory from which request is sent.
     // Deprecated but will continue to be filled in until January 2017.
     // Use the placement field to determine if inventory is interstitial or
-    // instream.  Use Device.device_type to determine if the request comes from
+    // instream. Use Device.device_type to determine if the request comes from
     // a mobile device and Mobile.is_app to determine if the request comes from
     // an app.
     // WEB_VIDEO is INSTREAM placements from web browsers.
@@ -654,14 +660,14 @@ message BidRequest {
     // formats are 728x90, 300x250, and 468x60.
     //
     // For VAST video ad requests a single width/height pair specifies the
-    // Google-detected video player size.  If Google cannot detect the player
-    // size the publisher-provided player size, if available, is used.  For
+    // Google-detected video player size. If Google cannot detect the player
+    // size the publisher-provided player size, if available, is used. For
     // VAST video ads, this size is informational; there is no restriction on
     // the size of the video ad that you can return.
     //
     // For mobile interstitial ads (including ones where video ads are eligible)
     // the first width height pair is the screen size (this is also the video
-    // player size for VAST video ads).  Subsequent pairs are recommended
+    // player size for VAST video ads). Subsequent pairs are recommended
     // interstitial ad sizes that satisfy the interstitial size restrictions,
     // i.e. no bigger than the screen size and no smaller than 50% of width and
     // 40% height.
@@ -803,7 +809,7 @@ message BidRequest {
     }
     repeated MatchingAdData matching_ad_data = 9;
 
-    // The publisher settings list ids that apply to this slot.  See the RTB
+    // The publisher settings list ids that apply to this slot. See the RTB
     // Publisher Settings guide at
     // https://developers.google.com/ad-exchange/rtb/pub-settings-guide for
     // details.
@@ -820,8 +826,8 @@ message BidRequest {
       // bidder.
       repeated string publisher_parameter = 1;
 
-      // DFP network code of the publisher.  This is always set for exchange
-      // bidding requests.  It is the same network code that the publisher
+      // DFP network code of the publisher. This is always set for exchange
+      // bidding requests. It is the same network code that the publisher
       // provides to the exchange as part of initially enabling the exchange for
       // exchange bidding.
       optional int64 dfp_network_code = 2;
@@ -876,9 +882,9 @@ message BidRequest {
     optional IFramingDepth iframing_depth = 20 [default = UNKNOWN_IFRAME_DEPTH];
 
     // A native ad consists of pieces that are rendered by the publisher. A
-    // publisher may support multiple distinct native ad templates.  If the
+    // publisher may support multiple distinct native ad templates. If the
     // request also allows banners or videos, you can respond with other
-    // types of ads by setting html_snippet or video_url instead.  If only
+    // types of ads by setting html_snippet or video_url instead. If only
     // native templates exist, you must set the native_ad field in any
     // response you send.
     //
@@ -1181,7 +1187,7 @@ message BidResponse {
       // The URL to the app store to purchase/download the promoted app.
       optional string store = 12;
 
-      // This field is deprecated.  Please use
+      // This field is deprecated. Please use
       // BidResponse.Ad.impression_tracking_url instead.
       repeated string DEPRECATED_impression_tracking_url = 9;
     };
@@ -1282,7 +1288,7 @@ message BidResponse {
     }
     repeated AdSlot adslot = 3;
 
-    // The URLs to call when the impression is rendered.  This is supported for
+    // The URLs to call when the impression is rendered. This is supported for
     // all inventory types and all formats except for VAST video.
     repeated string impression_tracking_url = 19;
 
