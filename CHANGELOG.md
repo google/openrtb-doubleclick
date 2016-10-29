@@ -1,17 +1,17 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.1.2, ??-10-2016
-* The client-side AdX/OpenRTB mapper was REMOVED from this library.
-  Ad Exchange's native, on-wire OpenRTB support, in both Protobuf and
-  JSON format, has been supported for quite some time already, and it's
-  more efficient as the bidder doesn't need to transcode all messages.
-  The remaining utility of the client-side mapper was support for a
-  "hybrid" model allowing to access the AdX fields when some of them
-  wouldn't map well to OpenRTB; but from now one you must make a choice
-  between the AdX protocol (provides some extra signals) and the OpenRTB
-  protocol (portable / cross-exchange). You may keep using older releases
-  of this library but they won't be updated or supported in any way.
+## Version 1.1.2, 28-10-2016
+* The AdX/OpenRTB mapper was REMOVED from this library.  Ad Exchange's
+  native, on-wire OpenRTB support, in both Protobuf and JSON format,
+  has been supported for quite some time, and it's more efficient as
+  the bidder doesn't need to perform mapping. The client-side mapper
+  could also support a "hybrid" model mixing OpenRTB and AdX, but this
+  hack was more useful when the mapping was much less complete; now
+  you must make a choice and pick a single protocol and data model.
+  Older releases of this library will be available but they won't be
+  updated or supported in any way.
+* DoubleClick proto v.105, DoubleClick OpenRTB extensions v.6.
 
 ## Version 1.1.1, 07-10-2016
 * DoubleClick protocol v.101: Added `Video.video_completion_rate`;

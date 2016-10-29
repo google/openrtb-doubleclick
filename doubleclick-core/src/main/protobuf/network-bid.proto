@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.102
+// Synchronized with v.105
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -147,26 +147,6 @@ message BidRequest {
   repeated int32 user_vertical = 30 [
       packed=true
   ];
-
-  // Demographic data provided by the publisher.
-  message UserDemographic {
-    enum Gender {
-      UNKNOWN = 0;
-      MALE = 1;
-      FEMALE = 2;
-    }
-    // Gender
-    optional Gender gender = 1 [
-        default = UNKNOWN
-    ];
-
-    // Age interval
-    optional int32 age_low = 2 [
-        default = 0];
-    optional int32 age_high = 3 [
-        default = 999];
-  }
-  optional UserDemographic user_demographic = 50;
 
   // This field is not populated by default. We recommend that bidders instead
   // store and look up list ids using either google_user_id or hosted_match_data
@@ -834,6 +814,10 @@ message BidRequest {
     }
     optional ExchangeBidding exchange_bidding = 28;
 
+    // The DFP ad unit code (http://support.google.com/dfp_premium/topic/28147)
+    // This is currently only set for exchange bidding requests.
+    optional string dfp_ad_unit_code = 33;
+
     // Visibility information for the slot.
     enum SlotVisibility  {
       NO_DETECTION = 0;
@@ -983,6 +967,21 @@ message BidRequest {
     }
     optional Stickiness stickiness = 24 [default = UNKNOWN_STICKINESS];
 
+    // Sources for non-browser inventory.
+    enum NonBrowserSource {
+      UNDECLARED_SOURCE = 0;
+      DESKTOP_APP = 1;
+    }
+    // Publisher declaration stating that this ad slot may serve on
+    // non-browser inventory, like desktop apps.
+    optional NonBrowserSource non_browser_slot_source = 34
+      [default = UNDECLARED_SOURCE];
+
+    // Publisher declaration stating that this ad slot will serve an
+    // interstitial ad. An interstitial ad covers the content for a period of
+    // time.
+    optional bool is_interstitial_slot = 35 [default = false];
+
     // Defines who controls the environment that made the ad request and will
     // render the ad. On platforms where code written by Google will handle
     // the ad this field is set to GOOGLE. When this field is PUBLISHER the
@@ -1090,6 +1089,12 @@ message BidRequest {
   optional bool DEPRECATED_experimental_deadline = 35 [default=false];
   repeated int32 DEPRECATED_site_list_id = 36;
   optional int32 DEPRECATED_vertical_dictionary_version = 24;
+  message UserDemographic {
+    optional int32 DEPRECATED_gender = 1;
+    optional int32 DEPRECATED_age_low = 2;
+    optional int32 DEPRECATED_age_high = 3;
+  }
+  optional UserDemographic DEPRECATED_user_demographic = 50;
 }
 
 // This is the message that you return in response to a BidRequest. You may
