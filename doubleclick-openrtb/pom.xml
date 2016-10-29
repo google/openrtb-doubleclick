@@ -110,8 +110,6 @@
             <excludes>
               <exclude>com/google/doubleclick/AdExt.class</exclude>
               <exclude>com/google/doubleclick/AdExt$*.class</exclude>
-              <exclude>com/google/doubleclick/DcExt.class</exclude>
-              <exclude>com/google/doubleclick/DcExt$*.class</exclude>
             </excludes>
           </instrumentation>
         </configuration>
