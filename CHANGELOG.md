@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.1.2, 28-10-2016
+## Version 1.2.0, 28-10-2016
 * The AdX/OpenRTB mapper was REMOVED from this library.  Ad Exchange's
   native, on-wire OpenRTB support, in both Protobuf and JSON format,
   has been supported for quite some time, and it's more efficient as
