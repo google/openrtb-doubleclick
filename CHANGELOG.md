@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.2.1, 07-11-2016
+## Version 1.2.1, 09-11-2016
 * DoubleClick proto v.109, DoubleClick OpenRTB extensions v.7.
 
 ## Version 1.2.0, 28-10-2016
