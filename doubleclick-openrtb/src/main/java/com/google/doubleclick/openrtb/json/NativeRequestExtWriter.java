@@ -17,16 +17,16 @@
 package com.google.doubleclick.openrtb.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.google.doubleclick.AdxExt.NativeRequestExtension;
+import com.google.doubleclick.AdxExt.NativeRequestExt;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
 /**
- * Writer for {@link NativeRequestExtension}.
+ * Writer for {@link NativeRequestExt}.
  */
-class NativeExtWriter extends OpenRtbJsonExtWriter<NativeRequestExtension> {
+class NativeRequestExtWriter extends OpenRtbJsonExtWriter<NativeRequestExt> {
 
-  @Override protected void write(NativeRequestExtension ext, JsonGenerator gen) throws IOException {
+  @Override protected void write(NativeRequestExt ext, JsonGenerator gen) throws IOException {
     if (ext.hasStyleId()) {
       gen.writeNumberField("style_id", ext.getStyleId());
     }

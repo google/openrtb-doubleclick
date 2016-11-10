@@ -20,23 +20,24 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.google.doubleclick.AdxExt;
-import com.google.doubleclick.AdxExt.NativeRequestExtension;
-import com.google.doubleclick.AdxExt.NativeRequestExtension.LayoutType;
+import com.google.doubleclick.AdxExt.NativeRequestExt;
+import com.google.doubleclick.AdxExt.NativeRequestExt.LayoutType;
 import com.google.openrtb.OpenRtb.NativeRequest;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
 import java.io.IOException;
 
 /**
- * Reader for {@link NativeRequestExtension}.
+ * Reader for {@link NativeRequestExt}.
  */
-class NativeExtReader extends OpenRtbJsonExtComplexReader<NativeRequest.Builder, NativeRequestExtension.Builder> {
+class NativeRequestExtReader
+    extends OpenRtbJsonExtComplexReader<NativeRequest.Builder, NativeRequestExt.Builder> {
 
-  public NativeExtReader() {
+  public NativeRequestExtReader() {
     super(AdxExt.nativeExt, false,
         "style_id", "style_height", "style_width", "style_layout_type");
   }
 
-  @Override protected void read(NativeRequestExtension.Builder ext, JsonParser par) throws IOException {
+  @Override protected void read(NativeRequestExt.Builder ext, JsonParser par) throws IOException {
     switch (getCurrentName(par)) {
       case "style_id":
         ext.setStyleId(par.nextIntValue(0));

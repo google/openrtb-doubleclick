@@ -8,8 +8,8 @@ import com.google.doubleclick.AdxExt.BidExt;
 import com.google.doubleclick.AdxExt.BidExt.ExchangeDealType;
 import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.doubleclick.AdxExt.ImpExt;
-import com.google.doubleclick.AdxExt.NativeRequestExtension;
-import com.google.doubleclick.AdxExt.NativeRequestExtension.LayoutType;
+import com.google.doubleclick.AdxExt.NativeRequestExt;
+import com.google.doubleclick.AdxExt.NativeRequestExt.LayoutType;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
@@ -38,7 +38,7 @@ public class AdxExtJsonTest {
             .setId("1")
             .setNative(Native.newBuilder()
                 .setRequestNative(NativeRequest.newBuilder()
-                      .setExtension(AdxExt.nativeExt, NativeRequestExtension.newBuilder()
+                      .setExtension(AdxExt.nativeExt, NativeRequestExt.newBuilder()
                           .setStyleId(12)
                           .setStyleWidth(200)
                           .setStyleHeight(100)

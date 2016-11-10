@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.2.2, 10-11-2016
+* DoubleClick OpenRTB extensions v.7 (fixed extension name).
+
 ## Version 1.2.1, 09-11-2016
 * DoubleClick proto v.109, DoubleClick OpenRTB extensions v.7.
 
