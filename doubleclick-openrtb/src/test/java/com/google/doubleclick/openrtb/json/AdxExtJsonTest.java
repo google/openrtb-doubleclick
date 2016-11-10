@@ -5,21 +5,24 @@ import static java.util.Arrays.asList;
 
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
+import com.google.doubleclick.AdxExt.BidExt.ExchangeDealType;
 import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.doubleclick.AdxExt.ImpExt;
+import com.google.doubleclick.AdxExt.NativeRequestExtension;
+import com.google.doubleclick.AdxExt.NativeRequestExtension.LayoutType;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Native;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.openrtb.OpenRtb.NativeRequest;
 import com.google.openrtb.json.OpenRtbJsonFactory;
-
+import java.io.IOException;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * Tests for the AdX/OpenRTB JSON support.
@@ -33,6 +36,14 @@ public class AdxExtJsonTest {
         .setId("0")
         .addImp(Imp.newBuilder()
             .setId("1")
+            .setNative(Native.newBuilder()
+                .setRequestNative(NativeRequest.newBuilder()
+                      .setExtension(AdxExt.nativeExt, NativeRequestExtension.newBuilder()
+                          .setStyleId(12)
+                          .setStyleWidth(200)
+                          .setStyleHeight(100)
+                          .setStyleLayoutType(LayoutType.PIXEL)
+                          .build())))
             .setExtension(AdxExt.imp, ImpExt.newBuilder()
                 .addAllBillingId(asList(100L, 101L, 102L))
                 .addAllPublisherSettingsListId(asList(200L, 201L, 202L))
@@ -55,6 +66,7 @@ public class AdxExtJsonTest {
                     .addAllImpressionTrackingUrl(asList("http://site.com/1", "http://site.com/2"))
                     .setAdChoicesDestinationUrl("http://adchoices.com")
                     .setBidderName("x")
+                    .setExchangeDealType(ExchangeDealType.OPEN_AUCTION)
                     .build())))
         .setExtension(AdxExt.bidResponse,
             BidResponseExt.newBuilder().setProcessingTimeMs(99).build())

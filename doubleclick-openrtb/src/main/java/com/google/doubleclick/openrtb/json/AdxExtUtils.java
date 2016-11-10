@@ -20,9 +20,11 @@ import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.doubleclick.AdxExt.ImpExt;
+import com.google.doubleclick.AdxExt.NativeRequestExtension;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
+import com.google.openrtb.OpenRtb.NativeRequest;
 import com.google.openrtb.json.OpenRtbJsonFactory;
 
 /**
@@ -40,6 +42,8 @@ public class AdxExtUtils {
         .register(new BidExtReader(), Bid.Builder.class)
         .register(new BidExtWriter(), BidExt.class, Bid.class)
         .register(new BidResponseExtReader(), BidResponse.Builder.class)
-        .register(new BidResponseExtWriter(), BidResponseExt.class, BidResponse.class);
+        .register(new BidResponseExtWriter(), BidResponseExt.class, BidResponse.class)
+        .register(new NativeExtReader(), NativeRequest.Builder.class)
+        .register(new NativeExtWriter(), NativeRequestExtension.class, NativeRequest.class);
   }
 }
