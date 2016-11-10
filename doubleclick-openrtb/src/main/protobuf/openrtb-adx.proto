@@ -69,7 +69,7 @@ extend com.google.openrtb.BidResponse.SeatBid.Bid {
   optional BidExt bid = 1014;
 }
 
-message NativeRequestExtension {
+message NativeRequestExt {
   // [AdX: BidRequest.AdSlot.native_ad_template[0].style_id]
   optional int32 style_id = 1;
 
@@ -89,5 +89,5 @@ message NativeRequestExtension {
 
 extend com.google.openrtb.NativeRequest {
   // Extension key for the AdX Native.ext.
-  optional NativeRequestExtension native_ext =  1001;
+  optional NativeRequestExt native_ext =  1001;
 }
