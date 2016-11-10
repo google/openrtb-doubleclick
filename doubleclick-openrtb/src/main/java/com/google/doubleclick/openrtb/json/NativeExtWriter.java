@@ -17,27 +17,27 @@
 package com.google.doubleclick.openrtb.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.google.doubleclick.AdxExt.BidExt;
+import com.google.doubleclick.AdxExt.NativeRequestExtension;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
-import com.google.openrtb.json.OpenRtbJsonUtils;
 import java.io.IOException;
 
 /**
- * Writer for {@link BidExt}.
+ * Writer for {@link NativeRequestExtension}.
  */
-class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
+class NativeExtWriter extends OpenRtbJsonExtWriter<NativeRequestExtension> {
 
-  @Override protected void write(BidExt ext, JsonGenerator gen) throws IOException {
-    OpenRtbJsonUtils.writeStrings(
-        "impression_tracking_url", ext.getImpressionTrackingUrlList(), gen);
-    if (ext.hasAdChoicesDestinationUrl()) {
-      gen.writeStringField("ad_choices_destination_url", ext.getAdChoicesDestinationUrl());
+  @Override protected void write(NativeRequestExtension ext, JsonGenerator gen) throws IOException {
+    if (ext.hasStyleId()) {
+      gen.writeNumberField("style_id", ext.getStyleId());
     }
-    if (ext.hasBidderName()) {
-      gen.writeStringField("bidder_name", ext.getBidderName());
+    if (ext.hasStyleHeight()) {
+      gen.writeNumberField("style_height", ext.getStyleHeight());
     }
-    if (ext.hasExchangeDealType()) {
-      gen.writeNumberField("exchange_deal_type", ext.getExchangeDealType().getNumber());
+    if (ext.hasStyleWidth()) {
+      gen.writeNumberField("style_width", ext.getStyleWidth());
+    }
+    if (ext.hasStyleLayoutType()) {
+      gen.writeNumberField("style_layout_type", ext.getStyleLayoutType().getNumber());
     }
   }
 }

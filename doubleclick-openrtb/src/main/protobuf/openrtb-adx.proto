@@ -54,9 +54,40 @@ message BidExt {
 
   // [AdX: BidResponse.Ad.bidder_name]
   optional string bidder_name = 3;
+
+  // [AdX: BidResponse.Ad.AdSlot.exchange_deal_type]
+  enum ExchangeDealType  {
+    OPEN_AUCTION = 0;
+    PRIVATE_AUCTION = 1;
+    PREFERRED_DEAL = 2;
+  }
+  optional ExchangeDealType exchange_deal_type = 4 [default = OPEN_AUCTION];
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
   // Extension key for AdX Bid.ext.
   optional BidExt bid = 1014;
+}
+
+message NativeRequestExtension {
+  // [AdX: BidRequest.AdSlot.native_ad_template[0].style_id]
+  optional int32 style_id = 1;
+
+  // [AdX: BidRequest.AdSlot.native_ad_template[0].style_height]
+  optional int32 style_height = 2;
+
+  // [AdX: BidRequest.AdSlot.native_ad_template[0].style_width]
+  optional int32 style_width = 3;
+
+  // [AdX: BidRequest.AdSlot.native_ad_template[0].style_layout_type]
+  enum LayoutType {
+    PIXEL = 0;
+    FLUID = 1;
+  }
+  optional LayoutType style_layout_type = 4 [default = PIXEL];
+}
+
+extend com.google.openrtb.NativeRequest {
+  // Extension key for the AdX Native.ext.
+  optional NativeRequestExtension native_ext =  1001;
 }

@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.105
+// Synchronized with v.109
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -917,6 +917,24 @@ message BidRequest {
       optional int32 logo_height = 10;
       optional int32 app_icon_width = 11;
       optional int32 app_icon_height = 12;
+
+      // Globally distinct id for the specific style, HTML, and CSS with which
+      // the native ad is rendered.
+      optional int32 style_id = 16;
+
+      // Type of style layout for each native ad template.
+      enum LayoutType {
+        PIXEL = 0;
+        FLUID = 1;
+      }
+      optional LayoutType style_layout_type = 17 [default = PIXEL];
+
+      // If the style_layout_type is Pixel, width and height of the
+      // entire native ad after rendering. If the style_layout_type is
+      // Fluid, the style_height and style_width may optionally
+      // not be populated.
+      optional int32 style_height = 18;
+      optional int32 style_width = 19;
     }
     repeated NativeAdTemplate native_ad_template = 51;
 
@@ -959,13 +977,33 @@ message BidRequest {
     }
     optional AutoRefresh auto_refresh = 23;
 
-    // Whether this request originated from a sticky ad slot that scrolls along
-    // with the content on the page.
-    enum Stickiness {
-      UNKNOWN_STICKINESS = 0;
-      IS_STICKY = 1;
+    // Stickiness settings declared by the publisher.
+    // Next Tag: 4
+    message StickySettings {
+      // Specifies the allowable sticky settings values.
+      enum Stickiness {
+        UNKNOWN_STICKINESS = 0;
+        IS_STICKY = 1;
+      }
+
+      // Whether the request originated from an ad slot that scrolls along with
+      // the contents of the page vertically.
+      optional Stickiness vertical_stickiness = 1
+          [default = UNKNOWN_STICKINESS];
+
+      // Whether the request originated from an ad slot that scrolls along with
+      // the contents of the page horizontally, and is located at the top of the
+      // page.
+      optional Stickiness top_horizontal_stickiness = 2
+          [default = UNKNOWN_STICKINESS];
+
+      // Whether the request originated from an ad slot that scrolls along with
+      // the contents of the page horizontally, and is located at the bottom of
+      // the page.
+      optional Stickiness bottom_horizontal_stickiness = 3
+          [default = UNKNOWN_STICKINESS];
     }
-    optional Stickiness stickiness = 24 [default = UNKNOWN_STICKINESS];
+    optional StickySettings sticky_settings = 31;
 
     // Sources for non-browser inventory.
     enum NonBrowserSource {
@@ -1014,10 +1052,26 @@ message BidRequest {
     }
     optional AmpAdRequestType amp_ad_request_type = 29 [default = NON_AMP_PAGE];
 
+    // Possible ad types that are allowed in the bid response. allowed_ad_types
+    // always contains one or more values. Interstitial slots may also support
+    // banner ads. An ad slot with ALLOWED_AD_TYPE_NATIVE may or may not support
+    // native video, regardless of whether ALLOWED_AD_TYPE_VIDEO is set.
+    // Likewise, an ad slot without ALLOWED_AD_TYPE_NATIVE does not support
+    // native video, regardless of whether ALLOWED_AD_TYPE_VIDEO is set.
+    enum AllowedAdType {
+      ALLOWED_AD_TYPE_BANNER = 0;
+      ALLOWED_AD_TYPE_NATIVE = 1;
+      ALLOWED_AD_TYPE_VIDEO = 2;
+    }
+    repeated AllowedAdType allowed_ad_types = 36 [packed = true];
+
     // These are deprecated. Please ignore.
     repeated int32 DEPRECATED_allowed_attribute = 5;
     repeated bytes DEPRECATED_publisher_settings_list_id = 11;
     repeated string DEPRECATED_excluded_click_through_url = 8;
+    // Use sticky_settings.vertical_stickiness instead.
+    optional int32 DEPRECATED_stickiness = 24;
+
   }
   repeated AdSlot adslot = 14;
 
@@ -1290,6 +1344,22 @@ message BidResponse {
       // or set it to "1" if a deal is available but you want to
       // ignore the deal and participate in the open auction.
       optional int64 deal_id = 5 [default = 0];
+
+      // For exchange bidders (third party exchanges doing real-time bidding on
+      // DFP), the deal id from the exchange's namespace that is associated with
+      // this bid and reported to publishers.  Leave unset if there is no
+      // associated deal. This is arbitrary UTF8 text and must be at most 64
+      // bytes.
+      optional string exchange_deal_id = 6;
+
+      // When exchange_deal_id is set, the type of deal.  This is reported to
+      // publishers and affects how the deal is treated in the auction.
+      enum ExchangeDealType  {
+        OPEN_AUCTION = 0;
+        PRIVATE_AUCTION = 1;
+        PREFERRED_DEAL = 2;
+      }
+      optional ExchangeDealType exchange_deal_type = 7 [default = OPEN_AUCTION];
     }
     repeated AdSlot adslot = 3;
 
