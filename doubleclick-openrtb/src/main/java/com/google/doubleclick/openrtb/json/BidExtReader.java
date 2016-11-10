@@ -20,13 +20,11 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.endArray;
 import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
 import static com.google.openrtb.json.OpenRtbJsonUtils.startArray;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
-
-import com.fasterxml.jackson.core.JsonParser;
-
 import java.io.IOException;
 
 /**
@@ -36,7 +34,8 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
 
   public BidExtReader() {
     super(AdxExt.bid, false,
-        "impression_tracking_url", "ad_choices_destination_url", "bidder_name");
+        "impression_tracking_url", "ad_choices_destination_url", "bidder_name",
+        "exchange_deal_type");
   }
 
   @Override protected void read(BidExt.Builder ext, JsonParser par) throws IOException {
@@ -51,6 +50,13 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
         break;
       case "bidder_name":
         ext.setBidderName(par.nextTextValue());
+        break;
+      case "exchange_deal_type": {
+          BidExt.ExchangeDealType value = BidExt.ExchangeDealType.valueOf(par.nextIntValue(0));
+          if (checkEnum(value)) {
+            ext.setExchangeDealType(value);
+          }
+        }
         break;
     }
   }
