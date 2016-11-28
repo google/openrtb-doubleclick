@@ -23,10 +23,6 @@ import static java.lang.Math.min;
 import com.google.common.base.MoreObjects;
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -36,12 +32,13 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
-
 import javax.annotation.Nullable;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
 * Encryption and decryption support for the DoubleClick Ad Exchange RTB protocol.
@@ -84,7 +81,6 @@ public class DoubleClickCrypto {
   private static final int MICROS_PER_CURRENCY_UNIT = 1_000_000;
 
   private final Keys keys;
-  private final ThreadLocalRandom fastRandom = ThreadLocalRandom.current();
 
   /**
    * Initializes with the encryption keys.
@@ -266,7 +262,7 @@ public class DoubleClickCrypto {
     if (initVector == null) {
       ByteBuffer byteBuffer = ByteBuffer.wrap(plainData);
       byteBuffer.putLong(INITV_TIMESTAMP_OFFSET, millisToSecsAndMicros(System.currentTimeMillis()));
-      byteBuffer.putLong(INITV_SERVERID_OFFSET, fastRandom.nextLong());
+      byteBuffer.putLong(INITV_SERVERID_OFFSET, ThreadLocalRandom.current().nextLong());
     } else {
       System.arraycopy(initVector, 0, plainData, INITV_BASE, min(INITV_SIZE, initVector.length));
     }
