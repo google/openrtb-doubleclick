@@ -24,9 +24,6 @@ import com.google.common.collect.Sets;
 import com.google.common.io.BaseEncoding;
 import com.google.common.net.InetAddresses;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.CodedInputStream;
-
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
@@ -119,16 +116,23 @@ public class MapperUtil {
 
   public static String toUUID(ByteString bytes, boolean iOS) {
     if (bytes.size() == 16) {
-      try {
-        CodedInputStream cis = bytes.newCodedInput();
-        String uuid = new UUID(cis.readFixed64(), cis.readFixed64()).toString();
-        return iOS ? uuid.toUpperCase() : uuid;
-      } catch (IOException e) {
-        // Fall-through
-      }
+      String uuid = new UUID(readRawBigEndian64(bytes, 0), readRawBigEndian64(bytes, 8)).toString();
+      return iOS ? uuid.toUpperCase() : uuid;
     }
     return BaseEncoding.base16().encode(bytes.toByteArray());
   }
+
+  private static long readRawBigEndian64(ByteString s, int pos) {
+    return (((s.byteAt(pos + 7) & 0xffL))       |
+            ((s.byteAt(pos + 6) & 0xffL) <<  8) |
+            ((s.byteAt(pos + 5) & 0xffL) << 16) |
+            ((s.byteAt(pos + 4) & 0xffL) << 24) |
+            ((s.byteAt(pos + 3) & 0xffL) << 32) |
+            ((s.byteAt(pos + 2) & 0xffL) << 40) |
+            ((s.byteAt(pos + 1) & 0xffL) << 48) |
+            ((s.byteAt(pos + 0) & 0xffL) << 56));
+  }
+
 
   protected static String decodeUri(String uri) {
     try {

@@ -231,6 +231,10 @@ public class DoubleClickOpenRtbMapperTest {
           assertWithMessage(testDesc).that(imp.hasVideo()).isEqualTo(impVideo);
           assertWithMessage(testDesc).that(imp.hasBanner()).isEqualTo(impBanner);
           assertWithMessage(testDesc).that(imp.hasNative()).isEqualTo(impNativ);
+          if (mobile && request.getDevice().hasIfa()) {
+            assertWithMessage(testDesc).that(request.getDevice().getIfa().toUpperCase())
+                .isEqualTo("663D10F8-611C-4791-B136-0925EB6E9746");
+          }
           if (impVideo) {
             if (imp.getVideo().getCompanionadCount() != 0) {
               Banner compAd = imp.getVideo().getCompanionad(0);

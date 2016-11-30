@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.1.2, 30-11-2016
+* Fixed mapping of `Device.ifa`.
+
 ## Version 1.1.1, 07-10-2016
 * DoubleClick protocol v.101: Added `Video.video_completion_rate`;
   Native Video support with `Field.VIDEO` and `NativeAd.video_url`.

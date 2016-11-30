@@ -20,6 +20,7 @@ import static java.lang.Math.min;
 import static java.util.Arrays.asList;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.BaseEncoding;
 import com.google.doubleclick.crypto.DoubleClickCrypto;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.NativeResponse;
@@ -248,10 +249,12 @@ public class TestData {
   static Mobile.Builder newMobile(int size, boolean coppa) {
     Mobile.Builder mobile = Mobile.newBuilder();
     if (size % 2 == 0) {
+      ByteString adid = ByteString.copyFrom(
+          BaseEncoding.base16().decode("663D10F8611C4791B1360925EB6E9746"));
       mobile
           .setIsApp(true)
           .setAppId("com.mygame")
-          .setEncryptedAdvertisingId(ByteString.EMPTY)
+          .setAdvertisingId(adid)
           .setEncryptedHashedIdfa(ByteString.EMPTY)
           .setAppName("Tic-Tac-Toe")
           .setAppRating(4.2f)
@@ -260,15 +263,15 @@ public class TestData {
 
       if (size % 4 == 0) {
         if (coppa) {
-          mobile.setConstrainedUsageEncryptedHashedIdfa(ByteString.EMPTY);
+          mobile.setConstrainedUsageHashedIdfa(ByteString.EMPTY);
         } else {
-          mobile.setEncryptedHashedIdfa(ByteString.EMPTY);
+          mobile.setHashedIdfa(ByteString.EMPTY);
         }
       } else {
         if (coppa) {
-          mobile.setConstrainedUsageEncryptedAdvertisingId(ByteString.EMPTY);
+          mobile.setConstrainedUsageAdvertisingId(adid);
         } else {
-          mobile.setEncryptedAdvertisingId(ByteString.EMPTY);
+          mobile.setAdvertisingId(adid);
         }
       }
     }
