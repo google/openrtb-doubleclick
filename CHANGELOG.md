@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.2.3, ??-12-2016
+* DoubleClick proto v.111.
+* Fix racy generation of init vector in `DoubleClickCrypto.encrypt*()`.
+
 ## Version 1.2.2, 10-11-2016
 * DoubleClick OpenRTB extensions v.7 (fixed extension name).
 

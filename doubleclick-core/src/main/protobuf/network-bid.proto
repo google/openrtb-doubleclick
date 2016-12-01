@@ -2,7 +2,7 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.109
+// Synchronized with v.111
 // https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
 
 // Copyright 2016 Google Inc. All Rights Reserved.
@@ -372,44 +372,14 @@ message BidRequest {
     optional bytes constrained_usage_hashed_idfa = 30;
 
     // App names for Android apps are from the Google Play store.
-    // App names for iOS apps are provided by AppAnnie.
+    // App names for iOS apps are provided by App Annie
+    // (https://www.appannie.com).
     optional string app_name = 24;
 
     // Average user rating for the app. The range of user rating is between 1.0
     // and 5.0. Currently only available for apps in Google Play store.
     optional float app_rating = 25;
 
-    // These are deprecated. Please ignore.
-    optional string DEPRECATED_app_name = 1;
-    optional string DEPRECATED_company_name = 2;
-    optional string DEPRECATED_platform = 3;
-    optional string DEPRECATED_carrier_name = 4;
-    optional string DEPRECATED_carrier_country = 5;
-    enum MobileDeviceType {
-      UNKNOWN = 0;
-      HIGHEND_PHONE = 1;
-      TABLET = 2;
-    }
-    optional MobileDeviceType DEPRECATED_mobile_device_type = 8
-        [default = UNKNOWN];
-    enum ScreenOrientation {
-      SCREEN_ORIENTATION_UNKNOWN = 0;
-      SCREEN_ORIENTATION_PORTRAIT = 1;
-      SCREEN_ORIENTATION_LANDSCAPE = 2;
-    }
-    optional int32 DEPRECATED_screen_orientation = 9 [default = 0];
-    optional string DEPRECATED_brand = 12;
-    optional string DEPRECATED_model = 13;
-    message DeviceOsVersion {
-      optional int32 os_version_major = 1;
-      optional int32 os_version_minor = 2;
-      optional int32 os_version_micro = 3;
-    }
-    optional DeviceOsVersion DEPRECATED_os_version = 14;
-    optional int32 DEPRECATED_screen_width = 15;
-    optional int32 DEPRECATED_screen_height = 16;
-    optional int64 DEPRECATED_carrier_id = 18;
-    optional int32 DEPRECATED_device_pixel_ratio_millis = 19 [default = 1000];
   }
   optional Mobile mobile = 28;
 
@@ -782,10 +752,6 @@ message BidRequest {
       }
       repeated DirectDeal direct_deal = 6;
 
-      // These are deprecated. Please ignore.
-      optional int64 DEPRECATED_campaign_id = 1;
-      optional bool DEPRECATED_per_buyer_minimum_cpm = 3;
-      optional int64 DEPRECATED_fixed_cpm_micros = 4;
     }
     repeated MatchingAdData matching_ad_data = 9;
 
@@ -806,11 +772,6 @@ message BidRequest {
       // bidder.
       repeated string publisher_parameter = 1;
 
-      // DFP network code of the publisher. This is always set for exchange
-      // bidding requests. It is the same network code that the publisher
-      // provides to the exchange as part of initially enabling the exchange for
-      // exchange bidding.
-      optional int64 dfp_network_code = 2;
     }
     optional ExchangeBidding exchange_bidding = 28;
 
@@ -1064,14 +1025,6 @@ message BidRequest {
       ALLOWED_AD_TYPE_VIDEO = 2;
     }
     repeated AllowedAdType allowed_ad_types = 36 [packed = true];
-
-    // These are deprecated. Please ignore.
-    repeated int32 DEPRECATED_allowed_attribute = 5;
-    repeated bytes DEPRECATED_publisher_settings_list_id = 11;
-    repeated string DEPRECATED_excluded_click_through_url = 8;
-    // Use sticky_settings.vertical_stickiness instead.
-    optional int32 DEPRECATED_stickiness = 24;
-
   }
   repeated AdSlot adslot = 14;
 
@@ -1123,32 +1076,6 @@ message BidRequest {
   // can automatically update the model when bidding patterns change.
   optional bool is_predicted_to_be_ignored = 45 [default=false];
 
-  // These are deprecated. Please ignore.
-  optional int32 DEPRECATED_protocol_version = 1;
-  optional string DEPRECATED_click_tracking_url = 3;
-  optional uint64 DEPRECATED_cookie = 5;
-  optional string DEPRECATED_country = 7;
-  optional string DEPRECATED_region = 8;
-  optional string DEPRECATED_city = 9;
-  optional int32 DEPRECATED_metro = 10;
-  optional bytes DEPRECATED_hashed_cookie = 16;
-  repeated string DEPRECATED_excluded_click_through_url = 18;
-  optional string DEPRECATED_seller_network = 22;
-  optional bytes DEPRECATED_publisher_settings_list_id = 23;
-  message MatchingNetwork {
-    optional string DEPRECATED_network_id = 1;
-    optional string DEPRECATED_google_user_id = 2;
-  }
-  repeated MatchingNetwork DEPRECATED_matching_network = 27;
-  optional bool DEPRECATED_experimental_deadline = 35 [default=false];
-  repeated int32 DEPRECATED_site_list_id = 36;
-  optional int32 DEPRECATED_vertical_dictionary_version = 24;
-  message UserDemographic {
-    optional int32 DEPRECATED_gender = 1;
-    optional int32 DEPRECATED_age_low = 2;
-    optional int32 DEPRECATED_age_high = 3;
-  }
-  optional UserDemographic DEPRECATED_user_demographic = 50;
 }
 
 // This is the message that you return in response to a BidRequest. You may
@@ -1234,6 +1161,12 @@ message BidResponse {
       // The app rating in the app store. Must be in the range [0-5].
       optional double star_rating = 8;
 
+      // The URL that the browser/SDK will load when the user clicks the ad.
+      // This can be the landing page directly, or the first step of a redirect
+      // chain that eventually leads to it. For backward compatibility, if this
+      // is not set, the first Ad.click_through_url is used.
+      optional string click_link_url = 14;
+
       // The URL to use for click tracking. The SDK pings click tracking url on
       // a background thread. When resolving the url, HTTP 30x redirects are
       // followed. The SDK ignores the contents of the response; this URL
@@ -1262,7 +1195,8 @@ message BidResponse {
     // For native ads, only the first value is used as the click URL, though
     // all values are subject to categorization and review. Only set this
     // field if html_snippet or video_url or native_ad are set. For native ads,
-    // the first value is used to direct the user to the landing page.
+    // if NativeAd.click_link_url is not set, the first value of
+    // click_through_url is used to direct the user to the landing page.
     repeated string click_through_url = 4;
 
     // All vendor types for the ads that may be shown from this snippet. You
@@ -1371,23 +1305,6 @@ message BidResponse {
     // If present, a standard AdChoices icon is added to the native creative and
     // linked to this URL.
     optional string ad_choices_destination_url = 21;
-
-    // These are deprecated. Please do not set.
-    optional int64 DEPRECATED_creative_id = 8;
-    optional string DEPRECATED_click_through_url = 2;
-    optional string DEPRECATED_snippet_template = 12;
-    message TemplateParameter {
-      optional string parameter_value = 1;
-      optional string blank_ad_parameter_value = 8;
-      optional string buyer_creative_id = 2;
-      optional string click_through_url = 3;
-      optional int32 left = 4;
-      optional int32 right = 5;
-      optional int32 top = 6;
-      optional int32 bottom = 7;
-      optional int32 backup_index = 9;
-    };
-    repeated TemplateParameter DEPRECATED_template_parameter = 13;
   }
   repeated Ad ad = 2;
 
@@ -1402,6 +1319,4 @@ message BidResponse {
   // received the request to when you returned the response.
   optional int32 processing_time_ms = 4;
 
-  // This is deprecated. Please do not set.
-  optional int32 DEPRECATED_protocol_version = 1;
 }
