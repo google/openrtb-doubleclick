@@ -2,9 +2,6 @@ syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
-// Synchronized with v.111
-// https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
-
 // Copyright 2016 Google Inc. All Rights Reserved.
 
 // This is the message that Google uses to request bids. A BidRequest
@@ -418,19 +415,20 @@ message BidRequest {
     optional bool is_embedded_offsite = 11 [default = false];
 
     // Describes how the video ad will be played. The playback method is
-    // determined to be auto-play or click-to-play based on the best measurement
-    // available. This includes things like how recently the user interacted
-    // with a web page. For auto-play, ads can start playing with the sound on
-    // or off. Some ads (e.g. in-feed ads) are muted until the user interacts
-    // with the ad. Alternatively, if an ad would normally play with the sound
-    // on but the device is muted then the value will be set to sound off. For
-    // devices where it is not possible to determine if the device is muted
-    // (e.g. desktop), we assume that sound is on.
+    // determined to be auto-play, click-to-play or mouse-over based on the best
+    // measurement available. This includes things like how recently the user
+    // interacted with a web page. For auto-play, ads can start playing with the
+    // sound on or off. Some ads (e.g. in-feed ads) are muted until the user
+    // interacts with the ad. Alternatively, if an ad would normally play with
+    // the sound on but the device is muted then the value will be set to sound
+    // off. For devices where it is not possible to determine if the device is
+    // muted (e.g. desktop), we assume that sound is on.
     enum VideoPlaybackMethod {
       METHOD_UNKNOWN = 0;
       AUTO_PLAY_SOUND_ON = 1;
       AUTO_PLAY_SOUND_OFF = 2;
       CLICK_TO_PLAY = 3;
+      MOUSE_OVER = 4;
     };
     optional VideoPlaybackMethod playback_method = 14
         [default = METHOD_UNKNOWN];
@@ -473,6 +471,22 @@ message BidRequest {
     // allowed for non-skippable ads). If this is not set or has value <= 0, any
     // duration is allowed.
     optional int32 skippable_max_ad_duration = 5;
+
+    // Supported video protocols.
+    enum VideoProtocol {
+      VAST_1_0 = 1;
+      VAST_2_0 = 2;
+      VAST_3_0 = 3;
+      VAST_1_0_WRAPPER = 4;
+      VAST_2_0_WRAPPER = 5;
+      VAST_3_0_WRAPPER = 6;
+      VAST_4_0 = 7;
+      VAST_4_0_WRAPPER = 8;
+      DAAST_1_0 = 9;
+      DAAST_1_0_WRAPPER = 10;
+    }
+    // Array of supported video bid response protocols.
+    repeated VideoProtocol protocols = 17 [packed = true];
 
     // The video file formats that are allowed for this request. The response
     // should support at least one of them.
