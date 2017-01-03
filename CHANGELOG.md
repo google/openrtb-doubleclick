@@ -1,8 +1,8 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.2.4, ??-12-2016
-* DoubleClick proto v.114.
+## Version 1.2.4, ??-01-2017
+* DoubleClick proto v.116.
 
 ## Version 1.2.3, 02-12-2016
 * DoubleClick proto v.111.

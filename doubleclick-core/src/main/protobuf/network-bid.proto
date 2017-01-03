@@ -89,15 +89,22 @@ message BidRequest {
   // request. Certain data may be redacted or replaced.
   optional string user_agent = 6;
 
-  // Geo information. These use a subset of the codes used in the AdWords API.
-  // See the geo-table.csv table in the technical documentation for a list of
-  // ids. The geo_criteria_id field replaces the deprecated country, region,
+  // The billing address country of the publisher. This may be different from
+  // the detected country of the user in geo_criteria_id or the hosting country
+  // of the website. For a complete list of country codes, please refer to
+  // https://developers.google.com/adwords/api/docs/appendix/codes-formats#country-codes
+  optional string publisher_country = 55;
+
+  // Location of the end user. Uses a subset of the codes used in the AdWords
+  // API. See the geo-table.csv table in the technical documentation for a list
+  // of ids. The geo_criteria_id field replaces the deprecated country, region,
   // city, and metro fields.
   optional int32 geo_criteria_id = 39;
 
-  // Detected postal code of the appropriate type for the country (e.g. zip code
-  // if the country is "US"). The postal_code_prefix field is set when accuracy
-  // is too low to imply a full code, otherwise the postal_code field is set.
+  // Detected postal code of the appropriate type for the country of the end
+  // user (e.g. zip code if the country is "US"). The postal_code_prefix field
+  // is set when accuracy is too low to imply a full code, otherwise the
+  // postal_code field is set.
   optional string postal_code = 33;
   optional string postal_code_prefix = 34;
 
@@ -875,8 +882,8 @@ message BidRequest {
       optional int64 recommended_fields = 2;
 
       // max_safe_length indicates the maximum number of Unicode characters that
-      // are guaranteed to be shown without truncation. Longer strings may or
-      // may not be truncated by the publisher during rendering.
+      // are guaranteed to be shown without truncation. Longer strings will be
+      // truncated by the publisher during rendering.
       optional int32 headline_max_safe_length = 3;
       optional int32 body_max_safe_length = 4;
       optional int32 call_to_action_max_safe_length = 5;
@@ -884,8 +891,10 @@ message BidRequest {
       optional int32 store_max_safe_length = 14;
       optional int32 price_max_safe_length = 15;
 
-      // Image widths and heights are specified in pixels. You may provide a
-      // larger image in the response.
+      // The width and height from which to calculate the required aspect ratio.
+      // You can provide a larger image in the response. Images that have aspect
+      // ratios substantially different than those implied by the height and
+      // width may be filtered.
       optional int32 image_width = 7;
       optional int32 image_height = 8;
       optional int32 logo_width = 9;

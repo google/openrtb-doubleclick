@@ -62,8 +62,8 @@
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
     <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.2.1</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
-    <slf4jVersion>1.7.21</slf4jVersion>
-    <truthVersion>0.30</truthVersion>
+    <slf4jVersion>1.7.22</slf4jVersion>
+    <truthVersion>0.31</truthVersion>
 
     <!-- Plugin versions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
