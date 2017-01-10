@@ -58,9 +58,9 @@
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>1.2.1</openrtbVersion>
+    <openrtbVersion>1.2.2</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.2.1</openrtbSource>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.2.2</openrtbSource>
     <protobufVersion>2.6.1</protobufVersion>
     <slf4jVersion>1.7.22</slf4jVersion>
     <truthVersion>0.31</truthVersion>
@@ -137,7 +137,7 @@
 
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
+        <version>3.0.0</version>
       </plugin>
 
       <plugin>
