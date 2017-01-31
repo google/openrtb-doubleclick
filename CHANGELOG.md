@@ -1,6 +1,11 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.2.5, ??-02-2017
+* Updated Protocol Buffers to v3.2.0!  You will need to install this
+  exact version of protobuf, have it in the PATH, rebuild everything.
+* DoubleClick proto v.120.
+
 ## Version 1.2.4, 09-01-2017
 * DoubleClick proto v.118.
 

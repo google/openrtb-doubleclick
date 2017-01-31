@@ -1,8 +1,10 @@
+// Protocol version: v.8
+syntax = "proto2";
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
 
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2017 Google Inc. All Rights Reserved.
 
 // Protocol buffer for Ad Exchange OpenRTB specification.
 
