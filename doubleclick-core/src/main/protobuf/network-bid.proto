@@ -1,8 +1,8 @@
+// Protocol version: v.120
+// Copyright 2017 Google Inc. All Rights Reserved.
 syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
-
-// Copyright 2016 Google Inc. All Rights Reserved.
 
 // This is the message that Google uses to request bids. A BidRequest
 // includes the ad slot from a single impression.
@@ -309,8 +309,10 @@ message BidRequest {
 
     // The identifier of the mobile app when this ad query comes from a mobile
     // app. If the app was downloaded from the Apple iTunes app store, then
-    // this is the app-store id. For Android devices, this is the fully
-    // qualified package name. Examples: 343200656, com.rovio.angrybirds
+    // this is the app-store id, e.g., 343200656. For Android devices, this
+    // is the fully qualified package name, e.g., com.rovio.angrybirds.
+    // For Windows devices it's the App ID, e.g.,
+    // f15abcde-f6gh-47i0-j3k8-37l93817mn3o.
     optional string app_id = 6;
 
     // If true, then this is a mobile full screen ad request.
@@ -405,6 +407,12 @@ message BidRequest {
       // able to proceed to the content until the ad has finished or been
       // skipped.
       INTERSTITIAL = 2;
+
+      // The in-feed video format is a video creative that shows when the user
+      // is scrolling through a feed of content, typically a social app feed, a
+      // news article, etc. The video renders in the main feed and in the user’s
+      // vision and reading flow, not to the side as e.g., for in-banner video.
+      IN_FEED = 3;
     }
     optional Placement placement = 16 [default=UNKNOWN_PLACEMENT];
 
@@ -1035,6 +1043,13 @@ message BidRequest {
       AMP_PAGE_LATE_REQUEST = 2;
     }
     optional AmpAdRequestType amp_ad_request_type = 29 [default = NON_AMP_PAGE];
+
+    // Whether the user receives a reward for viewing the ad. For video ads,
+    // typical implementations allow users to read an additional news article
+    // for free, receive an extra life in a game, or get a sponsored ad-free
+    // music session. The reward is typically distributed after the video ad is
+    // completed.
+    optional bool is_rewarded = 32 [default = false];
 
     // Possible ad types that are allowed in the bid response. allowed_ad_types
     // always contains one or more values. Interstitial slots may also support
