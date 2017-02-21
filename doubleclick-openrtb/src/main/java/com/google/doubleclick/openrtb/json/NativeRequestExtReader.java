@@ -49,7 +49,7 @@ class NativeRequestExtReader
         ext.setStyleWidth(par.nextIntValue(0));
         break;
       case "style_layout_type": {
-          LayoutType value = LayoutType.valueOf(par.nextIntValue(0));
+          LayoutType value = LayoutType.forNumber(par.nextIntValue(0));
           if (checkEnum(value)) {
             ext.setStyleLayoutType(value);
           }

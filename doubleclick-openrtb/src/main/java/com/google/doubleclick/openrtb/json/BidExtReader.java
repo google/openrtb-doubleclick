@@ -52,7 +52,7 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
         ext.setBidderName(par.nextTextValue());
         break;
       case "exchange_deal_type": {
-          BidExt.ExchangeDealType value = BidExt.ExchangeDealType.valueOf(par.nextIntValue(0));
+          BidExt.ExchangeDealType value = BidExt.ExchangeDealType.forNumber(par.nextIntValue(0));
           if (checkEnum(value)) {
             ext.setExchangeDealType(value);
           }

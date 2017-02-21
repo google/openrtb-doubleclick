@@ -1,4 +1,4 @@
-// Protocol version: v.120
+// Protocol version: v.122
 // Copyright 2017 Google Inc. All Rights Reserved.
 syntax = "proto2";
 package com.google.protos.adx;
@@ -402,8 +402,8 @@ message BidRequest {
       INSTREAM = 1;
 
       // Interstitial means the video ad plays in front of non-video content,
-      // (e.g. a news article or video game). The ad covers all or nearly all of
-      // the space on the screen occupied by the content and the user is not
+      // (e.g., a news article or video game). The ad covers all or nearly all
+      // of the space on the screen occupied by the content and the user is not
       // able to proceed to the content until the ad has finished or been
       // skipped.
       INTERSTITIAL = 2;
@@ -411,7 +411,8 @@ message BidRequest {
       // The in-feed video format is a video creative that shows when the user
       // is scrolling through a feed of content, typically a social app feed, a
       // news article, etc. The video renders in the main feed and in the user’s
-      // vision and reading flow, not to the side as e.g., for in-banner video.
+      // vision and reading flow. The video does not render to the side like
+      // in-banner video.
       IN_FEED = 3;
     }
     optional Placement placement = 16 [default=UNKNOWN_PLACEMENT];
@@ -770,6 +771,9 @@ message BidRequest {
           UNKNOWN_DEAL_TYPE = 0;
           PREFERRED_DEAL = 1;
           PRIVATE_AUCTION = 2;
+
+          // See https://support.google.com/adxbuyer/answer/7174589
+          PROGRAMMATIC_GUARANTEED = 3;
         }
         optional DealType deal_type = 3 [default = UNKNOWN_DEAL_TYPE];
 
