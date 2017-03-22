@@ -1,4 +1,4 @@
-// Protocol version: v.122
+// Protocol version: v.124
 // Copyright 2017 Google Inc. All Rights Reserved.
 syntax = "proto2";
 package com.google.protos.adx;
@@ -542,14 +542,16 @@ message BidRequest {
     // rendered as an end cap (info card) in the video slot after the video
     // ad finishes playing. If multiple companion ads are returned, IMA SDK
     // chooses one which best matches the device screen size. End cap is
-    // supported only on mobile video interstitial inventory. As of August 2015,
-    // END_CAP_FORBIDDEN and END_CAP_REQUIRED are not supported.
+    // supported only on mobile video interstitial inventory.
     enum EndCapSupport {
       END_CAP_NOT_ENABLED = 0;  // Companion ad won't be rendered as end cap.
       END_CAP_OPTIONAL = 1;     // End cap will be rendered if response contains
                                 // eligible companion banner, but companion
                                 // banner is not required.
+
+      // Not used at this time.
       END_CAP_FORBIDDEN = 2;    // Response with companion ad is filtered.
+      // Not used at this time.
       END_CAP_REQUIRED = 3;     // Response without companion ad is filtered.
     }
     optional EndCapSupport end_cap_support = 13 [default =
@@ -782,6 +784,9 @@ message BidRequest {
         // decisions.
         optional bool publisher_blocks_overridden = 4 [default = false];
 
+        // The number of remaining impressions that you have committed to buy.
+        // This field applies to programmatic guaranteed deals.
+        optional int64 remaining_impressions_to_buy = 6;
       }
       repeated DirectDeal direct_deal = 6;
 

@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.3.2, 22-03-2017
+* DoubleClick proto v.124.
+
 ## Version 1.3.1, 21-02-2017
 * DoubleClick proto v.122.
 
