@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.4.0, ??-04-2017
+* Support for OpenRTB 2.5!
+
 ## Version 1.3.2, 22-03-2017
 * DoubleClick proto v.124.
 
