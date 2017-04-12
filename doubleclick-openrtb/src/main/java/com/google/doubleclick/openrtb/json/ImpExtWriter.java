@@ -16,12 +16,13 @@
 
 package com.google.doubleclick.openrtb.json;
 
-import com.google.doubleclick.AdxExt.ImpExt;
-import com.google.openrtb.json.OpenRtbJsonExtWriter;
-import com.google.openrtb.json.OpenRtbJsonUtils;
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeInts;
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeLongs;
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-
+import com.google.doubleclick.AdxExt.ImpExt;
+import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
 /**
@@ -30,10 +31,9 @@ import java.io.IOException;
 class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
 
   @Override protected void write(ImpExt ext, JsonGenerator gen) throws IOException {
-    OpenRtbJsonUtils.writeLongs("billing_id", ext.getBillingIdList(), gen);
-    OpenRtbJsonUtils.writeLongs(
-        "publisher_settings_list_id", ext.getPublisherSettingsListIdList(), gen);
-    OpenRtbJsonUtils.writeInts("allowed_vendor_type", ext.getAllowedVendorTypeList(), gen);
-    OpenRtbJsonUtils.writeStrings("publisher_parameter", ext.getPublisherParameterList(), gen);
+    writeLongs("billing_id", ext.getBillingIdList(), gen);
+    writeLongs("publisher_settings_list_id", ext.getPublisherSettingsListIdList(), gen);
+    writeInts("allowed_vendor_type", ext.getAllowedVendorTypeList(), gen);
+    writeStrings("publisher_parameter", ext.getPublisherParameterList(), gen);
   }
 }

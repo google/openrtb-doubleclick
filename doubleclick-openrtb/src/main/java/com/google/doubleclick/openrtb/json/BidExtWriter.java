@@ -16,10 +16,11 @@
 
 package com.google.doubleclick.openrtb.json;
 
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
-import com.google.openrtb.json.OpenRtbJsonUtils;
 import java.io.IOException;
 
 /**
@@ -28,8 +29,7 @@ import java.io.IOException;
 class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
 
   @Override protected void write(BidExt ext, JsonGenerator gen) throws IOException {
-    OpenRtbJsonUtils.writeStrings(
-        "impression_tracking_url", ext.getImpressionTrackingUrlList(), gen);
+    writeStrings("impression_tracking_url", ext.getImpressionTrackingUrlList(), gen);
     if (ext.hasAdChoicesDestinationUrl()) {
       gen.writeStringField("ad_choices_destination_url", ext.getAdChoicesDestinationUrl());
     }
