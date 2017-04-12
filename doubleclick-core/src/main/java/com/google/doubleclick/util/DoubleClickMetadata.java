@@ -352,7 +352,8 @@ public class DoubleClickMetadata {
 
       return builder.build();
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
   }
 
@@ -372,7 +373,8 @@ public class DoubleClickMetadata {
 
       return builder.build();
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
   }
 
@@ -392,7 +394,8 @@ public class DoubleClickMetadata {
         return true;
       });
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
     return ImmutableMap.copyOf(map);
   }
@@ -455,7 +458,8 @@ public class DoubleClickMetadata {
 
       return ImmutableMap.copyOf(targetsById);
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
   }
 
@@ -479,7 +483,8 @@ public class DoubleClickMetadata {
         return true;
       });
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
     return map.build();
   }

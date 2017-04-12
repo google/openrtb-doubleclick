@@ -48,8 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public class DoubleClickValidator {
-  private static final Logger logger =
-      LoggerFactory.getLogger(DoubleClickValidator.class);
+  private static final Logger logger = LoggerFactory.getLogger(DoubleClickValidator.class);
   private static final int GDN = 1;
   static final int CREATIVE_FLASH = 34;
   static final int CREATIVE_NON_FLASH = 50;
