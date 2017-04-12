@@ -3,6 +3,8 @@ RELEASE NOTES
 
 ## Version 1.4.0, ??-04-2017
 * Support for OpenRTB 2.5!
+* Extension parser for `billing_id` and `publisher_settings_list_id`
+  fixed to allow quoted values, even when unnecessary (small numbers).
 
 ## Version 1.3.2, 22-03-2017
 * DoubleClick proto v.124.
