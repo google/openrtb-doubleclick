@@ -16,6 +16,8 @@
 
 package com.google.doubleclick.util;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -24,21 +26,15 @@ import com.google.protos.adx.NetworkBid.BidRequest;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot.MatchingAdData.DirectDeal;
 import com.google.protos.adx.NetworkBid.BidResponse;
-
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validates a pair of {@link BidRequest} and its corresponding {@link BidResponse}.
@@ -52,8 +48,7 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class DoubleClickValidator {
-  private static final Logger logger =
-      LoggerFactory.getLogger(DoubleClickValidator.class);
+  private static final Logger logger = LoggerFactory.getLogger(DoubleClickValidator.class);
   private static final int GDN = 1;
   static final int CREATIVE_FLASH = 34;
   static final int CREATIVE_NON_FLASH = 50;
@@ -101,13 +96,13 @@ public class DoubleClickValidator {
         unknownAttrTotal);
   }
 
-  public boolean validate(final BidRequest request, final BidResponse.Builder response) {
+  public boolean validate(BidRequest request, BidResponse.Builder response) {
     boolean hasBad = false;
     boolean hasEmpty = false;
     List<BidResponse.Ad.Builder> ads = response.getAdBuilderList();
 
     for (int iAd = 0; iAd < ads.size(); ++iAd) {
-      final BidResponse.Ad.Builder ad = ads.get(iAd);
+      BidResponse.Ad.Builder ad = ads.get(iAd);
       List<BidResponse.Ad.AdSlot.Builder> adslots = ad.getAdslotBuilderList();
 
       if (adslots.isEmpty()) {

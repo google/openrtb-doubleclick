@@ -23,10 +23,6 @@ import com.google.common.collect.Interners;
 import com.google.common.collect.Lists;
 import com.google.doubleclick.util.GeoTarget.Type;
 import com.google.doubleclick.util.impl.CSVParser;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +37,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DoubleClickMetadata for DoubleClick Ad Exchange dictionaries. Helps code that need to
@@ -128,9 +125,7 @@ public class DoubleClickMetadata {
       byKey.put(target.key(), target);
     }
     geoTargetsByCanonicalKey = ImmutableMap.copyOf(byKey);
-    dmaRegions = loadCitiesDMARegions(interner, transport, transport instanceof ResourceTransport
-        ? ADX_DICT + "cities-dma-regions.csv"
-        : "http://goo.gl/9ENFV7");
+    dmaRegions = loadCitiesDMARegions(interner, ADX_DICT + "cities-dma-regions.csv");
     countryCodes = loadCountryCodes(interner, ADX_DICT + "countries.txt");
   }
 
@@ -357,15 +352,16 @@ public class DoubleClickMetadata {
 
       return builder.build();
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
   }
 
   private static ImmutableMap<Integer, String> load(
-      final Interner<String> interner, Transport transport, CSVParser csvParser, Pattern pattern,
+      Interner<String> interner, Transport transport, CSVParser csvParser, Pattern pattern,
       String resourceName) {
     try (InputStream is = transport.open(resourceName)) {
-      final ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
+      ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
       csvParser.parse(is, pattern, fields -> {
         try {
           builder.put(Integer.parseInt(fields.get(0)), interner.intern(fields.get(1)));
@@ -377,14 +373,15 @@ public class DoubleClickMetadata {
 
       return builder.build();
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
   }
 
   private static ImmutableMap<CityDMARegionKey, CityDMARegionValue> loadCitiesDMARegions(
-      final Interner<String> interner, Transport transport, String resourceName) {
-    final Map<CityDMARegionKey, CityDMARegionValue> map = new LinkedHashMap<>();
-    try (InputStream is = transport.open(resourceName)) {
+      Interner<String> interner, String resourceName) {
+    Map<CityDMARegionKey, CityDMARegionValue> map = new LinkedHashMap<>();
+    try (InputStream is = new ResourceTransport().open(resourceName)) {
       CSVParser.csvParser().parse(is, ".*,(\\d+),.*,.*,(\\d+)", fields -> {
         map.put(
             new CityDMARegionKey(
@@ -397,17 +394,18 @@ public class DoubleClickMetadata {
         return true;
       });
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
     return ImmutableMap.copyOf(map);
   }
 
   private static ImmutableMap<Integer, GeoTarget> loadGeoTargets(
-      final Interner<String> interner, Transport transport, String resourceName) {
-    final Map<Integer, GeoTarget> targetsById = new LinkedHashMap<>();
-    final Map<Integer, List<Integer>> parentIdsById = new LinkedHashMap<>();
-    final Map<String, GeoTarget> targetsByCanon = new LinkedHashMap<>();
-    final Set<String> duplicateCanon = new LinkedHashSet<>();
+      Interner<String> interner, Transport transport, String resourceName) {
+    Map<Integer, GeoTarget> targetsById = new LinkedHashMap<>();
+    Map<Integer, List<Integer>> parentIdsById = new LinkedHashMap<>();
+    Map<String, GeoTarget> targetsByCanon = new LinkedHashMap<>();
+    Set<String> duplicateCanon = new LinkedHashSet<>();
 
     try (InputStream is = transport.open(resourceName)) {
       CSVParser.csvParser().parse(is, "(\\d+),(.*)", fields -> {
@@ -460,13 +458,14 @@ public class DoubleClickMetadata {
 
       return ImmutableMap.copyOf(targetsById);
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
   }
 
   private ImmutableMap<Object, CountryCodes> loadCountryCodes(
-      final Interner<String> interner, String resourceName) {
-    final ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
+      Interner<String> interner, String resourceName) {
+    ImmutableMap.Builder<Object, CountryCodes> map = ImmutableMap.builder();
 
     try (InputStream is = new ResourceTransport().open(resourceName)) {
       CSVParser.tsvParser().parse(is, "(\\d+)\\s+(.*)", fields -> {
@@ -484,7 +483,8 @@ public class DoubleClickMetadata {
         return true;
       });
     } catch (IOException e) {
-      throw new ExceptionInInitializerError(e);
+      logger.warn(e.toString());
+      return ImmutableMap.of();
     }
     return map.build();
   }

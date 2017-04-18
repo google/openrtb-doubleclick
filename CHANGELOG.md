@@ -3,6 +3,14 @@ RELEASE NOTES
 
 ## Version 1.4.0, ??-04-2017
 * Support for OpenRTB 2.5!
+* Extension parser for `billing_id` and `publisher_settings_list_id`
+  fixed to allow quoted values, even when unnecessary (small numbers).
+* `DoubleclickMetadata` now reads *cities-dma-regions.csv* only from a
+  local resource, because Ad Exchange doesn't redistribute this file
+  anymore (if you need a recent copy, you must get that from Nielsen).
+* `DoubleclickMetadata` is more lenient: if it fails to load some
+  resource file, it will just log that (and provide no data in the
+  respective getters) but proceed with initialization.
 
 ## Version 1.3.2, 22-03-2017
 * DoubleClick proto v.124.

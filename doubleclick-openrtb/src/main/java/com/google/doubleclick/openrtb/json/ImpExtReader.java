@@ -20,13 +20,11 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.endArray;
 import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
 import static com.google.openrtb.json.OpenRtbJsonUtils.startArray;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
-
-import com.fasterxml.jackson.core.JsonParser;
-
 import java.io.IOException;
 
 /**
@@ -43,13 +41,13 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
     switch (getCurrentName(par)) {
       case "billing_id":
         for (startArray(par); endArray(par); par.nextToken()) {
-          ext.addBillingId(par.getLongValue());
+          ext.addBillingId(par.getValueAsLong());
         }
         break;
 
       case "publisher_settings_list_id":
         for (startArray(par); endArray(par); par.nextToken()) {
-          ext.addPublisherSettingsListId(par.getLongValue());
+          ext.addPublisherSettingsListId(par.getValueAsLong());
         }
         break;
 
