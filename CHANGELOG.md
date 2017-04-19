@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.4.0, ??-04-2017
+## Version 1.4.0, 18-04-2017
 * Support for OpenRTB 2.5!
 * Extension parser for `billing_id` and `publisher_settings_list_id`
   fixed to allow quoted values, even when unnecessary (small numbers).
