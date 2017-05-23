@@ -49,6 +49,7 @@ public class AdxExtJsonTest {
                 .addAllPublisherSettingsListId(asList(200L, 201L, 8888888888888888888L))
                 .addAllAllowedVendorType(asList(300, 301, 302))
                 .addAllPublisherParameter(asList("a", "b", "c"))
+                .setDfpAdUnitCode("abc")
                 .build()))
         .build());
   }

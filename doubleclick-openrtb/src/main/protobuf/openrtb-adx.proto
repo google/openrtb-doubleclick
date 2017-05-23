@@ -1,4 +1,4 @@
-// Protocol version: v.8
+// Protocol version: v.20
 syntax = "proto2";
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
@@ -22,9 +22,6 @@ message ImpExt {
 
   // [AdX: BidRequest.AdSlot.ExchangeBidding.publisher_parameter]
   repeated string publisher_parameter = 4;
-
-  // [AdX: BidRequest.AdSlot.ExchangeBidding.dfp_network_code]
-  optional int64 dfp_network_code = 5;
 
   // [AdX: BidRequest.AdSlot.dfp_ad_unit_code]
   optional string dfp_ad_unit_code = 6;

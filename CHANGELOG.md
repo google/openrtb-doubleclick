@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.4.1, 23-05-2017
+- Removed obsolete extension `dfp_network_code`.
+- Now using Protobuf 3.3.1.
+
 ## Version 1.4.0, 18-04-2017
 * Support for OpenRTB 2.5!
 * Extension parser for `billing_id` and `publisher_settings_list_id`
