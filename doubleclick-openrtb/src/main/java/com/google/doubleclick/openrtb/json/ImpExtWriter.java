@@ -35,5 +35,8 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
     writeLongs("publisher_settings_list_id", ext.getPublisherSettingsListIdList(), gen);
     writeInts("allowed_vendor_type", ext.getAllowedVendorTypeList(), gen);
     writeStrings("publisher_parameter", ext.getPublisherParameterList(), gen);
+    if (ext.hasDfpAdUnitCode()) {
+      gen.writeStringField("dfp_ad_unit_code", ext.getDfpAdUnitCode());
+    }
   }
 }

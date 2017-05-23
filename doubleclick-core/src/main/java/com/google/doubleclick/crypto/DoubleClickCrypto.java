@@ -194,7 +194,6 @@ public class DoubleClickCrypto {
    * @return initialization vector
    * @see #createInitVector(long, long)
    */
-  @SuppressWarnings("deprecation")
   public byte[] createInitVector(@Nullable Date timestamp, long serverId) {
     return createInitVector(
         timestamp == null ? 0L : millisToSecsAndMicros(timestamp.getTime()),

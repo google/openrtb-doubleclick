@@ -62,6 +62,10 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
           ext.addPublisherParameter(par.getText());
         }
         break;
+        
+      case "dfp_ad_unit_code":
+        ext.setDfpAdUnitCode(par.nextTextValue());
+        break;
     }
   }
 }
