@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.4.2, 06-06-2017
+* DoubleClick proto v.127.
+* DoubleClick OpenRTB extensions proto v.20.
+
 ## Version 1.4.1, 23-05-2017
 - Removed obsolete extension `dfp_network_code`.
 - Now using Protobuf 3.3.1.

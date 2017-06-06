@@ -61,6 +61,12 @@ message BidExt {
     PREFERRED_DEAL = 2;
   }
   optional ExchangeDealType exchange_deal_type = 4 [default = OPEN_AUCTION];
+
+  // [AdX: BidResponse.Ad.attribute]
+  // See buyer-declarable-creative-attributes.txt in the technical documentation
+  // for a list of ids. Note that not all declarable attributes come through in
+  // the BidRequest in the various `battr` fields.
+  repeated int32 attribute = 5 [packed = true];
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
@@ -90,3 +96,16 @@ extend com.google.openrtb.NativeRequest {
   // Extension key for the AdX Native.ext.
   optional NativeRequestExt native_ext =  1001;
 }
+
+message PublisherExt {
+  // The billing address country code of the publisher. This may be different
+  // from the hosting country of the website. For a complete list of country
+  // codes, please refer to
+  // https://developers.google.com/adwords/api/docs/appendix/codes-formats#country-codes
+  optional string country = 1;
+};
+
+extend com.google.openrtb.BidRequest.Publisher {
+  // Extension key for the AdX Publisher.ext
+  optional PublisherExt publisher = 1002;
+};
