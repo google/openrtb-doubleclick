@@ -1,4 +1,4 @@
-// Protocol version: v.124
+// Protocol version: v.127
 // Copyright 2017 Google Inc. All Rights Reserved.
 syntax = "proto2";
 package com.google.protos.adx;
@@ -490,6 +490,7 @@ message BidRequest {
 
     // Supported video protocols.
     enum VideoProtocol {
+      UNKNOWN_VIDEO_PROTOCOL = 0;
       VAST_1_0 = 1;
       VAST_2_0 = 2;
       VAST_3_0 = 3;
@@ -507,6 +508,7 @@ message BidRequest {
     // The video file formats that are allowed for this request. The response
     // should support at least one of them.
     enum VideoFormat {
+      UNKNOWN_VIDEO_FORMAT = -1;
       VIDEO_FLV = 0;    // Flash video files are accepted (FLV).
       VIDEO_MP4 = 1;
       YT_HOSTED = 2;    // Valid VAST ads with at least one media file hosted
@@ -530,6 +532,7 @@ message BidRequest {
       // These are the formats of the creatives allowed in this companion ad
       // slot.
       enum CreativeFormat {
+        UNKNOWN_CREATIVE_FORMAT = -1;
         IMAGE_CREATIVE = 0;
         FLASH_CREATIVE = 1;
         HTML_CREATIVE  = 2;
@@ -875,6 +878,7 @@ message BidRequest {
       // Defines the bits used in required_fields and recommended_fields. There
       // is one bit for each of the fields in BidResponse.Ad.NativeAd
       enum Fields {
+        NO_FIELDS = 0x0;
         HEADLINE = 0x1;
         BODY = 0x2;
         CALL_TO_ACTION = 0x4;
@@ -899,8 +903,9 @@ message BidRequest {
       optional int64 recommended_fields = 2;
 
       // max_safe_length indicates the maximum number of Unicode characters that
-      // are guaranteed to be shown without truncation. Longer strings will be
-      // truncated by the publisher during rendering.
+      // are guaranteed to be shown without truncation. Longer strings may be
+      // truncated and ellipsized by Ad Exchange or the publisher during
+      // rendering.
       optional int32 headline_max_safe_length = 3;
       optional int32 body_max_safe_length = 4;
       optional int32 call_to_action_max_safe_length = 5;
@@ -1067,6 +1072,7 @@ message BidRequest {
     // Likewise, an ad slot without ALLOWED_AD_TYPE_NATIVE does not support
     // native video, regardless of whether ALLOWED_AD_TYPE_VIDEO is set.
     enum AllowedAdType {
+      UNKNOWN_ALLOWED_AD_TYPE = -1;
       ALLOWED_AD_TYPE_BANNER = 0;
       ALLOWED_AD_TYPE_NATIVE = 1;
       ALLOWED_AD_TYPE_VIDEO = 2;
@@ -1232,18 +1238,23 @@ message BidResponse {
     };
     optional NativeAd native_ad = 18;
 
-    // The set of destination URLs for the snippet. This includes
-    // the URLs that the user will go to if they click on the displayed
-    // ad, and any URLs that are visible in the rendered ad. Do not
-    // include intermediate calls to the adserver that are unrelated to the
-    // final landing page. This data is used for post-filtering of
-    // publisher-blocked URLs among other things. A BidResponse that returns a
-    // snippet or video ad but declares no click_through_url will be discarded.
-    // For native ads, only the first value is used as the click URL, though
-    // all values are subject to categorization and review. Only set this
-    // field if html_snippet or video_url or native_ad are set. For native ads,
-    // if NativeAd.click_link_url is not set, the first value of
-    // click_through_url is used to direct the user to the landing page.
+    // The set of destination URLs for the snippet. This includes the URLs that
+    // the user will go to if they click on the displayed ad, and any URLs that
+    // are visible in the rendered ad. Do not include intermediate calls to the
+    // adserver that are unrelated to the inal landing page. A BidResponse that
+    // returns a snippet or video ad but declares no click_through_url will be
+    // discarded. Only set this field if html_snippet or video_url or native_ad
+    // are set. This data is used as a destination URL declaration, for example
+    // for post-filtering of publisher-blocked URLs or ad categorization.
+    //
+    // For non-native ads, it is not used for click tracking or any
+    // other ad functionality; it is only used as a destination URL
+    // declaration.
+    //
+    // For native ads, if NativeAd.click_link_url is not set, the first
+    // value of click_through_url is used to direct the user to the landing
+    // page. In addition, all values are used as destination
+    // URL declarations (similar to the non-native case).
     repeated string click_through_url = 4;
 
     // All vendor types for the ads that may be shown from this snippet. You
