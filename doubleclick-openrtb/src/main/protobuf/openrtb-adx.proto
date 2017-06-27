@@ -1,4 +1,4 @@
-// Protocol version: v.20
+// Protocol version: v.21
 syntax = "proto2";
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
@@ -25,6 +25,9 @@ message ImpExt {
 
   // [AdX: BidRequest.AdSlot.dfp_ad_unit_code]
   optional string dfp_ad_unit_code = 6;
+
+  // [AdX: BidRequest.AdSlot.is_rewarded]
+  optional bool is_rewarded_inventory = 7;
 }
 
 extend com.google.openrtb.BidRequest.Imp {
