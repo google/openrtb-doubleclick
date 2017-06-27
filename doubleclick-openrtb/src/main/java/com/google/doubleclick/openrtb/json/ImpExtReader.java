@@ -34,7 +34,8 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
 
   public ImpExtReader() {
     super(AdxExt.imp, false,
-        "billing_id", "publisher_settings_list_id", "allowed_vendor_type", "publisher_parameter");
+        "billing_id", "publisher_settings_list_id", "allowed_vendor_type",
+        "publisher_parameter", "dfp_ad_unit_code", "is_rewarded_inventory");
   }
 
   @Override protected void read(ImpExt.Builder ext, JsonParser par) throws IOException {
@@ -66,6 +67,10 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
       case "dfp_ad_unit_code":
         ext.setDfpAdUnitCode(par.nextTextValue());
         break;
+        
+      case "is_rewarded_inventory":
+        par.nextToken();
+        ext.setIsRewardedInventory(par.getValueAsBoolean());
     }
   }
 }

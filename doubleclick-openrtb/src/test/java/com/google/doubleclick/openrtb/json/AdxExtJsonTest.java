@@ -50,6 +50,7 @@ public class AdxExtJsonTest {
                 .addAllAllowedVendorType(asList(300, 301, 302))
                 .addAllPublisherParameter(asList("a", "b", "c"))
                 .setDfpAdUnitCode("abc")
+                .setIsRewardedInventory(true)
                 .build()))
         .build());
   }
