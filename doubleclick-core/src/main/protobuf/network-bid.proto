@@ -1,4 +1,4 @@
-// Protocol version: v.127
+// Protocol version: v.128
 // Copyright 2017 Google Inc. All Rights Reserved.
 syntax = "proto2";
 package com.google.protos.adx;
@@ -169,10 +169,17 @@ message BidRequest {
   // This section lists information that we know about the web page or mobile
   // application where the impression originates.
 
+  // The publisher ID as defined by the publisher code suffix of
+  // the web property code. For instance, "pub-123" is the publisher code of web
+  // property code "ca-pub-123" (ca- is the product specific prefix of the web
+  // property).
+  optional string publisher_id = 56;
+
   // The seller network id. See seller-network-ids.txt file in the technical
   // documentation for a list of ids. This is only set if the site is not
   // anonymous and the publisher allows site targeting.
   optional int32 seller_network_id = 41;
+
   // Id for the partner that provides this inventory. This is only set when
   // seller_network_id is also set and further partner information beyond the
   // seller_network_id is also available. The value of the partner_id is not
@@ -1139,7 +1146,6 @@ message BidRequest {
 //
 message BidResponse {
   message Ad {
-
     // A unique identifier chosen by you for the creative in this response.
     // This must always be set, must be limited to at most 64 bytes, and must be
     // a valid UTF8 string. Every buyer_creative_id you use must always be
