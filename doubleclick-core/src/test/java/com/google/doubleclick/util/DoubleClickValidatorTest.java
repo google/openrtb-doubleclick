@@ -54,7 +54,7 @@ public class DoubleClickValidatorTest {
       .build();
 
   private MetricRegistry metricRegistry;
-  private DoubleClickMetadata metadata = new DoubleClickMetadata(
+  private final DoubleClickMetadata metadata = new DoubleClickMetadata(
       new DoubleClickMetadata.ResourceTransport());
   private DoubleClickValidator validator;
 

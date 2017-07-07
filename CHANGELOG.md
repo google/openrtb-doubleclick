@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.4.4, 07-07-2017
+* DoubleClick proto v.128.
+
 ## Version 1.4.3, 27-06-2017
 * DoubleClick OpenRTB extensions proto v.21.
 
