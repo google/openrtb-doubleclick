@@ -154,7 +154,7 @@
                 <id>compile-protoc</id>
                 <phase>generate-sources</phase>
                 <configuration>
-                  <tasks>
+                  <target>
                     <mkdir dir="${protobufGenerated}" />
                     <path id="proto.path">
                       <fileset dir="${protobufSource}">
@@ -167,7 +167,7 @@
                       <arg value="-I${protobufSource}" />
                       <arg line="${proto.files}" />
                     </exec>
-                  </tasks>
+                  </target>
                 </configuration>
                 <goals>
                   <goal>run</goal>

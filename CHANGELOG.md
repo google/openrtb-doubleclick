@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.4.5, 07-08-2017
+* [DoubleClick proto v.129](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v129)
+
 ## Version 1.4.4, 07-07-2017
 * DoubleClick proto v.128.
 
@@ -100,7 +103,6 @@ RELEASE NOTES
 * New AdX/OpenRTB extensions: `ImpExt.allowed_vendor_type`,
   `BidExt.ad_choices_destination_url`.
 * DoubleClick protocol v.84: Adds `Ad.ad_choices_destination_url`.
-  https://developers.google.com/ad-exchange/rtb/relnotes#may-13-2016
 * Reintroduced JDK 7 support in the "compat" branch.
 
 ## Version 1.0.3, 07-03-2016
