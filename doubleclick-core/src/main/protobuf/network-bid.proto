@@ -1,4 +1,4 @@
-// Protocol version: v.129
+// Protocol version: v.131
 // Copyright 2017 Google Inc. All Rights Reserved.
 syntax = "proto2";
 package com.google.protos.adx;
@@ -421,6 +421,10 @@ message BidRequest {
       // vision and reading flow. The video does not render to the side like
       // in-banner video.
       IN_FEED = 3;
+
+      // Audio is a request for an ad that is an audio stream.  It is distinct
+      // from INSTREAM above as that is exclusive to video requests.
+      AUDIO = 4;
     }
     optional Placement placement = 16 [default=UNKNOWN_PLACEMENT];
 
@@ -522,6 +526,16 @@ message BidRequest {
                         // on youtube.com.
       VPAID_FLASH = 3;  // Flash VPAID (SWF).
       VPAID_JS = 4;     // JavaScript VPAID.
+      VIDEO_WEBM = 8;
+      VIDEO_MOV = 9;
+      VIDEO_3GPP = 10;
+      VIDEO_HLS = 11;
+      VIDEO_DASH = 12;
+      AUDIO_MP3 = 5;
+      AUDIO_OGG = 6;
+      AUDIO_MP3_OGG = 7;  // Requires both MP3 & OGG as Google dosent know which
+                          // codecs are installed on the player
+      AUDIO_MP4A = 13;    // Audio version of MP4.
     };
     repeated VideoFormat allowed_video_formats = 6;
 
@@ -1086,6 +1100,7 @@ message BidRequest {
       ALLOWED_AD_TYPE_BANNER = 0;
       ALLOWED_AD_TYPE_NATIVE = 1;
       ALLOWED_AD_TYPE_VIDEO = 2;
+      ALLOWED_AD_TYPE_AUDIO = 3;
     }
     repeated AllowedAdType allowed_ad_types = 36 [packed = true];
   }
