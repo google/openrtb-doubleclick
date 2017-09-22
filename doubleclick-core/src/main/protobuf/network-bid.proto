@@ -1,4 +1,4 @@
-// Protocol version: v.131
+// Protocol version: v.134
 // Copyright 2017 Google Inc. All Rights Reserved.
 syntax = "proto2";
 package com.google.protos.adx;
@@ -309,17 +309,19 @@ message BidRequest {
   // either a smartphone or a tablet. This is present for ad queries both from
   // mobile devices browsing the web and from mobile apps.
   message Mobile {
-    // If true, then this request is from a mobile application. Will always be
-    // true when app_id is set. May also be true for anonymous inventory, in
-    // which case anonymous_id will be set.
+    // If true, then this request is from a mobile application. For branded
+    // requests, app_id will also be filled in. If the request is from a mobile
+    // web page contained inside an app, is_app will still be false, but app_id
+    // could be filled in with the app identifier. is_app may also be true for
+    // anonymous inventory, in which case anonymous_id will be set.
     optional bool is_app = 7 [default = false];
 
     // The identifier of the mobile app when this ad query comes from a mobile
-    // app. If the app was downloaded from the Apple iTunes app store, then
-    // this is the app-store id, e.g., 343200656. For Android devices, this
-    // is the fully qualified package name, e.g., com.rovio.angrybirds.
-    // For Windows devices it's the App ID, e.g.,
-    // f15abcde-f6gh-47i0-j3k8-37l93817mn3o.
+    // app, or from a mobile web page contained inside an app. If the app was
+    // downloaded from the Apple iTunes app store, then this is the app-store
+    // id, e.g., 343200656. For Android devices, this is the fully qualified
+    // package name, e.g., com.rovio.angrybirds. For Windows devices it's the
+    // App ID, e.g., f15abcde-f6gh-47i0-j3k8-37l93817mn3o.
     optional string app_id = 6;
 
     // If true, then this is a mobile full screen ad request.
@@ -415,16 +417,19 @@ message BidRequest {
       // skipped.
       INTERSTITIAL = 2;
 
-      // The in-feed video format is a video creative that shows when the user
-      // is scrolling through a feed of content, typically a social app feed, a
-      // news article, etc. The video renders in the main feed and in the user’s
-      // vision and reading flow. The video does not render to the side like
-      // in-banner video.
+      // The in-feed video format is a video creative that shows within a feed
+      // of content, typically a social app feed, a list of editorial content
+      // items, etc, as the user is scrolling. It renders centered and not to
+      // the side.
       IN_FEED = 3;
 
       // Audio is a request for an ad that is an audio stream.  It is distinct
       // from INSTREAM above as that is exclusive to video requests.
       AUDIO = 4;
+
+      // The in-article video format is a video creative that loads and plays
+      // between paragraphs of editorial content as a standalone video player.
+      IN_ARTICLE = 5;
     }
     optional Placement placement = 16 [default=UNKNOWN_PLACEMENT];
 
@@ -1132,6 +1137,9 @@ message BidRequest {
     optional int64 cpm_micros = 4;
   }
   repeated BidResponseFeedback bid_response_feedback = 44;
+
+  // How many milliseconds Google will wait for a response before ignoring it.
+  optional int32 response_deadline_ms = 57;
 
   // -----------------------------------------------------------
   // Testing flags.
