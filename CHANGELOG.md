@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.5.0, ??-11-2017
+* DoubleClick OpenRTB extensions proto v.23.
+* AdX/OpenRTB support for OpenRTB Native 1.2.
+
 ## Version 1.4.7, 22-09-2017
 * [DoubleClick proto v.134](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v134)
 
