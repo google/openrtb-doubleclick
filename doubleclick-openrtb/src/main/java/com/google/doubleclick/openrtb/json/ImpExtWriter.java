@@ -16,6 +16,8 @@
 
 package com.google.doubleclick.openrtb.json;
 
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeEnumField;
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeIntBoolField;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeInts;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeLongs;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
@@ -23,7 +25,6 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
-import com.google.openrtb.json.OpenRtbJsonUtils;
 import java.io.IOException;
 
 /**
@@ -40,8 +41,10 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
       gen.writeStringField("dfp_ad_unit_code", ext.getDfpAdUnitCode());
     }
     if (ext.hasIsRewardedInventory()) {
-      OpenRtbJsonUtils.writeIntBoolField(
-          "is_rewarded_inventory", ext.getIsRewardedInventory(), gen);
+      writeIntBoolField("is_rewarded_inventory", ext.getIsRewardedInventory(), gen);
+    }
+    if (ext.hasAmpad()) {
+      writeEnumField("ampad", ext.getAmpad(), gen);
     }
   }
 }

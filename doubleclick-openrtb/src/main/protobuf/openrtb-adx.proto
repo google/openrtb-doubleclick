@@ -1,5 +1,4 @@
-// Protocol version: v.21
-syntax = "proto2";
+// Protocol version: v.22
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -28,6 +27,26 @@ message ImpExt {
 
   // [AdX: BidRequest.AdSlot.is_rewarded]
   optional bool is_rewarded_inventory = 7;
+
+  // Possible requirement types for AMP ads.
+  enum AmpAdRequirementType {
+    // AMP ad requirements unknown.
+    UNKNOWN_AMP_AD_REQUIREMENT_TYPE = 1;
+    // AMP ads are not allowed.
+    AMP_AD_NOT_ALLOWED = 2;
+    // Either AMP ads or non-AMP ads are allowed;
+    // AMP ads are not early rendered.
+    AMP_AD_ALLOWED_AND_NOT_EARLY_RENDERED = 3;
+    // Either AMP ads or non-AMP ads are allowed;
+    // AMP ads are early rendered.
+    AMP_AD_ALLOWED_AND_EARLY_RENDERED = 4;
+    // AMP ads are required.
+    // Ads that are non-AMP may be rejected by the publisher.
+    AMP_AD_REQUIRED = 5;
+    // Exchange-specific values above 500.
+  }
+  optional AmpAdRequirementType ampad = 8
+    [default = UNKNOWN_AMP_AD_REQUIREMENT_TYPE];
 }
 
 extend com.google.openrtb.BidRequest.Imp {
@@ -111,4 +130,21 @@ message PublisherExt {
 extend com.google.openrtb.BidRequest.Publisher {
   // Extension key for the AdX Publisher.ext
   optional PublisherExt publisher = 1002;
+};
+
+message SiteExt {
+  enum AmpPage {
+    // This is not an AMP page.
+    DIALECT_HTML = 0;
+    // This is an Amp page.
+    DIALECT_HTML_AMP = 1;
+  }
+  // Whether this is an AMP page or not. Omitted if unknown.
+  optional AmpPage amp = 1;
+}
+
+extend com.google.openrtb.BidRequest.Site {
+  // Extension key for the Adx Site.ext
+  // Should match with the Adx ext in contentads/bidder/proto/openrtb/site.proto
+  optional SiteExt site = 1010;
 };

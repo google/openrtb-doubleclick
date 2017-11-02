@@ -8,12 +8,15 @@ import com.google.doubleclick.AdxExt.BidExt;
 import com.google.doubleclick.AdxExt.BidExt.ExchangeDealType;
 import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.doubleclick.AdxExt.ImpExt;
+import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.doubleclick.AdxExt.NativeRequestExt;
 import com.google.doubleclick.AdxExt.NativeRequestExt.LayoutType;
+import com.google.doubleclick.AdxExt.SiteExt;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Native;
+import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
@@ -51,6 +54,12 @@ public class AdxExtJsonTest {
                 .addAllPublisherParameter(asList("a", "b", "c"))
                 .setDfpAdUnitCode("abc")
                 .setIsRewardedInventory(true)
+                .setAmpad(AmpAdRequirementType.AMP_AD_REQUIRED)
+                .build()))
+        .setSite(Site.newBuilder()
+            .setDomain("mysite.com")
+            .setExtension(AdxExt.site, SiteExt.newBuilder()
+                .setAmp(SiteExt.AmpPage.DIALECT_HTML_AMP)
                 .build()))
         .build());
   }

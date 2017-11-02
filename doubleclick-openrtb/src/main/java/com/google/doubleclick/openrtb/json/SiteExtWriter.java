@@ -19,27 +19,18 @@ package com.google.doubleclick.openrtb.json;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeEnumField;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.google.doubleclick.AdxExt.NativeRequestExt;
+import com.google.doubleclick.AdxExt.SiteExt;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
 /**
- * Writer for {@link NativeRequestExt}.
+ * Writer for {@link SiteExt}.
  */
-class NativeRequestExtWriter extends OpenRtbJsonExtWriter<NativeRequestExt> {
+class SiteExtWriter extends OpenRtbJsonExtWriter<SiteExt> {
 
-  @Override protected void write(NativeRequestExt ext, JsonGenerator gen) throws IOException {
-    if (ext.hasStyleId()) {
-      gen.writeNumberField("style_id", ext.getStyleId());
-    }
-    if (ext.hasStyleHeight()) {
-      gen.writeNumberField("style_height", ext.getStyleHeight());
-    }
-    if (ext.hasStyleWidth()) {
-      gen.writeNumberField("style_width", ext.getStyleWidth());
-    }
-    if (ext.hasStyleLayoutType()) {
-      writeEnumField("style_layout_type", ext.getStyleLayoutType(), gen);
+  @Override protected void write(SiteExt ext, JsonGenerator gen) throws IOException {
+    if (ext.hasAmp()) {
+      writeEnumField("amp", ext.getAmp(), gen);
     }
   }
 }
