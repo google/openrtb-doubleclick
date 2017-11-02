@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +20,28 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.google.doubleclick.AdxExt;
-import com.google.doubleclick.AdxExt.BidResponseExt;
-import com.google.openrtb.OpenRtb.BidResponse;
+import com.google.doubleclick.AdxExt.SiteExt;
+import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
 import java.io.IOException;
 
 /**
- * Reader for {@link BidResponseExt}.
+ * Reader for {@link SiteExt}.
  */
-class BidResponseExtReader
-extends OpenRtbJsonExtComplexReader<BidResponse.Builder, BidResponseExt.Builder> {
+class SiteExtReader extends OpenRtbJsonExtComplexReader<Site.Builder, SiteExt.Builder> {
 
-  public BidResponseExtReader() {
-    super(AdxExt.bidResponse, false, "processing_time_ms");
+  public SiteExtReader() {
+    super(AdxExt.site, false, "amp");
   }
 
-  @Override protected void read(BidResponseExt.Builder ext, JsonParser par) throws IOException {
+  @Override protected void read(SiteExt.Builder ext, JsonParser par) throws IOException {
     switch (getCurrentName(par)) {
-      case "processing_time_ms":
-        ext.setProcessingTimeMs(par.nextIntValue(0));
+      case "amp": {
+          SiteExt.AmpPage value = SiteExt.AmpPage.forNumber(par.nextIntValue(0));
+          if (checkEnum(value)) {
+            ext.setAmp(value);
+          }
+        }
         break;
     }
   }

@@ -16,6 +16,7 @@
 
 package com.google.doubleclick.openrtb.json;
 
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeEnumField;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -37,7 +38,7 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
       gen.writeStringField("bidder_name", ext.getBidderName());
     }
     if (ext.hasExchangeDealType()) {
-      gen.writeNumberField("exchange_deal_type", ext.getExchangeDealType().getNumber());
+      writeEnumField("exchange_deal_type", ext.getExchangeDealType(), gen);
     }
   }
 }

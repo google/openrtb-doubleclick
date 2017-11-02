@@ -23,6 +23,7 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.startArray;
 import com.fasterxml.jackson.core.JsonParser;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.ImpExt;
+import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
 import java.io.IOException;
@@ -35,7 +36,7 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
   public ImpExtReader() {
     super(AdxExt.imp, false,
         "billing_id", "publisher_settings_list_id", "allowed_vendor_type",
-        "publisher_parameter", "dfp_ad_unit_code", "is_rewarded_inventory");
+        "publisher_parameter", "dfp_ad_unit_code", "is_rewarded_inventory", "ampad");
   }
 
   @Override protected void read(ImpExt.Builder ext, JsonParser par) throws IOException {
@@ -45,32 +46,35 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
           ext.addBillingId(par.getValueAsLong());
         }
         break;
-
       case "publisher_settings_list_id":
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addPublisherSettingsListId(par.getValueAsLong());
         }
         break;
-
       case "allowed_vendor_type":
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addAllowedVendorType(par.getIntValue());
         }
         break;
-
       case "publisher_parameter":
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addPublisherParameter(par.getText());
         }
         break;
-        
       case "dfp_ad_unit_code":
         ext.setDfpAdUnitCode(par.nextTextValue());
         break;
-        
       case "is_rewarded_inventory":
         par.nextToken();
         ext.setIsRewardedInventory(par.getValueAsBoolean());
+        break;
+      case "ampad": {
+          AmpAdRequirementType value = AmpAdRequirementType.forNumber(par.nextIntValue(0));
+          if (checkEnum(value)) {
+            ext.setAmpad(value);
+          }
+        }
+        break;
     }
   }
 }
