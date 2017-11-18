@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.5.1, ??-11-2017
+- Now using Protobuf 3.5.0.
+
 ## Version 1.5.0, 01-11-2017
 * DoubleClick OpenRTB extensions proto v.23.
 * AdX/OpenRTB support for OpenRTB Native 1.2.
