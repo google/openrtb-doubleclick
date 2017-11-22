@@ -78,6 +78,7 @@ public class AdxExtJsonTest {
                     .setAdChoicesDestinationUrl("http://adchoices.com")
                     .setBidderName("x")
                     .setExchangeDealType(ExchangeDealType.OPEN_AUCTION)
+                    .addAllAttribute(asList(11, 22, 33))
                     .build())))
         .setExtension(AdxExt.bidResponse,
             BidResponseExt.newBuilder().setProcessingTimeMs(99).build())
