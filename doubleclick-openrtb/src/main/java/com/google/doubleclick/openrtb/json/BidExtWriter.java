@@ -41,6 +41,6 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     if (ext.hasExchangeDealType()) {
       writeEnumField("exchange_deal_type", ext.getExchangeDealType(), gen);
     }
-    writeInts("attributes", ext.getAttributeList(), gen);
+    writeInts("attribute", ext.getAttributeList(), gen);
   }
 }
