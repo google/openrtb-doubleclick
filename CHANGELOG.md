@@ -1,7 +1,7 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.5.1, 22-11-2017
+## Version 1.5.3, 22-11-2017
 * Added missing JSON support for the new extension `BidExt.attribute`.
 * Now using Protobuf 3.5.0.
 
