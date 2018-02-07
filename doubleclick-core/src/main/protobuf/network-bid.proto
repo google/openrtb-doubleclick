@@ -1,5 +1,6 @@
-// Protocol version: v.134
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Protocol version: v.137
+// Copyright 2018 Google Inc. All Rights Reserved.
+
 syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
@@ -344,7 +345,8 @@ message BidRequest {
     // described at https://support.google.com/adxbuyer/answer/3221407),
     // 2) Android devices,
     // 3) Roku devices,
-    // 4) Microsoft Xbox devices.
+    // 4) Microsoft Xbox devices,
+    // 5) Amazon devices (i.e. Amazon Fire).
     //
     // When the encrypted_advertising_id is an IDFA, the plaintext after
     // decrypting the ciphertext is the IDFA (16 byte UUID) returned by iOS's
@@ -531,15 +533,15 @@ message BidRequest {
                         // on youtube.com.
       VPAID_FLASH = 3;  // Flash VPAID (SWF).
       VPAID_JS = 4;     // JavaScript VPAID.
+      AUDIO_MP3 = 5;
+      AUDIO_OGG = 6;
+      AUDIO_MP3_OGG = 7;  // Requires both MP3 & OGG as Google does not know
+                          // which codecs are installed on the player.
       VIDEO_WEBM = 8;
       VIDEO_MOV = 9;
       VIDEO_3GPP = 10;
       VIDEO_HLS = 11;
       VIDEO_DASH = 12;
-      AUDIO_MP3 = 5;
-      AUDIO_OGG = 6;
-      AUDIO_MP3_OGG = 7;  // Requires both MP3 & OGG as Google dosent know which
-                          // codecs are installed on the player
       AUDIO_MP4A = 13;    // Audio version of MP4.
     };
     repeated VideoFormat allowed_video_formats = 6;
@@ -691,9 +693,7 @@ message BidRequest {
     repeated int32 excluded_attribute = 4 [packed=true];
 
     // The allowed vendor types. See the vendors.txt file in the technical
-    // documentation for a list of ids. When the seller_network is GDN, the
-    // vendor ids listed in gdn-vendors.txt in the supporting technical
-    // documentation are also allowed. This field does not apply to deals with
+    // documentation for a list of ids. This field does not apply to deals with
     // block overrides (see https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 allowed_vendor_type = 6 [packed=true];
 
@@ -1087,6 +1087,35 @@ message BidRequest {
     }
     optional AmpAdRequestType amp_ad_request_type = 29 [default = NON_AMP_PAGE];
 
+    // Whether this is an AMP page or not.
+    enum AmpPage {
+      // AMP page status unknown.
+      UNKNOWN_AMP_PAGE = 0;
+      // This is not an AMP page.
+      DIALECT_HTML = 1;
+      // This is an Amp page.
+      DIALECT_HTML_AMP = 2;
+    }
+    optional AmpPage is_amp_page = 38;
+
+    // Possible requirement types for AMP ads.
+    enum AmpAdRequirementType {
+      // AMP ad requirements unknown.
+      UNKNOWN_AMP_AD_REQUIREMENT_TYPE = 0;
+      // AMP ads are not allowed.
+      AMP_AD_NOT_ALLOWED = 1;
+      // Either AMP ads or non-AMP ads are allowed;
+      // AMP ads are not early rendered.
+      AMP_AD_ALLOWED_AND_NOT_EARLY_RENDERED = 2;
+      // Either AMP ads or non-AMP ads are allowed;
+      // AMP ads are early rendered.
+      AMP_AD_ALLOWED_AND_EARLY_RENDERED = 3;
+      // AMP ads are required.
+      // Ads that are non-AMP may be rejected by the publisher.
+      AMP_AD_REQUIRED = 4;
+    }
+    optional AmpAdRequirementType amp_ad_requirement_type = 39;
+
     // Whether the user receives a reward for viewing the ad. For video ads,
     // typical implementations allow users to read an additional news article
     // for free, receive an extra life in a game, or get a sponsored ad-free
@@ -1135,6 +1164,12 @@ message BidRequest {
     // price feedback, or if your account has opted out of sharing winning
     // prices with other bidders.
     optional int64 cpm_micros = 4;
+
+    // Event notification token that was included in the bid response.
+    optional bytes event_notification_token = 5;
+
+    // Buyer creative ID that was included in the bid response.
+    optional string buyer_creative_id = 6;
   }
   repeated BidResponseFeedback bid_response_feedback = 44;
 
@@ -1172,6 +1207,12 @@ message BidRequest {
 //
 message BidResponse {
   message Ad {
+    // The event notification token is sent to AdX by bidders for
+    // troubleshooting. AdX will include the token in real-time feedback for the
+    // bid. The content of the token will not be logged by AdX. AdX will ignore
+    // any token longer than 64 bytes.
+    optional bytes event_notification_token = 25;
+
     // A unique identifier chosen by you for the creative in this response.
     // This must always be set, must be limited to at most 64 bytes, and must be
     // a valid UTF8 string. Every buyer_creative_id you use must always be
@@ -1263,7 +1304,13 @@ message BidResponse {
       // a background thread. When resolving the url, HTTP 30x redirects are
       // followed. The SDK ignores the contents of the response; this URL
       // has no effect on the landing page for the user.
+      // This field is planned to be deprecated and we are moving to the
+      // repeated click_tracking_urls field.
       optional string click_tracking_url = 11;
+
+      // The URLs to use for click tracking. This will be used throughout the
+      // serving stack and will incorporate any URL in click_tracking_url.
+      repeated string click_tracking_urls = 15;
 
       // The price of the promoted app including the currency info.
       optional string price = 10;

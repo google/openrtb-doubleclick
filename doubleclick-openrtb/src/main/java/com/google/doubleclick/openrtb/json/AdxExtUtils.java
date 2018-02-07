@@ -18,10 +18,12 @@ package com.google.doubleclick.openrtb.json;
 
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
+import com.google.doubleclick.AdxExt.BidRequestExt;
 import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.NativeRequestExt;
 import com.google.doubleclick.AdxExt.SiteExt;
+import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidResponse;
@@ -39,6 +41,8 @@ public class AdxExtUtils {
    */
   public static OpenRtbJsonFactory registerAdxExt(OpenRtbJsonFactory factory) {
     return factory
+        .register(new BidRequestExtReader(), BidRequest.Builder.class)
+        .register(new BidRequestExtWriter(), BidRequestExt.class, BidRequest.class)
         .register(new ImpExtReader(), Imp.Builder.class)
         .register(new ImpExtWriter(), ImpExt.class, Imp.class)
         .register(new BidExtReader(), Bid.Builder.class)
