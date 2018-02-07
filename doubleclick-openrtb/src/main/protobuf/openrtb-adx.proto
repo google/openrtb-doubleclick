@@ -1,9 +1,9 @@
-// Protocol version: v.22
+// Protocol version: v.24
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
 
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2018 Google Inc. All Rights Reserved.
 
 // Protocol buffer for Ad Exchange OpenRTB specification.
 
@@ -89,6 +89,16 @@ message BidExt {
   // for a list of ids. Note that not all declarable attributes come through in
   // the BidRequest in the various `battr` fields.
   repeated int32 attribute = 5 [packed = true];
+
+  message EventNotificationToken {
+    // The contents of the token, which will be ignored if longer than 64
+    // bytes.
+    optional string payload = 1;
+  }
+  // A token set by bidders for troubleshooting which will be included in the
+  // real-time feedback for the Bid it is sent in. The contents of the token
+  // will not be logged.
+  optional EventNotificationToken event_notification_token = 8;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
@@ -145,6 +155,44 @@ message SiteExt {
 
 extend com.google.openrtb.BidRequest.Site {
   // Extension key for the Adx Site.ext
-  // Should match with the Adx ext in contentads/bidder/proto/openrtb/site.proto
   optional SiteExt site = 1010;
+};
+
+message BidRequestExt {
+  // Feedback on bids submitted in previous responses. This is only set if
+  // real-time feedback is enabled for your bidder. Please contact your
+  // account manager if you wish to enable real-time feedback.
+  message BidFeedback {
+    // The unique id from BidRequest.id.
+    optional string request_id = 1;
+
+    // The status code for the ad. See creative-status-codes.txt in the
+    // technical documentation for a list of ids.
+    optional int32 creative_status_code = 2;
+
+    // If the bid won the auction, this is the second price cpm in your account
+    // currency. If the bid participated in the auction but was out-bid, this is
+    // the cpm that should have been exceeded in order to win the auction. This
+    // is not set if the bid was filtered prior to the auction, if the publisher
+    // or winning bidder has opted out the price feedback or if your account
+    // has opted out of sharing winning prices with other bidders. This field
+    // will never be set for Exchange Bidders.
+    optional double price = 3;
+
+    message EventNotificationToken {
+      // The contents of the token.
+      optional string payload = 1;
+    }
+    // The token included in the corresponding bid.
+    optional EventNotificationToken event_notification_token = 4;
+
+    // The creative ID included in the corresponding bid.
+    optional string buyer_creative_id = 5;
+  }
+  repeated BidFeedback bid_feedback = 1;
+};
+
+extend com.google.openrtb.BidRequest {
+  // Extension key for the Adx BidRequest.ext
+  optional BidRequestExt bid_request = 1018;
 };

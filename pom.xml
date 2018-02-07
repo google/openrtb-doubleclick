@@ -53,17 +53,17 @@
   <properties>
     <findBugsJsr305Version>3.0.2</findBugsJsr305Version>
     <gpg.skip>true</gpg.skip>
-    <guavaVersion>23.4-jre</guavaVersion>
-    <fasterxmlJacksonVersion>2.9.2</fasterxmlJacksonVersion>
+    <guavaVersion>24.0-jre</guavaVersion>
+    <fasterxmlJacksonVersion>2.9.4</fasterxmlJacksonVersion>
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
     <openrtbVersion>1.5.1</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
     <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.1</openrtbSource>
-    <protobufVersion>3.5.0</protobufVersion>
+    <protobufVersion>3.5.1</protobufVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
-    <truthVersion>0.36</truthVersion>
+    <truthVersion>0.39</truthVersion>
 
     <!-- Plugin versions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -132,7 +132,7 @@
 
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.6</version>
+        <version>3.7</version>
       </plugin>
 
       <plugin>
@@ -173,7 +173,7 @@
 
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.0.0-M1</version>
+        <version>3.0.0</version>
         <configuration>
           <windowtitle>${project.name}</windowtitle>
           <notimestamp>true</notimestamp>

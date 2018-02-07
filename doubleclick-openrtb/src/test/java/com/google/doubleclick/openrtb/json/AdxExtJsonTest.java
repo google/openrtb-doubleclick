@@ -5,7 +5,10 @@ import static java.util.Arrays.asList;
 
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
+import com.google.doubleclick.AdxExt.BidExt.EventNotificationToken;
 import com.google.doubleclick.AdxExt.BidExt.ExchangeDealType;
+import com.google.doubleclick.AdxExt.BidRequestExt;
+import com.google.doubleclick.AdxExt.BidRequestExt.BidFeedback;
 import com.google.doubleclick.AdxExt.BidResponseExt;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
@@ -61,6 +64,15 @@ public class AdxExtJsonTest {
             .setExtension(AdxExt.site, SiteExt.newBuilder()
                 .setAmp(SiteExt.AmpPage.DIALECT_HTML_AMP)
                 .build()))
+        .setExtension(AdxExt.bidRequest, BidRequestExt.newBuilder()
+            .addBidFeedback(BidFeedback.newBuilder()
+                .setBuyerCreativeId("cr1")
+                .setCreativeStatusCode(99)
+                .setPrice(1.2)
+                .setRequestId("req1")
+                .setEventNotificationToken(
+                    BidFeedback.EventNotificationToken.newBuilder().setPayload("data")))
+            .build())
         .build());
   }
 
@@ -78,6 +90,9 @@ public class AdxExtJsonTest {
                     .setAdChoicesDestinationUrl("http://adchoices.com")
                     .setBidderName("x")
                     .setExchangeDealType(ExchangeDealType.OPEN_AUCTION)
+                    .setEventNotificationToken(EventNotificationToken.newBuilder()
+                        .setPayload("token")
+                        .build())
                     .addAllAttribute(asList(11, 22, 33))
                     .build())))
         .setExtension(AdxExt.bidResponse,

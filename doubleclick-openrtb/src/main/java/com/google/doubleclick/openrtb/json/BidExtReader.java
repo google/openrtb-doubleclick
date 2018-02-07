@@ -17,12 +17,16 @@
 package com.google.doubleclick.openrtb.json;
 
 import static com.google.openrtb.json.OpenRtbJsonUtils.endArray;
+import static com.google.openrtb.json.OpenRtbJsonUtils.endObject;
 import static com.google.openrtb.json.OpenRtbJsonUtils.getCurrentName;
 import static com.google.openrtb.json.OpenRtbJsonUtils.startArray;
+import static com.google.openrtb.json.OpenRtbJsonUtils.startObject;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
+import com.google.doubleclick.AdxExt.BidExt.EventNotificationToken;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
 import java.io.IOException;
@@ -35,7 +39,7 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
   public BidExtReader() {
     super(AdxExt.bid, false,
         "impression_tracking_url", "ad_choices_destination_url", "bidder_name",
-        "exchange_deal_type", "attribute");
+        "exchange_deal_type", "event_notification_token", "attribute");
   }
 
   @Override protected void read(BidExt.Builder ext, JsonParser par) throws IOException {
@@ -58,10 +62,36 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
           }
         }
         break;
+      case "event_notification_token":
+        ext.setEventNotificationToken(readEventNotificationToken(par).build());
+        break;
+
       case "attribute":
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addAttribute(par.getIntValue());
         }
+        break;
+    }
+  }
+
+  public final EventNotificationToken.Builder readEventNotificationToken(JsonParser par)
+      throws IOException {
+    EventNotificationToken.Builder token = EventNotificationToken.newBuilder();
+    for (startObject(par); endObject(par); par.nextToken()) {
+      String fieldName = getCurrentName(par);
+      if (par.nextToken() != JsonToken.VALUE_NULL) {
+        readEventNotificationTokenField(par, token, fieldName);
+      }
+    }
+    return token;
+  }
+
+  protected void readEventNotificationTokenField(
+      JsonParser par, EventNotificationToken.Builder token, String fieldName)
+          throws IOException {
+    switch (fieldName) {
+      case "payload":
+        token.setPayload(par.getText());
         break;
     }
   }

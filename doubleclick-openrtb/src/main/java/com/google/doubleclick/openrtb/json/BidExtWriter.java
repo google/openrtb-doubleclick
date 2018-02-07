@@ -17,11 +17,12 @@
 package com.google.doubleclick.openrtb.json;
 
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeEnumField;
-import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeInts;
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.BidExt;
+import com.google.doubleclick.AdxExt.BidExt.EventNotificationToken;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
@@ -41,6 +42,25 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     if (ext.hasExchangeDealType()) {
       writeEnumField("exchange_deal_type", ext.getExchangeDealType(), gen);
     }
+    if (ext.hasEventNotificationToken()) {
+      gen.writeFieldName("event_notification_token");
+      writeEventNotificationToken(ext.getEventNotificationToken(), gen);
+    }
     writeInts("attribute", ext.getAttributeList(), gen);
+  }
+
+  private void writeEventNotificationToken(EventNotificationToken req, JsonGenerator gen)
+      throws IOException {
+    gen.writeStartObject();
+    writeEventNotificationTokenFields(req, gen);
+    gen.writeEndObject();
+    gen.flush();
+  }
+
+  private void writeEventNotificationTokenFields(EventNotificationToken req, JsonGenerator gen)
+      throws IOException {
+    if (req.hasPayload()) {
+      gen.writeStringField("payload", req.getPayload());
+    }
   }
 }

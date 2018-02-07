@@ -1,6 +1,10 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.5.4, 06-02-2018
+* [DoubleClick proto v.137](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v134)
+* DoubleClick OpenRTB extensions proto v.24.
+
 ## Version 1.5.3, 22-11-2017
 * Added missing JSON support for the new extension `BidExt.attribute`.
 * Now using Protobuf 3.5.0.
