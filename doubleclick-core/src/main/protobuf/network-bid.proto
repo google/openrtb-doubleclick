@@ -1,4 +1,4 @@
-// Protocol version: v.137
+// Protocol version: v.138
 // Copyright 2018 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -753,7 +753,7 @@ message BidRequest {
       // the publisher. The value is in micros of your account currency.
       optional int64 minimum_cpm_micros = 5;
 
-      // Publisher open auction pricing rules applicable to a particular buyer.
+      // This message is deprecated.
       message BuyerPricingRule {
         // Only one of the included_advertisers and excluded_advertisers fields
         // can be set in a rule. See advertisers.txt file in the technical
@@ -777,9 +777,8 @@ message BidRequest {
         optional int64 minimum_cpm_micros = 6;
       }
 
-      // Publisher open auction pricing rules in priority order, from highest to
-      // lowest.
-      repeated BuyerPricingRule pricing_rule = 7;
+      // This field is deprecated and will no longer be populated.
+      repeated BuyerPricingRule DEPRECATED_pricing_rule = 7;
 
       // Information about any deals that matched for this inventory.
       //
