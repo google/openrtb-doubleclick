@@ -1083,7 +1083,16 @@ message BidRequest {
       // Late-loading request from an AMP HTML page. Ad will render with a
       // slight delay so it will not negatively impact page render performance.
       AMP_PAGE_LATE_REQUEST = 2;
-    }
+
+      // TODO(sjclement): get a better link describing A4A and its specific
+      // restrictions before exposing these enum options.
+      // Early request from an AMP page, but response will render late,
+      // regardless of whether or not the response is AMP.
+      AMP_PAGE_EARLY_REQUEST_LATE_RENDER = 3;
+
+      // Early request from an AMP page, and if the response is AMP then it
+      // will be rendered early.
+      AMP_PAGE_EARLY_REQUEST_EARLY_RENDER_IF_AMP_AD = 4;    }
     optional AmpAdRequestType amp_ad_request_type = 29 [default = NON_AMP_PAGE];
 
     // Whether this is an AMP page or not.
@@ -1245,6 +1254,17 @@ message BidResponse {
     // Only set this field if the BidRequest is for an in-video ad and the
     // response is VAST XML.
     optional string video_vast_xml = 24;
+
+    // The URL to fetch an AMP (Accelerated Mobile Page) ad. For more
+    // information about AMP ads, refer to the AMP ads README:
+    // https://github.com/ampproject/amphtml/blob/master/ads/README.md.
+    // Please use BidResponse.Ad.AdSlot.billing_id to indicate which billing id
+    // to attribute this ad to. Only one of the following should be set:
+    // html_snippet, video_url, amp_ad_url, native_ad. Only set this field if
+    // the BidRequest is for an AMP ad (BidRequest.adslot.amp_ad_request_type is
+    // one of: AMP_PAGE_LATE_REQUEST, AMP_PAGE_EARLY_REQUEST_LATE_RENDER, or
+    // AMP_PAGE_EARLY_REQUEST_EARLY_RENDER_IF_AMP_AD).
+    optional string amp_ad_url = 23;
 
     // The content of a native ad. Native ads consist of multiple building
     // blocks, which are rendered by the publisher. Only one of the following
