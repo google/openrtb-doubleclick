@@ -23,7 +23,6 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.doubleclick.AdxExt.BidExt.EventNotificationToken;
-import com.google.doubleclick.AdxExt.BidExt.SdkRenderedAd;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
@@ -51,10 +50,6 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     if (ext.hasAmpAdUrl()) {
       gen.writeStringField("amp_ad_url", ext.getAmpAdUrl());
     }
-    if (ext.hasSdkRenderedAd()) {
-      gen.writeFieldName("sdk_rendered_ad");
-      writeSdkRenderedAd(ext.getSdkRenderedAd(), gen);
-    }
   }
 
   private void writeEventNotificationToken(EventNotificationToken req, JsonGenerator gen)
@@ -69,22 +64,6 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
       throws IOException {
     if (req.hasPayload()) {
       gen.writeStringField("payload", req.getPayload());
-    }
-  }
-
-  private void writeSdkRenderedAd(SdkRenderedAd ad, JsonGenerator gen) throws IOException {
-    gen.writeStartObject();
-    writeSdkRenderedAdFields(ad, gen);
-    gen.writeEndObject();
-    gen.flush();
-  }
-
-  private void writeSdkRenderedAdFields(SdkRenderedAd ad, JsonGenerator gen) throws IOException {
-    if (ad.hasId()) {
-      gen.writeStringField("id", ad.getId());
-    }
-    if (ad.hasRenderingData()) {
-      gen.writeStringField("rendering_data", ad.getRenderingData());
     }
   }
 }

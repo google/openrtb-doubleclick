@@ -53,17 +53,17 @@
   <properties>
     <findBugsJsr305Version>3.0.2</findBugsJsr305Version>
     <gpg.skip>true</gpg.skip>
-    <guavaVersion>24.0-jre</guavaVersion>
-    <fasterxmlJacksonVersion>2.9.4</fasterxmlJacksonVersion>
+    <guavaVersion>25.0-jre</guavaVersion>
+    <fasterxmlJacksonVersion>2.9.5</fasterxmlJacksonVersion>
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
-    <openrtbVersion>1.5.1</openrtbVersion>
+    <openrtbVersion>1.5.2</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.1</openrtbSource>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.2</openrtbSource>
     <protobufVersion>3.5.1</protobufVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
-    <truthVersion>0.39</truthVersion>
+    <truthVersion>0.40</truthVersion>
 
     <!-- Plugin versions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -102,12 +102,12 @@
     <plugins>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
       </plugin>
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.0</version>
       </plugin>
 
       <plugin>
@@ -137,7 +137,7 @@
 
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.0</version>
       </plugin>
 
       <plugin>
@@ -154,7 +154,7 @@
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.20.1</version>
+        <version>2.21.0</version>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <argLine>-Djava.util.logging.config.file=src/test/resources/logging.properties</argLine>

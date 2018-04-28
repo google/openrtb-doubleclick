@@ -24,8 +24,6 @@ import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.ImpExt;
-import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
-import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData.SourceApp;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
@@ -47,50 +45,6 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
     }
     if (ext.hasAmpad()) {
       writeEnumField("ampad", ext.getAmpad(), gen);
-    }
-    if (ext.getBuyerGeneratedRequestDataCount() != 0) {
-	  gen.writeArrayFieldStart("buyer_generated_request_data");
-	  for (BuyerGeneratedRequestData feedback : ext.getBuyerGeneratedRequestDataList()) {
-	    writeBuyerGeneratedRequestData(feedback, gen);
-	  }
-	  gen.writeEndArray();
-	}
-  }
-
-  private void writeBuyerGeneratedRequestData(BuyerGeneratedRequestData req, JsonGenerator gen)
-      throws IOException {
-    gen.writeStartObject();
-    writeBuyerGeneratedRequestDataFields(req, gen);
-    gen.writeEndObject();
-    gen.flush();
-  }
-
-  private void writeBuyerGeneratedRequestDataFields(
-      BuyerGeneratedRequestData req, JsonGenerator gen) throws IOException {
-    switch (req.getSourceCase()) {
-      case SOURCE_APP:
-        gen.writeFieldName("source_app");
-        writeSourceApp(req.getSourceApp(), gen);
-        break;
-      default:
-    }
-    if (req.hasData()) {
-      gen.writeStringField("data", req.getData());
-    }
-  }
-
-  private void writeSourceApp(SourceApp app, JsonGenerator gen)
-      throws IOException {
-    gen.writeStartObject();
-    writeSourceAppFields(app, gen);
-    gen.writeEndObject();
-    gen.flush();
-  }
-
-  private void writeSourceAppFields(SourceApp app, JsonGenerator gen)
-      throws IOException {
-    if (app.hasId()) {
-      gen.writeStringField("id", app.getId());
     }
   }
 }

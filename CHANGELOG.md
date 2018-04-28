@@ -1,8 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
-## Version 1.5.5, ??-02-2018
-* [DoubleClick proto v.138](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v138)
+## Version 1.5.5, 27-04-2018
+* [DoubleClick proto v.144](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v144)
+* [DoubleClick OpenRTB extensions proto v.28](https://developers.google.com/ad-exchange/rtb/relnotes#open-rtb-proto-v2.5.0_15).
 
 ## Version 1.5.4, 06-02-2018
 * [DoubleClick proto v.137](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v137)

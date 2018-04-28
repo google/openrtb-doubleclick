@@ -27,7 +27,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.doubleclick.AdxExt.BidExt.EventNotificationToken;
-import com.google.doubleclick.AdxExt.BidExt.SdkRenderedAd;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
 import java.io.IOException;
@@ -40,8 +39,7 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
   public BidExtReader() {
     super(AdxExt.bid, false,
         "impression_tracking_url", "ad_choices_destination_url", "bidder_name",
-        "exchange_deal_type", "event_notification_token", "attribute", "amp_ad_url",
-        "sdk_rendered_ad");
+        "exchange_deal_type", "event_notification_token", "attribute", "amp_ad_url");
   }
 
   @Override protected void read(BidExt.Builder ext, JsonParser par) throws IOException {
@@ -67,6 +65,7 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
       case "event_notification_token":
         ext.setEventNotificationToken(readEventNotificationToken(par).build());
         break;
+
       case "attribute":
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addAttribute(par.getIntValue());
@@ -74,9 +73,6 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
         break;
       case "amp_ad_url":
         ext.setAmpAdUrl(par.nextTextValue());
-        break;
-      case "sdk_rendered_ad":
-        ext.setSdkRenderedAd(readSdkRenderedAd(par));
         break;
     }
   }
@@ -99,29 +95,6 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
     switch (fieldName) {
       case "payload":
         token.setPayload(par.getText());
-        break;
-    }
-  }
-
-  public final SdkRenderedAd.Builder readSdkRenderedAd(JsonParser par) throws IOException {
-    SdkRenderedAd.Builder ad = SdkRenderedAd.newBuilder();
-    for (startObject(par); endObject(par); par.nextToken()) {
-      String fieldName = getCurrentName(par);
-      if (par.nextToken() != JsonToken.VALUE_NULL) {
-        readSdkRenderedAdField(par, ad, fieldName);
-      }
-    }
-    return ad;
-  }
-
-  protected void readSdkRenderedAdField(
-      JsonParser par, SdkRenderedAd.Builder ad, String fieldName) throws IOException {
-    switch (fieldName) {
-      case "id":
-        ad.setId(par.getText());
-        break;
-      case "rendering_data":
-        ad.setRenderingData(par.getText());
         break;
     }
   }
