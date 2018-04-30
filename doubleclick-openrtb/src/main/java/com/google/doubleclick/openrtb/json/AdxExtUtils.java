@@ -20,15 +20,21 @@ import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.doubleclick.AdxExt.BidRequestExt;
 import com.google.doubleclick.AdxExt.BidResponseExt;
+import com.google.doubleclick.AdxExt.EventTrackerExt;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.NativeRequestExt;
+import com.google.doubleclick.AdxExt.RegsExt;
 import com.google.doubleclick.AdxExt.SiteExt;
+import com.google.doubleclick.AdxExt.UserExt;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
+import com.google.openrtb.OpenRtb.BidRequest.Regs;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
+import com.google.openrtb.OpenRtb.BidRequest.User;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
 import com.google.openrtb.OpenRtb.NativeRequest;
+import com.google.openrtb.OpenRtb.NativeResponse.EventTracker;
 import com.google.openrtb.json.OpenRtbJsonFactory;
 
 /**
@@ -52,6 +58,12 @@ public class AdxExtUtils {
         .register(new SiteExtReader(), Site.Builder.class)
         .register(new SiteExtWriter(), SiteExt.class, Site.class)
         .register(new NativeRequestExtReader(), NativeRequest.Builder.class)
-        .register(new NativeRequestExtWriter(), NativeRequestExt.class, NativeRequest.class);
+        .register(new NativeRequestExtWriter(), NativeRequestExt.class, NativeRequest.class)
+        .register(new UserExtReader(), User.Builder.class)
+        .register(new UserExtWriter(), UserExt.class, User.class)
+        .register(new RegsExtReader(), Regs.Builder.class)
+        .register(new RegsExtWriter(), RegsExt.class, Regs.class)
+        .register(new EventTrackerExtReader(), EventTracker.Builder.class)
+        .register(new EventTrackerExtWriter(), EventTrackerExt.class, EventTracker.class);
   }
 }

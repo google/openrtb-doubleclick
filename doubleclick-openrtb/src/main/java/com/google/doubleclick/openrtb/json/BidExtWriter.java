@@ -47,6 +47,9 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
       writeEventNotificationToken(ext.getEventNotificationToken(), gen);
     }
     writeInts("attribute", ext.getAttributeList(), gen);
+    if (ext.hasAmpAdUrl()) {
+      gen.writeStringField("amp_ad_url", ext.getAmpAdUrl());
+    }
   }
 
   private void writeEventNotificationToken(EventNotificationToken req, JsonGenerator gen)
