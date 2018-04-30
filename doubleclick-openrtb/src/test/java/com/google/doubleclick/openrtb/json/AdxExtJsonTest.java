@@ -14,12 +14,17 @@ import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.doubleclick.AdxExt.NativeRequestExt;
 import com.google.doubleclick.AdxExt.NativeRequestExt.LayoutType;
+import com.google.doubleclick.AdxExt.RegsExt;
 import com.google.doubleclick.AdxExt.SiteExt;
+import com.google.doubleclick.AdxExt.UserExt;
+import com.google.doubleclick.AdxExt.UserExt.ConsentedProvidersSettings;
 import com.google.openrtb.OpenRtb;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Native;
+import com.google.openrtb.OpenRtb.BidRequest.Regs;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
+import com.google.openrtb.OpenRtb.BidRequest.User;
 import com.google.openrtb.OpenRtb.BidResponse;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid;
 import com.google.openrtb.OpenRtb.BidResponse.SeatBid.Bid;
@@ -64,6 +69,13 @@ public class AdxExtJsonTest {
             .setExtension(AdxExt.site, SiteExt.newBuilder()
                 .setAmp(SiteExt.AmpPage.DIALECT_HTML_AMP)
                 .build()))
+        .setUser(User.newBuilder()
+            .setExtension(AdxExt.user, UserExt.newBuilder()
+                .setConsentedProvidersSettings(ConsentedProvidersSettings.newBuilder()
+                    .addAllConsentedProviders(asList(100L, 101L)))
+                .build()))
+        .setRegs(Regs.newBuilder()
+            .setExtension(AdxExt.regs, RegsExt.newBuilder().setGdpr(true).build()))
         .setExtension(AdxExt.bidRequest, BidRequestExt.newBuilder()
             .addBidFeedback(BidFeedback.newBuilder()
                 .setBuyerCreativeId("cr1")

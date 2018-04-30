@@ -1,4 +1,4 @@
-// Protocol version: v.24
+// Protocol version: v.28
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -134,6 +134,20 @@ extend com.google.openrtb.NativeRequest {
   optional NativeRequestExt native_ext =  1001;
 }
 
+message EventTrackerExt {
+  // Additional context provided for rendering.
+  enum Context {
+    UNKNOWN = 0;
+    OMID = 1;
+  }
+  repeated Context context = 1;
+};
+
+extend com.google.openrtb.NativeResponse.EventTracker {
+  // Extension key for the AdX EventTracker.ext.
+  optional EventTrackerExt eventtrackers = 1000;
+}
+
 message PublisherExt {
   // The billing address country code of the publisher. This may be different
   // from the hosting country of the website. For a complete list of country
@@ -200,4 +214,36 @@ message BidRequestExt {
 extend com.google.openrtb.BidRequest {
   // Extension key for the Adx BidRequest.ext
   optional BidRequestExt bid_request = 1018;
+};
+
+message UserExt {
+  message ConsentedProvidersSettings {
+    // Set of IDs corresponding to providers for whom the publisher has told
+    // Google that its EEA users have consented to the use of their personal
+    // data for ads personalization. A mapping of provider ID to provider name
+    // is posted at providers.csv.
+    repeated int64 consented_providers = 2 [packed = true];
+  }
+  // Information about the providers for whom the publisher has told Google that
+  // its EEA users have consented to the use of their personal data for ads
+  // personalization. This field will only be populated when RegsExt.gdpr is
+  // true.
+  optional ConsentedProvidersSettings consented_providers_settings = 1;
+}
+
+extend com.google.openrtb.BidRequest.User {
+  // Extension key for the Adx User.ext
+  optional UserExt user = 1007;
+};
+
+message RegsExt {
+  // AdX fills this field solely based on whether the impression will serve to
+  // an EEA user, based on information available to Google. It does not
+  // constitute legal guidance on GDPR.
+  optional bool gdpr = 1;
+}
+
+extend com.google.openrtb.BidRequest.Regs {
+  // Extension key for the Adx Regs.ext
+  optional RegsExt regs = 1001;
 };

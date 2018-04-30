@@ -1,4 +1,4 @@
-// Protocol version: v.138
+// Protocol version: v.144
 // Copyright 2018 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -314,7 +314,9 @@ message BidRequest {
     // requests, app_id will also be filled in. If the request is from a mobile
     // web page contained inside an app, is_app will still be false, but app_id
     // could be filled in with the app identifier. is_app may also be true for
-    // anonymous inventory, in which case anonymous_id will be set.
+    // anonymous inventory, in which case anonymous_id will be set. For SDK-less
+    // requests (mostly from connected TVs), this will be true if an app ID is
+    // provided directly in the request.
     optional bool is_app = 7 [default = false];
 
     // The identifier of the mobile app when this ad query comes from a mobile
@@ -322,7 +324,9 @@ message BidRequest {
     // downloaded from the Apple iTunes app store, then this is the app-store
     // id, e.g., 343200656. For Android devices, this is the fully qualified
     // package name, e.g., com.rovio.angrybirds. For Windows devices it's the
-    // App ID, e.g., f15abcde-f6gh-47i0-j3k8-37l93817mn3o.
+    // App ID, e.g., f15abcde-f6gh-47i0-j3k8-37l93817mn3o. For SDK-less requests
+    // (mostly from connected TVs), the app ID provided by the publisher
+    // directly in the request.
     optional string app_id = 6;
 
     // If true, then this is a mobile full screen ad request.
@@ -390,7 +394,8 @@ message BidRequest {
 
     // App names for Android apps are from the Google Play store.
     // App names for iOS apps are provided by App Annie
-    // (https://www.appannie.com).
+    // (https://www.appannie.com). App names for SDK-less requests (mostly from
+    // connected TVs) are provided by the publisher directly in the request.
     optional string app_name = 24;
 
     // Average user rating for the app. The range of user rating is between 1.0
@@ -463,6 +468,8 @@ message BidRequest {
       AUTO_PLAY_SOUND_OFF = 2;
       CLICK_TO_PLAY = 3;
       MOUSE_OVER = 4;
+      INITIATE_ON_ENTERING_VIEWPORT_SOUND_ON = 5;
+      INITIATE_ON_ENTERING_VIEWPORT_SOUND_OFF = 6;
     };
     optional VideoPlaybackMethod playback_method = 14
         [default = METHOD_UNKNOWN];
@@ -697,6 +704,25 @@ message BidRequest {
     // block overrides (see https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 allowed_vendor_type = 6 [packed=true];
 
+    message ConsentedProvidersSettings {
+      // Set of IDs corresponding to providers for whom the publisher has told
+      // Google that its EEA users have consented to the use of their personal
+      // data for ads personalization. A mapping of provider ID to provider name
+      // is posted at providers.csv.
+      repeated int64 consented_providers = 2 [packed = true];
+    }
+    // Information about the providers for whom the publisher has told Google
+    // that its EEA users have consented to the use of their personal data for
+    // ads personalization. This field will only be populated when regs_gdpr is
+    // true.
+    optional ConsentedProvidersSettings consented_providers_settings = 42;
+
+    // AdX fills this field solely based on whether the impression will serve to
+    // an EEA user, based on information available to Google. It does not
+    // constitute legal guidance on GDPR. This field is equivalent to
+    // Regs.ext.gdpr in AdX OpenRTB.
+    optional bool regs_gdpr = 43;
+
     // The disallowed sensitive ad categories. See the
     // ad-sensitive-categories.txt file in the technical documentation for a
     // list of ids. You should enforce these exclusions if you have the ability
@@ -815,6 +841,11 @@ message BidRequest {
         // The number of remaining impressions that you have committed to buy.
         // This field applies to programmatic guaranteed deals.
         optional int64 remaining_impressions_to_buy = 6;
+
+        // Value between 0 and 1 only set for Programmatic Guaranteed deals.
+        // Buyers are required to bid if must_bid_level = 1 and can decide
+        // whether to bid if must_bid_level < 1.
+        optional double must_bid_level = 7 [default = 1.0];
       }
       repeated DirectDeal direct_deal = 6;
 
@@ -1246,6 +1277,10 @@ message BidResponse {
     // response is VAST XML.
     optional string video_vast_xml = 24;
 
+    // The URL to fetch an AMPHTML ad. Only one of the following should be set:
+    // html_snippet, video_url, amp_ad_url, native_ad.
+    optional string amp_ad_url = 23;
+
     // The content of a native ad. Native ads consist of multiple building
     // blocks, which are rendered by the publisher. Only one of the following
     // should be set: html_snippet, video_url, or native_ad.
@@ -1448,6 +1483,23 @@ message BidResponse {
     // If present, a standard AdChoices icon is added to the native creative and
     // linked to this URL.
     optional string ad_choices_destination_url = 21;
+
+    message ImpressionTrackingResource {
+      // The URL of a Javascript resource. The URLs should not contain script
+      // tags. For example: "https://mycdn.com/tracker.js".
+      optional string script_url = 1;
+
+      // Additional context provided for rendering.
+      enum Context {
+        UNKNOWN_CONTEXT = 0;
+        OMID = 1;
+      };
+      repeated Context context = 2;
+    };
+    // Resources to invoke when the impression is rendered. This is supported
+    // for native and banner formats only and explicitly whitelisted scripts
+    // only.
+    repeated ImpressionTrackingResource impression_tracking_resource = 26;
   }
   repeated Ad ad = 2;
 

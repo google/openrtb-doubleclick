@@ -65,7 +65,6 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
       case "event_notification_token":
         ext.setEventNotificationToken(readEventNotificationToken(par).build());
         break;
-
       case "attribute":
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addAttribute(par.getIntValue());
