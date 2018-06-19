@@ -1,4 +1,4 @@
-// Protocol version: v.28
+// Protocol version: v.29
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -141,6 +141,14 @@ message EventTrackerExt {
     OMID = 1;
   }
   repeated Context context = 1;
+
+  // Parameters associated with the resource that will be passed to the
+  // resource when it is loaded. The format of the parameters is dependent
+  // on the script vendor.
+  optional string verification_parameters = 2;
+
+  // Used to uniquely identify the verification script provider.
+  optional string vendor_key = 3;
 };
 
 extend com.google.openrtb.NativeResponse.EventTracker {
