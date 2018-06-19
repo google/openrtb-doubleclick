@@ -35,7 +35,7 @@ class EventTrackerExtReader
     extends OpenRtbJsonExtComplexReader<EventTracker.Builder, EventTrackerExt.Builder> {
 
   public EventTrackerExtReader() {
-    super(AdxExt.eventtrackers, false, "context");
+    super(AdxExt.eventtrackers, false, "context", "verification_parameters", "vendor_key");
   }
 
   @Override protected void read(EventTrackerExt.Builder ext, JsonParser par) throws IOException {
@@ -47,6 +47,12 @@ class EventTrackerExtReader
             ext.addContext(value);
           }
         }
+        break;
+      case "verification_parameters":
+        ext.setVerificationParameters(par.nextTextValue());
+        break;
+      case "vendor_key":
+        ext.setVendorKey(par.nextTextValue());
         break;
     }
   }

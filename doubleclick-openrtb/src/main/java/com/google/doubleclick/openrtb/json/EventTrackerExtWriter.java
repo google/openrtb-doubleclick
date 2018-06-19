@@ -30,5 +30,11 @@ class EventTrackerExtWriter extends OpenRtbJsonExtWriter<EventTrackerExt> {
 
   @Override protected void write(EventTrackerExt ext, JsonGenerator gen) throws IOException {
     writeEnums("context", ext.getContextList(), gen);
+    if (ext.hasVerificationParameters()) {
+      gen.writeStringField("verification_parameters", ext.getVerificationParameters());
+    }
+    if (ext.hasVendorKey()) {
+      gen.writeStringField("vendor_key", ext.getVendorKey());
+    }
   }
 }
