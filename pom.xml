@@ -53,8 +53,8 @@
   <properties>
     <findBugsJsr305Version>3.0.2</findBugsJsr305Version>
     <gpg.skip>true</gpg.skip>
-    <guavaVersion>25.0-jre</guavaVersion>
-    <fasterxmlJacksonVersion>2.9.5</fasterxmlJacksonVersion>
+    <guavaVersion>25.1-jre</guavaVersion>
+    <fasterxmlJacksonVersion>2.9.6</fasterxmlJacksonVersion>
     <injectVersion>1</injectVersion>
     <junitVersion>4.12</junitVersion>
     <metricsVersion>3.0.2</metricsVersion>
@@ -63,7 +63,7 @@
     <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.2</openrtbSource>
     <protobufVersion>3.5.1</protobufVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
-    <truthVersion>0.40</truthVersion>
+    <truthVersion>0.41</truthVersion>
 
     <!-- Plugin versions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

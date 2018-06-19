@@ -32,6 +32,8 @@ public class AdxExtNativeJsonTest {
             .setMethod(EventTrackingMethod.IMG)
             .setExtension(AdxExt.eventtrackers, EventTrackerExt.newBuilder()
                 .addContext(Context.OMID)
+                .setVerificationParameters("vparam1")
+                .setVendorKey("vkey1")
                 .build()))
         .build());
   }
