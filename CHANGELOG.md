@@ -1,6 +1,9 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+## Version 1.5.7, 20-06-2018
+- Now using Protobuf 3.6.0.
+
 ## Version 1.5.6, 19-06-2018
 * [DoubleClick proto v.147, DoubleClick OpenRTB extensions proto v.29](
   https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v147).
