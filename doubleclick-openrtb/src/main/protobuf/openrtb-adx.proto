@@ -1,4 +1,4 @@
-// Protocol version: v.30
+// Protocol version: v.31
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -55,7 +55,7 @@ message ImpExt {
     // that source is from within an application.
     message SourceApp {
       // Identifier for the SDK that generated this data. It will match the id
-      // in app.adx_ext.installed_sdk.id.
+      // in AppExt.InstalledSdk.id.
       optional string id = 1;
     }
     // The source of the data.
@@ -133,6 +133,7 @@ message BidExt {
     OPEN_AUCTION = 0;
     PRIVATE_AUCTION = 1;
     PREFERRED_DEAL = 2;
+    EXCHANGE_AUCTION_PACKAGE = 3;
   }
   optional ExchangeDealType exchange_deal_type = 4 [default = OPEN_AUCTION];
 
@@ -147,11 +148,10 @@ message BidExt {
   optional string amp_ad_url = 6;
 
   // An ad that will be rendered by an SDK known to the buyer. This can only
-  // be used when the BidRequest included an app.adx_ext.installed_sdk
-  // submessage.
+  // be used when the BidRequest included an AppExt.InstalledSdk submessage.
   message SdkRenderedAd {
     // The identifier for the SDK that will render the ad. Must match an
-    // app.adx_ext.installed_sdk.id sent in the corresponding bid request.
+    // AppExt.InstalledSdk.id sent in the corresponding bid request.
     optional string id = 1;
 
     // Data to pass to the SDK in order to render the ad. This data is opaque
