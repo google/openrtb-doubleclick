@@ -1,4 +1,4 @@
-// Protocol version: v.148
+// Protocol version: v.153
 // Copyright 2018 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -26,10 +26,8 @@ message BidRequest {
     // The current request should be treated as child-directed for purposes of
     // the Children's Online Privacy Protection Act. See
     // https://support.google.com/adxseller/answer/4442399 for more information.
-
     TAG_FOR_CHILD_DIRECTED_TREATMENT = 0;
   }
-
   // When set, the user's cookie/id data allows only restricted usage and is not
   // available in the usual fields. Instead the data may be accessed through
   // the constrained usage fields and stricter usage policies apply. There may
@@ -38,8 +36,8 @@ message BidRequest {
   // You will receive the user_data_treatment value in BidRequests if there are
   // any applicable restrictions. However, you must be whitelisted in order to
   // receive the constrained usage user data fields. See
-  // https://developers.google.com/ad-exchange/rtb/user_data_treatments for
-  // more information.
+  // https://developers.google.com/authorized-buyers/rtb/user_data_treatments
+  // for more information.
   // The impacted fields are:
   //  * google_user_id: use constrained_usage_google_user_id
   //  * hosted_match_data: use constrained_usage_hosted_match_data
@@ -138,7 +136,7 @@ message BidRequest {
   }
 
   // Hyperlocal targeting signal when available, encrypted as described at
-  // https://developers.google.com/ad-exchange/rtb/response-guide/decrypt-hyperlocal
+  // https://developers.google.com/authorized-buyers/rtb/response-guide/decrypt-hyperlocal
   optional bytes encrypted_hyperlocal_set = 40;
   // Unencrypted version of encrypted_hyperlocal_set. This field is only set
   // when using an SSL connection.
@@ -402,6 +400,28 @@ message BidRequest {
     // and 5.0. Currently only available for apps in Google Play store.
     optional float app_rating = 25;
 
+    // Identification of and information about an SDK installed in the
+    // publisher's app that the bidder has access to, often because it's the
+    // bidder's SDK.
+    message InstalledSdk {
+      // Identifier for the installed SDK.
+      optional string id = 1;
+
+      // Semantic version of the installed SDK and the adapter that communicates
+      // between the installed SDK and Google's SDK.
+      message Version {
+        optional int32 major = 1;
+        optional int32 minor = 2;
+        optional int32 micro = 3;
+      }
+
+      // The version of the installed SDK.
+      optional Version sdk_version = 2;
+
+      // The version of the adapter that communicates with the installed SDK.
+      optional Version adapter_version = 3;
+    }
+    repeated InstalledSdk installed_sdk = 32;
   }
   optional Mobile mobile = 28;
 
@@ -639,7 +659,7 @@ message BidRequest {
 
   // The publisher settings list id that applies to this page.
   // See the RTB Publisher Settings guide at
-  // https://developers.google.com/ad-exchange/rtb/pub-settings-guide
+  // https://developers.google.com/authorized-buyers/rtb/pub-settings-guide
   // for details.
   optional fixed64 publisher_settings_list_id = 42;
 
@@ -842,9 +862,8 @@ message BidRequest {
         // decisions.
         optional bool publisher_blocks_overridden = 4 [default = false];
 
-        // The number of remaining impressions that you have committed to buy.
-        // This field applies to programmatic guaranteed deals.
-        optional int64 remaining_impressions_to_buy = 6;
+        // This is deprecated. Please ignore.
+        optional int64 DEPRECATED_remaining_impressions_to_buy = 6;
 
         // Value between 0 and 1 only set for Programmatic Guaranteed deals.
         // Buyers are required to bid if must_bid_level = 1 and can decide
@@ -858,8 +877,8 @@ message BidRequest {
 
     // The publisher settings list ids that apply to this slot. See the RTB
     // Publisher Settings guide at
-    // https://developers.google.com/ad-exchange/rtb/pub-settings-guide for
-    // details.
+    // https://developers.google.com/authorized-buyers/rtb/pub-settings-guide
+    // for details.
     repeated fixed64 publisher_settings_list_id = 15;
 
     // Parameters related to exchange bidding (third party exchanges doing
@@ -1006,6 +1025,26 @@ message BidRequest {
       optional int32 style_width = 19;
     }
     repeated NativeAdTemplate native_ad_template = 51;
+
+    // NativePlacementType describes placement of native ad slot with respect to
+    // surrounding context.
+    enum NativePlacementType {
+      PLACEMENT_UNKNOWN = 0;
+      // In the feed of content - for example as an item inside the organic
+      // feed/grid/listing/carousel.
+      PLACEMENT_IN_FEED = 1;
+      // In the atomic unit of the content - i.e., in the article page or single
+      // image page.
+      PLACEMENT_ATOMIC_UNIT = 2;
+      // Outside the core content - for example in the ads section on the right
+      // rail, as a banner-style placement near the content, etc.
+      PLACEMENT_OUTSIDE = 3;
+      // Recommendation widget, most commonly presented below the article
+      // content.
+      PLACEMENT_RECOMMENDATION = 4;
+    }
+    optional NativePlacementType native_placement_type = 45
+        [default = PLACEMENT_UNKNOWN];
 
     // Whether the ad request has been determined to come directly from the
     // publisher.
@@ -1501,6 +1540,7 @@ message BidResponse {
         OPEN_AUCTION = 0;
         PRIVATE_AUCTION = 1;
         PREFERRED_DEAL = 2;
+        EXCHANGE_AUCTION_PACKAGE = 3;
       }
       optional ExchangeDealType exchange_deal_type = 7 [default = OPEN_AUCTION];
     }
