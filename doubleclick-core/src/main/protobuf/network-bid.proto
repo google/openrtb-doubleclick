@@ -1,4 +1,4 @@
-// Protocol version: v.153
+// Protocol version: v.161
 // Copyright 2018 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -224,6 +224,20 @@ message BidRequest {
   // technical documentation for a list of ids.
   repeated int32 detected_content_label = 26 [packed=true];
 
+  // This represents a unique ID for the overall query.  In the event
+  // that there are multiple callouts for a query, all callout requests for that
+  // query will contain the same google_query_id.
+  optional string google_query_id = 59;
+
+  // The type of auction that will be run for this query.
+  enum AuctionType {
+    UNKNOWN_AUCTION_TYPE = 0;
+    FIRST_PRICE = 1;
+    SECOND_PRICE = 2;
+    FIXED_PRICE = 3;
+  }
+  optional AuctionType auction_type = 60 [default = SECOND_PRICE];
+
   // Information about the device.
   message Device {
     // The type of device on which the ad will be shown.
@@ -240,6 +254,8 @@ message BidRequest {
       CONNECTED_TV = 4;
 
       GAME_CONSOLE = 5;
+
+      SET_TOP_BOX = 6;
     }
     optional DeviceType device_type = 1 [default = UNKNOWN_DEVICE];
 
@@ -362,7 +378,8 @@ message BidRequest {
     optional bytes encrypted_advertising_id = 20;
 
     // Unencrypted version of encrypted_advertising_id. This field is only set
-    // when using an SSL connection. This field is a 16 byte UUID.
+    // when using an SSL connection. This field is a 16 byte UUID (binary form)
+    // or a 32 byte alphanumeric id (such as Samsung ID).
     optional bytes advertising_id = 27;
 
     optional bytes encrypted_hashed_idfa = 21;
@@ -706,11 +723,10 @@ message BidRequest {
     // the size of the video ad that you can return.
     //
     // For mobile interstitial ads (including ones where video ads are eligible)
-    // the first width height pair is the screen size (this is also the video
-    // player size for VAST video ads). Subsequent pairs are recommended
-    // interstitial ad sizes that satisfy the interstitial size restrictions,
-    // i.e. no bigger than the screen size and no smaller than 50% of width and
-    // 40% height.
+    // the first width height pair is the slot size (this is also the video
+    // player size for VAST video ads). For many interstitials, this is the
+    // screen size. Subsequent pairs are recommended interstitial ad sizes that
+    // also meet the requirements for this interstitial.
     repeated int32 width = 2;
     repeated int32 height = 3;
 
@@ -785,6 +801,21 @@ message BidRequest {
     // categories. This field does not apply to deals with block overrides (see
     // https://support.google.com/adxbuyer/answer/6114194).
     repeated int32 excluded_product_category = 13 [packed=true];
+
+    // A creative that is disallowed to bid on this impression due to Ad
+    // Exchange policies or creative disapproval, excluded creative attributes,
+    // excluded product or sensitive categories, allowed vendor types,
+    // restricted categories or languages applicable to the bid request.
+    message ExcludedCreative {
+      // Buyer creative ID of the disallowed creative.
+      optional string buyer_creative_id = 1;
+    }
+
+    // Creatives that are disallowed for the impression. Submitting a bid with
+    // one of the creatives in this list will result in such bid being filtered
+    // before the auction. Please contact your account manager if you would like
+    // to enable this feature.
+    repeated ExcludedCreative excluded_creatives = 18;
 
     // Information about the pre-targeting configs that matched.
     //
@@ -970,7 +1001,7 @@ message BidRequest {
         APP_ICON = 0x40;
         STAR_RATING = 0x80;
         PRICE = 0x100;
-        STORE = 0x200;
+        DEPRECATED_STORE = 0x200;
         VIDEO = 0x400;
       }
 
@@ -992,7 +1023,9 @@ message BidRequest {
       optional int32 body_max_safe_length = 4;
       optional int32 call_to_action_max_safe_length = 5;
       optional int32 advertiser_max_safe_length = 6;
-      optional int32 store_max_safe_length = 14;
+
+      // This field is deprecated.
+      optional int32 DEPRECATED_store_max_safe_length = 14;
       optional int32 price_max_safe_length = 15;
 
       // The width and height from which to calculate the required aspect ratio.
@@ -1419,8 +1452,8 @@ message BidResponse {
       // The price of the promoted app including the currency info.
       optional string price = 10;
 
-      // The URL to the app store to purchase/download the promoted app.
-      optional string store = 12;
+      // This field is deprecated.
+      optional string DEPRECATED_store = 12;
 
       // This field is deprecated. Please use
       // BidResponse.Ad.impression_tracking_url instead.
@@ -1451,7 +1484,7 @@ message BidResponse {
     // should only declare vendor ids listed in the vendors.txt file in the
     // technical documentation. We will check to ensure that the vendors you
     // declare are in the allowed_vendor_type list sent in the BidRequest for
-    // AdX publishers, or in gdn-vendors.txt for GDN publishers.
+    // AdX publishers.
     repeated int32 vendor_type = 5;
 
     // All attributes for the ads that may be shown from this snippet. See
@@ -1543,6 +1576,11 @@ message BidResponse {
         EXCHANGE_AUCTION_PACKAGE = 3;
       }
       optional ExchangeDealType exchange_deal_type = 7 [default = OPEN_AUCTION];
+
+      // Buyer declared ID which will be used to breakdown spend and invalid
+      // traffic metrics in IVT transparency reporting. IDs longer than 64 bytes
+      // will be ignored.
+      optional string buyer_reporting_id = 8;
     }
     repeated AdSlot adslot = 3;
 

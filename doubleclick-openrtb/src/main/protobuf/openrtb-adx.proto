@@ -1,4 +1,4 @@
-// Protocol version: v.31
+// Protocol version: v.36
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -18,6 +18,21 @@ message ImpExt {
 
   // [AdX: BidRequest.AdSlot.allowed_vendor_type]
   repeated int32 allowed_vendor_type = 3 [packed=true];
+
+  // A creative that is disallowed to bid on this impression due to Ad
+  // Exchange policies or creative disapproval, excluded creative attributes,
+  // excluded product or sensitive categories, allowed vendor types,
+  // restricted categories or languages applicable to the bid request.
+  message ExcludedCreative {
+    // Buyer creative ID of the disallowed creative.
+    optional string buyer_creative_id = 1;
+  }
+
+  // Creatives that are disallowed for the impression. Submitting a bid with
+  // one of the creatives in this list will result in such bid being filtered
+  // before the auction. Please contact your account manager if you would like
+  // to enable this feature.
+  repeated ExcludedCreative excluded_creatives = 10;
 
   // [AdX: BidRequest.AdSlot.ExchangeBidding.publisher_parameter]
   repeated string publisher_parameter = 4;
@@ -169,6 +184,18 @@ message BidExt {
   // real-time feedback for the Bid it is sent in. The contents of the token
   // will not be logged.
   optional EventNotificationToken event_notification_token = 8;
+
+  // All restricted categories for the ads that may be shown from this snippet.
+  // See ad-restricted-categories.txt in the technical documentation for a list
+  // of ids. If you are bidding with ads in restricted categories, you must
+  // always declare them here.
+  repeated int32 restricted_category = 9;
+
+  // The billing ID to attribute this impression to. The value must be in the
+  // repeated BidRequest.Imp.ImpExt.billing_id field sent for this impression.
+  // If the length of BidRequest.Imp.ImpExt.billing_id is exactly 1, this field
+  // is not required and its contents will be ignored.
+  optional int64 billing_id = 10;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
@@ -282,6 +309,11 @@ message BidRequestExt {
     optional string buyer_creative_id = 5;
   }
   repeated BidFeedback bid_feedback = 1;
+
+  // This represents a unique ID for the overall query.  In the event
+  // that there are multiple callouts for a query, all callout requests for that
+  // query will contain the same google_query_id.
+  optional string google_query_id = 2;
 };
 
 extend com.google.openrtb.BidRequest {
