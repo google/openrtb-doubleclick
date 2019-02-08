@@ -62,7 +62,6 @@ public class DoubleClickMetadata {
   private static final String ADX_DICT = BASE_URL + "/adx-rtb-dictionaries/";
 
   private final ImmutableMap<Integer, String> vendors;
-  private final ImmutableMap<Integer, String> gdnVendors;
   private final ImmutableMap<Integer, String> adSensitiveCategories;
   private final ImmutableMap<Integer, String> adProductCategories;
   private final ImmutableMap<Integer, String> adRestrictedCategories;
@@ -96,7 +95,6 @@ public class DoubleClickMetadata {
 
     Interner<String> interner = Interners.<String>newStrongInterner();
     vendors = load(interner, transport, ssvp, ADX_DICT + "vendors.txt");
-    gdnVendors = load(interner, transport, ssvp, ADX_DICT + "gdn-vendors.txt");
     HashMap<Integer, String> cats = new HashMap<>();
     cats.putAll(adSensitiveCategories = load(
         interner, transport, ssvp, ADX_DICT + "ad-sensitive-categories.txt"));
@@ -218,13 +216,9 @@ public class DoubleClickMetadata {
     return vendors;
   }
 
-  /**
-   * Dictionary which lists all the allowed_vendor_type entries for any request
-   * from a GDN publisher. These vendor types are all allowed on GDN but must be declared if used.
-   * This is a subset of the entries in {@link #vendors()}.
-   */
+  @Deprecated
   public ImmutableMap<Integer, String> gdnVendors() {
-    return gdnVendors;
+    return ImmutableMap.of();
   }
 
   /**
@@ -317,7 +311,6 @@ public class DoubleClickMetadata {
         .add("countryCodes#", countryCodes.size())
         .add("mobileCarriers#", mobileCarriers.size())
         .add("creativeStatusCodes#", creativeStatusCodes.size())
-        .add("gdnVendorTypes#", gdnVendors.size())
         .add("productCategories#", adProductCategories.size())
         .add("pubExcCreativeAttributes#", pubExcCreativeAttributes.size())
         .add("publisherVerticals#", publisherVerticals.size())
