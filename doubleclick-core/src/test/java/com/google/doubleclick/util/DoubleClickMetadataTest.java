@@ -22,11 +22,9 @@ import com.google.doubleclick.TestUtil;
 import com.google.doubleclick.util.DoubleClickMetadata.ResourceTransport;
 import com.google.doubleclick.util.DoubleClickMetadata.Transport;
 import com.google.doubleclick.util.DoubleClickMetadata.URLConnectionTransport;
-
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
+import org.junit.Test;
 
 /**
  * Tests for  {@link DoubleClickMetadata}.
@@ -57,8 +55,6 @@ public class DoubleClickMetadataTest {
         .isEqualTo("1: NONE");
     assertThat(DoubleClickMetadata.toString(metadata.vendors(), 1))
         .isEqualTo("1: Vendor1");
-    assertThat(DoubleClickMetadata.toString(metadata.gdnVendors(), 1))
-        .isEqualTo("1: GDNVendor1");
     assertThat(DoubleClickMetadata.toString(metadata.sellerNetworks(), 1))
         .isEqualTo("1: GDN");
     assertThat(DoubleClickMetadata.toString(metadata.siteLists(), 31))
