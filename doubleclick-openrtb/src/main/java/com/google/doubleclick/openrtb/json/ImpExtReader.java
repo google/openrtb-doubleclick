@@ -43,7 +43,7 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
     super(AdxExt.imp, false,
         "billing_id", "publisher_settings_list_id", "allowed_vendor_type",
         "publisher_parameter", "dfp_ad_unit_code", "is_rewarded_inventory", "ampad",
-        "buyer_generated_request_data");
+        "buyer_generated_request_data", "excluded_creatives");
   }
 
   @Override protected void read(ImpExt.Builder ext, JsonParser par) throws IOException {
