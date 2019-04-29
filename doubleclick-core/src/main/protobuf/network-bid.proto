@@ -1,5 +1,5 @@
-// Protocol version: v.161
-// Copyright 2018 Google Inc. All Rights Reserved.
+// Protocol version: v.162
+// Copyright 2019 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
 package com.google.protos.adx;
@@ -20,31 +20,22 @@ message BidRequest {
   // included from IPv6 addresses may change later.
   optional bytes ip = 4;
 
-  // Reasons for constrained usage treatment of user data (google_user_id,
+  // Reasons for special treatment of user data (google_user_id,
   // hosted_match_data, IDFA, etc).
   enum UserDataTreatment {
     // The current request should be treated as child-directed for purposes of
     // the Children's Online Privacy Protection Act. See
-    // https://support.google.com/adxseller/answer/4442399 for more information.
+    // https://support.google.com/admanager/answer/4442399 for more information.
     TAG_FOR_CHILD_DIRECTED_TREATMENT = 0;
   }
+
   // When set, the user's cookie/id data allows only restricted usage and is not
-  // available in the usual fields. Instead the data may be accessed through
-  // the constrained usage fields and stricter usage policies apply. There may
-  // be multiple restrictions applicable at the same time. You must only use
-  // the data for use cases allowed by all restrictions.
-  // You will receive the user_data_treatment value in BidRequests if there are
-  // any applicable restrictions. However, you must be whitelisted in order to
-  // receive the constrained usage user data fields. See
-  // https://developers.google.com/authorized-buyers/rtb/user_data_treatments
-  // for more information.
+  // available in the usual fields.
   // The impacted fields are:
-  //  * google_user_id: use constrained_usage_google_user_id
-  //  * hosted_match_data: use constrained_usage_hosted_match_data
-  //  * mobile.encrypted_advertising_id: use
-  //    mobile.constrained_usage_encrypted_advertising_id
-  //  * mobile.encrypted_hashed_idfa: use
-  //    mobile.constrained_usage_encrypted_hashed_idfa
+  //  * google_user_id
+  //  * hosted_match_data
+  //  * mobile.encrypted_advertising_id
+  //  * mobile.encrypted_hashed_idfa
   repeated UserDataTreatment user_data_treatment = 49;
 
   // The Google ID for the user as described in the documentation for the cookie
@@ -52,15 +43,8 @@ message BidRequest {
   // version of a binary cookie id. See the "Base 64 Encoding with URL and
   // Filename Safe Alphabet" section in RFC 3548 for encoding details. This
   // field is the same as the Google ID returned by the cookie matching service.
-  // Not set if there is one or more user_data_treatment value, see
-  // constrained_usage_google_user_id instead.
+  // Not set if there is one or more user_data_treatment value.
   optional string google_user_id = 21;
-
-  // Only set if there is one or more user_data_treatment value. If
-  // constrained_usage_google_user_id is set, then google_user_id is not set.
-  // You must be whitelisted for all user_data_treatments in this request in
-  // order to receive this field.
-  optional string constrained_usage_google_user_id = 47;
 
   // The version number of the google_user_id. We may sometimes change the
   // mapping from cookie to google_user_id. In this case the version will be
@@ -74,15 +58,8 @@ message BidRequest {
   // Match data stored for this google_user_id through the cookie matching
   // service. If a match exists, then this field holds the decoded data that
   // was passed in the google_hm parameter.
-  // Not set if there is one or more user_data_treatment value, see
-  // constrained_usage_hosted_match_data instead.
+  // Not set if there is one or more user_data_treatment value.
   optional bytes hosted_match_data = 37;
-
-  // Only set if there is one or more user_data_treatment value. If
-  // constrained_usage_hosted_match_data is set, then hosted_match_data is not
-  // set. You must be whitelisted for all user_data_treatments in this request
-  // in order to receive this field.
-  optional bytes constrained_usage_hosted_match_data = 48;
 
   // A string that identifies the browser and type of device that sent the
   // request. Certain data may be redacted or replaced.
@@ -360,7 +337,7 @@ message BidRequest {
 
     // This field is used for advertising identifiers for
     // 1) iOS devices (This is called Identifier for Advertising, or IDFA, as
-    // described at https://support.google.com/adxbuyer/answer/3221407),
+    // described at https://support.google.com/authorizedbuyers/answer/3221407),
     // 2) Android devices,
     // 3) Roku devices,
     // 4) Microsoft Xbox devices,
@@ -372,9 +349,7 @@ message BidRequest {
     // the plaintext is the 16 byte MD5 hash of the IDFA. Only one of the two
     // fields will be available, depending on the version of the SDK making the
     // request. Later SDKs provide unhashed values. They are not set if there is
-    // one or more user_data_treatment value in the BidRequest, see
-    // constrained_usage_encrypted_advertising_id and
-    // constrained_usage_encrypted_hashed_idfa instead.
+    // one or more user_data_treatment value in the BidRequest.
     optional bytes encrypted_advertising_id = 20;
 
     // Unencrypted version of encrypted_advertising_id. This field is only set
@@ -388,24 +363,6 @@ message BidRequest {
     // when using an SSL connection. This field is a 16 byte MD5.
     optional bytes hashed_idfa = 28;
 
-    // Only set if the BidRequest contains one or more user_data_treatment
-    // value. If constrained_usage_encrypted_advertising_id or
-    // constrained_usage_encrypted_hashed_idfa is set, then the corresponding
-    // non-constrained field is not set. You must be whitelisted for all
-    // user_data_treatments in this request in order to receive these fields.
-    optional bytes constrained_usage_encrypted_advertising_id = 22;
-
-    // Unencrypted version of constrained_usage_encrypted_advertising_id. This
-    // field is only set when using an SSL connection. This field is a 16 byte
-    // UUID.
-    optional bytes constrained_usage_advertising_id = 29;
-
-    optional bytes constrained_usage_encrypted_hashed_idfa = 23;
-
-    // Unencrypted version of constrained_usage_encrypted_hashed_idfa. This
-    // field is only set when using an SSL connection. This field is a 16 byte
-    // MD5.
-    optional bytes constrained_usage_hashed_idfa = 30;
 
     // App names for Android apps are from the Google Play store.
     // App names for iOS apps are provided by App Annie
@@ -737,7 +694,8 @@ message BidRequest {
 
     // The allowed vendor types. See the vendors.txt file in the technical
     // documentation for a list of ids. This field does not apply to deals with
-    // block overrides (see https://support.google.com/adxbuyer/answer/6114194).
+    // block overrides (see
+    // https://support.google.com/authorizedbuyers/answer/6114194).
     repeated int32 allowed_vendor_type = 6 [packed=true];
 
     message ConsentedProvidersSettings {
@@ -764,7 +722,7 @@ message BidRequest {
     // list of ids. You should enforce these exclusions if you have the ability
     // to classify ads into the listed categories. This field does not apply to
     // deals with block overrides (see
-    // https://support.google.com/adxbuyer/answer/6114194).
+    // https://support.google.com/authorizedbuyers/answer/6114194).
     repeated int32 excluded_sensitive_category = 7 [packed=true];
 
     // The allowed restricted ad categories for private and open auctions. See
@@ -799,7 +757,7 @@ message BidRequest {
     // file in the technical documentation for a list of ids. You should enforce
     // these exclusions if you have the ability to classify ads into the listed
     // categories. This field does not apply to deals with block overrides (see
-    // https://support.google.com/adxbuyer/answer/6114194).
+    // https://support.google.com/authorizedbuyers/answer/6114194).
     repeated int32 excluded_product_category = 13 [packed=true];
 
     // A creative that is disallowed to bid on this impression due to Ad
@@ -867,11 +825,11 @@ message BidRequest {
         // you must bid at least fixed_cpm_micros (in micros of your account
         // currency) in order to participate in the deal. If you win, you will
         // be charged fixed_cpm_micros. For deal_type=PRIVATE_AUCTION or
-        // deal_type=AUCTION_PACKAGE you must bid at least fixed_cpm_micros and
-        // you pay the second price. Bidding higher CPM than fixed_cpm_micros
-        // will increase your chance to win when deal_type=PRIVATE_AUCTION or
-        // deal_type=AUCTION_PACKAGE, however it will not increase your chance
-        // to win for other types of deals.
+        // deal_type=AUCTION_PACKAGE you must bid at least fixed_cpm_micros.
+        // Bidding higher CPM than fixed_cpm_micros will increase your chance
+        // to win when deal_type=PRIVATE_AUCTION or deal_type=AUCTION_PACKAGE,
+        // however it will not increase your chance to win for other types of
+        // deals.
         optional int64 fixed_cpm_micros = 2;
 
         // The type of the deal.
@@ -880,10 +838,10 @@ message BidRequest {
           PREFERRED_DEAL = 1;
           PRIVATE_AUCTION = 2;
 
-          // See https://support.google.com/adxbuyer/answer/7174589
+          // See https://support.google.com/authorizedbuyers/answer/7174589
           PROGRAMMATIC_GUARANTEED = 3;
 
-          // See https://support.google.com/adxbuyer/answer/7516884
+          // See https://support.google.com/authorizedbuyers/answer/7516884
           AUCTION_PACKAGE = 4;
         }
         optional DealType deal_type = 3 [default = UNKNOWN_DEAL_TYPE];
@@ -929,7 +887,7 @@ message BidRequest {
     }
     optional ExchangeBidding exchange_bidding = 28;
 
-    // The DFP ad unit code (http://support.google.com/dfp_premium/topic/28147)
+    // The ad unit code (https://support.google.com/admanager/topic/4426071)
     // This is currently only set for exchange bidding requests.
     optional string dfp_ad_unit_code = 33;
 
@@ -1076,6 +1034,7 @@ message BidRequest {
       // content.
       PLACEMENT_RECOMMENDATION = 4;
     }
+
     optional NativePlacementType native_placement_type = 45
         [default = PLACEMENT_UNKNOWN];
 
@@ -1270,6 +1229,7 @@ message BidRequest {
       optional string data = 2;
     }
     repeated BuyerGeneratedRequestData buyer_generated_request_data = 41;
+
   }
   repeated AdSlot adslot = 14;
 
@@ -1289,14 +1249,23 @@ message BidRequest {
     // technical documentation for a list of ids.
     optional int32 creative_status_code = 3;
 
-    // The second price cpm in micros of your account currency if your bid won
-    // the auction, or the cpm that must be exceeded to win the auction if your
-    // bid was outbid. This is only set if your bid participated in the
-    // auction. It is not set if the bid was filtered prior to the auction. It
-    // is also withheld if the publisher or winning bidder has opted out of
-    // price feedback, or if your account has opted out of sharing winning
-    // prices with other bidders.
+    // If the bid won the auction, this is the price paid in your account
+    // currency.  If the bid participated in the auction but was out-bid, this
+    // is the CPM that should have been exceeded in order to win.  This is not
+    // set if the bid was filtered prior to the auction, if the publisher or
+    // winning bidder has opted out of price feedback or if your account has
+    // opted out of sharing winning prices with other bidders. For first price
+    // auctions, minimum_bid_to_win is also populated.
     optional int64 cpm_micros = 4;
+
+    // The minimum bid value necessary to have won the auction, in micros of
+    // your account currency. If your bid won the auction, this is the second
+    // highest bid that was not filtered (including the floor price). If your
+    // bid did not win the auction, this is the winning candidate's bid. This
+    // field will only be populated if your bid participated in a first-price
+    // auction, and will not be populated if your bid was filtered prior to the
+    // auction.
+    optional int64 minimum_bid_to_win = 7;
 
     // Event notification token that was included in the bid response.
     optional bytes event_notification_token = 5;
@@ -1325,7 +1294,7 @@ message BidRequest {
   // possible without executing any bidding logic.
   optional bool is_ping = 17 [default=false];
 
-  // If true, then the selective callout model predicted that you will not bid
+  // If true, then the callout model predicted that you will not bid
   // on this request. We send a sampled percentage of such requests so that we
   // can automatically update the model when bidding patterns change.
   optional bool is_predicted_to_be_ignored = 45 [default=false];
@@ -1545,7 +1514,8 @@ message BidResponse {
       // highest of several bids, or some form of reserve price if you wish to
       // override the reserve price set by the publisher. The bid must be less
       // than or equal to max_cpm_micros or it will be ignored. This field is
-      // optional and does not need to be set.
+      // optional and does not need to be set. This field is not applicable
+      // when responding to bid requests with auction_type set to FIRST_PRICE.
       optional int64 min_cpm_micros = 3;
 
       // Billing id to attribute this impression to. The value must be in the
@@ -1581,6 +1551,19 @@ message BidResponse {
       // traffic metrics in IVT transparency reporting. IDs longer than 64 bytes
       // will be ignored.
       optional string buyer_reporting_id = 8;
+
+      // This field is applicable only for bid requests that are marked as
+      // first price, and will otherwise be ignored. If the field is set to
+      // true on a first price request, then the bid will go through a bid
+      // translation service that converts the second price bid into a first
+      // price bid for participation in the first price auction (i.e. may
+      // reduce but will never increase the bid). If the field is not set,
+      // then for first price eligible queries the bid will be treated as a
+      // first price bid. This field is a temporary product for bidders that
+      // require assistance migrating to 1st price bidding, and will eventually
+      // be deprecated.
+      optional bool use_bid_translation_service = 10;
+
     }
     repeated AdSlot adslot = 3;
 
