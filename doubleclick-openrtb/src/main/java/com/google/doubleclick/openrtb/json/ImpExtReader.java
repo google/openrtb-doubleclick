@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.google.doubleclick.AdxExt;
 import com.google.doubleclick.AdxExt.ImpExt;
-import com.google.doubleclick.AdxExt.BidExt.EventNotificationToken;
 import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData.SourceApp;
@@ -142,21 +141,22 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
 
   public final ImpExt.ExcludedCreative.Builder readExcludedCreatives(JsonParser par)
           throws IOException {
-    ImpExt.ExcludedCreative.Builder excludedCreative = ImpExt.ExcludedCreative.newBuilder();
+    ImpExt.ExcludedCreative.Builder exCreat = ImpExt.ExcludedCreative.newBuilder();
     for (startObject(par); endObject(par); par.nextToken()) {
       String fieldName = getCurrentName(par);
       if (par.nextToken() != JsonToken.VALUE_NULL) {
-        readExcludedCreativeField(par, excludedCreative, fieldName);
+        readExcludedCreativeField(par, exCreat, fieldName);
       }
     }
-    return excludedCreative;
+    return exCreat;
   }
 
-  protected void readExcludedCreativeField(JsonParser par, ImpExt.ExcludedCreative.Builder excludedCreative, String fieldName)
+  protected void readExcludedCreativeField(
+      JsonParser par, ImpExt.ExcludedCreative.Builder exCreat, String fieldName)
           throws IOException {
     switch (fieldName) {
       case "buyer_creative_id":
-        excludedCreative.setBuyerCreativeId(par.getText());
+        exCreat.setBuyerCreativeId(par.getText());
         break;
     }
   }

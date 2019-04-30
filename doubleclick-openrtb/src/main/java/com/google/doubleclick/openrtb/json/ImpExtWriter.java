@@ -26,15 +26,15 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData.SourceApp;
+import com.google.doubleclick.AdxExt.ImpExt.ExcludedCreative;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
-/**
- * Writer for {@link ImpExt}.
- */
+/** Writer for {@link ImpExt}. */
 class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
 
-  @Override protected void write(ImpExt ext, JsonGenerator gen) throws IOException {
+  @Override
+  protected void write(ImpExt ext, JsonGenerator gen) throws IOException {
     writeLongs("billing_id", ext.getBillingIdList(), gen);
     writeLongs("publisher_settings_list_id", ext.getPublisherSettingsListIdList(), gen);
     writeInts("allowed_vendor_type", ext.getAllowedVendorTypeList(), gen);
@@ -49,12 +49,19 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
       writeEnumField("ampad", ext.getAmpad(), gen);
     }
     if (ext.getBuyerGeneratedRequestDataCount() != 0) {
-	  gen.writeArrayFieldStart("buyer_generated_request_data");
-	  for (BuyerGeneratedRequestData feedback : ext.getBuyerGeneratedRequestDataList()) {
-	    writeBuyerGeneratedRequestData(feedback, gen);
-	  }
-	  gen.writeEndArray();
-	}
+      gen.writeArrayFieldStart("buyer_generated_request_data");
+      for (BuyerGeneratedRequestData feedback : ext.getBuyerGeneratedRequestDataList()) {
+        writeBuyerGeneratedRequestData(feedback, gen);
+      }
+      gen.writeEndArray();
+    }
+    if (ext.getExcludedCreativesCount() != 0) {
+      gen.writeArrayFieldStart("excluded_creatives");
+      for (ExcludedCreative exCreat : ext.getExcludedCreativesList()) {
+        writeExcludedCreative(exCreat, gen);
+      }
+      gen.writeEndArray();
+    }
   }
 
   private void writeBuyerGeneratedRequestData(BuyerGeneratedRequestData req, JsonGenerator gen)
@@ -79,18 +86,31 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
     }
   }
 
-  private void writeSourceApp(SourceApp app, JsonGenerator gen)
-      throws IOException {
+  private void writeSourceApp(SourceApp app, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeSourceAppFields(app, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeSourceAppFields(SourceApp app, JsonGenerator gen)
-      throws IOException {
+  private void writeSourceAppFields(SourceApp app, JsonGenerator gen) throws IOException {
     if (app.hasId()) {
       gen.writeStringField("id", app.getId());
+    }
+  }
+
+  private void writeExcludedCreative(ExcludedCreative exCreat, JsonGenerator gen)
+      throws IOException {
+    gen.writeStartObject();
+    writeExcludedCreativeFields(exCreat, gen);
+    gen.writeEndObject();
+    gen.flush();
+  }
+
+  private void writeExcludedCreativeFields(ExcludedCreative exCreat, JsonGenerator gen)
+      throws IOException {
+    if (exCreat.hasBuyerCreativeId()) {
+      gen.writeStringField("buyer_creative_id", exCreat.getBuyerCreativeId());
     }
   }
 }
