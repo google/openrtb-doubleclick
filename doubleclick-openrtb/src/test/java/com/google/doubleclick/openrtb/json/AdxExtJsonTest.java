@@ -18,6 +18,7 @@ import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData.SourceApp;
+import com.google.doubleclick.AdxExt.ImpExt.ExcludedCreative;
 import com.google.doubleclick.AdxExt.NativeRequestExt;
 import com.google.doubleclick.AdxExt.NativeRequestExt.LayoutType;
 import com.google.doubleclick.AdxExt.RegsExt;
@@ -73,6 +74,9 @@ public class AdxExtJsonTest {
                 .addBuyerGeneratedRequestData(BuyerGeneratedRequestData.newBuilder()
                     .setSourceApp(SourceApp.newBuilder().setId("bgr-sa"))
                     .setData("bgr-data"))
+                .addAllExcludedCreatives(asList(
+                    ExcludedCreative.newBuilder().setBuyerCreativeId("cr1").build(),
+                    ExcludedCreative.newBuilder().setBuyerCreativeId("cr2").build()))
                 .build()))
         .setSite(Site.newBuilder()
             .setDomain("mysite.com")
