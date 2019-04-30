@@ -22,6 +22,7 @@ import com.google.common.base.MoreObjects;
  * Key for the DMA Region mapping.  This composite key is necessary
  * because cities can belong to multiple DMA Regions.
  */
+@Deprecated
 public class CityDMARegionKey {
   private final int criteriaId;
   private final String regionName;

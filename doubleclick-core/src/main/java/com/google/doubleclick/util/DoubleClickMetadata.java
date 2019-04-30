@@ -77,7 +77,6 @@ public class DoubleClickMetadata {
   private final ImmutableMap<Integer, String> publisherVerticals;
   private final ImmutableMap<Integer, String> mobileCarriers;
   private final ImmutableMap<Integer, GeoTarget> geoTargetsByCriteriaId;
-  private final ImmutableMap<CityDMARegionKey, CityDMARegionValue> dmaRegions;
   private final ImmutableMap<GeoTarget.CanonicalKey, GeoTarget> geoTargetsByCanonicalKey;
   private final ImmutableMap<Object, CountryCodes> countryCodes;
 
@@ -123,7 +122,6 @@ public class DoubleClickMetadata {
       byKey.put(target.key(), target);
     }
     geoTargetsByCanonicalKey = ImmutableMap.copyOf(byKey);
-    dmaRegions = loadCitiesDMARegions(interner, ADX_DICT + "cities-dma-regions.csv");
     countryCodes = loadCountryCodes(interner, ADX_DICT + "countries.txt");
   }
 
@@ -216,11 +214,6 @@ public class DoubleClickMetadata {
     return vendors;
   }
 
-  @Deprecated
-  public ImmutableMap<Integer, String> gdnVendors() {
-    return ImmutableMap.of();
-  }
-
   /**
    * Dictionary file used in the seller_network_id field of BidRequest. This field specifies
    * the seller network to which the publisher belongs.
@@ -256,11 +249,9 @@ public class DoubleClickMetadata {
     return publisherVerticals;
   }
 
-  /**
-   * Dictionary file used to map cities to DMA Region codes.
-   */
+  @Deprecated
   public ImmutableMap<CityDMARegionKey, CityDMARegionValue> dmaRegions() {
-    return dmaRegions;
+    return ImmutableMap.of();
   }
 
   /**
@@ -319,7 +310,6 @@ public class DoubleClickMetadata {
         .add("sensitiveCategories#", adSensitiveCategories.size())
         .add("siteLists#", siteLists.size())
         .add("geoTargets#", geoTargetsByCriteriaId.size())
-        .add("dmaRegions#", dmaRegions.size())
         .add("vendors#", vendors.size())
         .toString();
   }
@@ -369,28 +359,6 @@ public class DoubleClickMetadata {
       logger.warn(e.toString());
       return ImmutableMap.of();
     }
-  }
-
-  private static ImmutableMap<CityDMARegionKey, CityDMARegionValue> loadCitiesDMARegions(
-      Interner<String> interner, String resourceName) {
-    Map<CityDMARegionKey, CityDMARegionValue> map = new LinkedHashMap<>();
-    try (InputStream is = new ResourceTransport().open(resourceName)) {
-      CSVParser.csvParser().parse(is, ".*,(\\d+),.*,.*,(\\d+)", fields -> {
-        map.put(
-            new CityDMARegionKey(
-                Integer.parseInt(fields.get(1)),
-                interner.intern(fields.get(3))),
-            new CityDMARegionValue(
-                Integer.parseInt(fields.get(4)),
-                interner.intern(fields.get(0)),
-                interner.intern(fields.get(2))));
-        return true;
-      });
-    } catch (IOException e) {
-      logger.warn(e.toString());
-      return ImmutableMap.of();
-    }
-    return ImmutableMap.copyOf(map);
   }
 
   private static ImmutableMap<Integer, GeoTarget> loadGeoTargets(

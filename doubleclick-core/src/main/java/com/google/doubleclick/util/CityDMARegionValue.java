@@ -21,6 +21,7 @@ import com.google.common.base.MoreObjects;
 /**
  * Value for the DMA Region mapping.
  */
+@Deprecated
 public class CityDMARegionValue {
   private final int regionCode;
   private final String city;
