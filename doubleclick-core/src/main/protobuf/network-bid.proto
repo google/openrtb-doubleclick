@@ -1551,6 +1551,7 @@ message BidResponse {
       // traffic metrics in IVT transparency reporting. IDs longer than 64 bytes
       // will be ignored.
       optional string buyer_reporting_id = 8;
+      optional int64 payment_cpm_micros = 9;
 
       // This field is applicable only for bid requests that are marked as
       // first price, and will otherwise be ignored. If the field is set to
