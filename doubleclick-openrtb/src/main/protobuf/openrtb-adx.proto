@@ -196,6 +196,7 @@ message BidExt {
   // If the length of BidRequest.Imp.ImpExt.billing_id is exactly 1, this field
   // is not required and its contents will be ignored.
   optional int64 billing_id = 10;
+  optional double payment_bid = 11;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {

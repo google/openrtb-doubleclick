@@ -41,7 +41,7 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
     super(AdxExt.bid, false,
         "impression_tracking_url", "ad_choices_destination_url", "bidder_name",
         "exchange_deal_type", "event_notification_token", "attribute", "amp_ad_url",
-        "sdk_rendered_ad", "restricted_category", "billing_id");
+        "sdk_rendered_ad", "restricted_category", "billing_id", "payment_bid");
   }
 
   @Override protected void read(BidExt.Builder ext, JsonParser par) throws IOException {
@@ -85,6 +85,10 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
         break;
       case "billing_id":
         ext.setBillingId(par.nextIntValue(0));
+        break;
+      case "payment_bid":
+        par.nextToken();
+        ext.setPaymentBid(par.getDoubleValue());
         break;
     }
   }
