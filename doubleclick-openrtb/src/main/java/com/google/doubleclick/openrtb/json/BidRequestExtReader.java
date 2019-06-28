@@ -78,6 +78,10 @@ extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
         feedback.setPrice(par.getDoubleValue());
         break;
 
+      case "minimum_bid_to_win":
+        feedback.setMinimumBidToWin(par.getDoubleValue());
+        break;
+
       case "buyer_creative_id":
         feedback.setBuyerCreativeId(par.getText());
         break;
