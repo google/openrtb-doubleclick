@@ -102,6 +102,7 @@ public class AdxExtJsonTest {
                 .setBuyerCreativeId("cr1")
                 .setCreativeStatusCode(99)
                 .setPrice(1.2)
+                .setMinimumBidToWin(1.0)
                 .setRequestId("req1")
                 .setEventNotificationToken(
                     BidFeedback.EventNotificationToken.newBuilder().setPayload("data")))
@@ -135,6 +136,7 @@ public class AdxExtJsonTest {
                     .addAllRestrictedCategory(asList(44, 55, 66))
                     .setBillingId(77)
                     .setPaymentBid(8.8)
+                    .setUseBidTranslationService(true)
                     .build())))
         .setExtension(AdxExt.bidResponse,
             BidResponseExt.newBuilder().setProcessingTimeMs(99).build())

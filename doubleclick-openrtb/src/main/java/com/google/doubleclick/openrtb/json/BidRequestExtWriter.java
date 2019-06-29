@@ -58,6 +58,9 @@ class BidRequestExtWriter extends OpenRtbJsonExtWriter<BidRequestExt> {
     if (feedback.hasPrice()) {
       gen.writeNumberField("price", feedback.getPrice());
     }
+    if (feedback.hasMinimumBidToWin()) {
+      gen.writeNumberField("minimum_bid_to_win", feedback.getMinimumBidToWin());
+    }
     if (feedback.hasBuyerCreativeId()) {
       gen.writeStringField("buyer_creative_id", feedback.getBuyerCreativeId());
     }
