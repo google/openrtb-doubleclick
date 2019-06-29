@@ -102,6 +102,7 @@ public class AdxExtJsonTest {
                 .setBuyerCreativeId("cr1")
                 .setCreativeStatusCode(99)
                 .setPrice(1.2)
+                .setMinimumBidToWin(1.0)
                 .setRequestId("req1")
                 .setEventNotificationToken(
                     BidFeedback.EventNotificationToken.newBuilder().setPayload("data")))
@@ -131,6 +132,7 @@ public class AdxExtJsonTest {
                     .setSdkRenderedAd(SdkRenderedAd.newBuilder()
                         .setId("sdk1")
                         .setRenderingData("data"))
+                    .setUseBidTranslationService(true)
                     .build())))
         .setExtension(AdxExt.bidResponse,
             BidResponseExt.newBuilder().setProcessingTimeMs(99).build())
