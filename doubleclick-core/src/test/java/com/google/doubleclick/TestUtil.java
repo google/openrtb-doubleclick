@@ -23,7 +23,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.annotation.Nullable;
 
 /**
@@ -172,7 +171,7 @@ public class TestUtil {
       e.toString();
       throw e;
     } catch (Exception ee) {
-      assertThat(e).isSameAs(ee);
+      assertThat(e).isSameInstanceAs(ee);
     }
   }
 

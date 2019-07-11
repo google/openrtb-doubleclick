@@ -68,8 +68,6 @@ public class DoubleClickMetadataTest {
     assertThat(metadata.geoTargetFor(1023191).canonParent().canonParent().name())
         .isEqualTo("United States");
     assertThat(metadata.geoTargets().isEmpty()).isFalse();
-    assertThat(metadata.dmaRegions().get(new CityDMARegionKey(1016100, "Sioux City, IA")))
-        .isEqualTo(new CityDMARegionValue(624, "West Bend", "Iowa"));
     assertThat(metadata.mobileCarriers().get(70092)).isEqualTo("Verizon");
 
     GeoTarget geoTarget1 = metadata.geoTargetFor(GeoTarget.Type.COUNTRY, "United States");
@@ -82,10 +80,10 @@ public class DoubleClickMetadataTest {
     assertThat(geoTarget1.name()).isEqualTo("United States");
     assertThat(geoTarget1.canonicalName()).isEqualTo("United States");
     assertThat(geoTarget1.countryCode()).isEqualTo("US");
-    assertThat(geoTarget1.type()).isSameAs(GeoTarget.Type.COUNTRY);
-    assertThat(geoTarget1.getCanonAncestor(GeoTarget.Type.COUNTRY)).isSameAs(geoTarget1);
+    assertThat(geoTarget1.type()).isSameInstanceAs(GeoTarget.Type.COUNTRY);
+    assertThat(geoTarget1.getCanonAncestor(GeoTarget.Type.COUNTRY)).isSameInstanceAs(geoTarget1);
     assertThat(geoTarget1.getCanonAncestor(GeoTarget.Type.CITY)).isNull();
-    assertThat(geoTarget1.getIdAncestor(GeoTarget.Type.COUNTRY)).isSameAs(geoTarget1);
+    assertThat(geoTarget1.getIdAncestor(GeoTarget.Type.COUNTRY)).isSameInstanceAs(geoTarget1);
     assertThat(geoTarget1.getIdAncestor(GeoTarget.Type.CITY)).isNull();
     TestUtil.testCommonEnum(GeoTarget.Type.values());
 
@@ -93,8 +91,8 @@ public class DoubleClickMetadataTest {
     CountryCodes country2 = new CountryCodes(840, "US", "USA");
     CountryCodes country3 = new CountryCodes(840, "US", "USB");
     TestUtil.testCommonMethods(country1, country2, country3);
-    assertThat(metadata.countryCodes().get("USA")).isSameAs(country1);
-    assertThat(metadata.countryCodes().get(840)).isSameAs(country1);
+    assertThat(metadata.countryCodes().get("USA")).isSameInstanceAs(country1);
+    assertThat(metadata.countryCodes().get(840)).isSameInstanceAs(country1);
     assertThat(country1.numeric()).isEqualTo(840);
     assertThat(country1.alpha2()).isEqualTo("US");
     assertThat(country1.alpha3()).isEqualTo("USA");
@@ -138,22 +136,5 @@ public class DoubleClickMetadataTest {
     try (InputStream is = transport.open(
         "https://storage.googleapis.com/adx-rtb-dictionaries/doesnt.exist")) {
     }
-  }
-
-  @Test
-  public void testCityDMARegion() {
-    CityDMARegionKey key1 = new CityDMARegionKey(1, "a");
-    CityDMARegionKey key2 = new CityDMARegionKey(1, "a");
-    CityDMARegionKey key3 = new CityDMARegionKey(1, "b");
-    TestUtil.testCommonMethods(key1, key2, key3);
-    assertThat(key1.criteriaId()).isEqualTo(1);
-    assertThat(key1.regionName()).isEqualTo("a");
-    CityDMARegionValue value1 = new CityDMARegionValue(1, "a", "b");
-    CityDMARegionValue value2 = new CityDMARegionValue(1, "a", "b");
-    CityDMARegionValue value3 = new CityDMARegionValue(1, "a", "c");
-    assertThat(value1.regionCode()).isEqualTo(1);
-    assertThat(value1.city()).isEqualTo("a");
-    assertThat(value1.state()).isEqualTo("b");
-    TestUtil.testCommonMethods(value1, value2, value3);
   }
 }

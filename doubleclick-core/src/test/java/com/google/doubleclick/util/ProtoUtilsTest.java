@@ -20,7 +20,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.protos.adx.NetworkBid.BidRequest.AdSlot;
-
 import org.junit.Test;
 
 /**
@@ -35,7 +34,7 @@ public class ProtoUtilsTest {
         AdSlot.newBuilder().setId(2).build(),
         AdSlot.newBuilder().setId(3).build());
     assertThat(ProtoUtils.filter(adslots, adslot -> adslot.getId() >= 2)).hasSize(2);
-    assertThat(ProtoUtils.filter(adslots, adslot -> true)).isSameAs(adslots);
+    assertThat(ProtoUtils.filter(adslots, adslot -> true)).isSameInstanceAs(adslots);
     assertThat(ProtoUtils.filter(adslots, adslot -> false)).isEmpty();
   }
 }

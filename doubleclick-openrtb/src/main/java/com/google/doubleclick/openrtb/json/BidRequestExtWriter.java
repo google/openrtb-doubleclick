@@ -36,6 +36,9 @@ class BidRequestExtWriter extends OpenRtbJsonExtWriter<BidRequestExt> {
       }
       gen.writeEndArray();
     }
+    if (ext.hasGoogleQueryId()) {
+      gen.writeStringField("google_query_id", ext.getGoogleQueryId());
+    }
   }
 
   private void writeBidFeedback(BidFeedback feedback, JsonGenerator gen) throws IOException {

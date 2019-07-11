@@ -194,9 +194,7 @@ public class DoubleClickValidator {
     }
 
     List<Integer> bad;
-    ImmutableMap<Integer, String> metaVendors = request.getSellerNetworkId() == GDN
-        ? metadata.gdnVendors()
-        : metadata.vendors();
+    ImmutableMap<Integer, String> metaVendors = metadata.vendors();
 
     if (!(bad = checkAttributes(
         reqSlot.getAllowedVendorTypeList(), ad.getVendorTypeList(),

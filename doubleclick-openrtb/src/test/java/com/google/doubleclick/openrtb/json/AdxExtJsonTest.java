@@ -106,6 +106,7 @@ public class AdxExtJsonTest {
                 .setRequestId("req1")
                 .setEventNotificationToken(
                     BidFeedback.EventNotificationToken.newBuilder().setPayload("data")))
+            .setGoogleQueryId("gq1")
             .build())
         .build());
   }
@@ -132,6 +133,8 @@ public class AdxExtJsonTest {
                     .setSdkRenderedAd(SdkRenderedAd.newBuilder()
                         .setId("sdk1")
                         .setRenderingData("data"))
+                    .addAllRestrictedCategory(asList(44, 55, 66))
+                    .setBillingId(77)
                     .setUseBidTranslationService(true)
                     .build())))
         .setExtension(AdxExt.bidResponse,

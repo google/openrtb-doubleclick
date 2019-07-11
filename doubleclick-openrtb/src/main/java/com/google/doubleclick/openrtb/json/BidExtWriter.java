@@ -56,6 +56,10 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
       gen.writeFieldName("sdk_rendered_ad");
       writeSdkRenderedAd(ext.getSdkRenderedAd(), gen);
     }
+    writeInts("restricted_category", ext.getRestrictedCategoryList(), gen);
+    if (ext.hasBillingId()) {
+      gen.writeNumberField("billing_id", ext.getBillingId());
+    }
     if (ext.hasUseBidTranslationService()) {
       writeIntBoolField("use_bid_translation_service", ext.getUseBidTranslationService(), gen);
     }

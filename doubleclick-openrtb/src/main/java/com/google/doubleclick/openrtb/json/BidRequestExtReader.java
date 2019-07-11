@@ -39,7 +39,7 @@ class BidRequestExtReader
 extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
 
   public BidRequestExtReader() {
-    super(AdxExt.bidRequest, false, "bid_feedback");
+    super(AdxExt.bidRequest, false, "bid_feedback", "google_query_id");
   }
 
   @Override protected void read(BidRequestExt.Builder ext, JsonParser par) throws IOException {
@@ -49,6 +49,8 @@ extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
           ext.addBidFeedback(readBidFeedback(par));
         }
         break;
+      case "google_query_id":
+        ext.setGoogleQueryId(par.nextTextValue());
     }
   }
 

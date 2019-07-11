@@ -45,7 +45,7 @@ public class DoubleClickSnippetProcessorTest {
   @Test
   public void testNullProcessor() {
     assertThat(process(DoubleClickSnippetProcessor.DC_NULL, OpenRtbMacros.AUCTION_PRICE.key()))
-        .isSameAs(OpenRtbMacros.AUCTION_PRICE.key());
+        .isSameInstanceAs(OpenRtbMacros.AUCTION_PRICE.key());
   }
 
   private String process(DoubleClickSnippetProcessor processor, String snippet) {
