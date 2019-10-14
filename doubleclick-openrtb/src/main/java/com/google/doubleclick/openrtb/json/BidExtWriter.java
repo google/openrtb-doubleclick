@@ -63,6 +63,9 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     if (ext.hasUseBidTranslationService()) {
       writeIntBoolField("use_bid_translation_service", ext.getUseBidTranslationService(), gen);
     }
+    if (ext.hasThirdPartyBuyerToken()) {
+      gen.writeStringField("third_party_buyer_token", ext.getThirdPartyBuyerToken());
+    }
   }
 
   private void writeEventNotificationToken(EventNotificationToken req, JsonGenerator gen)

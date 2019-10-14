@@ -14,6 +14,8 @@ import com.google.doubleclick.AdxExt.BidExt.SdkRenderedAd;
 import com.google.doubleclick.AdxExt.BidRequestExt;
 import com.google.doubleclick.AdxExt.BidRequestExt.BidFeedback;
 import com.google.doubleclick.AdxExt.BidResponseExt;
+import com.google.doubleclick.AdxExt.DealExt;
+import com.google.doubleclick.AdxExt.DealExt.DealType;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
@@ -30,6 +32,8 @@ import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.App;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.OpenRtb.BidRequest.Imp.Native;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp.Deal;
 import com.google.openrtb.OpenRtb.BidRequest.Regs;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidRequest.User;
@@ -63,6 +67,12 @@ public class AdxExtJsonTest {
                           .setStyleHeight(100)
                           .setStyleLayoutType(LayoutType.PIXEL)
                           .build())))
+            .setPmp(Pmp.newBuilder()
+                .addDeals(Deal.newBuilder()
+                    .setId("deal")
+                    .setExtension(AdxExt.deal, DealExt.newBuilder()
+                        .setDealType(DealType.PREFERRED_DEAL)
+                        .build())))
             .setExtension(AdxExt.imp, ImpExt.newBuilder()
                 .addAllBillingId(asList(100L, 101L, 999999999999999999L))
                 .addAllPublisherSettingsListId(asList(200L, 201L, 8888888888888888888L))
@@ -136,6 +146,7 @@ public class AdxExtJsonTest {
                     .addAllRestrictedCategory(asList(44, 55, 66))
                     .setBillingId(77)
                     .setUseBidTranslationService(true)
+                    .setThirdPartyBuyerToken("tpbt")
                     .build())))
         .setExtension(AdxExt.bidResponse,
             BidResponseExt.newBuilder().setProcessingTimeMs(99).build())

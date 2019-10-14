@@ -31,7 +31,7 @@ import java.io.IOException;
 class RegsExtReader extends OpenRtbJsonExtComplexReader<Regs.Builder, RegsExt.Builder> {
 
   public RegsExtReader() {
-    super(AdxExt.regs, false, "gdpr");
+    super(AdxExt.regs, /*isJsonObject=*/ false, "gdpr");
   }
 
   @Override protected void read(RegsExt.Builder ext, JsonParser par) throws IOException {

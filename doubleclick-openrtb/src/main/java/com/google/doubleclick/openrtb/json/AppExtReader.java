@@ -38,7 +38,7 @@ import java.io.IOException;
 class AppExtReader extends OpenRtbJsonExtComplexReader<App.Builder, AppExt.Builder> {
 
   public AppExtReader() {
-    super(AdxExt.app, false, "installed_sdk");
+    super(AdxExt.app, /*isJsonObject=*/ false, "installed_sdk");
   }
 
   @Override protected void read(AppExt.Builder ext, JsonParser par) throws IOException {

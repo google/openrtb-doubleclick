@@ -33,7 +33,8 @@ class NativeRequestExtReader
     extends OpenRtbJsonExtComplexReader<NativeRequest.Builder, NativeRequestExt.Builder> {
 
   public NativeRequestExtReader() {
-    super(AdxExt.nativeExt, false,
+    super(
+        AdxExt.nativeExt, /*isJsonObject=*/ false,
         "style_id", "style_height", "style_width", "style_layout_type");
   }
 

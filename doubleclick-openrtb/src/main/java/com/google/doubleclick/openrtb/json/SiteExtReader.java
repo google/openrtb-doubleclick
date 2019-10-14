@@ -31,7 +31,7 @@ import java.io.IOException;
 class SiteExtReader extends OpenRtbJsonExtComplexReader<Site.Builder, SiteExt.Builder> {
 
   public SiteExtReader() {
-    super(AdxExt.site, false, "amp");
+    super(AdxExt.site, /*isJsonObject=*/ false, "amp");
   }
 
   @Override protected void read(SiteExt.Builder ext, JsonParser par) throws IOException {

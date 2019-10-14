@@ -21,6 +21,7 @@ import com.google.doubleclick.AdxExt.AppExt;
 import com.google.doubleclick.AdxExt.BidExt;
 import com.google.doubleclick.AdxExt.BidRequestExt;
 import com.google.doubleclick.AdxExt.BidResponseExt;
+import com.google.doubleclick.AdxExt.DealExt;
 import com.google.doubleclick.AdxExt.EventTrackerExt;
 import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.NativeRequestExt;
@@ -30,6 +31,7 @@ import com.google.doubleclick.AdxExt.UserExt;
 import com.google.openrtb.OpenRtb.BidRequest;
 import com.google.openrtb.OpenRtb.BidRequest.App;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
+import com.google.openrtb.OpenRtb.BidRequest.Imp.Pmp.Deal;
 import com.google.openrtb.OpenRtb.BidRequest.Regs;
 import com.google.openrtb.OpenRtb.BidRequest.Site;
 import com.google.openrtb.OpenRtb.BidRequest.User;
@@ -68,6 +70,8 @@ public class AdxExtUtils {
         .register(new RegsExtReader(), Regs.Builder.class)
         .register(new RegsExtWriter(), RegsExt.class, Regs.class)
         .register(new EventTrackerExtReader(), EventTracker.Builder.class)
-        .register(new EventTrackerExtWriter(), EventTrackerExt.class, EventTracker.class);
+        .register(new EventTrackerExtWriter(), EventTrackerExt.class, EventTracker.class)
+        .register(new DealExtReader(), Deal.Builder.class)
+        .register(new DealExtWriter(), DealExt.class, Deal.class);
   }
 }
