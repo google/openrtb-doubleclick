@@ -37,7 +37,7 @@ import java.io.IOException;
 class UserExtReader extends OpenRtbJsonExtComplexReader<User.Builder, UserExt.Builder> {
 
   public UserExtReader() {
-    super(AdxExt.user, false, "consented_providers_settings");
+    super(AdxExt.user, /*isJsonObject=*/ false, "consented_providers_settings");
   }
 
   @Override protected void read(UserExt.Builder ext, JsonParser par) throws IOException {

@@ -38,11 +38,11 @@ import java.io.IOException;
 class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Builder> {
 
   public BidExtReader() {
-    super(AdxExt.bid, false,
+    super(AdxExt.bid, /*isJsonObject=*/ false,
         "impression_tracking_url", "ad_choices_destination_url", "bidder_name",
         "exchange_deal_type", "event_notification_token", "attribute", "amp_ad_url",
         "sdk_rendered_ad", "restricted_category", "billing_id",
-        "use_bid_translation_service");
+        "use_bid_translation_service", "third_party_buyer_token");
   }
 
   @Override protected void read(BidExt.Builder ext, JsonParser par) throws IOException {
@@ -90,6 +90,9 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
       case "use_bid_translation_service":
         par.nextToken();
         ext.setUseBidTranslationService(par.getValueAsBoolean());
+        break;
+      case "third_party_buyer_token":
+        ext.setThirdPartyBuyerToken(par.nextTextValue());
         break;
     }
   }

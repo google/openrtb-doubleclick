@@ -39,7 +39,8 @@ import java.io.IOException;
 class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Builder> {
 
   public ImpExtReader() {
-    super(AdxExt.imp, false,
+    super(
+        AdxExt.imp, /*isJsonObject=*/ false,
         "billing_id", "publisher_settings_list_id", "allowed_vendor_type",
         "publisher_parameter", "dfp_ad_unit_code", "is_rewarded_inventory", "ampad",
         "buyer_generated_request_data", "excluded_creatives");
