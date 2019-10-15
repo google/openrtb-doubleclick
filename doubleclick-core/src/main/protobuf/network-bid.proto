@@ -1,4 +1,4 @@
-// Protocol version: v.162
+// Protocol version: v.167
 // Copyright 2019 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -29,8 +29,8 @@ message BidRequest {
     TAG_FOR_CHILD_DIRECTED_TREATMENT = 0;
   }
 
-  // When set, the user's cookie/id data allows only restricted usage and is not
-  // available in the usual fields.
+  // When user_data_treatment is set, the user's cookie/id data is cleared from
+  // the request and is not sent in callout.
   // The impacted fields are:
   //  * google_user_id
   //  * hosted_match_data
@@ -38,12 +38,11 @@ message BidRequest {
   //  * mobile.encrypted_hashed_idfa
   repeated UserDataTreatment user_data_treatment = 49;
 
-  // The Google ID for the user as described in the documentation for the cookie
-  // matching service. This field is the unpadded web-safe base64 encoded
-  // version of a binary cookie id. See the "Base 64 Encoding with URL and
-  // Filename Safe Alphabet" section in RFC 3548 for encoding details. This
-  // field is the same as the Google ID returned by the cookie matching service.
-  // Not set if there is one or more user_data_treatment value.
+  // The Google ID for the user. This field is the unpadded web-safe base64
+  // encoded version of a binary cookie id. See the "Base 64 Encoding with URL
+  // and Filename Safe Alphabet" section in RFC 3548 for encoding details. This
+  // field may be the same as the Google ID returned by the cookie matching
+  // service. Not set if there is one or more user_data_treatment value.
   optional string google_user_id = 21;
 
   // The version number of the google_user_id. We may sometimes change the
@@ -124,9 +123,7 @@ message BidRequest {
   optional int32 timezone_offset = 25;
 
   // List of detected user verticals. Currently unused.
-  repeated int32 user_vertical = 30 [
-      packed=true
-  ];
+  repeated int32 user_vertical = 30 [packed = true];
 
   // This field is not populated by default. We recommend that bidders instead
   // store and look up list ids using either google_user_id or hosted_match_data
@@ -199,7 +196,7 @@ message BidRequest {
 
   // List of detected content labels. See content-labels.txt file in the
   // technical documentation for a list of ids.
-  repeated int32 detected_content_label = 26 [packed=true];
+  repeated int32 detected_content_label = 26 [packed = true];
 
   // This represents a unique ID for the overall query.  In the event
   // that there are multiple callouts for a query, all callout requests for that
@@ -237,7 +234,7 @@ message BidRequest {
     optional DeviceType device_type = 1 [default = UNKNOWN_DEVICE];
 
     // The platform of the device. Examples: android, iphone, palm
-    optional string platform = 2;
+    optional string platform = 2 [default = ""];
 
     // The brand of the device, e.g. Nokia, Samsung.
     optional string brand = 3 [default = ""];
@@ -248,9 +245,9 @@ message BidRequest {
     // Contains the OS version of the platform. For instance, for Android 2,
     // major=2, minor=0. For iPhone 3.3.1, major=3 and minor=3.
     message OsVersion {
-      optional int32 major = 1;
-      optional int32 minor = 2;
-      optional int32 micro = 3;
+      optional int32 major = 1 [default = -1];
+      optional int32 minor = 2 [default = -1];
+      optional int32 micro = 3 [default = -1];
     }
     // The OS version; e.g. 2 for Android 2.1, or 3.3 for iOS 3.3.1.
     optional OsVersion os_version = 5;
@@ -259,7 +256,7 @@ message BidRequest {
     // the internet via a carrier (as opposed to via WiFi). To look up carrier
     // name and country from carrier ID, please refer to:
     // https://developers.google.com/adwords/api/docs/appendix/mobilecarriers.
-    optional int64 carrier_id = 6;
+    optional int64 carrier_id = 6 [default = 0];
 
     // The width of the device screen in pixels.
     optional int32 screen_width = 7 [default = 0];
@@ -282,8 +279,8 @@ message BidRequest {
       LANDSCAPE = 2;
     }
     // The screen orientation of the device when the ad request is sent.
-    optional ScreenOrientation screen_orientation = 10 [
-        default = UNKNOWN_ORIENTATION];
+    optional ScreenOrientation screen_orientation = 10
+        [default = UNKNOWN_ORIENTATION];
 
     // Apple iOS device model, e.g., "iphone 5s", "iphone 6+", "ipad 4".
     optional string hardware_version = 11;
@@ -333,7 +330,7 @@ message BidRequest {
 
     // For a mobile web request, this field indicates whether the page is
     // optimized for mobile browsers on high-end mobile phones.
-    optional bool is_mobile_web_optimized = 17 [default=false];
+    optional bool is_mobile_web_optimized = 17 [default = false];
 
     // This field is used for advertising identifiers for
     // 1) iOS devices (This is called Identifier for Advertising, or IDFA, as
@@ -384,9 +381,9 @@ message BidRequest {
       // Semantic version of the installed SDK and the adapter that communicates
       // between the installed SDK and Google's SDK.
       message Version {
-        optional int32 major = 1;
-        optional int32 minor = 2;
-        optional int32 micro = 3;
+        optional int32 major = 1 [default = -1];
+        optional int32 minor = 2 [default = -1];
+        optional int32 micro = 3 [default = -1];
       }
 
       // The version of the installed SDK.
@@ -432,7 +429,7 @@ message BidRequest {
       // between paragraphs of editorial content as a standalone video player.
       IN_ARTICLE = 5;
     }
-    optional Placement placement = 16 [default=UNKNOWN_PLACEMENT];
+    optional Placement placement = 16 [default = UNKNOWN_PLACEMENT];
 
     // The URL of the page that the publisher gives Google to describe the video
     // content, with parameters removed.
@@ -464,7 +461,7 @@ message BidRequest {
       MOUSE_OVER = 4;
       INITIATE_ON_ENTERING_VIEWPORT_SOUND_ON = 5;
       INITIATE_ON_ENTERING_VIEWPORT_SOUND_OFF = 6;
-    };
+    }
     optional VideoPlaybackMethod playback_method = 14
         [default = METHOD_UNKNOWN];
 
@@ -498,8 +495,8 @@ message BidRequest {
       REQUIRE_SKIPPABLE = 1;
       BLOCK_SKIPPABLE = 2;
     }
-    optional SkippableBidRequestType video_ad_skippable = 4 [default =
-        ALLOW_SKIPPABLE];
+    optional SkippableBidRequestType video_ad_skippable = 4
+        [default = ALLOW_SKIPPABLE];
 
     // The maximum duration in milliseconds for the ad you should return, if
     // this ad is skippable (this generally differs from the maximum duration
@@ -528,7 +525,7 @@ message BidRequest {
     // should support at least one of them.
     enum VideoFormat {
       UNKNOWN_VIDEO_FORMAT = -1;
-      VIDEO_FLV = 0;    // Flash video files are accepted (FLV).
+      VIDEO_FLV = 0;  // Flash video files are accepted (FLV).
       VIDEO_MP4 = 1;
       YT_HOSTED = 2;    // Valid VAST ads with at least one media file hosted
                         // on youtube.com.
@@ -543,8 +540,8 @@ message BidRequest {
       VIDEO_3GPP = 10;
       VIDEO_HLS = 11;
       VIDEO_DASH = 12;
-      AUDIO_MP4A = 13;    // Audio version of MP4.
-    };
+      AUDIO_MP4A = 13;  // Audio version of MP4.
+    }
     repeated VideoFormat allowed_video_formats = 6;
 
     // Information about the companion ad slots that can be shown with the
@@ -555,8 +552,8 @@ message BidRequest {
     message CompanionSlot {
       // These fields represent the available heights and widths in this slot.
       // There will always be the same number heights and widths fields.
-      repeated int32 height = 1 [packed=true];
-      repeated int32 width  = 2 [packed=true];
+      repeated int32 height = 1 [packed = true];
+      repeated int32 width = 2 [packed = true];
 
       // These are the formats of the creatives allowed in this companion ad
       // slot.
@@ -564,7 +561,7 @@ message BidRequest {
         UNKNOWN_CREATIVE_FORMAT = -1;
         IMAGE_CREATIVE = 0;
         FLASH_CREATIVE = 1;
-        HTML_CREATIVE  = 2;
+        HTML_CREATIVE = 2;
       }
       repeated CreativeFormat creative_format = 3;
     }
@@ -582,12 +579,11 @@ message BidRequest {
                                 // banner is not required.
 
       // Not used at this time.
-      END_CAP_FORBIDDEN = 2;    // Response with companion ad is filtered.
+      END_CAP_FORBIDDEN = 2;  // Response with companion ad is filtered.
       // Not used at this time.
-      END_CAP_REQUIRED = 3;     // Response without companion ad is filtered.
+      END_CAP_REQUIRED = 3;  // Response without companion ad is filtered.
     }
-    optional EndCapSupport end_cap_support = 13 [default =
-        END_CAP_NOT_ENABLED];
+    optional EndCapSupport end_cap_support = 13 [default = END_CAP_NOT_ENABLED];
 
     // Attributes of the video that the user is viewing, not the video ad.
     // These fields are based on the availability of the video metadata from the
@@ -628,6 +624,11 @@ message BidRequest {
       MOBILE_APP_VIDEO = 3;
     }
     optional InventoryType DEPRECATED_inventory_type = 3 [default = WEB_VIDEO];
+
+    // Identify whether or not the ad request is being served from a live video
+    // stream (0 = is not live, 1 = is live).
+    //
+    optional bool is_livestream = 18 [default = false];
   }
   optional Video video = 29;
 
@@ -646,13 +647,12 @@ message BidRequest {
     ADX_PUBLISHER_OWNED_AND_OPERATED = 1;
     ADX_PUBLISHER_REPRESENTED = 2;
     GOOGLE_REPRESENTED = 3;
-  };
+  }
   optional PublisherType publisher_type = 51 [default = UNKNOWN_PUBLISHER_TYPE];
 
   // -----------------------------------------------------------
   // Information about the adslots on the page.
   message AdSlot {
-
     // An arbitrarily assigned slot id that is unique on a given page and
     // usually starts counting from 1. You use this to identify which slot to
     // bid on in the BidResponse.
@@ -687,16 +687,26 @@ message BidRequest {
     repeated int32 width = 2;
     repeated int32 height = 3;
 
+    message FlexibleAdSlotSettings {
+      optional int32 max_width = 1;
+      optional int32 max_height = 2;
+      optional int32 min_width = 3;
+      optional int32 min_height = 4;
+    }
+    // If the adslot is flexible, this contains settings on how the slot
+    // may be resized.
+    optional FlexibleAdSlotSettings flexible_adslot_settings = 50;
+
     // The disallowed attribute ids for the ads that can show in this slot. See
     // the publisher-excludable-creative-attributes.txt file in the technical
     // documentation for a list of ids.
-    repeated int32 excluded_attribute = 4 [packed=true];
+    repeated int32 excluded_attribute = 4 [packed = true];
 
     // The allowed vendor types. See the vendors.txt file in the technical
     // documentation for a list of ids. This field does not apply to deals with
     // block overrides (see
     // https://support.google.com/authorizedbuyers/answer/6114194).
-    repeated int32 allowed_vendor_type = 6 [packed=true];
+    repeated int32 allowed_vendor_type = 6 [packed = true];
 
     message ConsentedProvidersSettings {
       // Set of IDs corresponding to providers for whom the publisher has told
@@ -723,7 +733,7 @@ message BidRequest {
     // to classify ads into the listed categories. This field does not apply to
     // deals with block overrides (see
     // https://support.google.com/authorizedbuyers/answer/6114194).
-    repeated int32 excluded_sensitive_category = 7 [packed=true];
+    repeated int32 excluded_sensitive_category = 7 [packed = true];
 
     // The allowed restricted ad categories for private and open auctions. See
     // the ad-restricted-categories.txt file in the technical documentation for
@@ -732,7 +742,7 @@ message BidRequest {
     // programmatic guarantees. If you bid with an ad in a restricted category,
     // you MUST ALWAYS declare the category in the bid response regardless of
     // the values in this field.
-    repeated int32 allowed_restricted_category = 16 [packed=true];
+    repeated int32 allowed_restricted_category = 16 [packed = true];
 
     // The allowed restricted ad categories for preferred deals or programmatic
     // guarantees. See the ad-restricted-categories.txt file in the technical
@@ -745,7 +755,7 @@ message BidRequest {
     // programmatic guarantees. If you bid with an ad in a restricted category,
     // you MUST ALWAYS declare the category in the bid response regardless of
     // the values in this field.
-    repeated int32 allowed_restricted_category_for_deals = 22 [packed=true];
+    repeated int32 allowed_restricted_category_for_deals = 22 [packed = true];
 
     // List of creative languages allowed by the publisher. The order is
     // arbitrary. The codes are 2 or 5 characters and are documented at
@@ -758,7 +768,7 @@ message BidRequest {
     // these exclusions if you have the ability to classify ads into the listed
     // categories. This field does not apply to deals with block overrides (see
     // https://support.google.com/authorizedbuyers/answer/6114194).
-    repeated int32 excluded_product_category = 13 [packed=true];
+    repeated int32 excluded_product_category = 13 [packed = true];
 
     // A creative that is disallowed to bid on this impression due to Ad
     // Exchange policies or creative disapproval, excluded creative attributes,
@@ -779,13 +789,15 @@ message BidRequest {
     //
     message MatchingAdData {
       // The billing ids corresponding to the pretargeting configs that matched.
-      repeated int64 billing_id = 2 [
-          packed = false
-      ];
+      repeated int64 billing_id = 2 [packed = false];
 
       // The minimum CPM value that you can bid to not be filtered before the
       // auction. This may be a global minimum, or it may be a minimum set by
-      // the publisher. The value is in micros of your account currency.
+      // the publisher. The value is in micros of the bidding currency.
+      // The bidding currency is determined by:
+      // 1. The bidder-level currency, if configured.
+      // 2. Otherwise, the currency of the buyer accounts indicated by the
+      // billing IDs in the billing_id field.
       optional int64 minimum_cpm_micros = 5;
 
       // This message is deprecated.
@@ -822,7 +834,7 @@ message BidRequest {
         optional int64 direct_deal_id = 1;
 
         // For deal_type=PREFERRED_DEAL or deal_type=PROGRAMMATIC_GUARANTEED,
-        // you must bid at least fixed_cpm_micros (in micros of your account
+        // you must bid at least fixed_cpm_micros (in micros of the bidding
         // currency) in order to participate in the deal. If you win, you will
         // be charged fixed_cpm_micros. For deal_type=PRIVATE_AUCTION or
         // deal_type=AUCTION_PACKAGE you must bid at least fixed_cpm_micros.
@@ -830,18 +842,43 @@ message BidRequest {
         // to win when deal_type=PRIVATE_AUCTION or deal_type=AUCTION_PACKAGE,
         // however it will not increase your chance to win for other types of
         // deals.
+        // The bidding currency is determined by:
+        // 1. The bidder-level currency, if configured.
+        // 2. Otherwise, the currency of the buyer accounts indicated by the
+        // billing IDs in the billing_id field.
         optional int64 fixed_cpm_micros = 2;
 
-        // The type of the deal.
+        // The type of the deal. Note that Authorized Buyers policy overrides
+        // apply to all Programmatic Guaranteed and Preferred Deal bids, and do
+        // not apply to bids for other deal types.
         enum DealType {
           UNKNOWN_DEAL_TYPE = 0;
+
+          // Bids are fixed-price and evaluated before the Open Auction. Bidders
+          // are not required to bid with Preferred Deals when they are present
+          // on the bid request. See
+          // https://support.google.com/authorizedbuyers/answer/2604595 for more
+          // information.
           PREFERRED_DEAL = 1;
+
+          // Bids participate in a Private Auction against a select list of
+          // buyers with specific floors. See
+          // https://support.google.com/authorizedbuyers/answer/2839853 for more
+          // information.
           PRIVATE_AUCTION = 2;
 
-          // See https://support.google.com/authorizedbuyers/answer/7174589
+          // Bids are fixed-price and evaluated before the Open Auction. Bidders
+          // are expected to bid with Programmatic Guaranteed deals whenever
+          // they are present on a bid request in order to ensure that the
+          // number of impressions agreed upon for a given deal are served. See
+          // https://support.google.com/authorizedbuyers/answer/7174589 for more
+          // information.
           PROGRAMMATIC_GUARANTEED = 3;
 
-          // See https://support.google.com/authorizedbuyers/answer/7516884
+          // The deal ID is an identifier for a collection of Open Auction
+          // inventory matching a given set of targeting criteria. See
+          // https://support.google.com/authorizedbuyers/answer/7516884 for more
+          // information.
           AUCTION_PACKAGE = 4;
         }
         optional DealType deal_type = 3 [default = UNKNOWN_DEAL_TYPE];
@@ -892,7 +929,7 @@ message BidRequest {
     optional string dfp_ad_unit_code = 33;
 
     // Visibility information for the slot.
-    enum SlotVisibility  {
+    enum SlotVisibility {
       NO_DETECTION = 0;
       ABOVE_THE_FOLD = 1;
       BELOW_THE_FOLD = 2;
@@ -902,8 +939,8 @@ message BidRequest {
     // Viewability percentage for the ad slot. This is an estimate of the
     // likelihood that this slot will be viewable by the end user based on
     // historical and environment data. It is expressed as a percentage in the
-    // range of [0, 100] and rounded down to the next multiple of 10. The
-    // default value -1 indicates that viewability could not be estimated.
+    // range of [0, 100]. The default value -1 indicates that viewability could
+    // not be estimated.
     optional int32 viewability = 21 [default = -1];
 
     // Historical click-through rate for ads served in the ad slot. This is
@@ -925,7 +962,7 @@ message BidRequest {
       NO_IFRAME = 1;
       SAME_DOMAIN_IFRAME = 2;
       CROSS_DOMAIN_IFRAME = 3;
-    };
+    }
     optional IFramingState iframing_state = 19 [default = UNKNOWN_IFRAME_STATE];
 
     // iFrame depth of the ad slot on the webpage where it is present.
@@ -935,7 +972,7 @@ message BidRequest {
       NOT_IN_IFRAME = 1;
       ONE_IFRAME = 2;
       MULTIPLE_IFRAME = 3;
-     };
+    }
     optional IFramingDepth iframing_depth = 20 [default = UNKNOWN_IFRAME_DEPTH];
 
     // A native ad consists of pieces that are rendered by the publisher. A
@@ -1043,7 +1080,7 @@ message BidRequest {
     enum MediationStatus {
       UNKNOWN = 0;
       DIRECT_REQUEST = 1;
-    };
+    }
     optional MediationStatus mediation_status = 52 [default = UNKNOWN];
 
     // Auto refresh settings.
@@ -1060,7 +1097,7 @@ message BidRequest {
         }
         // The type of the declared auto refresh.
         optional AutoRefreshType refresh_type = 1
-          [default = UNKNOWN_AUTO_REFRESH_TYPE];
+            [default = UNKNOWN_AUTO_REFRESH_TYPE];
 
         // The minimum refresh interval. This applies to all refresh types.
         optional int32 min_refresh_interval_seconds = 2;
@@ -1113,12 +1150,7 @@ message BidRequest {
     // Publisher declaration stating that this ad slot may serve on
     // non-browser inventory, like desktop apps.
     optional NonBrowserSource non_browser_slot_source = 34
-      [default = UNDECLARED_SOURCE];
-
-    // Publisher declaration stating that this ad slot will serve an
-    // interstitial ad. An interstitial ad covers the content for a period of
-    // time.
-    optional bool is_interstitial_slot = 35 [default = false];
+        [default = UNDECLARED_SOURCE];
 
     // Defines who controls the environment that made the ad request and will
     // render the ad. On platforms where code written by Google will handle
@@ -1229,7 +1261,6 @@ message BidRequest {
       optional string data = 2;
     }
     repeated BuyerGeneratedRequestData buyer_generated_request_data = 41;
-
   }
   repeated AdSlot adslot = 14;
 
@@ -1287,17 +1318,17 @@ message BidRequest {
   // used to evaluate latencies or for other testing. During your initial
   // testing with Google traffic any response that you make will be filtered
   // out of the auction whether this flag has a value of true or false.
-  optional bool is_test = 15 [default=false];
+  optional bool is_test = 15 [default = false];
 
   // If true, then this request is intended to measure network latency. Please
   // return an empty BidResponse with only processing_time_ms set as quickly as
   // possible without executing any bidding logic.
-  optional bool is_ping = 17 [default=false];
+  optional bool is_ping = 17 [default = false];
 
   // If true, then the callout model predicted that you will not bid
   // on this request. We send a sampled percentage of such requests so that we
   // can automatically update the model when bidding patterns change.
-  optional bool is_predicted_to_be_ignored = 45 [default=false];
+  optional bool is_predicted_to_be_ignored = 45 [default = false];
 
 }
 
@@ -1423,11 +1454,7 @@ message BidResponse {
 
       // This field is deprecated.
       optional string DEPRECATED_store = 12;
-
-      // This field is deprecated. Please use
-      // BidResponse.Ad.impression_tracking_url instead.
-      repeated string DEPRECATED_impression_tracking_url = 9;
-    };
+    }
     optional NativeAd native_ad = 18;
 
     // The set of destination URLs for the snippet. This includes the URLs that
@@ -1503,19 +1530,32 @@ message BidResponse {
       required int32 id = 1;
 
       // The maximum CPM you want to be charged if you win the auction for this
-      // ad slot, expressed in micros of your account currency. For example, to
+      // ad slot, expressed in micros of the bidding currecy. For example, to
       // bid a CPM of 1.29 USD, set max_cpm_micros = 1290000. Winning bids are
       // rounded up to billable units. For example, in USD, bids are rounded up
       // to the next multiple of 10,000 micros (one cent).
+      // The bidding currency is determined by:
+      // 1. The bidder-level currency, if configured.
+      // 2. Otherwise, the currency of the buyer account indicated by the
+      // billing ID in the billing_id field.
+      // 3. If billing_id is empty, the currency of the buyer account indicated
+      // by the sole billing ID in the bid request.
       required int64 max_cpm_micros = 2;
 
       // The minimum CPM you want to be charged if you win the auction for this
-      // ad slot. This may represent a second price if you choose max_cpm as the
-      // highest of several bids, or some form of reserve price if you wish to
-      // override the reserve price set by the publisher. The bid must be less
-      // than or equal to max_cpm_micros or it will be ignored. This field is
-      // optional and does not need to be set. This field is not applicable
-      // when responding to bid requests with auction_type set to FIRST_PRICE.
+      // ad slot, expressed in micros of the bidding currecy. This may represent
+      // a second price if you choose max_cpm as the highest of several bids, or
+      // some form of reserve price if you wish to override the reserve price
+      // set by the publisher. The bid must be less than or equal to
+      // max_cpm_micros or it will be ignored. This field is optional and does
+      // not need to be set. This field is not applicable when responding to bid
+      // requests with auction_type set to FIRST_PRICE.
+      // The bidding currency is determined by:
+      // 1. The bidder-level currency, if configured.
+      // 2. Otherwise, the currency of the buyer account indicated by the
+      // billing ID in the billing_id field.
+      // 3. If billing_id is empty, the currency of the buyer account indicated
+      // by the sole billing ID in the bid request.
       optional int64 min_cpm_micros = 3;
 
       // Billing id to attribute this impression to. The value must be in the
@@ -1539,7 +1579,7 @@ message BidResponse {
 
       // When exchange_deal_id is set, the type of deal.  This is reported to
       // publishers and affects how the deal is treated in the auction.
-      enum ExchangeDealType  {
+      enum ExchangeDealType {
         OPEN_AUCTION = 0;
         PRIVATE_AUCTION = 1;
         PREFERRED_DEAL = 2;
@@ -1551,7 +1591,6 @@ message BidResponse {
       // traffic metrics in IVT transparency reporting. IDs longer than 64 bytes
       // will be ignored.
       optional string buyer_reporting_id = 8;
-      optional int64 payment_cpm_micros = 9;
 
       // This field is applicable only for bid requests that are marked as
       // first price, and will otherwise be ignored. If the field is set to
@@ -1565,6 +1604,11 @@ message BidResponse {
       // be deprecated.
       optional bool use_bid_translation_service = 10;
 
+      // Token used to identify end third party buyer information if an
+      // exchange as an open bidder is an intermediary. This is obtained from
+      // the third party buyer and must be passed to Google unaltered in the bid
+      // response.
+      optional string third_party_buyer_token = 12;
     }
     repeated AdSlot adslot = 3;
 
@@ -1585,8 +1629,10 @@ message BidResponse {
       // Additional context provided for rendering.
       enum Context {
         UNKNOWN_CONTEXT = 0;
+
+        // Currently not supported.
         OMID = 1;
-      };
+      }
       repeated Context context = 2;
 
       // Parameters associated with the resource that will be passed to the
@@ -1596,7 +1642,7 @@ message BidResponse {
 
       // Used to uniquely identify the verification script provider.
       optional string vendor_key = 4;
-    };
+    }
     // Resources to invoke when the impression is rendered. This is supported
     // for native and banner formats only and explicitly whitelisted scripts
     // only.
