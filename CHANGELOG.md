@@ -1,28 +1,48 @@
 RELEASE NOTES
 ----------------------------------------------------------------------
 
+Please check the [Ad Exchange Release Notes](https://developers.google.com/ad-exchange/rtb/relnotes)
+for detailed notes about protocol updates.
+
+## Version 1.5.14, 14-09-2019
+* DoubleClick proto v.167.
+
+## Version 1.5.13, 14-10-2019
+* DoubleClick OpenRTB extensions proto v.40.
+
+## Version 1.5.12, 11-07-2019
+* DoubleClick proto v.162, DoubleClick OpenRTB extensions proto v.37.
+* Deprecate DMA regions metadata; Ad Exchange does not redistribute that file anymore.
+* JSON support for extensions (v.35) restricted_category, billing_id, google_query_id.
+* JSON support for extensions (v.36) use_bid_translation_service, minimum_bid_to_win
+  (thanks Mary Clair Thompson!)
+
+## Version 1.5.11, 29-04-2019
+* DoubleClick proto v.162.
+* Remove obsolete gdn-vendors metadata.
+* JSON support for AdX/OpenRTB extension (v.36) excluded_creatives
+  (thanks Mary Clair Thompson!)
+
+## Version 1.5.10, 23-01-2019
+* DoubleClick proto v.161, DoubleClick OpenRTB extensions proto v.36.
+
 ## Version 1.5.9, 10-09-2018
-* [DoubleClick proto v.152, DoubleClick OpenRTB extensions proto v.31](
-  https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v153).
+* DoubleClick proto v.152, DoubleClick OpenRTB extensions proto v.31].
 
 ## Version 1.5.8, 09-07-2018
-* [DoubleClick proto v.148, DoubleClick OpenRTB extensions proto v.30](
-  https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v148).
+* DoubleClick proto v.148, DoubleClick OpenRTB extensions proto v.30.
 
 ## Version 1.5.7, 20-06-2018
 - Now using Protobuf 3.6.0.
 
 ## Version 1.5.6, 19-06-2018
-* [DoubleClick proto v.147, DoubleClick OpenRTB extensions proto v.29](
-  https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v147).
+* DoubleClick proto v.147, DoubleClick OpenRTB extensions proto v.29.
 
 ## Version 1.5.5, 27-04-2018
-* [DoubleClick proto v.144](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v144).
-* [DoubleClick OpenRTB extensions proto v.28](https://developers.google.com/ad-exchange/rtb/relnotes#open-rtb-proto-v2.5.0_15).
+* DoubleClick proto v.144, DoubleClick OpenRTB extensions proto v.28.
 
 ## Version 1.5.4, 06-02-2018
-* [DoubleClick proto v.137](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v137)
-* [DoubleClick OpenRTB extensions proto v.24](https://developers.google.com/ad-exchange/rtb/relnotes#open-rtb-proto-v2.5.0_10).
+* DoubleClick proto v.137, DoubleClick OpenRTB extensions proto v.24.
 
 ## Version 1.5.3, 22-11-2017
 * Added missing JSON support for the new extension `BidExt.attribute`.
@@ -34,14 +54,14 @@ RELEASE NOTES
 * The library now builds correctly, and is supported, on JDK 9.
 
 ## Version 1.4.7, 22-09-2017
-* [DoubleClick proto v.134](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v134)
+* DoubleClick proto v.134.
 
 ## Version 1.4.6, 29-08-2017
-* [DoubleClick proto v.131](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v131)
+* DoubleClick proto v.131.
 - Now using Protobuf 3.4.0.
 
 ## Version 1.4.5, 07-08-2017
-* [DoubleClick proto v.129](https://developers.google.com/ad-exchange/rtb/relnotes#rtb-proto-v129)
+* DoubleClick proto v.129.
 
 ## Version 1.4.4, 07-07-2017
 * DoubleClick proto v.128.
@@ -268,63 +288,53 @@ RELEASE NOTES
 * Mapper changes for OpenRTB model changes.
 
 ## Version 0.8.6, 24-06-2015
-
 * Small mapper reviews. Breaking changes to `ExtMapper`.
 * Fixes for a couple potential NPEs.
 
 ## Version 0.8.5, 11-06-2015
-
 * Fix mapping for `Bid.cat`, now includes all categories.
 * Improved mapping for `ExpandableDirection`.
 * Cleanup `ExtMapper.toDoubleClickAd()`, has one less parameter.
 
 ## Version 0.8.4, 29-05-2015
-
 * Improved mapping of `Device.devicetype`.
 * Changes for the new names of some OpenRTB messages and enums.
 * Several small mapping reviews, in particular to avoid setting a value
   that would be redundant because it's the default in the target model.
 
 ## Version 0.8.3, 22-05-2015
-
 * Maps `Video.content.title/len/keywords`.
 * DoubleClick protocol v.63, only fixes two enum value names.
 * Mapping of `Impression.bidfloor` now ignores DC `BuyerPricingRule`,
   which could rarely result in zero prices.
 
 ## Version 0.8.1, 29-04-2015
-
 * DoubleClick protocol v.61, adds `inventory_type` and `deal_type`.
 * Maps `BidRequest.at`, `Deal.at`.
 
 ## Version 0.8.0, 21-04-2015
-
 * DoubleClick protocol v.60, adds `allowed_restricted_category_for_deals`.
 * `DoubleClickOpenRtbNativeMapper` more lenient.
 * Improved mapping of `api` fields (`ApiFramework`).
 * Maps `Native.battr`, `Native.api`.
 
 ## Version 0.8.0-beta5, 03-04-2015
-
 * Improved handling of `geo_criteria_id` in the `DoubleclickMetadata` API
   and the OpenRTB mapper. You should see more `Geo` fields populated
   for many requests, e.g. `city` for requests located at a postal code,
   `metro` for requests from a city that belongs to a metro, etc.
 
 ## Version 0.8.0-beta3, 31-03-2015
-
 * Logging updates, mostly avoiding multiline logs (bad for syslog).
 * Refactor some `DoubleClickMetadata` helper types.
 
 ## Version 0.8.0-beta2, 13-03-2015
-
 * `BidRequest.id` & `User.customdata` using base64Url, not base16.
 * Fix `bcat` mapping; optimize some enum mappings.
 * More metadata: Agencies, Site lists, Creative status.
 * Removed error-prone from build, new version had some issues too.
 
 ## Version 0.8.0-beta, 20-02-2015
-
 * Support for Native Ads completed!
 * Maps `Publisher.name`.
 * `ExtMapper` has new methods that make easier to create mapper
@@ -333,7 +343,6 @@ RELEASE NOTES
 * Updated to latest error-prone; now Maven build works with JDK 8!
 
 ## Version 0.7.5, 02-12-2014
-
 * Partial support for OpenRTB 2.3! The missing item is Native ads,
   which depends on the OpenRTB Native 1.0 spec (proposed final draft
   at this time). This support will come in a future update.
@@ -351,7 +360,6 @@ RELEASE NOTES
 * Improvements and cleanups in the internal CSV parser.
 
 ## Version 0.7.4, 21-11-2014
-
 * DoubleClick proto v57.  Notice that the major new in this update is
   native ads, but the corresponding OpenRTB spec is not finalized so
   there's no DoubleClick/OpenRTB mapping support at this time.
@@ -359,29 +367,24 @@ RELEASE NOTES
   - Maps OpenRTB `Bid.nurl` / DC `Ad.impressionTrackingUrl`
 
 ## Version 0.7.3, 17-11-2014
-
 * Fix mapping of `BidRequest.User.customdata`.
 
 ## Version 0.7.2, 29-10-2014
-
 * Updated to Protocol Buffers 2.6.1 (bugfix, doesn't require rebuilds).
 * `DoubleClickMetadata` more resilient to bad resources.
 * DoubleClick protocol v.54.
 * Test & logging reviews.
 
 ## Version 0.7.1, 20-10-2014
-
 * Updated to Protocol Buffers 2.6.0. Full rebuild recommended, the
   code generated by protoc 2.6.0 is NOT 100% compatible with 2.5.0.
 
 ## Version 0.7.0, 16-10-2014
-
 * Fix namespace of DoubleClick proto to Google standard: replace all
   `com.google.doubleclick.Doubleclick`->`com.google.protos.adx.NetworkBid`.
 * `DoubleClickValidator` validates SSL-enabled ads.
 
 ## Version 0.6.6, 14-10-2014
-
 * DoubleClick proto v.52.
 * Mapper: Much better mapping of IAB categories.
 * New link extension `DcExt.bidResponse`.
@@ -389,7 +392,6 @@ RELEASE NOTES
 * Update Guava library.
 
 ## Version 0.6.5, 18-08-2014
-
 - Crypto reviews: `javax.security`'s exceptions; initVector improvements;
   fix block cypher for >1 blocks; `Price` method names (millis/micros).
 - Metadata: content-labels, publisher-verticals; better GeoTable parser.
@@ -398,7 +400,6 @@ RELEASE NOTES
 - DoubleClickValidator: validates `deal_id`; optimizations.
 
 ## Version 0.6.4, 10-08-2014
-
 * Remove dependency from apache-commons-codec!
 * `DoubleClickValidator` improved (better logs) and refactored to not
   depend on OpenRTB; moved to the doubleclick-core module.
@@ -408,7 +409,6 @@ RELEASE NOTES
 * No need anymore to checkout the openrtb project for building.
 
 ## Version 0.6.3, 02-08-2014
-
 * Update DoubleClick protocol to v51.
 * Map `User.gender/age` from new `UserDemographics` data.
 * Decrypt `HyperlocalSet`, keep in a link extension, and map `Geo.lat/lon`.
@@ -419,14 +419,12 @@ RELEASE NOTES
   from this code's DoubleClick roots but was not OpenRTB-compliant.
 
 ## Version 0.6.2, 25-07-2014
-
 * `DoubleClickCrypto`: optimize memory usage in Base64 encoding/decoding;
   some initial fixes for IDFA/Hyperlocal but still broken in some cases.
 * Remove dependency on buggy, unsupported opencsv; using custom parser.
 * Mapping: Fix semi-transparent branded channels.
 
 ## Version 0.6.1, 15-07-2014
-
 * Remove depedency from Guice! The libraries still supports all
   JSR-305 DI frameworks, but now only uses `javax.inject`.
 * DoubleClick protocol v50; map `app.content.userrating`, `app.name`.
@@ -435,5 +433,4 @@ RELEASE NOTES
   see new documentation about this in `OpenRtbMacros`.
 
 ## Version 0.6, 10-07-2014
-
 * Initial Open Source release.
