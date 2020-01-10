@@ -17,6 +17,7 @@
 package com.google.doubleclick.openrtb.json;
 
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeEnumField;
+import static com.google.openrtb.json.OpenRtbJsonUtils.writeIntBoolField;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.doubleclick.AdxExt.DealExt;
@@ -30,6 +31,12 @@ class DealExtWriter extends OpenRtbJsonExtWriter<DealExt> {
   protected void write(DealExt ext, JsonGenerator gen) throws IOException {
     if (ext.hasDealType()) {
       writeEnumField("deal_type", ext.getDealType(), gen);
+    }
+    if (ext.hasMustBid()) {
+      writeIntBoolField("must_bid", ext.getMustBid(), gen);
+    }
+    if (ext.hasPublisherBlocksOverridden()) {
+      writeIntBoolField("publisher_blocks_overridden", ext.getPublisherBlocksOverridden(), gen);
     }
   }
 }

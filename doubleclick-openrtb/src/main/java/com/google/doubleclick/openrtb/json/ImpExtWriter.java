@@ -27,6 +27,7 @@ import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData.SourceApp;
 import com.google.doubleclick.AdxExt.ImpExt.ExcludedCreative;
+import com.google.doubleclick.AdxExt.ImpExt.OpenBidding;
 import com.google.openrtb.json.OpenRtbJsonExtWriter;
 import java.io.IOException;
 
@@ -61,6 +62,24 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
         writeExcludedCreative(exCreat, gen);
       }
       gen.writeEndArray();
+    }
+    if (ext.hasOpenBidding()) {
+      gen.writeFieldName("open_bidding");
+      writeOpenBidding(ext.getOpenBidding(), gen);
+    }
+    writeInts("allowed_restricted_category", ext.getAllowedRestrictedCategoryList(), gen);
+  }
+
+  private void writeOpenBidding(OpenBidding obid, JsonGenerator gen) throws IOException {
+    gen.writeStartObject();
+    writeOpenBiddingFields(obid, gen);
+    gen.writeEndObject();
+    gen.flush();
+  }
+
+  private void writeOpenBiddingFields(OpenBidding obid, JsonGenerator gen) throws IOException {
+    if (obid.hasIsOpenBidding()) {
+      writeIntBoolField("is_open_bidding", obid.getIsOpenBidding(), gen);
     }
   }
 
