@@ -4,6 +4,9 @@ RELEASE NOTES
 Please check the [Ad Exchange Release Notes](https://developers.google.com/ad-exchange/rtb/relnotes)
 for detailed notes about protocol updates.
 
+## Version 1.5.15, 10-01-2020
+* DoubleClick proto v.170, DoubleClick OpenRTB extensions proto v.45.
+
 ## Version 1.5.14, 14-09-2019
 * DoubleClick proto v.167.
 
