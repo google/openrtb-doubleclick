@@ -71,25 +71,23 @@ extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
       case "request_id":
         feedback.setRequestId(par.getText());
         break;
-
       case "creative_status_code":
         feedback.setCreativeStatusCode(par.getIntValue());
         break;
-
       case "price":
         feedback.setPrice(par.getDoubleValue());
         break;
-
       case "minimum_bid_to_win":
         feedback.setMinimumBidToWin(par.getDoubleValue());
         break;
-
       case "buyer_creative_id":
         feedback.setBuyerCreativeId(par.getText());
         break;
-
       case "event_notification_token":
         feedback.setEventNotificationToken(readEventNotificationToken(par));
+        break;
+      case "sampled_mediation_cpm_ahead_of_auction_winner":
+        feedback.setSampledMediationCpmAheadOfAuctionWinner(par.getDoubleValue());
         break;
     }
   }

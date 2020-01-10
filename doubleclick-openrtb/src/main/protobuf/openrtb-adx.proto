@@ -1,9 +1,9 @@
-// Protocol version: v.40
+// Protocol version: v.45
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
 
-// Copyright 2019 Google Inc. All Rights Reserved.
+// Copyright 2020 Google Inc. All Rights Reserved.
 
 // Protocol buffer for Ad Exchange OpenRTB specification.
 
@@ -85,6 +85,22 @@ message ImpExt {
 
   repeated BuyerGeneratedRequestData buyer_generated_request_data = 9;
 
+  // Parameters related to Open Bidding.
+  message OpenBidding {
+    // This field is set to true if the publisher set up a yield group or a
+    // mediation group that targets this adslot and this bidder. See
+    // https://support.google.com/admanager/answer/7128453 for information on
+    // Open Bidding and its effects on the bidding process.
+    optional bool is_open_bidding = 2;
+  }
+  optional OpenBidding open_bidding = 12;
+
+  // The allowed restricted ad categories. See
+  // https://storage.googleapis.com/adx-rtb-dictionaries/ad-restricted-categories.txt
+  // for a list of ids. If you bid with an ad in a restricted category, you MUST
+  // ALWAYS declare the category in the bid response regardless of the values in
+  // this field.
+  repeated int32 allowed_restricted_category = 13;
 }
 
 extend com.google.openrtb.BidRequest.Imp {
@@ -216,6 +232,12 @@ message BidExt {
   // third party buyer and must be passed to Google unaltered in the bid
   // response.
   optional string third_party_buyer_token = 14;
+
+  // Buyer declared ID which will be used to break down spend and invalid
+  // traffic metrics in IVT transparency reporting in Query Tool. Note that IDs
+  // with fewer than 1000 impressions will not be used to break down metrics.
+  // IDs longer than 64 bytes will be ignored.
+  optional string buyer_reporting_id = 17;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
@@ -328,6 +350,18 @@ message BidRequestExt {
     // will not be populated if your bid was filtered prior to the auction.
     optional double minimum_bid_to_win = 6;
 
+    // When a publisher uses an RTB auction and waterfall-based SDK mediation on
+    // the same query, the winner of the real-time auction must also compete in
+    // a mediation waterfall (which is ordered by price) to win the impression.
+    // If the bid participated in the auction and there was no waterfall, the
+    // value of this field is 0. If the bid participated in the auction and
+    // there was a waterfall, the value of this field is a price representing a
+    // sample bid from the eligible mediation networks that were higher than the
+    // auction winner, weighted by expected fill rate.  This field can be used
+    // in conjunction with minimum_bid_to_win to train bidding models. The CPM
+    // is in your account currency.
+    optional double sampled_mediation_cpm_ahead_of_auction_winner = 8;
+
     message EventNotificationToken {
       // The contents of the token.
       optional string payload = 1;
@@ -404,10 +438,10 @@ message DealExt {
 
     // Bids are fixed-price and evaluated before the Open Auction. Bidders are
     // expected to bid with Programmatic Guaranteed deals whenever they are
-    // present on a bid request in order to ensure that the number of
-    // impressions agreed upon for a given deal are served. See
-    // https://support.google.com/authorizedbuyers/answer/7174589 for more
-    // information.
+    // present on a bid request and the must_bid field is true in order to
+    // ensure that the number of impressions agreed upon for a given deal are
+    // served. See https://support.google.com/authorizedbuyers/answer/7174589
+    // for more information.
     PROGRAMMATIC_GUARANTEED = 3;
 
     // The deal ID is an identifier for a collection of Open Auction inventory
@@ -417,6 +451,19 @@ message DealExt {
     AUCTION_PACKAGE = 4;
   }
   optional DealType deal_type = 1 [default = UNKNOWN_DEAL_TYPE];
+
+  // This field is only applicable to Programmatic Guaranteed deals. The
+  // buyer is allowed to skip bidding on the impression if this field is
+  // false. When it is true, the buyer is required to bid on this deal for
+  // this impression opportunity. This field will always be filled explicitly
+  // for the JSON wire format.
+  optional bool must_bid = 2 [default = true];
+
+  // Whether the publisher has exempted this deal from configured blocks. This
+  // setting does not override AdX policies or Ad Review Center decisions. See
+  // https://support.google.com/authorizedbuyers/answer/6114194 for more
+  // information.
+  optional bool publisher_blocks_overridden = 3;
 }
 
 extend com.google.openrtb.BidRequest.Imp.Pmp.Deal {

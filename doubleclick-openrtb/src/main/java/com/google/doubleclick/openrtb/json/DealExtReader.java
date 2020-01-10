@@ -32,7 +32,9 @@ import java.io.IOException;
 class DealExtReader extends OpenRtbJsonExtComplexReader<Deal.Builder, DealExt.Builder> {
 
   public DealExtReader() {
-    super(AdxExt.deal, /*isJsonObject=*/ false, "deal_type");
+    super(
+        AdxExt.deal, /*isJsonObject=*/ false,
+        "deal_type", "must_bid", "publisher_blocks_overridden");
   }
 
   @Override protected void read(DealExt.Builder ext, JsonParser par) throws IOException {
@@ -42,6 +44,14 @@ class DealExtReader extends OpenRtbJsonExtComplexReader<Deal.Builder, DealExt.Bu
         if (checkEnum(value)) {
           ext.setDealType(value);
         }
+        break;
+      case "must_bid":
+        par.nextToken();
+        ext.setMustBid(par.getValueAsBoolean());
+        break;
+      case "publisher_blocks_overridden":
+        par.nextToken();
+        ext.setPublisherBlocksOverridden(par.getValueAsBoolean());
         break;
     }
   }

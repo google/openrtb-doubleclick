@@ -1,4 +1,4 @@
-// Protocol version: v.167
+// Protocol version: v.170
 // Copyright 2019 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -75,6 +75,7 @@ message BidRequest {
   // of ids. The geo_criteria_id field replaces the deprecated country, region,
   // city, and metro fields.
   optional int32 geo_criteria_id = 39;
+
 
   // Detected postal code of the appropriate type for the country of the end
   // user (e.g. zip code if the country is "US"). The postal_code_prefix field
@@ -891,10 +892,18 @@ message BidRequest {
         // This is deprecated. Please ignore.
         optional int64 DEPRECATED_remaining_impressions_to_buy = 6;
 
+        // This field is deprecated in favor of the boolean must_bid field
+        // below.
         // Value between 0 and 1 only set for Programmatic Guaranteed deals.
         // Buyers are required to bid if must_bid_level = 1 and can decide
         // whether to bid if must_bid_level < 1.
-        optional double must_bid_level = 7 [default = 1.0];
+        optional double must_bid_level = 7 [default = 1.0, deprecated = true];
+
+        // This field is only applicable to Programmatic Guaranteed deals. The
+        // buyer is allowed to skip bidding on the impression if this field is
+        // false. When it is true, the buyer is required to bid on this deal for
+        // this impression opportunity.
+        optional bool must_bid = 9 [default = true];
       }
       repeated DirectDeal direct_deal = 6;
 
@@ -923,6 +932,16 @@ message BidRequest {
       repeated KeyValue key_value = 3;
     }
     optional ExchangeBidding exchange_bidding = 28;
+
+    // Parameters related to Open Bidding.
+    message OpenBidding {
+      // This field is set to true if the publisher set up a yield group or a
+      // mediation group that targets this adslot and this bidder. See
+      // https://support.google.com/admanager/answer/7128453 for information on
+      // Open Bidding and its effects on the bidding process.
+      optional bool is_open_bidding = 2;
+    }
+    optional OpenBidding open_bidding = 53;
 
     // The ad unit code (https://support.google.com/admanager/topic/4426071)
     // This is currently only set for exchange bidding requests.
@@ -1298,6 +1317,18 @@ message BidRequest {
     // auction.
     optional int64 minimum_bid_to_win = 7;
 
+    // When a publisher uses an RTB auction and waterfall-based SDK mediation on
+    // the same query, the winner of the real-time auction must also compete in
+    // a mediation waterfall (which is ordered by price) to win the impression.
+    // If the bid participated in the auction and there was no waterfall, the
+    // value of this field is 0. If the bid participated in the auction and
+    // there was a waterfall, the value of this field is a price representing a
+    // sample bid from the eligible mediation networks that were higher than the
+    // auction winner, weighted by expected fill rate.  This field can be used
+    // in conjunction with minimum_bid_to_win to train bidding models. The CPM
+    // is in micros of your account currency.
+    optional int64 sampled_mediation_cpm_ahead_of_auction_winner = 10;
+
     // Event notification token that was included in the bid response.
     optional bytes event_notification_token = 5;
 
@@ -1587,9 +1618,10 @@ message BidResponse {
       }
       optional ExchangeDealType exchange_deal_type = 7 [default = OPEN_AUCTION];
 
-      // Buyer declared ID which will be used to breakdown spend and invalid
-      // traffic metrics in IVT transparency reporting. IDs longer than 64 bytes
-      // will be ignored.
+      // Buyer declared ID which will be used to break down spend and invalid
+      // traffic metrics in IVT transparency reporting in Query Tool. Note that
+      // IDs with fewer than 1000 impressions will not be used to break down
+      // metrics. IDs longer than 64 bytes will be ignored.
       optional string buyer_reporting_id = 8;
 
       // This field is applicable only for bid requests that are marked as

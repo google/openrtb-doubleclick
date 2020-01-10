@@ -68,6 +68,11 @@ class BidRequestExtWriter extends OpenRtbJsonExtWriter<BidRequestExt> {
       gen.writeFieldName("event_notification_token");
       writeEventNotificationToken(feedback.getEventNotificationToken(), gen);
     }
+    if (feedback.hasSampledMediationCpmAheadOfAuctionWinner()) {
+      gen.writeNumberField(
+          "sampled_mediation_cpm_ahead_of_auction_winner",
+          feedback.getSampledMediationCpmAheadOfAuctionWinner());
+    }
   }
 
   private void writeEventNotificationToken(EventNotificationToken token, JsonGenerator gen)

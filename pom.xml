@@ -54,15 +54,15 @@
     <findBugsJsr305Version>3.0.2</findBugsJsr305Version>
     <gpg.skip>true</gpg.skip>
     <guavaVersion>28.1-jre</guavaVersion>
-    <fasterxmlJacksonVersion>2.10.0</fasterxmlJacksonVersion>
+    <fasterxmlJacksonVersion>2.10.2</fasterxmlJacksonVersion>
     <injectVersion>1</injectVersion>
-    <junitVersion>4.12</junitVersion>
+    <junitVersion>4.13</junitVersion>
     <metricsVersion>4.1.0</metricsVersion>
-    <openrtbVersion>1.5.9</openrtbVersion>
+    <openrtbVersion>1.5.10</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.9</openrtbSource>
-    <protobufVersion>3.10.0</protobufVersion>
-    <slf4jVersion>1.7.25</slf4jVersion>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.10</openrtbSource>
+    <protobufVersion>3.11.1</protobufVersion>
+    <slf4jVersion>1.7.30</slf4jVersion>
     <truthVersion>1.0</truthVersion>
 
     <!-- Plugin versions -->
@@ -107,12 +107,12 @@
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.2.0</version>
       </plugin>
 
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.1</version>
       </plugin>
 
       <plugin>
@@ -132,7 +132,7 @@
 
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.8.2</version>
       </plugin>
 
       <plugin>
@@ -154,7 +154,7 @@
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.0</version>
+        <version>2.22.2</version>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <argLine>-Djava.util.logging.config.file=src/test/resources/logging.properties</argLine>

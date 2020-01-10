@@ -21,6 +21,7 @@ import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData.SourceApp;
 import com.google.doubleclick.AdxExt.ImpExt.ExcludedCreative;
+import com.google.doubleclick.AdxExt.ImpExt.OpenBidding;
 import com.google.doubleclick.AdxExt.NativeRequestExt;
 import com.google.doubleclick.AdxExt.NativeRequestExt.LayoutType;
 import com.google.doubleclick.AdxExt.RegsExt;
@@ -72,6 +73,8 @@ public class AdxExtJsonTest {
                     .setId("deal")
                     .setExtension(AdxExt.deal, DealExt.newBuilder()
                         .setDealType(DealType.PREFERRED_DEAL)
+                        .setMustBid(true)
+                        .setPublisherBlocksOverridden(true)
                         .build())))
             .setExtension(AdxExt.imp, ImpExt.newBuilder()
                 .addAllBillingId(asList(100L, 101L, 999999999999999999L))
@@ -87,6 +90,8 @@ public class AdxExtJsonTest {
                 .addAllExcludedCreatives(asList(
                     ExcludedCreative.newBuilder().setBuyerCreativeId("cr1").build(),
                     ExcludedCreative.newBuilder().setBuyerCreativeId("cr2").build()))
+                .setOpenBidding(OpenBidding.newBuilder().setIsOpenBidding(true))
+                .addAllAllowedRestrictedCategory(asList(401, 402, 403))
                 .build()))
         .setSite(Site.newBuilder()
             .setDomain("mysite.com")
@@ -115,7 +120,8 @@ public class AdxExtJsonTest {
                 .setMinimumBidToWin(1.0)
                 .setRequestId("req1")
                 .setEventNotificationToken(
-                    BidFeedback.EventNotificationToken.newBuilder().setPayload("data")))
+                    BidFeedback.EventNotificationToken.newBuilder().setPayload("data"))
+                .setSampledMediationCpmAheadOfAuctionWinner(2.3))
             .setGoogleQueryId("gq1")
             .build())
         .build());
@@ -147,6 +153,7 @@ public class AdxExtJsonTest {
                     .setBillingId(77)
                     .setUseBidTranslationService(true)
                     .setThirdPartyBuyerToken("tpbt")
+                    .setBuyerReportingId("bri1")
                     .build())))
         .setExtension(AdxExt.bidResponse,
             BidResponseExt.newBuilder().setProcessingTimeMs(99).build())

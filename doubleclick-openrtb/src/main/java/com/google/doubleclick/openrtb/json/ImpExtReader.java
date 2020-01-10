@@ -29,6 +29,7 @@ import com.google.doubleclick.AdxExt.ImpExt;
 import com.google.doubleclick.AdxExt.ImpExt.AmpAdRequirementType;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData;
 import com.google.doubleclick.AdxExt.ImpExt.BuyerGeneratedRequestData.SourceApp;
+import com.google.doubleclick.AdxExt.ImpExt.OpenBidding;
 import com.google.openrtb.OpenRtb.BidRequest.Imp;
 import com.google.openrtb.json.OpenRtbJsonExtComplexReader;
 import java.io.IOException;
@@ -41,9 +42,9 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
   public ImpExtReader() {
     super(
         AdxExt.imp, /*isJsonObject=*/ false,
-        "billing_id", "publisher_settings_list_id", "allowed_vendor_type",
-        "publisher_parameter", "dfp_ad_unit_code", "is_rewarded_inventory", "ampad",
-        "buyer_generated_request_data", "excluded_creatives");
+        "billing_id", "publisher_settings_list_id", "allowed_vendor_type", "publisher_parameter",
+        "dfp_ad_unit_code", "is_rewarded_inventory", "ampad", "buyer_generated_request_data",
+        "excluded_creatives", "open_bidding", "allowed_restricted_category");
   }
 
   @Override protected void read(ImpExt.Builder ext, JsonParser par) throws IOException {
@@ -91,6 +92,34 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
         for (startArray(par); endArray(par); par.nextToken()) {
           ext.addExcludedCreatives(readExcludedCreatives(par));
         }
+        break;
+      case "open_bidding":
+        ext.setOpenBidding(readOpenBidding(par));
+        break;
+      case "allowed_restricted_category":
+        for (startArray(par); endArray(par); par.nextToken()) {
+          ext.addAllowedRestrictedCategory(par.getIntValue());
+        }
+        break;
+    }
+  }
+
+  public final OpenBidding.Builder readOpenBidding(JsonParser par) throws IOException {
+    OpenBidding.Builder obid = OpenBidding.newBuilder();
+    for (startObject(par); endObject(par); par.nextToken()) {
+      String fieldName = getCurrentName(par);
+      if (par.nextToken() != JsonToken.VALUE_NULL) {
+        readOpenBiddingField(par, obid, fieldName);
+      }
+    }
+    return obid;
+  }
+
+  protected void readOpenBiddingField(JsonParser par, OpenBidding.Builder obid, String fieldName)
+      throws IOException {
+    switch (fieldName) {
+      case "is_open_bidding":
+        obid.setIsOpenBidding(par.getValueAsBoolean());
         break;
     }
   }
