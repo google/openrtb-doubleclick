@@ -410,6 +410,9 @@ message RegsExt {
   // an EEA user, based on information available to Google. It does not
   // constitute legal guidance on GDPR.
   optional bool gdpr = 1;
+  
+  // OpenRTB Extension for US Privacy (CCPA)
+  optional string us_privacy = 2;  
 }
 
 extend com.google.openrtb.BidRequest.Regs {
