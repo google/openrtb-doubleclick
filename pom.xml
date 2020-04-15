@@ -60,7 +60,7 @@
     <metricsVersion>4.1.6</metricsVersion>
     <openrtbVersion>1.5.10</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.10</openrtbSource>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.11</openrtbSource>
     <protobufVersion>3.11.1</protobufVersion>
     <slf4jVersion>1.7.30</slf4jVersion>
     <truthVersion>1.0.1</truthVersion>
