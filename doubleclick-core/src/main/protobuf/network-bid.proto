@@ -1,4 +1,4 @@
-// Protocol version: v.170
+// Protocol version: v.172
 // Copyright 2019 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -724,8 +724,7 @@ message BidRequest {
 
     // AdX fills this field solely based on whether the impression will serve to
     // an EEA user, based on information available to Google. It does not
-    // constitute legal guidance on GDPR. This field is equivalent to
-    // Regs.ext.gdpr in AdX OpenRTB.
+    // constitute legal guidance on GDPR.
     optional bool regs_gdpr = 43;
 
     // The disallowed sensitive ad categories. See the
@@ -1593,7 +1592,8 @@ message BidResponse {
       // set of billing ids for this slot that were sent in the
       // BidRequest.AdSlot.matching_ad_data.billing_id. This must always be set
       // if the BidRequest has more than one
-      // BidRequest.AdSlot.matching_ad_data.billing_id.
+      // BidRequest.AdSlot.matching_ad_data.billing_id or if the bidder has
+      // active child seats.
       optional int64 billing_id = 4;
 
       // The deal id that you want this bid to participate in. Leave unset

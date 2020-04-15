@@ -1,4 +1,4 @@
-// Protocol version: v.45
+// Protocol version: v.46
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -210,7 +210,8 @@ message BidExt {
 
   // The billing ID to attribute this impression to. The value must be in the
   // repeated BidRequest.Imp.ImpExt.billing_id field sent for this impression.
-  // If the length of BidRequest.Imp.ImpExt.billing_id is exactly 1, this field
+  // If the length of BidRequest.Imp.ImpExt.billing_id is exactly 1
+  // and the bidder does not have any active child seats, this field
   // is not required and its contents will be ignored.
   optional int64 billing_id = 10;
 
