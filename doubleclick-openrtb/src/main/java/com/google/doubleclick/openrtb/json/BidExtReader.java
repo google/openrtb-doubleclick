@@ -89,7 +89,7 @@ class BidExtReader extends OpenRtbJsonExtComplexReader<Bid.Builder, BidExt.Build
         break;
       case "use_bid_translation_service":
         par.nextToken();
-        ext.setUseBidTranslationService(par.getValueAsBoolean());
+        ext.setDEPRECATEDUseBidTranslationService(par.getValueAsBoolean());
         break;
       case "third_party_buyer_token":
         ext.setThirdPartyBuyerToken(par.nextTextValue());

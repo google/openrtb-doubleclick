@@ -41,14 +41,14 @@ class BidRequestExtWriter extends OpenRtbJsonExtWriter<BidRequestExt> {
     }
   }
 
-  private void writeBidFeedback(BidFeedback feedback, JsonGenerator gen) throws IOException {
+  public final void writeBidFeedback(BidFeedback feedback, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeBidFeedbackFields(feedback, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeBidFeedbackFields(BidFeedback feedback, JsonGenerator gen) throws IOException {
+  protected void writeBidFeedbackFields(BidFeedback feedback, JsonGenerator gen) throws IOException {
     if (feedback.hasRequestId()) {
       gen.writeStringField("request_id", feedback.getRequestId());
     }
@@ -75,7 +75,7 @@ class BidRequestExtWriter extends OpenRtbJsonExtWriter<BidRequestExt> {
     }
   }
 
-  private void writeEventNotificationToken(EventNotificationToken token, JsonGenerator gen)
+  public final void writeEventNotificationToken(EventNotificationToken token, JsonGenerator gen)
       throws IOException {
     gen.writeStartObject();
     writeEventNotificationTokenFields(token, gen);
@@ -83,7 +83,7 @@ class BidRequestExtWriter extends OpenRtbJsonExtWriter<BidRequestExt> {
     gen.flush();
   }
 
-  private void writeEventNotificationTokenFields(EventNotificationToken token, JsonGenerator gen)
+  protected void writeEventNotificationTokenFields(EventNotificationToken token, JsonGenerator gen)
       throws IOException {
     if (token.hasPayload()) {
       gen.writeStringField("payload", token.getPayload());

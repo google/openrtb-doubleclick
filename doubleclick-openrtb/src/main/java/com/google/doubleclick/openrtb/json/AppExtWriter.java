@@ -38,16 +38,14 @@ class AppExtWriter extends OpenRtbJsonExtWriter<AppExt> {
     }
   }
 
-  private void writeInstalledSdk(InstalledSdk sdk, JsonGenerator gen)
-      throws IOException {
+  public final void writeInstalledSdk(InstalledSdk sdk, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeInstalledSdkFields(sdk, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeInstalledSdkFields(InstalledSdk sdk, JsonGenerator gen)
-      throws IOException {
+  protected void writeInstalledSdkFields(InstalledSdk sdk, JsonGenerator gen) throws IOException {
     if (sdk.hasId()) {
       gen.writeStringField("id", sdk.getId());
     }
@@ -61,14 +59,14 @@ class AppExtWriter extends OpenRtbJsonExtWriter<AppExt> {
     }
   }
 
-  private void writeVersion(Version version, JsonGenerator gen) throws IOException {
+  public final void writeVersion(Version version, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeVersionFields(version, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeVersionFields(Version version, JsonGenerator gen) throws IOException {
+  protected void writeVersionFields(Version version, JsonGenerator gen) throws IOException {
     if (version.hasMajor()) {
       gen.writeNumberField("major", version.getMajor());
     }

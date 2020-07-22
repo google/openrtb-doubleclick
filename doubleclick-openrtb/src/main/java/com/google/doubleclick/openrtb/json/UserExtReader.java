@@ -37,13 +37,16 @@ import java.io.IOException;
 class UserExtReader extends OpenRtbJsonExtComplexReader<User.Builder, UserExt.Builder> {
 
   public UserExtReader() {
-    super(AdxExt.user, /*isJsonObject=*/ false, "consented_providers_settings");
+    super(AdxExt.user, /*isJsonObject=*/ false, "consented_providers_settings", "consent");
   }
 
   @Override protected void read(UserExt.Builder ext, JsonParser par) throws IOException {
     switch (getCurrentName(par)) {
       case "consented_providers_settings":
         ext.setConsentedProvidersSettings(readConsentedProvidersSettings(par));
+        break;
+      case "consent":
+        ext.setConsent(par.nextTextValue());
         break;
     }
   }

@@ -34,6 +34,9 @@ class UserExtWriter extends OpenRtbJsonExtWriter<UserExt> {
       gen.writeFieldName("consented_providers_settings");
       writeConsentedProvidersSettings(ext.getConsentedProvidersSettings(), gen);
     }
+    if (ext.hasConsent()) {
+      gen.writeStringField("consent", ext.getConsent());
+    }
   }
 
   public final void writeConsentedProvidersSettings(

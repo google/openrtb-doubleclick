@@ -54,7 +54,7 @@ extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
     }
   }
 
-  private BidFeedback.Builder readBidFeedback(JsonParser par) throws IOException {
+  public final BidFeedback.Builder readBidFeedback(JsonParser par) throws IOException {
     BidFeedback.Builder feedback = BidFeedback.newBuilder();
     for (startObject(par); endObject(par); par.nextToken()) {
       String fieldName = getCurrentName(par);
@@ -65,7 +65,7 @@ extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
     return feedback;
   }
 
-  private void readBidFeedbackField(
+  protected void readBidFeedbackField(
       JsonParser par, BidFeedback.Builder feedback, String fieldName) throws IOException {
     switch (fieldName) {
       case "request_id":
@@ -92,7 +92,8 @@ extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
     }
   }
 
-  private EventNotificationToken.Builder readEventNotificationToken(JsonParser par) throws IOException {
+  public final EventNotificationToken.Builder readEventNotificationToken(JsonParser par)
+      throws IOException {
     EventNotificationToken.Builder token = EventNotificationToken.newBuilder();
     for (startObject(par); endObject(par); par.nextToken()) {
       String fieldName = getCurrentName(par);
@@ -103,7 +104,7 @@ extends OpenRtbJsonExtComplexReader<BidRequest.Builder, BidRequestExt.Builder> {
     return token;
   }
 
-  private void readEventNotificationTokenField(
+  protected void readEventNotificationTokenField(
       JsonParser par, EventNotificationToken.Builder token, String fieldName) throws IOException {
     switch (fieldName) {
       case "payload":
