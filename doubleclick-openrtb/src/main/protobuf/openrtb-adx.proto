@@ -1,4 +1,4 @@
-// Protocol version: v.46
+// Protocol version: v.49
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -216,6 +216,9 @@ message BidExt {
   optional int64 billing_id = 10;
 
 
+  // This field is deprecated as of July 8, 2020 and will be removed July 31,
+  // 2020.
+  //
   // [AdX: BidResponse.Ad.AdSlot.use_bid_translation_service]
   // This field is applicable only for bid requests that are marked as first
   // price, and will otherwise be ignored. If the field is set to true on a
@@ -225,8 +228,8 @@ message BidExt {
   // never increase the bid). If the field is not set, then for first price
   // eligible queries the bid will be treated as a first price bid. This
   // field is a temporary product for bidders that require assistance
-  // migrating to 1st price bidding, and will eventually be deprecated.
-  optional bool use_bid_translation_service = 12;
+  // migrating to 1st price bidding.
+  optional bool DEPRECATED_use_bid_translation_service = 12;
 
   // Token used to identify end third party buyer information if an
   // exchange as an open bidder is an intermediary. This is obtained from the
@@ -339,8 +342,8 @@ message BidRequestExt {
     // is the CPM that should have been exceeded in order to win.  This is not
     // set if the bid was filtered prior to the auction, if the publisher or
     // winning bidder has opted out of price feedback or if your account has
-    // opted out of sharing winning prices with other bidders. For first price
-    // auctions, minimum_bid_to_win is also populated.
+    // opted out of sharing winning prices with other bidders. For first-price
+    // auctions, minimum_bid_to_win is populated instead of this field.
     optional double price = 3;
 
     // The minimum bid value necessary to have the auction, in your account
@@ -388,17 +391,43 @@ extend com.google.openrtb.BidRequest {
 
 message UserExt {
   message ConsentedProvidersSettings {
-    // Set of IDs corresponding to providers for whom the publisher has told
-    // Google that its EEA users have consented to the use of their personal
-    // data for ads personalization. A mapping of provider ID to provider name
-    // is posted at providers.csv.
+    // Set of IDs corresponding to ad tech providers (ATPs) for whom the
+    // publisher has specified to Google that its EEA users have given legally
+    // valid consent to: 1) the use of cookies or other local storage where
+    // legally required; and 2) the collection, sharing, and use of personal
+    // data for personalization of ads by an ATP in accordance with Googleâ€™s EU
+    // User Consent Policy.
+    //
+    // If a publisher is using the IAB Transparency and Consent Framework (TCF)
+    // v2 to manage user consent, this is the set of ATPs consented via the
+    // Additional Consent string (see
+    // https://support.google.com/admanager/answer/9681920 for details about
+    // Google's Additional Consent mode). ATPs consented via the TCF v2 consent
+    // string are represented in the UserExt.consent field.
+    //
+    // A mapping of ATP ID to ATP name is posted at providers.csv.
     repeated int64 consented_providers = 2 [packed = true];
   }
-  // Information about the providers for whom the publisher has told Google that
-  // its EEA users have consented to the use of their personal data for ads
-  // personalization. This field will only be populated when RegsExt.gdpr is
+  // Information about the ad tech providers for whom the publisher has
+  // specified to Google that its EEA user has consented to the use of their
+  // personal data for ads personalization in accordance with Google's EU User
+  // Consent Policy. This field will only be populated when RegsExt.gdpr is
   // true.
   optional ConsentedProvidersSettings consented_providers_settings = 1;
+
+  // The web-safe base64-encoded IAB Transparency and Consent Framework (TCF) v2
+  // consent string fetched from the publisher's IAB Consent Management Platform
+  // (CMP). The structure of the string is defined by the IAB TCF v2. This field
+  // will be populated if the publisher has integrated with a CMP for TCF v2 and
+  // that CMP indicates that GDPR applies to this ad request and provides a
+  // valid consent string.  See
+  // https://support.google.com/authorizedbuyers/answer/9789378 for additional
+  // information about the Google TCF v2 integration.
+  //
+  // See the IAB Global Vendor List at
+  // https://vendorlist.consensu.org/v2/vendor-list.json for details about the
+  // vendors listed in the consent string.
+  optional string consent = 2;
 }
 
 extend com.google.openrtb.BidRequest.User {
@@ -407,9 +436,14 @@ extend com.google.openrtb.BidRequest.User {
 }
 
 message RegsExt {
-  // AdX fills this field solely based on whether the impression will serve to
-  // an EEA user, based on information available to Google. It does not
-  // constitute legal guidance on GDPR.
+  // This field will be set to true in either of the two following cases:
+  //   1. Google receives a valid IAB Transparency and Consent Framework (TCF)
+  //      v2 consent string and the Consent Management Platform indicates that
+  //      GDPR applies to this ad request.
+  //   2. Google does not receive an IAB TCF v2 consent string and, based on
+  //      information available to Google, this impression will serve to an
+  //      EEA user.
+  // It does not constitute legal guidance on GDPR.
   optional bool gdpr = 1;
 }
 

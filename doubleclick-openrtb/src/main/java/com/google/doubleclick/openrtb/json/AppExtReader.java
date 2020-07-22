@@ -51,8 +51,7 @@ class AppExtReader extends OpenRtbJsonExtComplexReader<App.Builder, AppExt.Build
     }
   }
 
-  public final InstalledSdk.Builder readInstalledSdk(JsonParser par)
-      throws IOException {
+  public final InstalledSdk.Builder readInstalledSdk(JsonParser par) throws IOException {
     InstalledSdk.Builder sdk = InstalledSdk.newBuilder();
     for (startObject(par); endObject(par); par.nextToken()) {
       String fieldName = getCurrentName(par);
@@ -78,8 +77,7 @@ class AppExtReader extends OpenRtbJsonExtComplexReader<App.Builder, AppExt.Build
     }
   }
 
-  public final Version.Builder readVersion(JsonParser par)
-      throws IOException {
+  public final Version.Builder readVersion(JsonParser par) throws IOException {
     Version.Builder version = Version.newBuilder();
     for (startObject(par); endObject(par); par.nextToken()) {
       String fieldName = getCurrentName(par);

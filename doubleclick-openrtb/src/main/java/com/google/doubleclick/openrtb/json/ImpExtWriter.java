@@ -70,28 +70,28 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
     writeInts("allowed_restricted_category", ext.getAllowedRestrictedCategoryList(), gen);
   }
 
-  private void writeOpenBidding(OpenBidding obid, JsonGenerator gen) throws IOException {
+  public final void writeOpenBidding(OpenBidding obid, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeOpenBiddingFields(obid, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeOpenBiddingFields(OpenBidding obid, JsonGenerator gen) throws IOException {
+  protected void writeOpenBiddingFields(OpenBidding obid, JsonGenerator gen) throws IOException {
     if (obid.hasIsOpenBidding()) {
       writeIntBoolField("is_open_bidding", obid.getIsOpenBidding(), gen);
     }
   }
 
-  private void writeBuyerGeneratedRequestData(BuyerGeneratedRequestData req, JsonGenerator gen)
-      throws IOException {
+  public final void writeBuyerGeneratedRequestData(
+      BuyerGeneratedRequestData req, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeBuyerGeneratedRequestDataFields(req, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeBuyerGeneratedRequestDataFields(
+  protected void writeBuyerGeneratedRequestDataFields(
       BuyerGeneratedRequestData req, JsonGenerator gen) throws IOException {
     switch (req.getSourceCase()) {
       case SOURCE_APP:
@@ -105,20 +105,20 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
     }
   }
 
-  private void writeSourceApp(SourceApp app, JsonGenerator gen) throws IOException {
+  public final void writeSourceApp(SourceApp app, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeSourceAppFields(app, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeSourceAppFields(SourceApp app, JsonGenerator gen) throws IOException {
+  protected void writeSourceAppFields(SourceApp app, JsonGenerator gen) throws IOException {
     if (app.hasId()) {
       gen.writeStringField("id", app.getId());
     }
   }
 
-  private void writeExcludedCreative(ExcludedCreative exCreat, JsonGenerator gen)
+  public final void writeExcludedCreative(ExcludedCreative exCreat, JsonGenerator gen)
       throws IOException {
     gen.writeStartObject();
     writeExcludedCreativeFields(exCreat, gen);
@@ -126,7 +126,7 @@ class ImpExtWriter extends OpenRtbJsonExtWriter<ImpExt> {
     gen.flush();
   }
 
-  private void writeExcludedCreativeFields(ExcludedCreative exCreat, JsonGenerator gen)
+  protected void writeExcludedCreativeFields(ExcludedCreative exCreat, JsonGenerator gen)
       throws IOException {
     if (exCreat.hasBuyerCreativeId()) {
       gen.writeStringField("buyer_creative_id", exCreat.getBuyerCreativeId());

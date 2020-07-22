@@ -60,8 +60,9 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     if (ext.hasBillingId()) {
       gen.writeNumberField("billing_id", ext.getBillingId());
     }
-    if (ext.hasUseBidTranslationService()) {
-      writeIntBoolField("use_bid_translation_service", ext.getUseBidTranslationService(), gen);
+    if (ext.hasDEPRECATEDUseBidTranslationService()) {
+      writeIntBoolField(
+          "use_bid_translation_service", ext.getDEPRECATEDUseBidTranslationService(), gen);
     }
     if (ext.hasThirdPartyBuyerToken()) {
       gen.writeStringField("third_party_buyer_token", ext.getThirdPartyBuyerToken());
@@ -71,7 +72,7 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     }
   }
 
-  private void writeEventNotificationToken(EventNotificationToken req, JsonGenerator gen)
+  public final void writeEventNotificationToken(EventNotificationToken req, JsonGenerator gen)
       throws IOException {
     gen.writeStartObject();
     writeEventNotificationTokenFields(req, gen);
@@ -79,21 +80,21 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     gen.flush();
   }
 
-  private void writeEventNotificationTokenFields(EventNotificationToken req, JsonGenerator gen)
+  protected void writeEventNotificationTokenFields(EventNotificationToken req, JsonGenerator gen)
       throws IOException {
     if (req.hasPayload()) {
       gen.writeStringField("payload", req.getPayload());
     }
   }
 
-  private void writeSdkRenderedAd(SdkRenderedAd ad, JsonGenerator gen) throws IOException {
+  public final void writeSdkRenderedAd(SdkRenderedAd ad, JsonGenerator gen) throws IOException {
     gen.writeStartObject();
     writeSdkRenderedAdFields(ad, gen);
     gen.writeEndObject();
     gen.flush();
   }
 
-  private void writeSdkRenderedAdFields(SdkRenderedAd ad, JsonGenerator gen) throws IOException {
+  protected void writeSdkRenderedAdFields(SdkRenderedAd ad, JsonGenerator gen) throws IOException {
     if (ad.hasId()) {
       gen.writeStringField("id", ad.getId());
     }

@@ -170,7 +170,7 @@ class ImpExtReader extends OpenRtbJsonExtComplexReader<Imp.Builder, ImpExt.Build
   }
 
   public final ImpExt.ExcludedCreative.Builder readExcludedCreatives(JsonParser par)
-          throws IOException {
+      throws IOException {
     ImpExt.ExcludedCreative.Builder exCreat = ImpExt.ExcludedCreative.newBuilder();
     for (startObject(par); endObject(par); par.nextToken()) {
       String fieldName = getCurrentName(par);
