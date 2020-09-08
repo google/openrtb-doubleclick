@@ -1,4 +1,4 @@
-// Protocol version: v.177
+// Protocol version: v.182
 // Copyright 2020 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
@@ -36,6 +36,7 @@ message BidRequest {
   //  * hosted_match_data
   //  * mobile.encrypted_advertising_id
   //  * mobile.encrypted_hashed_idfa
+  //  * session_id
   repeated UserDataTreatment user_data_treatment = 49;
 
   // The Google ID for the user. This field is the unpadded web-safe base64
@@ -59,6 +60,14 @@ message BidRequest {
   // was passed in the google_hm parameter.
   // Not set if there is one or more user_data_treatment value.
   optional bytes hosted_match_data = 37;
+
+  // Beta feature. Represents a short-lived user session on CTV/OTT devices,
+  // with a maximum session duration of 6 hours.
+  // The use of session_id is never allowed for ads personalization.
+  // session_id may only be used for frequency capping, competitive exclusions
+  // or related purposes. Please contact your account manager if you would like
+  // to enable this feature.
+  optional string session_id = 65;
 
   // A string that identifies the browser and type of device that sent the
   // request. Certain data may be redacted or replaced.
@@ -394,6 +403,29 @@ message BidRequest {
       optional Version adapter_version = 3;
     }
     repeated InstalledSdk installed_sdk = 32;
+
+    // Publisher's SKAdNetwork information to support app installation
+    // attribution for iOS 14 and later. Apple's SKAdNetwork API helps
+    // advertisers measure ad-driven app installation by sending a postback
+    // to the ad network after a successful install. Publishers will need
+    // to configure supported ad networks in their app's property list
+    // (Info.plist) to allow an install to be attributed to the ad impression.
+    // For more info visit:
+    // https://developer.apple.com/documentation/storekit/skadnetwork
+    message SKAdNetworkRequest {
+      // Version of SKAdNetwork supported. Dependent on both the OS version
+      // and the SDK version.
+      optional string version = 1;
+
+      // ID of publisher app in Appleâ€™s App Store.
+      optional string sourceapp = 2;
+
+      // SKAdNetworkIdentifier entries in the publisher app's Info.plist.
+      repeated string skadnetids = 3;
+    }
+
+    optional SKAdNetworkRequest skadn = 34;
+
   }
   optional Mobile mobile = 28;
 
@@ -624,7 +656,8 @@ message BidRequest {
       MOBILE_INTERSTITIAL = 2;
       MOBILE_APP_VIDEO = 3;
     }
-    optional InventoryType DEPRECATED_inventory_type = 3 [default = WEB_VIDEO];
+    optional InventoryType DEPRECATED_inventory_type = 3
+        [default = WEB_VIDEO, deprecated = true];
 
     // Identify whether or not the ad request is being served from a live video
     // stream (0 = is not live, 1 = is live).
@@ -759,6 +792,16 @@ message BidRequest {
     // to Regs.ext.gdpr in Google OpenRTB.
     optional bool regs_gdpr = 43;
 
+    // This field will be set to true when, based on information available to
+    // Google, this impression will serve to a user in Brazil. See
+    // https://storage.googleapis.com/adx-rtb-dictionaries/lgpd-providers.csv
+    // for the list of ad tech providers that are allowed to
+    // serve on LGPD-enforced requests.
+    //
+    // See https://support.google.com/authorizedbuyers/answer/9928204 for more
+    // information on LGPD.
+    optional bool regs_lgpd = 54;
+
     // The disallowed sensitive ad categories. See the
     // ad-sensitive-categories.txt file in the technical documentation for a
     // list of ids. You should enforce these exclusions if you have the ability
@@ -837,33 +880,6 @@ message BidRequest {
       // billing IDs in the billing_id field.
       optional int64 minimum_cpm_micros = 5;
 
-      // This message is deprecated.
-      message BuyerPricingRule {
-        // Only one of the included_advertisers and excluded_advertisers fields
-        // can be set in a rule. See advertisers.txt file in the technical
-        // documentation for a list of ids.
-        repeated int64 included_advertisers = 1;
-        repeated int64 excluded_advertisers = 2;
-
-        // Only one of the included_agencies and excluded_agencies fields can be
-        // set in a rule. See agencies.txt file in the technical documentation
-        // for a list of ids.
-        repeated int64 included_agencies = 3;
-        repeated int64 excluded_agencies = 4;
-
-        // Only one of the blocked and minimum_cpm_micros can be set in a rule.
-        // If set to true, indicates that the specified advertisers/agencies are
-        // blocked from bidding.
-        optional bool blocked = 5;
-
-        // Minimum CPM value that you can bid to not be filtered before the
-        // auction. The value is in micros of the bidder account currency.
-        optional int64 minimum_cpm_micros = 6;
-      }
-
-      // This field is deprecated and will no longer be populated.
-      repeated BuyerPricingRule DEPRECATED_pricing_rule = 7;
-
       // Information about any deals that matched for this inventory.
       //
       message DirectDeal {
@@ -925,9 +941,25 @@ message BidRequest {
         // decisions.
         optional bool publisher_blocks_overridden = 4 [default = false];
 
-        // This is deprecated. Please ignore.
-        optional int64 DEPRECATED_remaining_impressions_to_buy = 6;
-
+        // Experimental field; subject to change.
+        // An enum declaring the host of the creative, which will only be
+        // populated for Programmatic Guaranteed deals.
+        // Currently, this field should only ever be set to
+        // CREATIVE_SOURCE_ADVERTISER.
+        enum CreativeSourceType {
+          CREATIVE_SOURCE_UNKNOWN = 0;
+          // The creative is hosted by the advertiser, which means the bidder
+          // is required to provide a creative in the bid response.
+          CREATIVE_SOURCE_ADVERTISER = 1;
+          // The creative is hosted by the publisher, which means the bidder
+          // does not need to include a creative in the bid response.
+          // For more information on publisher-hosted creatives, see
+          // https://support.google.com/admanager/answer/9243220.
+          // This feature isn't currently supported for RTB bidders.
+          CREATIVE_SOURCE_PUBLISHER = 2;
+        }
+        optional CreativeSourceType creative_source = 16
+            [default = CREATIVE_SOURCE_ADVERTISER];
 
         // This field is deprecated in favor of the boolean must_bid field
         // below as of December 2019. It will be removed from the protocol in
@@ -935,8 +967,8 @@ message BidRequest {
         // Value between 0 and 1 only set for Programmatic Guaranteed deals.
         // Buyers are required to bid if must_bid_level = 1 and can decide
         // whether to bid if must_bid_level < 1.
-        optional double DEPRECATED_must_bid_level = 7 [
-            default = 1.0, deprecated = true];
+        optional double DEPRECATED_must_bid_level = 7
+            [default = 1.0, deprecated = true];
 
         // This field is only applicable to Programmatic Guaranteed deals. The
         // buyer is allowed to skip bidding on the impression if this field is
@@ -1076,9 +1108,6 @@ message BidRequest {
       optional int32 body_max_safe_length = 4;
       optional int32 call_to_action_max_safe_length = 5;
       optional int32 advertiser_max_safe_length = 6;
-
-      // This field is deprecated.
-      optional int32 DEPRECATED_store_max_safe_length = 14;
       optional int32 price_max_safe_length = 15;
 
       // The width and height from which to calculate the required aspect ratio.
@@ -1521,9 +1550,6 @@ message BidResponse {
 
       // The price of the promoted app including the currency info.
       optional string price = 10;
-
-      // This field is deprecated.
-      optional string DEPRECATED_store = 12;
     }
     optional NativeAd native_ad = 18;
 
@@ -1676,7 +1702,8 @@ message BidResponse {
       // then for first price eligible queries the bid will be treated as a
       // first price bid. This field is a temporary product for bidders that
       // require assistance migrating to 1st price bidding.
-      optional bool DEPRECATED_use_bid_translation_service = 10;
+      optional bool DEPRECATED_use_bid_translation_service = 10
+          [deprecated = true];
 
       // Token used to identify end third party buyer information if an
       // exchange as an open bidder is an intermediary. This is obtained from
@@ -1733,6 +1760,48 @@ message BidResponse {
       optional string rendering_data = 2;
     }
     optional SdkRenderedAd sdk_rendered_ad = 27;
+
+    // Advertiser's SKAdNetwork information to support app installation
+    // attribution for iOS 14 and later.  Apple's SKAdNetwork API helps
+    // advertisers measure ad-driven app installation by sending a postback
+    // to the ad network after a successful install. Ad networks will need
+    // to send their network ID and signed advertiser information to allow
+    // an install to be attributed to the ad impression.
+    // For more info visit:
+    // https://developer.apple.com/documentation/storekit/skadnetwork
+    message SKAdNetworkResponse {
+      // Version of SKAdNetwork supported by the advertiser. Also used to
+      // specify how the signature was generated by the advertiser. This
+      // should match the version from BidRequest.mobile.skad.version.
+      optional string version = 1;
+
+      // Ad network identifier used in signature. This should match one of the
+      // items in BidRequest.mobile.skad.skadnetids.
+      optional string network = 2;
+
+      // Campaign ID compatible with Apple's spec.
+      optional int64 campaign = 3;
+
+      // ID of advertiser's app in Apple's app store.
+      optional string itunesitem = 4;
+
+      // A unique all-lowercase UUID generated by the advertiser to use for
+      // generating the signature.
+      optional string nonce = 5;
+
+      // ID of publisher's app in Apple's app store. This should match the ID
+      // from BidRequest.mobile.skad.sourceapp.
+      optional string sourceapp = 6;
+
+      // Unix time in millis used at the time of signature generation.
+      optional int64 timestamp = 7;
+
+      // SKAdNetwork signature as specified by Apple.
+      optional string signature = 8;
+    }
+
+    optional SKAdNetworkResponse skadn = 29;
+
   }
   repeated Ad ad = 2;
 
