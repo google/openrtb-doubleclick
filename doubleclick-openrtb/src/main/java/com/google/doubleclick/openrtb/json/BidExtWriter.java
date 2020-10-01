@@ -17,7 +17,6 @@
 package com.google.doubleclick.openrtb.json;
 
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeEnumField;
-import static com.google.openrtb.json.OpenRtbJsonUtils.writeIntBoolField;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeInts;
 import static com.google.openrtb.json.OpenRtbJsonUtils.writeStrings;
 
@@ -59,10 +58,6 @@ class BidExtWriter extends OpenRtbJsonExtWriter<BidExt> {
     writeInts("restricted_category", ext.getRestrictedCategoryList(), gen);
     if (ext.hasBillingId()) {
       gen.writeNumberField("billing_id", ext.getBillingId());
-    }
-    if (ext.hasDEPRECATEDUseBidTranslationService()) {
-      writeIntBoolField(
-          "use_bid_translation_service", ext.getDEPRECATEDUseBidTranslationService(), gen);
     }
     if (ext.hasThirdPartyBuyerToken()) {
       gen.writeStringField("third_party_buyer_token", ext.getThirdPartyBuyerToken());

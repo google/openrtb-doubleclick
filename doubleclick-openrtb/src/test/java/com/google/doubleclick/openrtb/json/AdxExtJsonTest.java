@@ -152,7 +152,6 @@ public class AdxExtJsonTest {
                         .setRenderingData("data"))
                     .addAllRestrictedCategory(asList(44, 55, 66))
                     .setBillingId(77)
-                    .setDEPRECATEDUseBidTranslationService(true)
                     .setThirdPartyBuyerToken("tpbt")
                     .setBuyerReportingId("bri1")
                     .build())))
