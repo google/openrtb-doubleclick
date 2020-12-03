@@ -1,4 +1,4 @@
-// Protocol version: v.53
+// Protocol version: v.58
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
@@ -165,6 +165,7 @@ extend com.google.openrtb.BidRequest.App {
 message BidResponseExt {
   // [AdX: BidResponse.processing_time_ms]
   optional int32 processing_time_ms = 1;
+
 }
 
 extend com.google.openrtb.BidResponse {
@@ -180,8 +181,9 @@ message BidExt {
   // [AdX: BidResponse.Ad.ad_choices_destination_url]
   optional string ad_choices_destination_url = 2;
 
+  // This field is deprecated due to being unused.
   // [AdX: BidResponse.Ad.bidder_name]
-  optional string bidder_name = 3;
+  optional string DEPRECATED_bidder_name = 3 [deprecated = true];
 
   // [AdX: BidResponse.Ad.AdSlot.exchange_deal_type]
   enum ExchangeDealType {
@@ -238,22 +240,6 @@ message BidExt {
   // is not required and its contents will be ignored.
   optional int64 billing_id = 10;
 
-
-  // This field is deprecated as of July 8, 2020 and will be removed July 31,
-  // 2020.
-  //
-  // [AdX: BidResponse.Ad.AdSlot.use_bid_translation_service]
-  // This field is applicable only for bid requests that are marked as first
-  // price, and will otherwise be ignored. If the field is set to true on a
-  // first price request, then the bid will go through a bid translation service
-  // that converts the second price bid into a first price bid for
-  // participation in the first price auction (i.e. may reduce but will
-  // never increase the bid). If the field is not set, then for first price
-  // eligible queries the bid will be treated as a first price bid. This
-  // field is a temporary product for bidders that require assistance
-  // migrating to 1st price bidding.
-  optional bool DEPRECATED_use_bid_translation_service = 12;
-
   // Token used to identify end third party buyer information if an
   // exchange as an open bidder is an intermediary. This is obtained from the
   // third party buyer and must be passed to Google unaltered in the bid
@@ -307,6 +293,7 @@ message BidExt {
 
   // [AdX: BidResponse.Ad.skadn]
   optional SKAdNetworkResponse skadn = 19;
+
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
@@ -383,6 +370,27 @@ message SiteExt {
   }
   // Whether this is an AMP page or not. Omitted if unknown.
   optional AmpPage amp = 1;
+
+  enum VisibilityState {
+    VISIBILITY_STATE_UNKNOWN = 0;
+    // The page is at least partially visible. For example, in the foreground
+    // tab of a non-minimized window.
+    VISIBILITY_STATE_VISIBLE = 1;
+    // The page is not visible at all to users. For example, when the page is
+    // on a background browser tab, or in a minimized window.
+    VISIBILITY_STATE_HIDDEN = 2;
+  }
+  // The visibility state of the web page containing the ad slot.
+  // See https://www.w3.org/TR/page-visibility/.
+  // [AdX: BidRequest.page_visibility]
+  optional VisibilityState page_visibility = 2
+      [default = VISIBILITY_STATE_UNKNOWN];
+
+  // Indicates that the request is using semi-transparent branding,
+  // which means only a truncated version of the request URL will
+  // be provided.  This decision is made by the publisher, see
+  // https://support.google.com/admanager/answer/4584891#urls for context.
+  optional bool is_semi_transparent_request = 3;
 }
 
 extend com.google.openrtb.BidRequest.Site {
@@ -613,4 +621,22 @@ message DealExt {
 extend com.google.openrtb.BidRequest.Imp.Pmp.Deal {
   // Extension key for AdX Deal.ext.
   optional DealExt deal = 1010;
+}
+
+message SourceExt {
+  // Identifier of the OM SDK integration. Equivalent to
+  // BidRequest.AdSlot.omidpn in the Google protocol. For more info,
+  // see the OpenRTB Advisory for Open Measurement SDK:
+  // https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/master/OpenRTB%20support%20for%20OMSDK.md#openrtb-and-adcom.
+  optional string omidpn = 1;
+  // Version of the OM SDK integration. Equivalent to BidRequest.AdSlot.omidpv
+  // in the Google protocol. For more info, see the OpenRTB Advisory for
+  // Open Measurement SDK:
+  // https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/master/OpenRTB%20support%20for%20OMSDK.md#openrtb-and-adcom.
+  optional string omidpv = 2;
+}
+
+extend com.google.openrtb.BidRequest.Source {
+  // Extension key for Source.ext
+  optional SourceExt source = 1059;
 }
