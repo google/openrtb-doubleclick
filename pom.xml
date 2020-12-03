@@ -53,17 +53,16 @@
   <properties>
     <findBugsJsr305Version>3.0.2</findBugsJsr305Version>
     <gpg.skip>true</gpg.skip>
-    <guavaVersion>29.0-jre</guavaVersion>
-    <fasterxmlJacksonVersion>2.11.1</fasterxmlJacksonVersion>
+    <guavaVersion>30.0-jre</guavaVersion>
     <injectVersion>1</injectVersion>
-    <junitVersion>4.13</junitVersion>
-    <metricsVersion>4.1.11</metricsVersion>
-    <openrtbVersion>1.5.12</openrtbVersion>
+    <junitVersion>4.13.1</junitVersion>
+    <metricsVersion>4.1.16</metricsVersion>
+    <openrtbVersion>2.0.0</openrtbVersion>
     <!-- Use .../master for snapshot, .../${openrtbVersion} for release. -->
-    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/1.5.12</openrtbSource>
-    <protobufVersion>3.12.2</protobufVersion>
+    <openrtbSource>https://raw.githubusercontent.com/google/openrtb/2.0.0</openrtbSource>
+    <protobufVersion>3.14.0</protobufVersion>
     <slf4jVersion>1.7.30</slf4jVersion>
-    <truthVersion>1.0.1</truthVersion>
+    <truthVersion>1.1</truthVersion>
 
     <!-- Plugin versions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -132,7 +131,7 @@
 
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.9.0</version>
+        <version>3.9.1</version>
       </plugin>
 
       <plugin>
@@ -143,13 +142,13 @@
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
-        <version>1.5.1</version>
+        <version>1.6.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
       </plugin>
 
       <plugin>
