@@ -53,7 +53,7 @@
   <properties>
     <findBugsJsr305Version>3.0.2</findBugsJsr305Version>
     <gpg.skip>true</gpg.skip>
-    <guavaVersion>30.0-jre</guavaVersion>
+    <guavaVersion>30.1-jre</guavaVersion>
     <injectVersion>1</injectVersion>
     <junitVersion>4.13.1</junitVersion>
     <metricsVersion>4.1.16</metricsVersion>
@@ -62,7 +62,7 @@
     <openrtbSource>https://raw.githubusercontent.com/google/openrtb/2.0.0</openrtbSource>
     <protobufVersion>3.14.0</protobufVersion>
     <slf4jVersion>1.7.30</slf4jVersion>
-    <truthVersion>1.1</truthVersion>
+    <truthVersion>1.1.2</truthVersion>
 
     <!-- Plugin versions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -142,7 +142,7 @@
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
       </plugin>
 
       <plugin>

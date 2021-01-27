@@ -4,6 +4,9 @@ RELEASE NOTES
 Please check the [Ad Exchange Release Notes](https://developers.google.com/ad-exchange/rtb/relnotes)
 for detailed notes about protocol updates.
 
+## Version 2.0.1, 27-01-2021
+* DoubleClick proto v.196, DoubleClick OpenRTB extensions proto v.67.
+
 ## Version 2.0.0, 03-12-2020
 * DoubleClick proto v.188, DoubleClick OpenRTB extensions proto v.58.
 * Removed support for JSON serialization.
