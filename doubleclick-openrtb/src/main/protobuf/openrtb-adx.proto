@@ -1,9 +1,11 @@
-// Protocol version: v.58
+// Protocol version: v.67
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
 
-// Copyright 2020 Google Inc. All Rights Reserved.
+// Copyright 2021 Google Inc. All Rights Reserved.
+
+import "google/protobuf/struct.proto";
 
 // Protocol buffer for Ad Exchange OpenRTB specification.
 
@@ -124,6 +126,7 @@ message ImpExt {
 
   // [AdX: BidRequest.Mobile.skadn]
   optional SKAdNetworkRequest skadn = 14;
+
 }
 
 extend com.google.openrtb.BidRequest.Imp {
@@ -166,6 +169,14 @@ message BidResponseExt {
   // [AdX: BidResponse.processing_time_ms]
   optional int32 processing_time_ms = 1;
 
+  // Experimental feature; may be subject to change. See
+  // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
+  // and https://developers.google.com/authorized-buyers/rtb/turtledove
+  // for more information about the TURTLEDOVE simulation for RTB.
+  //
+  // Contains contextual signals that will be passed to the bidding function
+  // for the TURTLEDOVE simulation.
+  optional .google.protobuf.Value contextual_signal = 2;
 }
 
 extend com.google.openrtb.BidResponse {
@@ -252,6 +263,64 @@ message BidExt {
   // IDs longer than 64 bytes will be ignored.
   optional string buyer_reporting_id = 17;
 
+  // Experimental feature; may be subject to change. See
+  // https://github.com/google/ads-privacy/tree/master/experiments/frequency-capping
+  // for more information about the experiment on exchange-enforced
+  // frequency capping.
+  //
+  // Specifies frequency capping to be applied to the bid. Impressions for each
+  // user are capped at the level specified by fcap_id. A bid will not
+  // participate in the auction if an additional impression for the user would
+  // violate any of the specified caps. Multiple frequency caps can be specified
+  // for the same fcap_id.
+  //
+  // A bid is filtered before the auction if the frequency cap is malformed.
+  // Instances where the cap is malformed include:
+  //  - fcap_id is empty or is very long
+  //  - max_mpressions or time_range are non-positive
+  //  - there are a large number of frequency caps for a single bid
+  //  - time_unit is not specified
+  //
+  // Note that if a subsequent bid with the same fcap_id uses a different
+  // duration (represented by time_unit and time_range) then impressions counted
+  // against the old frequency cap will not count against the new one and vice
+  // versa.
+  message FrequencyCap {
+    // An ID that can represent a bidder's use-case for frequency capping; for
+    // example, it could represent their campaign, ad, line item, etc. It should
+    // not contain any user-specific information or identifiers.
+    optional string fcap_id = 1;
+
+    // The time units for which frequency caps can be enforced.
+    enum TimeUnit {
+      UNKNOWN_TIME_UNIT = 0;
+      MINUTE = 1;
+      DAY = 2;
+      WEEK = 3;
+      MONTH = 4;
+      // When INDEFINITE is used, time_range will be ignored. INDEFINITE means
+      // the frequency cap will be applied for a long period of time, (longer
+      // than a month) but not necessarily forever.
+      INDEFINITE = 5;
+    }
+
+    // The unit of time used to specify the time window for which a frequency
+    // cap applies.
+    optional TimeUnit time_unit = 2;
+
+    // The length of the time window, in units specified by time_unit, for which
+    // the frequency cap applies. For instance, if time_unit=WEEK and
+    // time_range=3, then capping is applied for a three week period. If the
+    // time_unit=INDEFINITE, this will be ignored.
+    optional int32 time_range = 3 [default = 1];
+
+    // The maximum number of impressions allowed to be shown to a user for
+    // the provided frequency_cap_id within the time window described by
+    // time_unit and time_range.
+    optional int32 max_imp = 4;
+  }
+  repeated FrequencyCap fcap = 18;
+
   // Advertiser's SKAdNetwork information to support app installation
   // attribution for iOS 14 and later.  Apple's SKAdNetwork API helps
   // advertisers measure ad-driven app installation by sending a postback
@@ -294,6 +363,26 @@ message BidExt {
   // [AdX: BidResponse.Ad.skadn]
   optional SKAdNetworkResponse skadn = 19;
 
+  // Experimental feature; may be subject to change. See
+  // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
+  // and https://developers.google.com/authorized-buyers/rtb/turtledove
+  // for more information about the TURTLEDOVE simulation for RTB.
+  //
+  // Bidding function name that the bidder selected for the TURTLEDOVE
+  // simulation. The name refers to the bidding function
+  // that is provided ahead of time via Bidding functions API resource.
+  // Bid value will be computed by the bidding function; value provided via
+  // max_cpm_micros will be ignored.
+  optional string bidding_function_name = 20;
+
+  // Experimental feature; may be subject to change. See
+  // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
+  // and https://developers.google.com/authorized-buyers/rtb/turtledove
+  // for more information about the TURTLEDOVE simulation for RTB.
+  //
+  // Contains TURTLEDOVE interest group-related data that will be passed
+  // to the bidding function.
+  optional .google.protobuf.Value interest_group_data = 21;
 }
 
 extend com.google.openrtb.BidResponse.SeatBid.Bid {
@@ -376,8 +465,8 @@ message SiteExt {
     // The page is at least partially visible. For example, in the foreground
     // tab of a non-minimized window.
     VISIBILITY_STATE_VISIBLE = 1;
-    // The page is not visible at all to users. For example, when the page is
-    // on a background browser tab, or in a minimized window.
+    // The page is not visible to users. For example, when the page is in a
+    // background browser tab, or in a minimized window.
     VISIBILITY_STATE_HIDDEN = 2;
   }
   // The visibility state of the web page containing the ad slot.
@@ -409,6 +498,23 @@ message BidRequestExt {
     // The status code for the ad. See creative-status-codes.txt in the
     // technical documentation for a list of ids.
     optional int32 creative_status_code = 2;
+
+    // Experimental feature; may be subject to change. See
+    // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
+    // and https://developers.google.com/authorized-buyers/rtb/turtledove
+    // for more information about the TURTLEDOVE simulation for RTB.
+    //
+    // This is the bid price CPM specified by the bidder in the bid response
+    // or computed by a bidding function in the TURTLEDOVE simulation
+    // (https://developers.google.com/authorized-buyers/rtb/turtledove)
+    // expressed in the bidding currency. The bidding currency is determined
+    // by:
+    // 1. The bidder-level currency, if configured.
+    // 2. Otherwise, the currency of the buyer account indicated by the
+    // billing ID in the billing_id field.
+    // 3. If billing_id is empty, the currency of the buyer account indicated
+    // by the sole billing ID in the bid request.
+    optional double bid_price = 9;
 
     // If the bid won the auction, this is the price paid in your account
     // currency.  If the bid participated in the auction but was out-bid, this
@@ -501,6 +607,40 @@ message UserExt {
   // https://vendorlist.consensu.org/v2/vendor-list.json for details about the
   // vendors listed in the consent string.
   optional string consent = 2;
+
+  message Floc {
+    // The value of a cohort ID â€“ a string identifier that is common to a large
+    // cohort of users with similar browsing habits.
+    optional string id = 1;
+
+    // The type of the FLoC. See
+    // https://github.com/google/ads-privacy/blob/master/proposals/FLoC/FLOC-Whitepaper-Google.pdf.
+    enum FlocType {
+      // Default value that should not be used.
+      FLOC_TYPE_UNKNOWN = 0;
+      // FLoC simulated using affinity hierarchical clustering with centroids
+      // and feature extraction based on Topic categories as described in the
+      // whitepaper.
+      SIMULATED_AFFINITY_CLUSTERING_CENTROID_VERTICAL = 2;
+      // FLoC simulated using SortingLSH clustering algorithm and Domain One-hot
+      // encoding feature extraction as described in the whitepaper.
+      SIMULATED_SIMHASH_SORTING_LSH_DOMAIN_ONE_HOT = 3;
+      // FLoC simulated using a k Random Centers locality-sensitive hash
+      // function as described in
+      // https://github.com/google/ads-privacy/blob/master/proposals/FLoC/k-random-centers.md
+      // with Domain TF-IDF feature extraction as described in the whitepaper.
+      KCENTER_DOM_FILTERED_TFDIF = 4;
+    }
+    optional FlocType type = 2;
+  }
+  // Cohort ID that is common to a large cohort of users with similar
+  // browsing habits. Currently the cohort ID is simulated by the exchange
+  // (as opposed to by the browser). When simulated
+  // cohort ID is provided, traditional pseudonymous cookie-based user
+  // identifiers or device advertising identifiers would not be populated.
+  // Experimental feature; may be subject to change. See
+  // https://github.com/WICG/floc for more background on FLoC.
+  optional Floc floc = 3;
 }
 
 extend com.google.openrtb.BidRequest.User {

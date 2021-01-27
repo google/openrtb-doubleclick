@@ -127,6 +127,24 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>com.googlecode.maven-download-plugin</groupId>
+            <artifactId>download-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>include-proto-library</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
+                <configuration>
+                  <uri>https://raw.githubusercontent.com/protocolbuffers/protobuf/v${protobufVersion}/src/google/protobuf/struct.proto</uri>
+                  <outputDirectory>${protobufGenerated}/include/google/protobuf</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
             <artifactId>maven-jar-plugin</artifactId>
             <executions>
               <execution>
@@ -146,7 +164,7 @@
               <outputDirectory>${basedir}/target</outputDirectory>
             </configuration>
           </plugin>
-    
+
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
@@ -165,6 +183,8 @@
                     <exec executable="protoc" failonerror="true">
                       <arg value="--java_out=${protobufGenerated}" />
                       <arg value="-I${protobufSource}" />
+                      <arg value="-I${protobufSource}/../../../../doubleclick-core/src/main/protobuf/" />
+                      <arg value="-I${protobufGenerated}/include" />
                       <arg line="${proto.files}" />
                     </exec>
                   </target>

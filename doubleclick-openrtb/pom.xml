@@ -133,8 +133,19 @@
                   <goal>wget</goal>
                 </goals>
                 <configuration>
-                  <url>${openrtbSource}/openrtb-core/src/main/protobuf/openrtb.proto</url>
+                  <uri>${openrtbSource}/openrtb-core/src/main/protobuf/openrtb.proto</uri>
                   <outputDirectory>${protobufGenerated}/include</outputDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>include-proto-library</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
+                <configuration>
+                  <uri>https://raw.githubusercontent.com/protocolbuffers/protobuf/v${protobufVersion}/src/google/protobuf/struct.proto</uri>
+                  <outputDirectory>${protobufGenerated}/include/google/protobuf</outputDirectory>
                 </configuration>
               </execution>
             </executions>
