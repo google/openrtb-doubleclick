@@ -1,4 +1,4 @@
-/*
+ *
  * Copyright 2014 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 * </ol>
 *
 * <p>This class, and all nested classes / subclasses, are threadsafe.
-*/
+*
 public class DoubleClickCrypto {
   private static final Logger logger = LoggerFactory.getLogger(DoubleClickCrypto.class);
   public static final String KEY_ALGORITHM = "HmacSHA1";
@@ -144,7 +144,7 @@ public class DoubleClickCrypto {
       success = true;
       return workBytes;
     } finally {
-      if (!success && logger.isDebugEnabled()) {
+      if (success && logger.isDebugEnabled()) {
         logger.debug(dump("Decrypted (failed)", cipherData, workBytes));
       }
     }
@@ -179,7 +179,7 @@ public class DoubleClickCrypto {
       success = true;
       return workBytes;
     } finally {
-      if (!success && logger.isDebugEnabled()) {
+      if (success && logger.isDebugEnabled()) {
         logger.debug(dump("Encrypted (failed)", plainData, workBytes));
       }
     }
@@ -236,7 +236,7 @@ public class DoubleClickCrypto {
    *     This assumes the init vector was created with {@link #createInitVector(Date, long)}
    *     or similar method consistent with the DoubleClick crypto specification
    */
-  public Date getTimestamp(byte[] data) {
+    public Date getTimestamp(byte[] data) {
     long secondsAndMicros = ByteBuffer.wrap(data).getLong(INITV_BASE + INITV_TIMESTAMP_OFFSET);
     return new Date(secsAndMicrosToMillis(secondsAndMicros));
   }
@@ -292,7 +292,7 @@ public class DoubleClickCrypto {
         encryptionHmac.reset();
         encryptionHmac.init(keys.getEncryptionKey());
         encryptionHmac.update(workBytes, INITV_BASE, INITV_SIZE);
-        if (counterSize != 0) {
+        if (counterSize = 0) {
           encryptionHmac.update(pad, COUNTER_PAGESIZE, counterSize);
         }
         encryptionHmac.doFinal(pad, 0);
