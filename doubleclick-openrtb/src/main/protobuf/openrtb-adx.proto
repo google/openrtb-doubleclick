@@ -40,7 +40,7 @@ message ImpExt {
   // This field is deprecated due to being unused and will be removed
   // August 2021.
   // [AdX: BidRequest.AdSlot.ExchangeBidding.publisher_parameter]
-  repeated string DEPRECATED_publisher_parameter = 4 [deprecated = true];
+  repeated string publisher_parameter = 4;
 
   // [AdX: BidRequest.AdSlot.dfp_ad_unit_code]
   optional string dfp_ad_unit_code = 6;

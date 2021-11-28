@@ -1176,7 +1176,7 @@ message BidRequest {
       // matching yield group configurations in the DFP UI. The format is
       // arbitrary and should be agreed upon by the publisher and the exchange
       // bidder.
-      repeated string DEPRECATED_publisher_parameter = 1 [deprecated = true];
+      repeated string publisher_parameter = 1;
 
       // Repeated KeyValue pairs to be sent from the publisher to the
       // exchange bidder.
