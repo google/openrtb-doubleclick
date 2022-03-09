@@ -1,10 +1,11 @@
-// Protocol version: v.196
+// Protocol version: v.235
 // Copyright 2021 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
 package com.google.protos.adx;
 option java_outer_classname = "NetworkBid";
 
+import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 
 // This is the message that Google uses to request bids. A BidRequest
@@ -63,21 +64,47 @@ message BidRequest {
   // Not set if there is one or more user_data_treatment value.
   optional bytes hosted_match_data = 37;
 
-  // Beta feature. Represents a short-lived user session on CTV/OTT devices,
+  // Represents a short-lived user session on CTV/OTT devices,
   // with a maximum session duration of 6 hours.
   // The use of session_id is never allowed for ads personalization.
   // session_id may only be used for frequency capping, competitive exclusions
-  // or related purposes. Please contact your account manager if you would like
-  // to enable this feature.
+  // or related purposes.
   optional string session_id = 65;
 
   // A string that identifies the browser and type of device that sent the
   // request. Certain data may be redacted or replaced.
   optional string user_agent = 6;
 
+  // Privacy treatments. Some fields in the bid request can be coarsened or
+  // redacted in order to protect user privacy. This message provides
+  // information about privacy treatments that apply to an ad opportunity
+  // offered via this request.
+  message PrivacyTreatments {
+
+    // Specifies the reasons that ads returned in response to this request
+    // should not be personalized.
+    enum NonPersonalizedAdsReason {
+      UNKNOWN = 0;
+      // The publisher has declared that this request should serve
+      // non-personalized ads independent of other signals.
+      // https://support.google.com/admanager/answer/9005435#npa
+      PUBLISHER_DECLARED_NPA = 1;
+      // The publisher has requested restricted data processing for this
+      // request. https://support.google.com/authorizedbuyers/answer/11121285
+      RESTRICT_DATA_PROCESSING = 2;
+      // The user has opted out of ads personalization.
+      USER_OPT_OUT = 3;
+    }
+    repeated NonPersonalizedAdsReason non_personalized_ads_reason = 6
+        [packed = true];
+  }
+  optional PrivacyTreatments privacy_treatments = 71;
+
   message Floc {
     // The value of a cohort ID â€“ a string identifier that is common to a large
     // cohort of users with similar browsing habits.
+    //
+    // Not currently populated.
     optional string id = 1;
 
     // The type of the FLoC. See
@@ -107,7 +134,42 @@ message BidRequest {
   // identifiers or device advertising identifiers would not be populated.
   // Experimental feature; may be subject to change. See
   // https://github.com/WICG/floc for more background on FLoC.
+  //
+  // FLoC cohort information is not currently populated.
   optional Floc floc = 68;
+
+  // User Agent information. This will be populated with information about the
+  // user agent, extracted from the User-Agent header or from Sec-CH-UA headers
+  // (https://wicg.github.io/ua-client-hints/).
+  message UserAgent {
+    // A tuple of (brand, version) for the user agent or platform.
+    message BrandVersion {
+      // Brand identifier, e.g., "Chrome" or "Windows".
+      optional string brand = 1;
+      // Version, split in components if needed, e.g., {"85", "1"} = v85.1.
+      repeated string version = 2;
+    }
+    // Identifies the browser. Prefer using the new field: browsers.
+    optional BrandVersion browser = 1;
+    // Identifies the browser.
+    repeated BrandVersion browsers = 8;
+    // Identifies the platform.
+    optional BrandVersion platform = 2;
+    // True if the agent prefers "mobile-optimized" content. Refer to the
+    // BidRequest.device field for specific information about the device, which
+    // may or may not be consistent with this field (for example, a smartphone's
+    // browser can be requesting "Desktop site").
+    optional bool mobile = 3;
+    // Device architecture, e.g. "x86" or "arm".
+    optional string architecture = 4;
+    // Device's bitness, e.g. "64" for 64-bit architecture.
+    optional string bitness = 9;
+    // Device model.
+    optional string model = 5;
+  }
+
+  // User Agent information.
+  optional UserAgent user_agent_data = 63;
 
   // The billing address country of the publisher. This may be different from
   // the detected country of the user in geo_criteria_id or the hosting country
@@ -115,10 +177,18 @@ message BidRequest {
   // https://developers.google.com/google-ads/api/reference/data/codes-formats#country_codes
   optional string publisher_country = 55;
 
+  // The ID of the host publisher. When populated, indicates that the host
+  // publisher participated in revenue sharing, and the ID can be used to
+  // authorize ads.txt.
+  optional string host_publisher_id = 73;
+
   // Location of the end user. Uses a subset of the codes used in the Google
   // Ads API. See the geo-table.csv table in the technical documentation for a
   // list of IDs. The geo_criteria_id field replaces the deprecated country,
   // region, city, and metro fields.
+  // It is recommended that BidRequest.geo be used instead of this field.
+  // See Geotargeting Guide:
+  // https://developers.google.com/authorized-buyers/rtb/geotargeting
   optional int32 geo_criteria_id = 39;
 
   // The user's approximate geographic location. All location information is
@@ -127,7 +197,10 @@ message BidRequest {
   // by the other fields (e.g. a city), and accuracy will be the radius of a
   // circle with the approximate area of that location. Location and its
   // accuracy will be fuzzified as necessary to protect user privacy.
+  // See Geotargeting Guide:
+  // https://developers.google.com/authorized-buyers/rtb/geotargeting
   message Geo {
+    // Latitude from -90.0 to +90.0, where negative is south.
     optional double lat = 1;
 
     // Longitude from -180.0 to +180.0, where negative is west.
@@ -161,7 +234,13 @@ message BidRequest {
   // user (e.g., zip code if the country is "US"). The postal_code_prefix field
   // is set when accuracy is too low to imply a full code, otherwise the
   // postal_code field is set.
+  // It is recommended that BidRequest.geo be used instead of this field.
+  // See Geotargeting Guide:
+  // https://developers.google.com/authorized-buyers/rtb/geotargeting
   optional string postal_code = 33;
+  // It is recommended that BidRequest.geo be used instead of this field.
+  // See Geotargeting Guide:
+  // https://developers.google.com/authorized-buyers/rtb/geotargeting
   optional string postal_code_prefix = 34;
 
   // A hyperlocal targeting location when available.
@@ -203,9 +282,6 @@ message BidRequest {
   // timezone_offset = 600.
   optional int32 timezone_offset = 25;
 
-  // List of detected user verticals. Currently unused.
-  repeated int32 user_vertical = 30 [packed = true];
-
   // This field is not populated by default. We recommend that bidders instead
   // store and look up list ids using either google_user_id or hosted_match_data
   // as keys.
@@ -240,11 +316,9 @@ message BidRequest {
   // meaningful beyond providing a stable identifier.
   optional fixed64 partner_id = 52;
 
-  // The URL of the page with parameters removed. This is only set if the site
-  // is not anonymous and the publisher allows site targeting. You can use
-  // anonymous_id for targeting if the inventory is anonymous. Otherwise, use
-  // detected_vertical's. Only one of url or anonymous_id is ever set in the
-  // same request. This always starts with a protocol (either http or https).
+  // The URL of the page with parameters removed. This is only set if the
+  // publisher allows site targeting. This always starts with a protocol (either
+  // http or https).
   optional string url = 11;
 
   // Indicates that the request is using semi-transparent branding,
@@ -252,11 +326,6 @@ message BidRequest {
   // be provided. This decision is made by the publisher, see
   // https://support.google.com/admanager/answer/4584891#urls for context.
   optional bool is_semi_transparent_request = 67;
-
-  // An id for the domain of the page. This is set when the inventory is
-  // anonymous. Only one of url or anonymous_id is ever set in the same
-  // request.
-  optional string anonymous_id = 19;
 
   // Detected user languages, based on the language of the web page, the browser
   // settings, and other signals. The order is arbitrary. The codes are 2 or 5
@@ -372,6 +441,41 @@ message BidRequest {
     // Apple iOS device model, e.g., "iphone 5s", "iphone 6+", "ipad 4".
     optional string hardware_version = 11;
 
+    // Indicates whether the user has opted out of interest based advertising or
+    // ads personalization as determined by an OS-level setting in iOS or
+    // Android:
+    // https://support.apple.com/en-us/HT202074
+    // https://support.google.com/googleplay/answer/3405269
+    optional bool limit_ad_tracking = 12;
+
+    // The possible app tracking authorization statuses that could be applicable
+    // for bid requests from iOS devices. For more information about iOS's app
+    // tracking authorization status, see:
+    // https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus
+    enum AuthorizationStatus {
+      // User has not yet received a request to authorize access to app-related
+      // data that can be used for tracking the user or the device.
+      NOT_DETERMINED = 0;
+
+      // Authorization to access app-related data that can be used for tracking
+      // the user or the device is restricted.
+      RESTRICTED = 1;
+
+      // User denies authorization to access app-related data that can be used
+      // for tracking the user or the device.
+      DENIED = 2;
+
+      // User authorizes access to app-related data that can be used for
+      // tracking the user or the device.
+      AUTHORIZED = 3;
+    }
+
+    // This field is only populated for iOS devices. Indicates the app tracking
+    // authorization status. This value is retrieved from ATTrackingManager
+    // and provided as is. For more information about iOS's app tracking
+    // authorization status, see:
+    // https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus
+    optional AuthorizationStatus app_tracking_authorization_status = 13;
   }
   optional Device device = 54;
 
@@ -389,10 +493,9 @@ message BidRequest {
     // If true, then this request is from a mobile application. For branded
     // requests, app_id will also be filled in. If the request is from a mobile
     // web page contained inside an app, is_app will still be false, but app_id
-    // could be filled in with the app identifier. is_app may also be true for
-    // anonymous inventory, in which case anonymous_id will be set. For SDK-less
-    // requests (mostly from connected TVs), this will be true if an app ID is
-    // provided directly in the request.
+    // could be filled in with the app identifier. For SDK-less requests (mostly
+    // from connected TVs), this will be true if an app ID is provided directly
+    // in the request.
     optional bool is_app = 7 [default = false];
 
     // The identifier of the mobile app when this ad query comes from a mobile
@@ -492,17 +595,28 @@ message BidRequest {
     message SKAdNetworkRequest {
       // Version of SKAdNetwork supported. Dependent on both the OS version
       // and the SDK version.
+      // Note:  This field will be replaced by the
+      // BidRequest.mobile.skadn.versions field to support a list of version
+      // numbers.
       optional string version = 1;
+
+      // List of SKAdNetwork versions supported, depending on the OS version
+      // and the SDK version.
+      repeated string versions = 4;
 
       // ID of publisher app in Appleâ€™s App Store.
       optional string sourceapp = 2;
 
       // SKAdNetworkIdentifier entries in the publisher app's Info.plist.
       repeated string skadnetids = 3;
+
+      // List of fidelity types supported, depending on the SKAdNetwork API
+      // version supported by the operating system and SDK as well as ad slot
+      // properties.
+      repeated SKAdNetworkFidelityType supported_fidelity_types = 5
+          [packed = true];
     }
-
     optional SKAdNetworkRequest skadn = 34;
-
   }
   optional Mobile mobile = 28;
 
@@ -700,41 +814,10 @@ message BidRequest {
     // video publisher and may not always be populated.
     //
     message ContentAttributes {
-      // The title of the video.
-      optional string title = 1;
-
       // The duration of the video, in seconds.
       optional int32 duration_seconds = 2;
-
-      // A list of keywords describing the video, extracted from the content
-      // management system of the video publisher. There will be no more than 10
-      // keywords in this list.
-      repeated string keywords = 3;
     }
     optional ContentAttributes content_attributes = 9;
-
-    // The type of inventory from which request is sent.
-    // Deprecated but will continue to be filled in until January 2017.
-    // Use the placement field to determine if inventory is interstitial or
-    // instream. Use Device.device_type to determine if the request comes from
-    // a mobile device and Mobile.is_app to determine if the request comes from
-    // an app.
-    // WEB_VIDEO is INSTREAM placements from web browsers.
-    // GAMES consists of INTERSTITIAL placements from both apps and web
-    // browsers.
-    // MOBILE_INTERSTITIAL is INTERSTITIAL placements from apps only.
-    // This inventory also allows display ads. You can tell if an adslot allows
-    // display ads if adslot->excluded_attributes does not contain 21
-    // (CreativeType: Html)
-    // MOBILE_APP_VIDEO is INSTREAM placement from apps only.
-    enum InventoryType {
-      WEB_VIDEO = 0;
-      GAMES = 1;
-      MOBILE_INTERSTITIAL = 2;
-      MOBILE_APP_VIDEO = 3;
-    }
-    optional InventoryType DEPRECATED_inventory_type = 3
-        [default = WEB_VIDEO, deprecated = true];
 
     // Identify whether or not the ad request is being served from a live video
     // stream (0 = is not live, 1 = is live).
@@ -861,9 +944,27 @@ message BidRequest {
       // additional information about the Google TCF v2 integration.
       //
       // See the IAB Global Vendor List at
-      // https://vendorlist.consensu.org/v2/vendor-list.json for details about
+      // https://vendor-list.consensu.org/v2/vendor-list.json for details about
       // the vendors listed in the consent string.
       optional string tcf_consent_string = 3;
+
+      // The raw Additional Consent string, which contains a list of certain
+      // Google Ad Tech Providers (ATPs). These ATPs are not registered with IAB
+      // TCF v2, but publishers or their Consent Management Providers (CMPs)
+      // have ensured that certain disclosures are given to, and consents are
+      // obtained from, end users, as required by Googleâ€™s EU User Consent
+      // Policy. This field is only populated with the use of CMPs that are
+      // integrated with IAB TCF v2. Such CMPs use the raw Additional Consent
+      // string to indicate vendors that are not registered with IAB, and
+      // communicate end usersâ€™ CMP choices to those vendors. The
+      // consented_providers field contains the set of vendors that mirrors the
+      // one represented by the additional_consent_string field, which is in the
+      // raw form. Vendors or any other third-party service providers must not
+      // create AC strings themselves.
+      //
+      // See https://support.google.com/admanager/answer/9681920 for more
+      // details about this field.
+      optional string additional_consent_string = 4;
     }
     // Information about the ad tech providers for whom the publisher has
     // specified to Google that its EEA user has consented to the use of their
@@ -1058,7 +1159,6 @@ message BidRequest {
         optional bool must_bid = 9 [default = true];
       }
       repeated DirectDeal direct_deal = 6;
-
     }
     repeated MatchingAdData matching_ad_data = 9;
 
@@ -1073,12 +1173,6 @@ message BidRequest {
     // real-time bidders.
     //
     message ExchangeBidding {
-      // UTF8 strings optionally provided by the publisher as part of their
-      // matching yield group configurations in the DFP UI. The format is
-      // arbitrary and should be agreed upon by the publisher and the exchange
-      // bidder.
-      repeated string publisher_parameter = 1;
-
       // Repeated KeyValue pairs to be sent from the publisher to the
       // exchange bidder.
       repeated KeyValue key_value = 3;
@@ -1094,6 +1188,64 @@ message BidRequest {
       optional bool is_open_bidding = 2;
     }
     optional OpenBidding open_bidding = 53;
+
+    // Indicates the creative policy and publisher blocks that applies to this
+    // request.
+    message CreativeEnforcementSettings {
+      // Creative policy enforcement level that applies to this request.
+      // Creatives that don't adhere to the specified policy will be filtered
+      // before the auction. The status of the creatives with their respective
+      // policies can be retrieved via Creative API.
+      // https://developers.google.com/authorized-buyers/apis/guides/rtb-api/creatives
+      // Bids on deals may override the policy enforcement applicable to the
+      // request.
+      enum PolicyEnforcement {
+        POLICY_ENFORCEMENT_UNKNOWN = 0;
+
+        // Baseline policy for all ads serving through any of Googleâ€™s ads
+        // platform products. Learn more at:
+        // https://support.google.com/platformspolicy/answer/3013851.
+        POLICY_ENFORCEMENT_PLATFORM_POLICY = 1;
+
+        // Policy for ads serving through Googleâ€™s ad network. This includes the
+        // baseline policy for all ads serving through any of Googleâ€™s ads
+        // platform products. Learn more at:
+        // https://support.google.com/authorizedbuyers/answer/1325008.
+        POLICY_ENFORCEMENT_NETWORK_AND_PLATFORM_POLICY = 2;
+      }
+      optional PolicyEnforcement policy_enforcement = 1;
+
+      // Creative publisher blocks enforcement level that applies to this
+      // request. Publisher blocks allow publishers to control which creatives
+      // can be shown on their properties.
+      // Deals may also override publisher blocks. Please refer to adslot.
+      // matching_ad_data.direct_deal.publisher_blocks_overridden field.
+      enum PublisherBlocksEnforcement {
+        PUBLISHER_BLOCKS_ENFORCEMENT_UNKNOWN = 0;
+
+        // The publisher's blocking controls are enforced on creatives
+        // submitted. Publisher blocks enforcement settings are provided in the
+        // following fields:
+        // - publisher_settings_list_id
+        // - excluded_sensitive_category
+        // - allowed_restricted_category
+        // - excluded_product_category
+        // - allowed_vendor_type
+        // - excluded_attribute
+        PUBLISHER_BLOCKS_ENFORCEMENT_APPLIES = 1;
+
+        // The publisher's blocking controls are not enforced on creatives
+        // submitted.
+        PUBLISHER_BLOCKS_ENFORCEMENT_OVERRIDDEN = 2;
+      }
+      optional PublisherBlocksEnforcement publisher_blocks_enforcement = 3;
+
+      // Indicates whether the policy, scan and publisher blocks level
+      // combination is the default combination for this bidder.
+      optional bool is_default = 4;
+    }
+
+    optional CreativeEnforcementSettings creative_enforcement_settings = 58;
 
     // The ad unit code (https://support.google.com/admanager/topic/4426071)
     // This is currently only set for exchange bidding requests.
@@ -1409,26 +1561,83 @@ message BidRequest {
     // depth cannot be estimated.
     optional int32 session_depth = 40 [default = -1];
 
-    // Data, opaque to Google and to the publisher, generated by the buyer
-    // within the publisher's mobile application.
+    // Encrypted data to be passed to a buyer by the publisher.
     message BuyerGeneratedRequestData {
-      // Identification for the source of the buyer generated request data when
-      // that source is from within an application.
+      // The source of the signal when this request is from an app.
       message SourceApp {
         // Identifier for the SDK that generated this data. It will match the id
         // in mobile.installed_sdk.id.
         optional string id = 1;
       }
-      // The source of the data.
+      // The source of the signal when this request is from a web page.
+      message SourceJs {
+        // Identifier of the JavaScript library that generated this data
+        optional string id = 1;
+      }
+      // The source (provider) of the signal.
       oneof source {
         SourceApp source_app = 1;
+        SourceJs source_js = 3;
       }
-
-      // Data sent from the buyer's source within the publisher's domain to the
-      // bidder. This data is opaque to the publisher and to Google.
+      // The encrypted signal.
       optional string data = 2;
     }
     repeated BuyerGeneratedRequestData buyer_generated_request_data = 41;
+
+    // Possible ad rendering API frameworks that can be supported.
+    // If an API is not explicitly listed, it is assumed not to be supported.
+    enum APIFramework {
+      UNKNOWN_FRAMEWORK = 0;
+      // Mobile Rich Media Ad Interface Definitions Version 1.0. See
+      // https://www.iab.com/guidelines/mraid/.
+      MRAID_1 = 3;
+      // Mobile Rich Media Ad Interface Definitions Version 2.0. See
+      // https://www.iab.com/guidelines/mraid/.
+      MRAID_2 = 5;
+      // Mobile Rich Media Ad Interface Definitions Version 3.0. See
+      // https://www.iab.com/guidelines/mraid/.
+      MRAID_3 = 6;
+      // Open Measurement Interface Definition Version 1.0. See
+      // https://iabtechlab.com/standards/open-measurement-sdk/.
+      OMID_1 = 7;
+    }
+    // List of supported API frameworks for this impression.
+    repeated APIFramework api = 46 [packed = true];
+
+    // For ads rendered using a custom SDK only: multiplier applied to bid in
+    // the auction. The adjustment reflects the likelihood that your bid would
+    // generate a billable event (i.e. the ad renders successfully) if it won
+    // the auction, relative to the probability that other bids generate a
+    // billable event if they won the auction. This adjustment can be larger or
+    // smaller than 1. This affects the final ranking in the auction only; in
+    // particular, this multiplier does not affect the payment.
+    optional double billable_event_rate_adjustment = 59 [default = 1.0];
+
+    // Note: This feature is currently in beta testing for publishers
+    // and is subject to change.
+    // This message is populated when the request is for an individual cell
+    // within a multi-ad grid. It provides cell level information as well as
+    // information about the grid this cell belongs to in the AdSlot.
+    // Only native ads are supported for cells in a multi-ad grid at this time.
+    message MultiAdsCellInfo {
+      // The row this cell belongs to.
+      optional int32 cell_row = 1;
+      // The column this cell belongs to.
+      optional int32 cell_column = 2;
+      // Total number of rows in the grid for this cell.
+      optional int32 grid_rows = 3;
+      // Total number of columns in the grid for this cell.
+      optional int32 grid_columns = 4;
+      // Unique ID for the grid. It identifies a single grid on a single
+      // instance of a page and is the same for all cells within that grid. If a
+      // page has multiple grids, the grid_id for other grids would be
+      // different. It would also be different for the same grid in two
+      // different pageviews.
+      // This is distinct from the google_query_id, which will differ for every
+      // request for a cell in the grid.
+      optional int64 grid_id = 5;
+    }
+    optional MultiAdsCellInfo multi_ads_cell_info = 55;
 
     // Identifier of the OM SDK integration. For more info, see the OpenRTB
     // Advisory for Open Measurement SDK:
@@ -1439,6 +1648,41 @@ message BidRequest {
     // Advisory for Open Measurement SDK:
     // https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/master/OpenRTB%20support%20for%20OMSDK.md#openrtb-and-adcom.
     optional string omidpv = 57;
+
+    // Describes the environment where the ad auction is run:  either all
+    // on the server-side, server-side with sandboxed interest group bidding
+    // simulation, or with the contextual auction on the server-side and the
+    // interest group bidding and the final auction on the device.
+    enum AuctionEnvironment {
+      // The auction determining the winning ad is held server-side.
+      SERVER_SIDE_AUCTION = 0;
+
+      // This value is currently not in use and will be provided only when
+      // browsers start supporting on-device auctions.
+      // The contextual auction that determines a winning contextual bid is held
+      // server-side, and bidding functions are run on the device to determine
+      // interest group bids. Both the winning contextual bid and interest
+      // group bids are entered into a final auction held on the device to
+      // select the winning ad. For more information regarding the TURTLEDOVE
+      // on device bidding and auction, see:
+      // https://github.com/WICG/turtledove and
+      // https://github.com/WICG/turtledove/blob/main/FLEDGE.md
+      ON_DEVICE_INTEREST_GROUP_AUCTION = 1;
+
+      // An interest group auction is simulated in a sandboxed environment, and
+      // its results are entered into the conventional server-side auction to
+      // determine the winning ad. Experimental feature; may be subject to
+      // change. For more information regarding about the TURTLEDOVE simulation
+      // for RTB, see:
+      // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation,
+      // https://developers.google.com/authorized-buyers/rtb/turtledove,
+      // and https://developers.google.com/authorized-buyers/rtb/fledge
+      SERVER_SIDE_AUCTION_WITH_INTEREST_GROUP_SIMULATION = 2;
+    }
+
+    // Specifies where the ad auction runs.
+    optional AuctionEnvironment auction_environment = 61
+        [default = SERVER_SIDE_AUCTION];
   }
   repeated AdSlot adslot = 14;
 
@@ -1458,20 +1702,6 @@ message BidRequest {
     // technical documentation for a list of ids.
     optional int32 creative_status_code = 3;
 
-    // Experimental feature; may be subject to change. See
-    // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
-    // and https://developers.google.com/authorized-buyers/rtb/turtledove
-    // for more information about the TURTLEDOVE simulation for RTB.
-    //
-    // This is the bid price CPM specified by the bidder in the bid response or
-    // computed by a bidding function in the TURTLEDOVE simulation expressed in
-    // micros of the bidding currency. The bidding currency is determined by:
-    // 1. The bidder-level currency, if configured.
-    // 2. Otherwise, the currency of the buyer account indicated by the
-    // billing ID in the billing_id field.
-    // 3. If billing_id is empty, the currency of the buyer account indicated
-    // by the sole billing ID in the bid request.
-    optional int64 bid_cpm_micros = 11;
 
     // If the bid won the auction, this is the price paid in your account
     // currency. If the bid participated in the auction but was out-bid, this
@@ -1535,6 +1765,87 @@ message BidRequest {
   // can automatically update the model when bidding patterns change.
   optional bool is_predicted_to_be_ignored = 45 [default = false];
 
+  // SupplyChain object. For more information, see
+  // https://github.com/InteractiveAdvertisingBureau/openrtb/blob/master/supplychainobject.md.
+  message SupplyChain {
+    // Flag indicating whether the chain contains all nodes involved in the
+    // transaction leading back to the owner of the site, app or other medium of
+    // the inventory.
+    optional bool complete = 1;
+
+    message SupplyChainNode {
+      // The canonical domain name of the SSP, Exchange, Header Wrapper, etc
+      // system that bidders connect to. This may be the operational domain of
+      // the system, if that is different than the parent corporate domain, to
+      // facilitate WHOIS and reverse IP lookups to establish clear ownership of
+      // the delegate system. This should be the same value as used to identify
+      // sellers in an ads.txt file if one exists.
+      optional string advertising_system_identifier = 1;
+
+      // The identifier associated with the seller or reseller account within
+      // the advertising system. This must contain the same value used in
+      // transactions, i.e. "publisher_id" in Google protocol. Should be
+      // limited to 64 characters in length.
+      optional string seller_identifier = 2;
+
+      // Indicates whether this node will be involved in the flow of payment for
+      // the inventory. When set to true, the advertising system in the
+      // advertising_system_identifier field pays the seller in the
+      // seller_identifier field, who is responsible for paying the previous
+      // node in the chain. When set to false, this node is not involved in the
+      // flow of payment for the inventory.
+      optional bool handles_payment = 6;
+    }
+
+    // Array of SupplyChainNode objects in the order of the chain. In a complete
+    // supply chain, the first node represents the initial advertising system
+    // and seller ID involved in the transaction, i.e. the owner of the site,
+    // app, or other medium. In an incomplete supply chain, it represents the
+    // first known node. The last node represents the entity sending this bid
+    // request.
+    repeated SupplyChainNode nodes = 2;
+
+    // Version of the supply chain specification in use, in the format of
+    // â€œmajor.minorâ€. For example, for version 1.0 of the spec, use the string
+    // â€œ1.0â€.
+    optional string version = 3;
+  }
+
+  optional SupplyChain supply_chain = 69;
+
+  // Experimental feature; may be subject to change. See
+  // https://support.google.com/authorizedbuyers/answer/10890762 for more
+  // information.
+  //
+  // Describes the scope of frequency cap enforcement available for this
+  // request. Frequency caps to be enforced for a bid can be specified in the
+  // BidResponse.ad.adslot.frequency_cap field.
+  enum FrequencyCappingScope {
+    // Default value which should not be used, or which can indicate that
+    // frequency cap scope could not be reliably determined.
+    FREQUENCY_CAPPING_SCOPE_UNKNOWN = 0;
+
+    // Frequency capping based on bid response specifications is not available
+    // for this request. A frequency-capped bid for a bid request with no
+    // frequency cap availability will be filtered prior to the auction.
+    FREQUENCY_CAPPING_SCOPE_NONE = 1;
+
+    // Frequency capping enforcement is available across multiple sites within
+    // the same browser.
+    FREQUENCY_CAPPING_SCOPE_BROWSER = 2;
+
+    // Frequency capping enforcement is available across multiple apps on the
+    // device, excluding browsers.
+    FREQUENCY_CAPPING_SCOPE_DEVICE = 3;
+
+    // Frequency capping enforcement is available within a single app.
+    FREQUENCY_CAPPING_SCOPE_APP = 4;
+
+    // Frequency capping enforcement is available within a single site.
+    FREQUENCY_CAPPING_SCOPE_SITE = 5;
+  }
+
+  optional FrequencyCappingScope frequency_capping_scope = 70;
 }
 
 // This is the message that you return in response to a BidRequest. You may
@@ -1628,10 +1939,17 @@ message BidResponse {
       // The app icon, for app download ads.
       optional Image app_icon = 7;
 
-      // The URL to fetch a video ad. The URL should return an XML response that
-      // conforms to VAST standards. Only set this field if the video field is
-      // requested.
-      optional string video_url = 13;
+      // A video in the form of either a URL for a VAST tag, or an in-line VAST
+      // tag. Only set this field if VIDEO is required or recommended in the
+      // BidRequest's NativeAdTemplate.
+      oneof video {
+        // The URL to fetch a video ad. The URL should return an XML response
+        // that conforms to VAST standards.
+        string video_url = 13;
+
+        // The VAST document to be returned. Max size is 100kB.
+        string video_vast_xml = 16;
+      }
 
       // The app rating in the app store. Must be in the range [0-5].
       optional double star_rating = 8;
@@ -1804,9 +2122,8 @@ message BidResponse {
       optional string third_party_buyer_token = 12;
 
       // Experimental feature; may be subject to change. See
-      // https://github.com/google/ads-privacy/tree/master/experiments/frequency-capping
-      // for more information about the experiment on exchange-enforced
-      // frequency capping.
+      // https://support.google.com/authorizedbuyers/answer/10890762 for more
+      // information.
       //
       // Specifies frequency capping to be applied to the bid. Impressions for
       // each user are capped at the level specified by frequency_cap_id. A bid
@@ -1828,7 +2145,8 @@ message BidResponse {
       message FrequencyCap {
         // An ID that can represent a bidder's use-case for frequency capping;
         // for example, it could represent their campaign, ad, line item, etc.
-        // It should not contain any user-specific information or identifiers.
+        // It should not contain any user-specific information or identifiers
+        // and should not be longer than 64 characters.
         optional string frequency_cap_id = 1;
 
         // The time units for which frequency caps can be enforced.
@@ -1861,31 +2179,11 @@ message BidResponse {
       }
       repeated FrequencyCap frequency_cap = 16;
 
-      // Experimental feature; may be subject to change. See
-      // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
-      // and https://developers.google.com/authorized-buyers/rtb/turtledove
-      // for more information about the TURTLEDOVE simulation for RTB.
-      //
-      // Bidding function name that the bidder selected for the TURTLEDOVE
-      // simulation. The name refers to the bidding function
-      // that is provided ahead of time via Bidding functions API resource.
-      // Bid value will be computed by the bidding function; value provided via
-      // max_cpm_micros will be ignored.
-      optional string bidding_function_name = 17;
-
-      // Experimental feature; may be subject to change. See
-      // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
-      // and https://developers.google.com/authorized-buyers/rtb/turtledove
-      // for more information about the TURTLEDOVE simulation for RTB.
-      //
-      // Contains TURTLEDOVE interest group-related data that will be passed
-      // to the bidding function
-      optional .google.protobuf.Value interest_group_data = 18;
     }
     repeated AdSlot adslot = 3;
 
     // The URLs to call when the impression is rendered. This is supported for
-    // all inventory types and all formats except for VAST video.
+    // all inventory types and all formats.
     repeated string impression_tracking_url = 19;
 
     // Link to ad preferences page. This is only supported for native ads.
@@ -1929,6 +2227,27 @@ message BidResponse {
       // Data to pass to the SDK in order to render the ad. This data is opaque
       // to the publisher and to Google.
       optional string rendering_data = 2;
+      // Declared ad assets to support creative scanning, classification, and
+      // enforcement of ad policy and publisher blocks for ads rendered with a
+      // custom SDK.
+      message DeclaredAd {
+        // Ad content used by SDK to render an ad.
+        oneof content {
+          // The HTML snippet representative of the SDK-rendered ad.
+          string html_snippet = 1;
+
+          // The URL to the VAST asset used in the SDK-rendered ad.
+          string video_url = 2;
+
+          // The VAST document used to render custom SDK-rendered ad. This
+          // document should conform to the VAST 2.0 or 3.0 standard.
+          string video_vast_xml = 5;
+        }
+
+        // The final landing pages of the SDK-rendered ad.
+        repeated string click_through_url = 4;
+      }
+      optional DeclaredAd declared_ad = 6;
     }
     optional SdkRenderedAd sdk_rendered_ad = 27;
 
@@ -1956,8 +2275,35 @@ message BidResponse {
       // ID of advertiser's app in Apple's app store.
       optional string itunesitem = 4;
 
+      // SKAdNetwork API starting from version 2.2 supports multiple ad
+      // presentation options specified by the `fidelity-type` parameter of the
+      // SKAdNetwork signature.  This holds parameters used to generate the
+      // signature that would be different for each fidelity type supported.
+      // For more info visit:
+      // https://developer.apple.com/documentation/storekit/skadnetwork/signing_and_providing_ads
+      message Fidelity {
+        // The fidelity type of the attribution to track.
+        optional SKAdNetworkFidelityType fidelity_type = 1
+            [default = STOREKIT_RENDERED_ADS];
+
+        // A unique all-lowercase UUID generated by the advertiser to use for
+        // generating the signature.
+        optional string nonce = 2;
+
+        // Unix time in millis used at the time of signature generation.
+        optional int64 timestamp = 3;
+
+        // SKAdNetwork signature as specified by Apple.
+        optional string signature = 4;
+      }
+
+      repeated Fidelity fidelities = 9;
+
       // A unique all-lowercase UUID generated by the advertiser to use for
       // generating the signature.
+      // Note:  This field will be deprecated in favor of the
+      // BidResponse.ad.skadn.fidelities.nonce field to support multiple
+      // fidelity types.
       optional string nonce = 5;
 
       // ID of publisher's app in Apple's app store. This should match the ID
@@ -1965,14 +2311,34 @@ message BidResponse {
       optional string sourceapp = 6;
 
       // Unix time in millis used at the time of signature generation.
+      // Note:  This field will be deprecated in favor of the
+      // BidResponse.ad.skadn.fidelities.timestamp field to support multiple
+      // fidelity types.
       optional int64 timestamp = 7;
 
       // SKAdNetwork signature as specified by Apple.
+      // Note:  This field will be deprecated in favor of the
+      // BidResponse.ad.skadn.fidelities.signature field to support multiple
+      // fidelity types.
       optional string signature = 8;
+
+      // Google Mobile Ads SDK options for SKAdNetwork handling.
+      message SKAdNetworkOptions {
+        // By default, SKAdNetwork attribution will only be initiated if the
+        // click-through URL lands on the app store, either as a direct link to
+        // the app store or as the final destination of a server-side redirect
+        // chain.  This flag enables GMA SDK to always initiate SKAdNetwork
+        // attribution on-click regardless of the detected click's final
+        // destination URL. Note that enabling this will launch the app store
+        // even for clicks that are not meant to open the app store, for example
+        // clicks on Ad Choices icon. For more info, see:
+        // https://developers.google.com/authorized-buyers/rtb/skadnetwork
+        optional bool always_open_appstore = 1 [default = false];
+      }
+      optional SKAdNetworkOptions skadn_options = 10;
     }
 
     optional SKAdNetworkResponse skadn = 29;
-
   }
   repeated Ad ad = 2;
 
@@ -1994,12 +2360,22 @@ message BidResponse {
   // for the full set of no-bid reason codes.
   optional int32 no_bid_reason = 6;
 
-  // Experimental feature; may be subject to change. See
-  // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
-  // and https://developers.google.com/authorized-buyers/rtb/turtledove
-  // for more information about the TURTLEDOVE simulation for RTB.
-  //
-  // Contains contextual signals that will be passed to the bidding function
-  // for the TURTLEDOVE simulation.
-  optional .google.protobuf.Value contextual_signal = 7;
+}
+
+// SKAdNetwork API starting from version 2.2 supports multiple ad
+// presentation options specified by the `fidelity-type` parameter of the
+// SKAdNetwork signature.  The following are the fidelity types supported by
+// Apple. For more info visit:
+// https://developer.apple.com/documentation/storekit/skadnetwork/signing_and_providing_ads
+enum SKAdNetworkFidelityType {
+  // Attribution for app installs within 24 hours of viewing an ad for at least
+  // 3 seconds. Supported for SKAdnetwork version 2.2 and up. For more info see:
+  // https://developer.apple.com/documentation/storekit/skadnetwork/generating_the_signature_to_validate_view-through_ads
+  VIEW_THROUGH_ADS = 0;
+
+  // Attribution for app installs initiated from the StoreKit-rendered App Store
+  // product page driven by ad clicks. Supported for all SKAdNetwork versions.
+  // For more info see:
+  // https://developer.apple.com/documentation/storekit/skadnetwork/generating_the_signature_to_validate_storekit-rendered_ads
+  STOREKIT_RENDERED_ADS = 1;
 }
