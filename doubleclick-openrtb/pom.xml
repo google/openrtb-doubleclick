@@ -138,13 +138,24 @@
                 </configuration>
               </execution>
               <execution>
-                <id>include-proto-library</id>
+                <id>include-proto-lib-struct</id>
                 <phase>initialize</phase>
                 <goals>
                   <goal>wget</goal>
                 </goals>
                 <configuration>
                   <uri>https://raw.githubusercontent.com/protocolbuffers/protobuf/v${protobufVersion}/src/google/protobuf/struct.proto</uri>
+                  <outputDirectory>${protobufGenerated}/include/google/protobuf</outputDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>include-proto-lib-duration</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>wget</goal>
+                </goals>
+                <configuration>
+                  <uri>https://raw.githubusercontent.com/protocolbuffers/protobuf/v${protobufVersion}/src/google/protobuf/duration.proto</uri>
                   <outputDirectory>${protobufGenerated}/include/google/protobuf</outputDirectory>
                 </configuration>
               </execution>
