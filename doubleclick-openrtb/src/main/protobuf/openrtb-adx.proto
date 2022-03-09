@@ -411,6 +411,9 @@ message BidExt {
   // duration (represented by time_unit and time_range) then impressions counted
   // against the old frequency cap will not count against the new one and vice
   // versa.
+  //
+  // To enable frequency capping for your account, please contact your account
+  // manager.
   message FrequencyCap {
     // An ID that can represent a bidder's use-case for frequency capping; for
     // example, it could represent their campaign, ad, line item, etc. It should
@@ -689,6 +692,26 @@ message BidRequestExt {
     // technical documentation for a list of ids.
     optional int32 creative_status_code = 2;
 
+
+    // Experimental feature; may be subject to change. See
+    // https://developers.google.com/authorized-buyers/rtb/fledge and
+    // https://developers.google.com/authorized-buyers/rtb/turtledove
+    // for more information about the FLEDGE and TURTLEDOVE simulations for RTB.
+    //
+    // An optional string for debugging a bidding function.
+    // This is the string that can be returned by the bidding function during
+    // invocation. This debug string is limited to a maximum size of 200 bytes
+    // of data.
+    optional string bidding_function_debug_string = 10;
+
+    // Experimental feature; may be subject to change. For more information
+    // about the TURTLEDOVE and FLEDGE simulations respectively, see:
+    // https://developers.google.com/authorized-buyers/rtb/turtledove,
+    // https://developers.google.com/authorized-buyers/rtb/fledge
+    //
+    // The estimated time it took for the bidding function specified by the
+    // bidder to run for on-device auctions simulated server-side.
+    optional .google.protobuf.Duration bidding_function_runtime = 11;
 
     // If the bid won the auction, this is the price paid in your account
     // currency.  If the bid participated in the auction but was out-bid, this
