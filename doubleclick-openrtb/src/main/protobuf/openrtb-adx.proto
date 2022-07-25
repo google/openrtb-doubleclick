@@ -1,9 +1,9 @@
-// Protocol version: v.101
+// Protocol version: v.108
 import "openrtb.proto";
 option java_outer_classname = "AdxExt";
 package com.google.doubleclick;
 
-// Copyright 2021 Google Inc. All Rights Reserved.
+// Copyright 2022 Google Inc. All Rights Reserved.
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -131,7 +131,7 @@ message ImpExt {
     // and the SDK version.
     repeated string versions = 4;
 
-    // ID of publisher app in Appleâ€™s App Store.
+    // ID of publisher app in Apple's App Store.
     optional string sourceapp = 2;
 
     // SKAdNetworkIdentifier entries in the publisher app's Info.plist.
@@ -159,13 +159,13 @@ message ImpExt {
     enum PolicyEnforcement {
       POLICY_ENFORCEMENT_UNKNOWN = 0;
 
-      // Baseline policy for all ads serving through any of Googleâ€™s ads
+      // Baseline policy for all ads serving through any of Google's ads
       // platform products. Learn more at:
       // https://support.google.com/platformspolicy/answer/3013851.
       POLICY_ENFORCEMENT_PLATFORM_POLICY = 1;
 
-      // Policy for ads serving through Googleâ€™s ad network. This includes the
-      // baseline policy for all ads serving through any of Googleâ€™s ads
+      // Policy for ads serving through Google's ad network. This includes the
+      // baseline policy for all ads serving through any of Google's ads
       // platform products. Learn more at:
       // https://support.google.com/authorizedbuyers/answer/1325008.
       POLICY_ENFORCEMENT_NETWORK_AND_PLATFORM_POLICY = 2;
@@ -199,9 +199,14 @@ message ImpExt {
     }
     optional PublisherBlocksEnforcement publisher_blocks_enforcement = 3;
 
+    // Deprecated. This will be removed in August 2022.
+    //
     // Indicates whether the policy, scan and publisher blocks level
-    // combination is the default combination for this bidder.
-    optional bool is_default = 4;
+    // combination is the default combination for this bidder. Please use
+    // policy_enforcement and publisher_blocks_enforcement in
+    // CreativeEnforcementSettings to learn which creative policy and
+    // publisher blocks apply to the request.
+    optional bool is_default = 4 [deprecated = true];
   }
 
   optional CreativeEnforcementSettings creative_enforcement_settings = 15;
@@ -271,6 +276,7 @@ message AppExt {
     optional Version adapter_version = 3;
   }
   repeated InstalledSdk installed_sdk = 1;
+
 }
 
 extend com.google.openrtb.BidRequest.App {
@@ -297,6 +303,16 @@ message BidExt {
 
   // [AdX: BidResponse.Ad.ad_choices_destination_url]
   optional string ad_choices_destination_url = 2;
+
+  // The URLs to call when the user clicks on the ad. Currently supported only
+  // for native ads and Programmatic Guaranteed deals with publisher-
+  // managed creatives. In the publisher managed case, these click trackers
+  // will be sent to the bidder server to server. In all other cases, these
+  // will be sent from the user's device. For more information on
+  // publisher-managed creatives, see
+  // https://support.google.com/admanager/answer/9243220.
+  // [AdX: BidResponse.Ad.click_tracking_urls]
+  repeated string click_tracking_urls = 22;
 
   // This field is deprecated due to being unused.
   // [AdX: BidResponse.Ad.bidder_name]
@@ -346,6 +362,15 @@ message BidExt {
         // The VAST document used to render custom SDK-rendered ad. This
         // document should conform to the VAST 2.0 or 3.0 standard.
         string video_vast_xml = 4;
+
+        // The content of a native ad. Native ads consist of multiple building
+        // blocks (such as image and text), which are rendered by the buyer SDK.
+        // This field is only required for creative scanning. The assets you
+        // include don't need to match assets specified in a native request
+        // object (if any) in the bid request. NativeResponse.assets.id is
+        // optional and doesn't need to match an asset on the native request
+        // object. NativeResponse.assets.img.type is required.
+        com.google.openrtb.NativeResponse native_response = 5;
       }
 
       // The final landing pages of the SDK-rendered ad.
@@ -411,9 +436,6 @@ message BidExt {
   // duration (represented by time_unit and time_range) then impressions counted
   // against the old frequency cap will not count against the new one and vice
   // versa.
-  //
-  // To enable frequency capping for your account, please contact your account
-  // manager.
   message FrequencyCap {
     // An ID that can represent a bidder's use-case for frequency capping; for
     // example, it could represent their campaign, ad, line item, etc. It should
@@ -672,6 +694,7 @@ message SiteExt {
   // be provided.  This decision is made by the publisher, see
   // https://support.google.com/admanager/answer/4584891#urls for context.
   optional bool is_semi_transparent_request = 3;
+
 }
 
 extend com.google.openrtb.BidRequest.Site {
@@ -692,26 +715,6 @@ message BidRequestExt {
     // technical documentation for a list of ids.
     optional int32 creative_status_code = 2;
 
-
-    // Experimental feature; may be subject to change. See
-    // https://developers.google.com/authorized-buyers/rtb/fledge and
-    // https://developers.google.com/authorized-buyers/rtb/turtledove
-    // for more information about the FLEDGE and TURTLEDOVE simulations for RTB.
-    //
-    // An optional string for debugging a bidding function.
-    // This is the string that can be returned by the bidding function during
-    // invocation. This debug string is limited to a maximum size of 200 bytes
-    // of data.
-    optional string bidding_function_debug_string = 10;
-
-    // Experimental feature; may be subject to change. For more information
-    // about the TURTLEDOVE and FLEDGE simulations respectively, see:
-    // https://developers.google.com/authorized-buyers/rtb/turtledove,
-    // https://developers.google.com/authorized-buyers/rtb/fledge
-    //
-    // The estimated time it took for the bidding function specified by the
-    // bidder to run for on-device auctions simulated server-side.
-    optional .google.protobuf.Duration bidding_function_runtime = 11;
 
     // If the bid won the auction, this is the price paid in your account
     // currency.  If the bid participated in the auction but was out-bid, this
@@ -815,6 +818,14 @@ message BidRequestExt {
     }
     repeated NonPersonalizedAdsReason non_personalized_ads_reason = 6
         [packed = true];
+
+    // True if publisher grants the permission to allow the bidder to use
+    // user visitation information from the publisher's site to create
+    // interest categories that can be used to serve ads based on those
+    // categories. To use this data to create interest categories, a bidder must
+    // also win a given impression.
+    // https://support.google.com/admanager/answer/11956152
+    optional bool allow_user_data_collection = 7;
   }
 
   optional PrivacyTreatments privacy_treatments = 5;
@@ -831,7 +842,7 @@ message UserExt {
     // publisher has specified to Google that its EEA users have given legally
     // valid consent to: 1) the use of cookies or other local storage where
     // legally required; and 2) the collection, sharing, and use of personal
-    // data for personalization of ads by an ATP in accordance with Googleâ€™s EU
+    // data for personalization of ads by an ATP in accordance with Google's EU
     // User Consent Policy.
     //
     // If a publisher is using the IAB Transparency and Consent Framework (TCF)
@@ -848,10 +859,10 @@ message UserExt {
     // Google Ad Tech Providers (ATPs). These ATPs are not registered with IAB
     // TCF v2, but publishers or their Consent Management Providers (CMPs) have
     // ensured that certain disclosures are given to, and consents are obtained
-    // from, end users, as required by Googleâ€™s EU User Consent Policy. This
+    // from, end users, as required by Google's EU User Consent Policy. This
     // field is only populated with the use of CMPs that are integrated with IAB
     // TCF v2. Such CMPs use the raw Additional Consent string to indicate
-    // vendors that are not registered with IAB, and communicate end usersâ€™ CMP
+    // vendors that are not registered with IAB, and communicate end users' CMP
     // choices to those vendors. The consented_providers field contains the set
     // of vendors that mirrors the one represented by the additional_consent
     // field, which is in the raw form. Vendors or any other third-party service
@@ -881,44 +892,6 @@ message UserExt {
   // https://vendor-list.consensu.org/v2/vendor-list.json for details about the
   // vendors listed in the consent string.
   optional string consent = 2;
-
-  message Floc {
-    // The value of a cohort ID â€“ a string identifier that is common to a large
-    // cohort of users with similar browsing habits.
-    //
-    // Not currently populated.
-    optional string id = 1;
-
-    // The type of the FLoC. See
-    // https://github.com/google/ads-privacy/blob/master/proposals/FLoC/FLOC-Whitepaper-Google.pdf.
-    enum FlocType {
-      // Default value that should not be used.
-      FLOC_TYPE_UNKNOWN = 0;
-      // FLoC simulated using affinity hierarchical clustering with centroids
-      // and feature extraction based on Topic categories as described in the
-      // whitepaper.
-      SIMULATED_AFFINITY_CLUSTERING_CENTROID_VERTICAL = 2;
-      // FLoC simulated using SortingLSH clustering algorithm and Domain One-hot
-      // encoding feature extraction as described in the whitepaper.
-      SIMULATED_SIMHASH_SORTING_LSH_DOMAIN_ONE_HOT = 3;
-      // FLoC simulated using a k Random Centers locality-sensitive hash
-      // function as described in
-      // https://github.com/google/ads-privacy/blob/master/proposals/FLoC/k-random-centers.md
-      // with Domain TF-IDF feature extraction as described in the whitepaper.
-      KCENTER_DOM_FILTERED_TFDIF = 4;
-    }
-    optional FlocType type = 2;
-  }
-  // Cohort ID that is common to a large cohort of users with similar
-  // browsing habits. Currently the cohort ID is simulated by the exchange
-  // (as opposed to by the browser). When simulated
-  // cohort ID is provided, traditional pseudonymous cookie-based user
-  // identifiers or device advertising identifiers would not be populated.
-  // Experimental feature; may be subject to change. See
-  // https://github.com/WICG/floc for more background on FLoC.
-  //
-  // FLoC cohort information is not currently populated.
-  optional Floc floc = 3;
 
   // Encrypted data to be passed to a buyer by the publisher.
   message ExtendedId {
@@ -952,33 +925,51 @@ message DeviceExt {
   // or related purposes. This field is populated with web-safe base64 alphabet.
   optional string session_id = 1;
 
-  // User Agent information. This will be populated with information about the
-  // user agent, extracted from the User-Agent header or from Sec-CH-UA headers
-  // (https://github.com/WICG/ua-client-hints).
+  // Structured user agent information, which can be used when a client
+  // supports User-Agent Client Hints: https://wicg.github.io/ua-client-hints/
+  //
+  // Note: When available, fields are sourced from Client Hints HTTP headers
+  // or equivalent JavaScript accessors from the NavigatorUAData interface.
+  // For agents that have no support for User-Agent Client Hints, an exchange
+  // can also extract information from the parsed User-Agent header, so this
+  // object can always be used as the source of the user agent information.
   message UserAgent {
-    // A tuple of (brand, version) for the browser or platform.
+    // Identifies a device's browser or similar software component, and the
+    // user agent's execution platform or operating system.
     message BrandVersion {
-      // Brand identifier, e.g. "Chrome" or "Windows".
+      // A brand identifier, for example, "Chrome" or "Windows". The value may
+      // be sourced from the User-Agent Client Hints headers, representing
+      // either the user agent brand (from the Sec-CH-UA-Full-Version header)
+      // or the platform brand (from the Sec-CH-UA-Platform header).
       optional string brand = 1;
-      // Version, split in components if needed, e.g. {"85", "1"} = v85.1.
+      // A sequence of version components, in descending hierarchical order
+      // (major, minor, micro, ...).
       repeated string version = 2;
     }
-    // Identifies the browser. Prefer using the new field: browsers.
-    optional BrandVersion browser = 1;
-    // Identifies the browser.
+
+    // Identifies the browser. Use the new field browsers.
+    optional BrandVersion DEPRECATED_browser = 1 [deprecated = true];
+    // Each BrandVersion object identifies a browser or similar software
+    // component. Exchanges should send brands and versions derived from
+    // the Sec-CH-UA-Full-Version-List header.
     repeated BrandVersion browsers = 8;
-    // Identifies the platform.
+    // Identifies the user agent's execution platform / OS. Exchanges should
+    // send a brand derived from the Sec-CH-UA-Platform header, and version
+    // derived from the Sec-CH-UAPlatform-Version header.
     optional BrandVersion platform = 2;
-    // True if the agent prefers "mobile-optimized" content. Refer to the
-    // BidRequest.device field for specific information about the device, which
-    // may or may not be consistent with this field (for example, a smartphone's
-    // browser can be requesting "Desktop site").
+    // True if the agent prefers a "mobile" version of the content if
+    // available, i.e. optimized for small screens or touch input. False if
+    // the agent prefers the "desktop" or "full" content. Exchanges should
+    // derive this value from the Sec-CH-UAMobile header.
     optional bool mobile = 3;
-    // Device architecture, e.g. "x86" or "arm".
+    // Device's major binary architecture, e.g. "x86" or "arm". Exchanges
+    // should retrieve this value from the Sec-CH-UA-Arch header.
     optional string architecture = 4;
-    // Device's bitness, e.g. "64" for 64-bit architecture.
+    // Device's bitness, e.g. "64" for 64-bit architecture. Exchanges should
+    // retrieve this value from the Sec-CH-UA-Bitness header.
     optional string bitness = 9;
-    // Device model.
+    // Device model. Exchanges should retrieve this value from the
+    // Sec-CH-UAModel header.
     optional string model = 5;
   }
 
@@ -1135,7 +1126,7 @@ message SourceExt {
       // the advertising system. This must contain the same value used in
       // transactions (i.e. OpenRTB bid requests) in the field specified by
       // the SSP/exchange. Typically, in OpenRTB, this is publisher.id.
-      // For OpenDirect it is typically the publisherâ€™s organization ID.
+      // For OpenDirect it is typically the publisher's organization ID.
       // Should be limited to 64 characters in length.
       optional string sid = 2;
 
@@ -1144,13 +1135,13 @@ message SourceExt {
 
       // The name of the company (the legal entity) that is paid for inventory
       // transacted under the given seller_id. This value is optional and
-      // should NOT be included if it exists in the advertising systemâ€™s
+      // should NOT be included if it exists in the advertising system's
       // sellers.json file.
       optional string name = 4;
 
       // The business domain name of the entity represented by this node.
       // This value is optional and should NOT be included if it exists in
-      // the advertising systemâ€™s sellers.json file.
+      // the advertising system's sellers.json file.
       optional string domain = 5;
 
       // Indicates whether this node will be involved in the flow of payment
@@ -1176,8 +1167,8 @@ message SourceExt {
     repeated SupplyChainNode nodes = 2;
 
     // Version of the supply chain specification in use, in the format of
-    // â€œmajor.minorâ€. For example, for version 1.0 of the spec,
-    // use the string â€œ1.0â€.
+    // "major.minor". For example, for version 1.0 of the spec,
+    // use the string "1.0".
     optional string ver = 3;
   }
   optional SupplyChain schain = 3;
