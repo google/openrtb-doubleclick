@@ -1,5 +1,5 @@
-// Protocol version: v.235
-// Copyright 2021 Google Inc. All Rights Reserved.
+// Protocol version: v.242
+// Copyright 2022 Google Inc. All Rights Reserved.
 
 syntax = "proto2";
 package com.google.protos.adx;
@@ -75,9 +75,7 @@ message BidRequest {
   // request. Certain data may be redacted or replaced.
   optional string user_agent = 6;
 
-  // Privacy treatments. Some fields in the bid request can be coarsened or
-  // redacted in order to protect user privacy. This message provides
-  // information about privacy treatments that apply to an ad opportunity
+  // Information about privacy treatments that apply to an ad opportunity
   // offered via this request.
   message PrivacyTreatments {
 
@@ -97,78 +95,71 @@ message BidRequest {
     }
     repeated NonPersonalizedAdsReason non_personalized_ads_reason = 6
         [packed = true];
+
+    // True if publisher grants the permission to allow the bidder to use
+    // user visitation information from the publisher's site to create
+    // interest categories that can be used to serve ads based on those
+    // categories. To use this data to create interest categories, a bidder must
+    // also win a given impression.
+    // https://support.google.com/admanager/answer/11956152
+    optional bool allow_user_data_collection = 7;
   }
   optional PrivacyTreatments privacy_treatments = 71;
 
-  message Floc {
-    // The value of a cohort ID â€“ a string identifier that is common to a large
-    // cohort of users with similar browsing habits.
-    //
-    // Not currently populated.
-    optional string id = 1;
 
-    // The type of the FLoC. See
-    // https://github.com/google/ads-privacy/blob/master/proposals/FLoC/FLOC-Whitepaper-Google.pdf.
-    enum FlocType {
-      // Default value that should not be used.
-      FLOC_TYPE_UNKNOWN = 0;
-      // FLoC simulated using affinity hierarchical clustering with centroids
-      // and feature extraction based on Topic categories as described in the
-      // whitepaper.
-      SIMULATED_AFFINITY_CLUSTERING_CENTROID_VERTICAL = 2;
-      // FLoC simulated using SortingLSH clustering algorithm and Domain One-hot
-      // encoding feature extraction as described in the whitepaper.
-      SIMULATED_SIMHASH_SORTING_LSH_DOMAIN_ONE_HOT = 3;
-      // FLoC simulated using a k Random Centers locality-sensitive hash
-      // function as described in
-      // https://github.com/google/ads-privacy/blob/master/proposals/FLoC/k-random-centers.md
-      // with Domain TF-IDF feature extraction as described in the whitepaper.
-      KCENTER_DOM_FILTERED_TFDIF = 4;
-    }
-    optional FlocType type = 2;
-  }
-  // Cohort ID that is common to a large cohort of users with similar
-  // browsing habits. Currently the cohort ID is simulated by the exchange
-  // (as opposed to by the browser). When simulated
-  // cohort ID is provided, traditional pseudonymous cookie-based user
-  // identifiers or device advertising identifiers would not be populated.
-  // Experimental feature; may be subject to change. See
-  // https://github.com/WICG/floc for more background on FLoC.
+  // Structured user agent information, which can be used when a client
+  // supports User-Agent Client Hints: https://wicg.github.io/ua-client-hints/
   //
-  // FLoC cohort information is not currently populated.
-  optional Floc floc = 68;
-
-  // User Agent information. This will be populated with information about the
-  // user agent, extracted from the User-Agent header or from Sec-CH-UA headers
-  // (https://wicg.github.io/ua-client-hints/).
+  // Note: When available, fields are sourced from Client Hints HTTP headers
+  // or equivalent JavaScript accessors from the NavigatorUAData interface.
+  // For agents that have no support for User-Agent Client Hints, an exchange
+  // can also extract information from the parsed User-Agent header, so this
+  // object can always be used as the source of the user agent information.
   message UserAgent {
-    // A tuple of (brand, version) for the user agent or platform.
+    // Identifies a device's browser or similar software component, and the
+    // user agent's execution platform or operating system.
     message BrandVersion {
-      // Brand identifier, e.g., "Chrome" or "Windows".
+      // A brand identifier, for example, "Chrome" or "Windows". The value may
+      // be sourced from the User-Agent Client Hints headers, representing
+      // either the user agent brand (from the Sec-CH-UA-Full-Version header)
+      // or the platform brand (from the Sec-CH-UA-Platform header).
       optional string brand = 1;
-      // Version, split in components if needed, e.g., {"85", "1"} = v85.1.
+      // A sequence of version components, in descending hierarchical order
+      // (major, minor, micro, ...).
       repeated string version = 2;
     }
-    // Identifies the browser. Prefer using the new field: browsers.
-    optional BrandVersion browser = 1;
-    // Identifies the browser.
+
+    // Identifies the browser. Use the new field browsers.
+    optional BrandVersion DEPRECATED_browser = 1 [deprecated = true];
+    // Each BrandVersion object identifies a browser or similar software
+    // component. Exchanges should send brands and versions derived from
+    // the Sec-CH-UA-Full-Version-List header.
     repeated BrandVersion browsers = 8;
-    // Identifies the platform.
+    // Identifies the user agent's execution platform / OS. Exchanges should
+    // send a brand derived from the Sec-CH-UA-Platform header, and version
+    // derived from the Sec-CH-UAPlatform-Version header.
     optional BrandVersion platform = 2;
-    // True if the agent prefers "mobile-optimized" content. Refer to the
-    // BidRequest.device field for specific information about the device, which
-    // may or may not be consistent with this field (for example, a smartphone's
-    // browser can be requesting "Desktop site").
+    // True if the agent prefers a "mobile" version of the content if
+    // available, i.e. optimized for small screens or touch input. False if
+    // the agent prefers the "desktop" or "full" content. Exchanges should
+    // derive this value from the Sec-CH-UAMobile header.
     optional bool mobile = 3;
-    // Device architecture, e.g. "x86" or "arm".
+    // Device's major binary architecture, e.g. "x86" or "arm". Exchanges
+    // should retrieve this value from the Sec-CH-UA-Arch header.
     optional string architecture = 4;
-    // Device's bitness, e.g. "64" for 64-bit architecture.
+    // Device's bitness, e.g. "64" for 64-bit architecture. Exchanges should
+    // retrieve this value from the Sec-CH-UA-Bitness header.
     optional string bitness = 9;
-    // Device model.
+    // Device model. Exchanges should retrieve this value from the
+    // Sec-CH-UAModel header.
     optional string model = 5;
+
   }
 
-  // User Agent information.
+  // Structured user agent information. If both BidRequest.ua and
+  // BidRequest.sua are present, BidRequest.sua should be considered the
+  // more accurate representation of the device attributes. This is because
+  // BidRequest.ua may contain a frozen or reduced user agent string.
   optional UserAgent user_agent_data = 63;
 
   // The billing address country of the publisher. This may be different from
@@ -604,7 +595,7 @@ message BidRequest {
       // and the SDK version.
       repeated string versions = 4;
 
-      // ID of publisher app in Appleâ€™s App Store.
+      // ID of publisher app in Apple's App Store.
       optional string sourceapp = 2;
 
       // SKAdNetworkIdentifier entries in the publisher app's Info.plist.
@@ -823,6 +814,7 @@ message BidRequest {
     // stream (0 = is not live, 1 = is live).
     //
     optional bool is_livestream = 18 [default = false];
+
   }
   optional Video video = 29;
 
@@ -920,7 +912,7 @@ message BidRequest {
       // publisher has specified to Google that its EEA users have given legally
       // valid consent to: 1) the use of cookies or other local storage where
       // legally required; and 2) the collection, sharing, and use of personal
-      // data for personalization of ads by an ATP in accordance with Googleâ€™s
+      // data for personalization of ads by an ATP in accordance with Google's
       // EU User Consent Policy.
       //
       // If a publisher is using the IAB Transparency and Consent Framework
@@ -952,11 +944,11 @@ message BidRequest {
       // Google Ad Tech Providers (ATPs). These ATPs are not registered with IAB
       // TCF v2, but publishers or their Consent Management Providers (CMPs)
       // have ensured that certain disclosures are given to, and consents are
-      // obtained from, end users, as required by Googleâ€™s EU User Consent
+      // obtained from, end users, as required by Google's EU User Consent
       // Policy. This field is only populated with the use of CMPs that are
       // integrated with IAB TCF v2. Such CMPs use the raw Additional Consent
       // string to indicate vendors that are not registered with IAB, and
-      // communicate end usersâ€™ CMP choices to those vendors. The
+      // communicate end users' CMP choices to those vendors. The
       // consented_providers field contains the set of vendors that mirrors the
       // one represented by the additional_consent_string field, which is in the
       // raw form. Vendors or any other third-party service providers must not
@@ -1202,13 +1194,13 @@ message BidRequest {
       enum PolicyEnforcement {
         POLICY_ENFORCEMENT_UNKNOWN = 0;
 
-        // Baseline policy for all ads serving through any of Googleâ€™s ads
+        // Baseline policy for all ads serving through any of Google's ads
         // platform products. Learn more at:
         // https://support.google.com/platformspolicy/answer/3013851.
         POLICY_ENFORCEMENT_PLATFORM_POLICY = 1;
 
-        // Policy for ads serving through Googleâ€™s ad network. This includes the
-        // baseline policy for all ads serving through any of Googleâ€™s ads
+        // Policy for ads serving through Google's ad network. This includes the
+        // baseline policy for all ads serving through any of Google's ads
         // platform products. Learn more at:
         // https://support.google.com/authorizedbuyers/answer/1325008.
         POLICY_ENFORCEMENT_NETWORK_AND_PLATFORM_POLICY = 2;
@@ -1240,9 +1232,14 @@ message BidRequest {
       }
       optional PublisherBlocksEnforcement publisher_blocks_enforcement = 3;
 
+      // Deprecated. This will be removed in August 2022.
+      //
       // Indicates whether the policy, scan and publisher blocks level
-      // combination is the default combination for this bidder.
-      optional bool is_default = 4;
+      // combination is the default combination for this bidder. Please use
+      // policy_enforcement and publisher_blocks_enforcement in
+      // CreativeEnforcementSettings to learn which creative policy and
+      // publisher blocks apply to the request.
+      optional bool is_default = 4 [deprecated = true];
     }
 
     optional CreativeEnforcementSettings creative_enforcement_settings = 58;
@@ -1443,20 +1440,18 @@ message BidRequest {
         IS_STICKY = 1;
       }
 
-      // Whether the request originated from an ad slot that scrolls along with
-      // the contents of the page vertically.
+      // Whether the ad slot is a sidebar that sticks on screen when user
+      // scrolls.
       optional Stickiness vertical_stickiness = 1
           [default = UNKNOWN_STICKINESS];
 
-      // Whether the request originated from an ad slot that scrolls along with
-      // the contents of the page horizontally, and is located at the top of the
-      // page.
+      // Whether the ad slot is a horizontal slot that sticks on the top of the
+      // screen when user scrolls.
       optional Stickiness top_horizontal_stickiness = 2
           [default = UNKNOWN_STICKINESS];
 
-      // Whether the request originated from an ad slot that scrolls along with
-      // the contents of the page horizontally, and is located at the bottom of
-      // the page.
+      // Whether the ad slot is a horizontal slot that sticks on the bottom of
+      // the screen when user scrolls.
       optional Stickiness bottom_horizontal_stickiness = 3
           [default = UNKNOWN_STICKINESS];
     }
@@ -1683,6 +1678,7 @@ message BidRequest {
     // Specifies where the ad auction runs.
     optional AuctionEnvironment auction_environment = 61
         [default = SERVER_SIDE_AUCTION];
+
   }
   repeated AdSlot adslot = 14;
 
@@ -1702,26 +1698,6 @@ message BidRequest {
     // technical documentation for a list of ids.
     optional int32 creative_status_code = 3;
 
-
-    // Experimental feature; may be subject to change. See
-    // https://github.com/google/ads-privacy/tree/master/experiments/turtledove-simulation
-    // and https://developers.google.com/authorized-buyers/rtb/turtledove
-    // for more information about the TURTLEDOVE simulation for RTB.
-    //
-    // The estimated time it took for the bidding function specified by the
-    // bidder to run for the TURTLEDOVE simulation.
-    optional .google.protobuf.Duration bidding_function_runtime = 12;
-
-    // Experimental feature; may be subject to change. See
-    // https://developers.google.com/authorized-buyers/rtb/fledge and
-    // https://developers.google.com/authorized-buyers/rtb/turtledove
-    // for more information about the FLEDGE and TURTLEDOVE simulations for RTB.
-    //
-    // An optional string for debugging a bidding function.
-    // This is the string that can be returned by the bidding function during
-    // invocation. This debug string is limited to a maximum of 200 bytes of
-    // data.
-    optional string bidding_function_debug_string = 13;
 
     // If the bid won the auction, this is the price paid in your account
     // currency. If the bid participated in the auction but was out-bid, this
@@ -1826,8 +1802,8 @@ message BidRequest {
     repeated SupplyChainNode nodes = 2;
 
     // Version of the supply chain specification in use, in the format of
-    // â€œmajor.minorâ€. For example, for version 1.0 of the spec, use the string
-    // â€œ1.0â€.
+    // "major.minor". For example, for version 1.0 of the spec, use the string
+    // "1.0".
     optional string version = 3;
   }
 
@@ -1980,17 +1956,21 @@ message BidResponse {
       // is not set, the first Ad.click_through_url is used.
       optional string click_link_url = 14;
 
+      // This field is deprecated in favor of the repeated click_tracking_urls
+      // field at the BidResponse.Ad level. It will be removed at the end of
+      // Q2 2022.
       // The URL to use for click tracking. The SDK pings click tracking url on
       // a background thread. When resolving the url, HTTP 30x redirects are
       // followed. The SDK ignores the contents of the response; this URL
       // has no effect on the landing page for the user.
-      // This field is planned to be deprecated and we are moving to the
-      // repeated click_tracking_urls field.
-      optional string click_tracking_url = 11;
+      optional string DEPRECATED_click_tracking_url = 11 [deprecated = true];
 
+      // This field is deprecated in favor of the click_tracking_urls
+      // field at the BidResponse.Ad level. It will be removed at the end of
+      // Q2 2022.
       // The URLs to use for click tracking. This will be used throughout the
       // serving stack and will incorporate any URL in click_tracking_url.
-      repeated string click_tracking_urls = 15;
+      repeated string DEPRECATED_click_tracking_urls = 15 [deprecated = true];
 
       // The price of the promoted app including the currency info.
       optional string price = 10;
@@ -2099,6 +2079,22 @@ message BidResponse {
       // by the sole billing ID in the bid request.
       optional int64 min_cpm_micros = 3;
 
+      // The currency in which max_cpm_micros and min_cpm_micros are given,
+      // using ISO-4217 alpha codes. This field will be required starting in Q4
+      // 2022. If this field is populated and differs from the bidding currency,
+      // the bid will be filtered. If this field is not populated, the currency
+      // will be assumed to be the bidding currency. The bidding currency is
+      // determined by:
+      // 1. The bidder-level currency, if configured in RTB account settings.
+      // 2. Otherwise, the currency of the buyer account indicated by the
+      // billing ID in the billing_id field of the bid response.
+      // 3. Otherwise, if billing_id is not populated in the bid response, the
+      // currency of the buyer account indicated by the sole billing ID in the
+      // bid request.
+      // The currency of the buyer account is set on account creation and can be
+      // checked by contacting a Technical Account Manager.
+      optional string currency = 15;
+
       // Billing id to attribute this impression to. The value must be in the
       // set of billing ids for this slot that were sent in the
       // BidRequest.AdSlot.matching_ad_data.billing_id. This must always be set
@@ -2144,9 +2140,6 @@ message BidResponse {
       // Experimental feature; may be subject to change. See
       // https://support.google.com/authorizedbuyers/answer/10890762 for more
       // information.
-      //
-      // To enable frequency capping for your account, please contact your
-      // account manager.
       //
       // Specifies frequency capping to be applied to the bid. Impressions for
       // each user are capped at the level specified by frequency_cap_id. A bid
@@ -2202,12 +2195,22 @@ message BidResponse {
       }
       repeated FrequencyCap frequency_cap = 16;
 
+
     }
     repeated AdSlot adslot = 3;
 
     // The URLs to call when the impression is rendered. This is supported for
     // all inventory types and all formats.
     repeated string impression_tracking_url = 19;
+
+    // The URLs to call when the user clicks on the ad. Currently supported only
+    // for native ads and Programmatic Guaranteed deals with publisher-
+    // managed creatives. In the publisher managed case, these click trackers
+    // will be sent to the bidder server to server. In all other cases, these
+    // will be sent from the user's device. For more information on
+    // publisher-managed creatives, see
+    // https://support.google.com/admanager/answer/9243220.
+    repeated string click_tracking_urls = 30;
 
     // Link to ad preferences page. This is only supported for native ads.
     // If present, a standard AdChoices icon is added to the native creative and
@@ -2265,6 +2268,11 @@ message BidResponse {
           // The VAST document used to render custom SDK-rendered ad. This
           // document should conform to the VAST 2.0 or 3.0 standard.
           string video_vast_xml = 5;
+
+          // The content of a native ad. Native ads consist of multiple building
+          // blocks (such as image and text), which are rendered by the buyer
+          // SDK.
+          NativeAd native_ad = 6;
         }
 
         // The final landing pages of the SDK-rendered ad.
